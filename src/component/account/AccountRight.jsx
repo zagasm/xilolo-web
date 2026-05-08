@@ -157,11 +157,11 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       label: "Blocked Organizers / Users",
       to: "/account/blocked",
     },
-    // {
-    //   icon: ShieldCheck,
-    //   label: "Two-Factor Authentication",
-    //   to: "/account/2fa",
-    // },
+    {
+      icon: ShieldCheck,
+      label: "Two-Factor Authentication",
+      to: "/account/security",
+    },
   ];
   const events = [{ icon: User2, label: "Mentions Tag", to: "/mentions" }];
   const profile = [

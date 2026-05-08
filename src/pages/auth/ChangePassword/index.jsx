@@ -6,7 +6,7 @@ import axios from "axios";
 import { showSuccess, showError } from "../../../component/ui/toast";
 import { useAuth } from "../AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
-import { getWebDeviceName } from "../../../lib/deviceName";
+import { getWebDevicePayload } from "../../../lib/deviceName";
 
 export function ChangePassword({ ResetPasswordVerificationData }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -70,7 +70,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         token:reset_token.trim(),
         password:password.trim(),
          password_confirmation:confirmPassword.trim(),
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       };
 
       const response = await axios.post(

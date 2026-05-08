@@ -86,6 +86,8 @@ import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
 import WalletHub from "./pages/Account/WalletHub.jsx";
 import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
 import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage.jsx";
+import SecurityPage from "./pages/Account/SecurityPage.jsx";
+import TwoFactorSecurityPrompt from "./component/auth/TwoFactorSecurityPrompt.jsx";
 
 const MainLayout = () => (
   <>
@@ -262,6 +264,7 @@ export function App() {
       <ToastHost />
       <ToastContainer />
       <ForcedLogoutModalHost />
+      <TwoFactorSecurityPrompt />
       <NetworkStatus />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
@@ -354,6 +357,7 @@ export function App() {
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
               <Route path="blocked" element={<BlockedUsersPage />} />
+              <Route path="security" element={<SecurityPage />} />
               <Route path="wallet" element={<WalletPage />} />
               <Route path="bank-accounts" element={<BankAccountsPage />} />
               <Route path="crypto-wallet" element={<CryptoWalletsPage />} />

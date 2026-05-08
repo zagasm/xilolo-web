@@ -145,14 +145,14 @@ export default function TermsOfServicePage() {
                 <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
                   <li>
                     <span>
-                      <strong>Minimum age:</strong> You must be at least 18
-                      years old (or the age of majority in your jurisdiction,
-                      whichever is higher) to create an account, use the
-                      Service, or engage in monetized activities. Minors under
-                      18 may not register or participate without verifiable
-                      parental or guardian consent and supervision, in line with
-                      applicable laws such as COPPA or Nigeria’s Child Rights
-                      Act 2003.
+                      <strong>Minimum age:</strong> You must be at least 13
+                      years old to create an account or use the Service. Users
+                      under the age of majority in their jurisdiction may need
+                      verifiable parental or guardian consent and supervision,
+                      in line with applicable laws such as COPPA or Nigeria’s
+                      Child Rights Act 2003. Monetized activities may remain
+                      subject to additional age, identity, payment, and legal
+                      capacity checks.
                     </span>
                   </li>
                   <li>
@@ -282,6 +282,15 @@ export default function TermsOfServicePage() {
                       , including bans on adult sexual content, pornography,
                       hate speech, unlawful activity, and other prohibited
                       material.
+                    </span>
+                  </li>
+                  <li>
+                    <span>
+                      <strong>No adult content:</strong> Xilolo does not
+                      support adult content. You may not upload, stream,
+                      promote, sell, or otherwise distribute pornography,
+                      sexually explicit material, or services intended for adult
+                      entertainment through the Service.
                     </span>
                   </li>
                   <li>

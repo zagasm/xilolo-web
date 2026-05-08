@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { SigninWithCode } from "./SignCode";
 import { showError, showSuccess } from "../../../component/ui/toast";
@@ -15,9 +14,10 @@ import {
 import defaultAvatar from "../../../assets/avater_pix.avif";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { isAppleAuthConfigured } from "../../../lib/appleAuth";
-import { getWebDeviceName } from "../../../lib/deviceName";
+import { getWebDevicePayload } from "../../../lib/deviceName";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
+import TwoFactorLoginForm from "../components/TwoFactorLoginForm.jsx";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -51,6 +51,7 @@ export function Signin() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [emailExistsError, setEmailExistsError] = useState("");
   const [checkedEmail, setCheckedEmail] = useState("");
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState(null);
   const emailCheckRequestId = useRef(0);
   const navigate = useNavigate();
   const location = useLocation();
@@ -318,6 +319,29 @@ export function Signin() {
     resetToManualLogin();
   };
 
+  const finishLogin = (data) => {
+    if (!data?.token || !data?.user) {
+      throw new Error("Invalid login response.");
+    }
+
+    login({
+      user: data.user,
+      organiser: data.organiser || data.organizer,
+      token: data.token,
+      security: data.security,
+    });
+  };
+
+  const handleTwoFactorRequired = (data) => {
+    setTwoFactorChallenge(data);
+    showSuccess(data?.message || "Two-factor authentication required.");
+  };
+
+  const handleTwoFactorVerified = (data) => {
+    finishLogin(data);
+    navigate(redirectPath, { replace: true });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validatePassword()) return;
@@ -328,20 +352,19 @@ export function Signin() {
       const payload = {
         input: formData.email,
         password: formData.password,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       };
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/login`,
-        payload
-      );
+      const response = await api.post("/api/v1/login", payload);
 
       const data = response.data;
+      if (response.status === 202 || data?.two_factor_required) {
+        handleTwoFactorRequired(data);
+        return;
+      }
+
       if (data.token) {
-        login({
-          user: data.user,
-          token: data.token,
-        });
+        finishLogin(data);
         showSuccess(data.message || "Login successful!");
         navigate(redirectPath, { replace: true });
       } else {
@@ -375,17 +398,15 @@ export function Signin() {
     try {
       const { data } = await api.post("/api/v1/google/login", {
         id_token: idToken,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       });
 
-      if (!data?.token || !data?.user) {
-        throw new Error("Invalid Google login response.");
+      if (data?.two_factor_required) {
+        handleTwoFactorRequired(data);
+        return;
       }
 
-      login({
-        user: data.user,
-        token: data.token,
-      });
+      finishLogin(data);
       showSuccess(data.message || "Google login successful.");
       navigate(redirectPath, { replace: true });
     } catch (err) {
@@ -417,17 +438,15 @@ export function Signin() {
     try {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       });
 
-      if (!data?.token || !data?.user) {
-        throw new Error("Invalid Apple login response.");
+      if (data?.two_factor_required) {
+        handleTwoFactorRequired(data);
+        return;
       }
 
-      login({
-        user: data.user,
-        token: data.token,
-      });
+      finishLogin(data);
       showSuccess(data.message || "Apple login successful.");
       navigate(redirectPath, { replace: true });
     } catch (err) {
@@ -447,6 +466,16 @@ export function Signin() {
         CodeSource={verificationSource}
         loginMethod="email"
         formData={formData}
+      />
+    );
+  }
+
+  if (twoFactorChallenge) {
+    return (
+      <TwoFactorLoginForm
+        challenge={twoFactorChallenge}
+        onVerified={handleTwoFactorVerified}
+        onCancel={() => setTwoFactorChallenge(null)}
       />
     );
   }

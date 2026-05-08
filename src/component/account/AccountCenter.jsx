@@ -8,6 +8,7 @@ import {
   PiMoney,
   PiPower,
   PiProhibitInset,
+  PiShieldCheck,
   PiShieldSlash,
   PiWallet,
 } from "react-icons/pi";
@@ -133,6 +134,11 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
   };
 
   const securityItems = [
+    {
+      iconComponent: PiShieldCheck,
+      label: "Two-Factor Authentication",
+      to: "/account/security",
+    },
     {
       iconComponent: PiShieldSlash,
       label: "Blocked Organizers / Users",
