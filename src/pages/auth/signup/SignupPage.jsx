@@ -12,9 +12,10 @@ import {
   isValidEmailAddress,
   normalizeEmailInput,
 } from "../../../lib/emailValidation";
-import { getWebDeviceName } from "../../../lib/deviceName";
+import { getWebDevicePayload } from "../../../lib/deviceName";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
+import TwoFactorLoginForm from "../components/TwoFactorLoginForm.jsx";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -28,6 +29,7 @@ export function SignUp() {
   const [isAppleLoading, setIsAppleLoading] = useState(false);
   const [emailExistsError, setEmailExistsError] = useState("");
   const [checkedEmail, setCheckedEmail] = useState("");
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState(null);
   const emailCheckRequestId = useRef(0);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
@@ -193,7 +195,7 @@ export function SignUp() {
         last_name: formData.last_name,
         email: normalizedEmail,
         password: formData.password,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       };
 
       const response = await axios.post(
@@ -234,7 +236,7 @@ export function SignUp() {
     try {
       const { data } = await api.post("/api/v1/google/signup", {
         id_token: idToken,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       });
 
       if (!data?.token || !data?.user) {
@@ -276,8 +278,14 @@ export function SignUp() {
     try {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
-        device_name: getWebDeviceName(),
+        ...getWebDevicePayload(),
       });
+
+      if (data?.two_factor_required) {
+        setTwoFactorChallenge(data);
+        showSuccess(data?.message || "Two-factor authentication required.");
+        return;
+      }
 
       if (!data?.token || !data?.user) {
         throw new Error("Invalid Apple login response.");
@@ -303,6 +311,24 @@ export function SignUp() {
       setIsAppleLoading(false);
     }
   };
+
+  if (twoFactorChallenge) {
+    return (
+      <TwoFactorLoginForm
+        challenge={twoFactorChallenge}
+        onVerified={(data) => {
+          login({
+            token: data.token,
+            user: data.user,
+            organiser: data.organiser || data.organizer,
+            security: data.security,
+          });
+          navigate("/feed", { replace: true });
+        }}
+        onCancel={() => setTwoFactorChallenge(null)}
+      />
+    );
+  }
 
   const isFormValid = () => {
     return (

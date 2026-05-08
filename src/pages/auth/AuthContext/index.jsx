@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [organiser, setOrganiser] = useState(null);
   const [token, setToken] = useState(null);
+  const [security, setSecurity] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   /** persist helpers */
@@ -36,10 +37,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   /** Login (full replace) */
-  const login = ({ user: u, token: t, organiser: o }) => {
+  const login = ({ user: u, token: t, organiser: o, security: s }) => {
     setUser(u);
     setOrganiser(o ?? u?.organiser ?? u?.organizer ?? null);
     setToken(t);
+    setSecurity(s ?? null);
     persist(u, t, o ?? u?.organiser ?? u?.organizer ?? null);
     if (u) rememberAccount(u, t);
   };
@@ -75,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   /** Update only token and/or user (used after password change, profile edits, etc.) */
-  const setAuth = ({ user: u, token: t, organiser: o }) => {
+  const setAuth = ({ user: u, token: t, organiser: o, security: s }) => {
     if (typeof t !== "undefined") {
       setToken(t);
       if (t) localStorage.setItem("token", t);
@@ -92,12 +94,16 @@ export const AuthProvider = ({ children }) => {
       if (o) localStorage.setItem("organiserdata", JSON.stringify(o));
       else localStorage.removeItem("organiserdata");
     }
+    if (typeof s !== "undefined") {
+      setSecurity(s);
+    }
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     setOrganiser(null);
+    setSecurity(null);
     clearActiveAuthStorage();
   };
 
@@ -110,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         user,
         organiser,
         token,
+        security,
         isAuthenticated,
         isLoading,
         login,
