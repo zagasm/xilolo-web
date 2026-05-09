@@ -55,6 +55,7 @@ function getEventFromStreamResponse(payload) {
   if (payload?.stream) {
     return {
       stream: payload.stream,
+      credentials: payload.credentials || null,
       stream_status: payload.stream?.status || null,
       status: payload.stream?.status || null,
     };
@@ -74,6 +75,7 @@ function mergeEventData(baseEvent, streamEvent) {
       baseEvent?.poster ||
       [],
     stream: streamEvent?.stream || baseEvent?.stream || null,
+    credentials: streamEvent?.credentials || baseEvent?.credentials || null,
     stream_status:
       streamEvent?.stream_status ||
       baseEvent?.stream_status ||
@@ -249,7 +251,6 @@ export default function EventStreamControlPage() {
   const [watchModalOpen, setWatchModalOpen] = useState(false);
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
-  const [streamStartedFromPage, setStreamStartedFromPage] = useState(false);
   const copyTimeoutRef = useRef(null);
 
   const loadEventDetails = useCallback(
@@ -318,6 +319,8 @@ export default function EventStreamControlPage() {
   }, []);
 
   const stream = eventData?.stream || {};
+  const credentials = eventData?.credentials || {};
+  const rtmpCredentials = credentials?.rtmp || {};
   const streamingApi = stream?.streaming_api || {};
 
   const status = String(eventData?.status || "upcoming").toLowerCase();
@@ -327,16 +330,19 @@ export default function EventStreamControlPage() {
   const hasStartedStream = Boolean(
     stream?.id ||
     stream?.stream_key ||
+    rtmpCredentials?.stream_key ||
+    rtmpCredentials?.url ||
     streamingApi?.streamKey ||
     stream?.rtmp_url ||
     streamingApi?.rtmp_server,
   );
 
-  const shouldShowObsDetails = streamStartedFromPage;
+  const shouldShowObsDetails = hasStartedStream && !isEnded;
   const rtmpServer = shouldShowObsDetails ? RTMP_SERVER_URL : "";
   const rtmpKey =
     shouldShowObsDetails
-      ? streamingApi?.rtmp_key ||
+      ? rtmpCredentials?.stream_key ||
+        streamingApi?.rtmp_key ||
         streamingApi?.streamKey ||
         stream?.stream_key ||
         ""
@@ -464,7 +470,6 @@ export default function EventStreamControlPage() {
       loadingText: "Generating stream credentials…",
       successText: "Stream details ready. Configure OBS, then go live.",
     });
-    setStreamStartedFromPage(true);
   };
 
   const handleGoLive = async () => {

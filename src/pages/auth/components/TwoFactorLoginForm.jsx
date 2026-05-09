@@ -145,6 +145,10 @@ export default function TwoFactorLoginForm({
         </label>
 
         <button
+          style={{
+            borderRadius: "8px",
+            // marginTop: "0.75rem",
+          }}
           type="submit"
           disabled={!isComplete || isSubmitting}
           className="tw:w-full tw:rounded-lg tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:bg-gray-300"
@@ -153,6 +157,10 @@ export default function TwoFactorLoginForm({
         </button>
 
         <button
+          style={{
+            borderRadius: "8px",
+            marginTop: "0.75rem",
+          }}
           type="button"
           onClick={onCancel}
           className="tw:mt-3 tw:w-full tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900"
