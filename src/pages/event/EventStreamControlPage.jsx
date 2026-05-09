@@ -26,6 +26,7 @@ import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDo
 import { formatEventDateTime } from "../../utils/ui";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
+const RTMP_SERVER_URL = "rtmp://173.199.93.204/live";
 
 function getErrorMessage(error, fallback = "Something went wrong.") {
   return (
@@ -248,6 +249,7 @@ export default function EventStreamControlPage() {
   const [watchModalOpen, setWatchModalOpen] = useState(false);
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
+  const [streamStartedFromPage, setStreamStartedFromPage] = useState(false);
   const copyTimeoutRef = useRef(null);
 
   const loadEventDetails = useCallback(
@@ -330,14 +332,15 @@ export default function EventStreamControlPage() {
     streamingApi?.rtmp_server,
   );
 
-  const rtmpServer =
-    streamingApi?.rtmp_server ||
-    (stream?.rtmp_url ? stream.rtmp_url.replace(/\/[^/]+$/, "") : "");
+  const shouldShowObsDetails = streamStartedFromPage;
+  const rtmpServer = shouldShowObsDetails ? RTMP_SERVER_URL : "";
   const rtmpKey =
-    streamingApi?.rtmp_key ||
-    streamingApi?.streamKey ||
-    stream?.stream_key ||
-    "";
+    shouldShowObsDetails
+      ? streamingApi?.rtmp_key ||
+        streamingApi?.streamKey ||
+        stream?.stream_key ||
+        ""
+      : "";
   const isPreLiveStage =
     hasStartedStream && !isEnded && stageOverride === "started";
   const showGoLive =
@@ -453,14 +456,16 @@ export default function EventStreamControlPage() {
     }
   };
 
-  const handleStart = () =>
-    runAction({
+  const handleStart = async () => {
+    await runAction({
       key: "start",
       request: () =>
         api.post(`/api/v1/events/${eventId}/streams/start`, {}, authHeaders(token)),
       loadingText: "Generating stream credentials…",
       successText: "Stream details ready. Configure OBS, then go live.",
     });
+    setStreamStartedFromPage(true);
+  };
 
   const handleGoLive = async () => {
     setStageOverride("live");
