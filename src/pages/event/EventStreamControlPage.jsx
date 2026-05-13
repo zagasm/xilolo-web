@@ -29,10 +29,25 @@ const cx = (...classes) => classes.filter(Boolean).join(" ");
 const RTMP_SERVER_URL = "rtmp://173.199.93.204/live";
 
 function getErrorMessage(error, fallback = "Something went wrong.") {
+  const code = getErrorCode(error);
+
+  if (code === "TICKET_PURCHASE_REQUIRED") {
+    return "At least one ticket must be purchased before this event can start streaming.";
+  }
+
   return (
     error?.response?.data?.message ||
     error?.message ||
     fallback
+  );
+}
+
+function getErrorCode(error) {
+  return (
+    error?.response?.data?.code ||
+    error?.response?.data?.error_code ||
+    error?.code ||
+    ""
   );
 }
 
@@ -123,6 +138,40 @@ function formatStartedAt(value) {
 
 function extractPoster(event) {
   return event?.poster?.find?.((item) => item?.type === "image")?.url || "";
+}
+
+function toFiniteNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : null;
+}
+
+function getTicketSalesCount(event) {
+  const candidates = [
+    event?.ticket_sales_count,
+    event?.tickets_sold_count,
+    event?.tickets_sold,
+    event?.ticketsSold,
+    event?.successful_payments_count,
+    event?.successfulPayments,
+    event?.paid_tickets_count,
+    event?.total_tickets_sold,
+    event?.sales?.tickets_sold,
+    event?.sales?.ticketsSold,
+    event?.ticket_sales?.count,
+    event?.ticket_sales?.tickets_sold,
+    event?.stats?.tickets_sold,
+    event?.stats?.ticket_sales_count,
+    event?.payments?.successful_count,
+  ];
+
+  for (const candidate of candidates) {
+    const parsed = toFiniteNumber(candidate);
+    if (parsed !== null) return parsed;
+  }
+
+  return null;
 }
 
 function getStatusTone(status) {
@@ -251,6 +300,7 @@ export default function EventStreamControlPage() {
   const [watchModalOpen, setWatchModalOpen] = useState(false);
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
+  const [closeTicketSalesOnGoLive, setCloseTicketSalesOnGoLive] = useState(false);
   const copyTimeoutRef = useRef(null);
 
   const loadEventDetails = useCallback(
@@ -358,6 +408,13 @@ export default function EventStreamControlPage() {
     (isLive || isPaused || stageOverride === "live");
   const showEnd = hasStartedStream && !isEnded;
   const showWatch = hasStartedStream && !isEnded;
+  const ticketSalesCount = getTicketSalesCount(eventData);
+  const hasKnownTicketSalesCount = ticketSalesCount !== null;
+  const streamStartRequiresTicketPurchase =
+    hasKnownTicketSalesCount && ticketSalesCount <= 0;
+  const ticketSalesClosed = Boolean(eventData?.ticket_sales_closed);
+  const ticketGateMessage =
+    "At least one ticket must be purchased before this event can start streaming.";
 
   const handleCopy = async (value, label) => {
     if (!value) {
@@ -463,6 +520,11 @@ export default function EventStreamControlPage() {
   };
 
   const handleStart = async () => {
+    if (streamStartRequiresTicketPurchase) {
+      showError(ticketGateMessage);
+      return;
+    }
+
     await runAction({
       key: "start",
       request: () =>
@@ -473,6 +535,15 @@ export default function EventStreamControlPage() {
   };
 
   const handleGoLive = async () => {
+    if (streamStartRequiresTicketPurchase) {
+      showError(ticketGateMessage);
+      return;
+    }
+
+    const payload = closeTicketSalesOnGoLive
+      ? { close_ticket_sales: true }
+      : {};
+
     setStageOverride("live");
     try {
       await runAction({
@@ -480,11 +551,13 @@ export default function EventStreamControlPage() {
         request: () =>
           api.post(
             `/api/v1/events/${eventId}/streams/go-live`,
-            {},
+            payload,
             authHeaders(token),
           ),
         loadingText: "Taking event live…",
-        successText: "Event is now live.",
+        successText: closeTicketSalesOnGoLive
+          ? "Event is now live. Ticket sales are closed."
+          : "Event is now live.",
       });
     } catch (error) {
       setStageOverride("started");
@@ -783,6 +856,43 @@ export default function EventStreamControlPage() {
                       </div>
                     </div>
 
+                    {(streamStartRequiresTicketPurchase || ticketSalesClosed || showGoLive) ? (
+                      <div className="tw:mt-5 tw:space-y-3">
+                        {streamStartRequiresTicketPurchase ? (
+                          <div className="tw:rounded-3xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-4 tw:text-sm tw:leading-6 tw:text-amber-800">
+                            {ticketGateMessage}
+                          </div>
+                        ) : null}
+
+                        {ticketSalesClosed ? (
+                          <div className="tw:rounded-3xl tw:border tw:border-emerald-200 tw:bg-emerald-50 tw:p-4 tw:text-sm tw:leading-6 tw:text-emerald-800">
+                            Ticket sales are closed for new buyers. Existing ticket holders still keep access.
+                          </div>
+                        ) : null}
+
+                        {showGoLive && !ticketSalesClosed && !streamStartRequiresTicketPurchase ? (
+                          <label className="tw:flex tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf7f3] tw:p-4">
+                            <input
+                              type="checkbox"
+                              checked={closeTicketSalesOnGoLive}
+                              onChange={(event) =>
+                                setCloseTicketSalesOnGoLive(event.target.checked)
+                              }
+                              className="tw:mt-1 tw:h-4 tw:w-4 tw:accent-primary"
+                            />
+                            <span>
+                              <span className="tw:block tw:text-sm tw:font-semibold tw:text-gray-900">
+                                Close ticket sales when I go live
+                              </span>
+                              <span className="tw:mt-1 tw:block tw:text-sm tw:leading-6 tw:text-gray-600">
+                                New users will not be able to buy tickets after the event goes live. Existing ticket holders keep their tickets.
+                              </span>
+                            </span>
+                          </label>
+                        ) : null}
+                      </div>
+                    ) : null}
+
                     <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
                       {!hasStartedStream ? (
                         <ActionButton
@@ -796,6 +906,7 @@ export default function EventStreamControlPage() {
                             }
                           }}
                           loading={pendingAction === "start"}
+                          disabled={streamStartRequiresTicketPurchase}
                           className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
                           icon={Radio}
                         >
@@ -807,6 +918,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleGoLive}
                           loading={pendingAction === "go-live"}
+                          disabled={streamStartRequiresTicketPurchase}
                           className="tw:bg-red-500 tw:text-white hover:tw:bg-red-600"
                           icon={PlayCircle}
                         >
