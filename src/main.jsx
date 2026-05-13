@@ -17,10 +17,10 @@ import { HelmetProvider } from "react-helmet-async";
 import { ModalProvider } from "./component/assets/ModalContext/index.jsx";
 import { store } from "./store";
 
-import { initGA } from "./lib/analytics";
-import AnalyticsTracker from "./component/AnalyticsTracker";
+// import { initGA } from "./lib/analytics";
+// import AnalyticsTracker from "./component/AnalyticsTracker";
 
-initGA();
+// initGA();
 
 // window.onerror = (msg, url, line) => {
 //   debugger;
@@ -48,7 +48,7 @@ const RootWrapper = () => {
 
   return (
     <BrowserRouter>
-      <AnalyticsTracker />
+      {/* <AnalyticsTracker /> */}
       <App />
     </BrowserRouter>
   );

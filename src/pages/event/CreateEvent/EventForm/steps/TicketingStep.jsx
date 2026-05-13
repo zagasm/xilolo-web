@@ -120,6 +120,10 @@ function fileLabel(file) {
   return file?.name || "";
 }
 
+function isBrowserFile(value) {
+  return typeof File !== "undefined" && value instanceof File;
+}
+
 const schema = z
   .object({
     priceInput: z.string().min(1, "Enter a ticket price"),
@@ -224,8 +228,12 @@ const schema = z
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
   const [currencies, setCurrencies] = useState([]);
-  const [manualFile, setManualFile] = useState(null);
-  const [manualCover, setManualCover] = useState(null);
+  const [manualFile, setManualFile] = useState(() =>
+    isBrowserFile(defaultValues.manualFile) ? defaultValues.manualFile : null
+  );
+  const [manualCover, setManualCover] = useState(() =>
+    isBrowserFile(defaultValues.manualCover) ? defaultValues.manualCover : null
+  );
   const [manualErrors, setManualErrors] = useState({});
 
   const existingManual = defaultValues.existingManual || null;

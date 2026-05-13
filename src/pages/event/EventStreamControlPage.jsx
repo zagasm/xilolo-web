@@ -26,6 +26,7 @@ import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDo
 import { formatEventDateTime } from "../../utils/ui";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
+const RTMP_SERVER_URL = "rtmp://173.199.93.204/live";
 
 function getErrorMessage(error, fallback = "Something went wrong.") {
   return (
@@ -54,6 +55,7 @@ function getEventFromStreamResponse(payload) {
   if (payload?.stream) {
     return {
       stream: payload.stream,
+      credentials: payload.credentials || null,
       stream_status: payload.stream?.status || null,
       status: payload.stream?.status || null,
     };
@@ -73,6 +75,7 @@ function mergeEventData(baseEvent, streamEvent) {
       baseEvent?.poster ||
       [],
     stream: streamEvent?.stream || baseEvent?.stream || null,
+    credentials: streamEvent?.credentials || baseEvent?.credentials || null,
     stream_status:
       streamEvent?.stream_status ||
       baseEvent?.stream_status ||
@@ -316,6 +319,8 @@ export default function EventStreamControlPage() {
   }, []);
 
   const stream = eventData?.stream || {};
+  const credentials = eventData?.credentials || {};
+  const rtmpCredentials = credentials?.rtmp || {};
   const streamingApi = stream?.streaming_api || {};
 
   const status = String(eventData?.status || "upcoming").toLowerCase();
@@ -325,19 +330,23 @@ export default function EventStreamControlPage() {
   const hasStartedStream = Boolean(
     stream?.id ||
     stream?.stream_key ||
+    rtmpCredentials?.stream_key ||
+    rtmpCredentials?.url ||
     streamingApi?.streamKey ||
     stream?.rtmp_url ||
     streamingApi?.rtmp_server,
   );
 
-  const rtmpServer =
-    streamingApi?.rtmp_server ||
-    (stream?.rtmp_url ? stream.rtmp_url.replace(/\/[^/]+$/, "") : "");
+  const shouldShowObsDetails = hasStartedStream && !isEnded;
+  const rtmpServer = shouldShowObsDetails ? RTMP_SERVER_URL : "";
   const rtmpKey =
-    streamingApi?.rtmp_key ||
-    streamingApi?.streamKey ||
-    stream?.stream_key ||
-    "";
+    shouldShowObsDetails
+      ? rtmpCredentials?.stream_key ||
+        streamingApi?.rtmp_key ||
+        streamingApi?.streamKey ||
+        stream?.stream_key ||
+        ""
+      : "";
   const isPreLiveStage =
     hasStartedStream && !isEnded && stageOverride === "started";
   const showGoLive =
@@ -453,14 +462,15 @@ export default function EventStreamControlPage() {
     }
   };
 
-  const handleStart = () =>
-    runAction({
+  const handleStart = async () => {
+    await runAction({
       key: "start",
       request: () =>
         api.post(`/api/v1/events/${eventId}/streams/start`, {}, authHeaders(token)),
       loadingText: "Generating stream credentials…",
       successText: "Stream details ready. Configure OBS, then go live.",
     });
+  };
 
   const handleGoLive = async () => {
     setStageOverride("live");
