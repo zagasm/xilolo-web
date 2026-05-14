@@ -145,6 +145,7 @@ export default function EventCard({
   const [openDelete, setOpenDelete] = useState(false);
   const [openReplayUpload, setOpenReplayUpload] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [startingStream, setStartingStream] = useState(false);
 
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -160,8 +161,26 @@ export default function EventCard({
     navigate(`/event/view/${event.id}`);
   };
 
-  const goToStreamControl = () => {
-    navigate(`/event/stream/${event.id}`);
+  const goToStreamControl = async () => {
+    if (normalizedStatus === "ended") {
+      navigate(`/event/stream/${event.id}`);
+      return;
+    }
+
+    setStartingStream(true);
+    try {
+      await showPromise(
+        api.post(`/api/v1/events/${event.id}/streams/start`, {}, authHeaders(token)),
+        {
+          loading: "Starting stream…",
+          success: "Stream ready",
+          error: (err) => getApiErrorMessage(err),
+        },
+      );
+      navigate(`/event/stream/${event.id}`);
+    } finally {
+      setStartingStream(false);
+    }
   };
 
   const toggleSave = async () => {
@@ -439,10 +458,13 @@ export default function EventCard({
               e.stopPropagation();
               goToStreamControl();
             }}
+            disabled={startingStream}
             className="tw:mt-auto tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
-              {normalizedStatus === "live"
+              {startingStream
+                ? "Starting stream..."
+                : normalizedStatus === "live"
                 ? "Manage live stream"
                 : normalizedStatus === "paused"
                   ? "Resume Event"

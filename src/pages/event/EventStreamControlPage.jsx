@@ -98,6 +98,15 @@ function mergeEventData(baseEvent, streamEvent) {
   };
 }
 
+function streamExists(event) {
+  return Boolean(
+    event?.stream?.id ||
+    event?.stream?.stream_key ||
+    event?.stream_status ||
+    event?.credentials?.rtmp?.stream_key,
+  );
+}
+
 function hasStreamAccessDetails(event) {
   const stream = event?.stream;
   const streamingApi = stream?.streaming_api;
@@ -324,21 +333,33 @@ export default function EventStreamControlPage() {
 
         let merged = getEventFromViewResponse(viewPayload);
 
-        if (
-          merged &&
-          shouldHydrateStartedStream(merged) &&
-          !hasStreamAccessDetails(merged)
-        ) {
-          const startResult = await api.post(
-            `/api/v1/events/${eventId}/streams/start`,
-            {},
+        if (merged) {
+          const streamResult = await api.get(
+            `/api/v1/events/${eventId}/streams`,
             authHeaders(token),
           );
 
           merged = mergeEventData(
             merged,
-            getEventFromStreamResponse(startResult?.data),
+            getEventFromStreamResponse(streamResult?.data),
           );
+
+          if (
+            shouldHydrateStartedStream(merged) &&
+            !hasStreamAccessDetails(merged) &&
+            !streamExists(merged)
+          ) {
+            const startResult = await api.post(
+              `/api/v1/events/${eventId}/streams/start`,
+              {},
+              authHeaders(token),
+            );
+
+            merged = mergeEventData(
+              merged,
+              getEventFromStreamResponse(startResult?.data),
+            );
+          }
         }
 
         if (!merged) {

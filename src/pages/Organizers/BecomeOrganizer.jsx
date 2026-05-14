@@ -437,15 +437,22 @@ const BecomeOrganiser = () => {
         }
       );
 
-      await showPromise(promise, {
+      const response = await showPromise(promise, {
         loading: "Submitting BVN...",
-        success: "BVN submitted, we're processing your verification",
+        success: "BVN submitted",
         error: "Failed to submit BVN",
       });
 
       await refreshUser?.();
-      setProcessingOpen(true);
+      const kycStatus = response?.data?.data?.kyc_status;
 
+      if (kycStatus === "verified") {
+        showSuccess("Your organiser account is now active.");
+        navigate(`/profile/${user?.id}`);
+        return;
+      }
+
+      setProcessingOpen(true);
       window.setTimeout(() => {
         setProcessingOpen(false);
         showSuccess("We're reviewing your details");

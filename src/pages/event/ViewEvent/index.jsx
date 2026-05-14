@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
-import { showSuccess, showError } from "../../../component/ui/toast";
+import { showSuccess, showError, showPromise } from "../../../component/ui/toast";
 import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import EventReviewsSection from "../../../component/Events/EventReviewsSection.jsx";
 import ReportModal from "../../../component/Events/ReportModal";
@@ -220,6 +220,7 @@ export default function ViewEvent() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [startingStream, setStartingStream] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -606,6 +607,33 @@ export default function ViewEvent() {
     }
 
     handleGetTicket(ticketAndManualAvailable ? "ticket_and_manual" : "ticket_only");
+  };
+
+  const handleOwnerStreamAction = async () => {
+    if (!event?.id) return;
+
+    if (isEnded) {
+      navigate(`/event/stream/${event.id}`);
+      return;
+    }
+
+    setStartingStream(true);
+    try {
+      await showPromise(
+        api.post(`/api/v1/events/${event.id}/streams/start`, {}, authHeaders(token)),
+        {
+          loading: "Starting stream...",
+          success: "Stream ready",
+          error: (err) =>
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to start stream.",
+        }
+      );
+      navigate(`/event/stream/${event.id}`);
+    } finally {
+      setStartingStream(false);
+    }
   };
 
   if (loading) {
@@ -1127,7 +1155,31 @@ export default function ViewEvent() {
                       </div>
                     )}
 
-                    {!isOwnerEvent && (
+                    {isOwnerEvent ? (
+                      <>
+                        <button
+                          style={{
+                            borderRadius: 24
+                          }}
+                          type="button"
+                          disabled={startingStream}
+                          onClick={handleOwnerStreamAction}
+                          className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                        >
+                          {startingStream
+                            ? "Starting stream..."
+                            : isLiveNow || isPaused
+                              ? "Manage stream"
+                              : isEnded
+                                ? "View stream"
+                                : "Start stream"}
+                        </button>
+
+                        <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                          Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
+                        </p>
+                      </>
+                    ) : (
                       <>
                         <button
                           style={{
@@ -1272,7 +1324,17 @@ export default function ViewEvent() {
               </div>
             </div>
 
-            {!isOwnerEvent && (
+            {isOwnerEvent ? (
+              <button
+                style={{ borderRadius: 18 }}
+                type="button"
+                disabled={startingStream}
+                onClick={handleOwnerStreamAction}
+                className="tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:bg-primary tw:px-3 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+              >
+                {startingStream ? "Starting..." : isLiveNow || isPaused ? "Manage stream" : "Start stream"}
+              </button>
+            ) : (
               <button
                 style={{ borderRadius: 18 }}
                 type="button"
