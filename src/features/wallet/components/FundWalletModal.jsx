@@ -254,6 +254,9 @@ export default function FundWalletModal({
     window.location.href = reviewData.authorization_url;
   };
 
+  const selectedMethod = selectableMethods.find((method) => method.value === provider);
+  const isCryptoFunding = String(provider).toLowerCase() === "cryptomus" || selectedMethod?.raw?.metadata?.category === "crypto";
+
   const handleClose = () => {
     if (previewLoading) return;
     onClose();
@@ -388,6 +391,11 @@ export default function FundWalletModal({
                             </span>
                           </div>
                         </div>
+                        {isCryptoFunding ? (
+                          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-3 tw:text-xs tw:text-gray-600">
+                            Crypto funding is processed by {selectedMethod?.label || "Cryptomus"}. The gateway fee is added to your charge, so your wallet receives only the credit amount shown above.
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
 

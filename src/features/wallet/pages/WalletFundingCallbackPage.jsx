@@ -14,6 +14,15 @@ import {
 } from "../store/walletFlowSlice";
 import { getApiErrorMessage } from "../walletUtils";
 
+const CRYPTOMUS_SUCCESS_STATUSES = ["paid", "paid_over"];
+const CRYPTOMUS_FAILED_STATUSES = [
+  "fail",
+  "wrong_amount",
+  "cancel",
+  "system_fail",
+  "refund_fail",
+];
+
 export default function WalletFundingCallbackPage() {
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
@@ -31,9 +40,29 @@ export default function WalletFundingCallbackPage() {
   });
   const navigate = useNavigate();
 
+  const provider = String(
+    searchParams.get("provider") || lastFunding?.provider || ""
+  ).toLowerCase();
+  const cryptomusStatus = String(
+    searchParams.get("status") ||
+      searchParams.get("payment_status") ||
+      searchParams.get("paymentStatus") ||
+      ""
+  ).toLowerCase();
+  const isCryptomusReturn =
+    provider === "cryptomus" ||
+    searchParams.has("uuid") ||
+    searchParams.has("order_id") ||
+    searchParams.has("payment_uuid");
+  const isCryptomusSuccessStatus =
+    CRYPTOMUS_SUCCESS_STATUSES.includes(cryptomusStatus);
+  const isCryptomusFailedStatus =
+    CRYPTOMUS_FAILED_STATUSES.includes(cryptomusStatus);
+
   const reference =
     searchParams.get("reference") ||
     searchParams.get("trxref") ||
+    searchParams.get("order_id") ||
     lastFunding?.reference ||
     "";
 
@@ -60,11 +89,24 @@ export default function WalletFundingCallbackPage() {
     },
   });
 
-  const handleVerify = async () => {
+  const handleVerify = async ({ force = false } = {}) => {
     if (!reference) {
       setVerificationState({
         status: "error",
         error: "No wallet funding reference was found.",
+        payload: null,
+      });
+      return;
+    }
+
+    if (
+      isCryptomusReturn &&
+      !force &&
+      (!cryptomusStatus || (!isCryptomusSuccessStatus && !isCryptomusFailedStatus))
+    ) {
+      setVerificationState({
+        status: "pending",
+        error: "",
         payload: null,
       });
       return;
@@ -80,9 +122,17 @@ export default function WalletFundingCallbackPage() {
       const providerPayload = {};
       const orderId = searchParams.get("order_id");
       const txid = searchParams.get("txid");
+      const uuid =
+        searchParams.get("uuid") || searchParams.get("payment_uuid");
 
       if (orderId) providerPayload.order_id = orderId;
       if (txid) providerPayload.txid = txid;
+      if (uuid) providerPayload.uuid = uuid;
+      if (cryptomusStatus) {
+        providerPayload.status = cryptomusStatus;
+        providerPayload.payment_status = cryptomusStatus;
+      }
+      if (isCryptomusReturn) providerPayload.provider = "cryptomus";
 
       const payload = await verifyFunding.mutateAsync({
         reference,
@@ -95,6 +145,19 @@ export default function WalletFundingCallbackPage() {
         payload,
       });
     } catch (error) {
+      const responseStatus = error?.response?.data?.data?.status;
+      if (
+        isCryptomusReturn &&
+        (responseStatus === "pending" || (!cryptomusStatus && !force))
+      ) {
+        setVerificationState({
+          status: "pending",
+          error: "",
+          payload: null,
+        });
+        return;
+      }
+
       const message = getApiErrorMessage(
         error,
         "Unable to verify wallet funding right now."
@@ -111,7 +174,7 @@ export default function WalletFundingCallbackPage() {
   useEffect(() => {
     handleVerify();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reference]);
+  }, [reference, cryptomusStatus]);
 
   useEffect(() => {
     if (
@@ -205,6 +268,43 @@ export default function WalletFundingCallbackPage() {
               >
                 Retry verification
               </button>
+            </>
+          ) : verificationState.status === "pending" ? (
+            <>
+              <div className="tw:mx-auto tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:rounded-full tw:bg-amber-100 tw:text-amber-700">
+                <RefreshCcw className="tw:h-8 tw:w-8" />
+              </div>
+              <div className="tw:mt-5 tw:text-3xl tw:font-semibold tw:text-gray-900">
+                Payment confirmation pending
+              </div>
+              <div className="tw:mt-3 tw:text-sm tw:text-gray-500">
+                Cryptomus is still confirming your crypto payment. Your wallet
+                will be credited automatically after the blockchain payment is
+                confirmed and Cryptomus sends the webhook.
+              </div>
+              {reference ? (
+                <div className="tw:mt-5 tw:rounded-2xl tw:bg-amber-50 tw:px-4 tw:py-3 tw:text-xs tw:font-medium tw:text-amber-800">
+                  Funding reference: {reference}
+                </div>
+              ) : null}
+              <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => handleVerify({ force: true })}
+                  disabled={verifyFunding.isPending}
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  style={{ borderRadius: 16 }}
+                >
+                  {verifyFunding.isPending ? "Checking..." : "Check status"}
+                </button>
+                <button
+                  onClick={() => navigate("/account/wallet")}
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                  style={{ borderRadius: 16 }}
+                >
+                  View wallet
+                </button>
+              </div>
             </>
           ) : (
             <>
