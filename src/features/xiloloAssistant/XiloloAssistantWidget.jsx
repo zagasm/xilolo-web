@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  ArrowLeft,
   ImagePlus,
   Loader2,
   MessageCircle,
   Minus,
+  Plus,
   Send,
   Sparkles,
   Trash2,
@@ -67,6 +69,9 @@ export default function XiloloAssistantWidget() {
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
   const [gateError, setGateError] = useState("");
+  const [aiConversations, setAiConversations] = useState([]);
+  const [aiView, setAiView] = useState("list");
+  const [aiListLoading, setAiListLoading] = useState(false);
   const [aiConversationId, setAiConversationId] = useState("");
   const [aiMessages, setAiMessages] = useState([INITIAL_AI_MESSAGE]);
   const [input, setInput] = useState("");
@@ -112,39 +117,59 @@ export default function XiloloAssistantWidget() {
     };
   }, [isOpen, hasToken]);
 
-  const loadAiConversation = useCallback(async () => {
-    if (aiConversationId || !hasAccess) return aiConversationId;
-
+  const loadAiConversations = useCallback(async () => {
+    if (!hasAccess) return;
+    setAiListLoading(true);
     try {
       const listResponse = await api.get("/api/v1/ai/conversations", authHeaders());
-      const existing = listResponse.data?.data?.data?.[0] || listResponse.data?.data?.[0];
-
-      if (existing?.id) {
-        setAiConversationId(existing.id);
-        const showResponse = await api.get(`/api/v1/ai/conversations/${existing.id}`, authHeaders());
-        const loaded = normalizeMessages(showResponse.data?.data?.messages || []);
-        setAiMessages(loaded.length ? loaded : [INITIAL_AI_MESSAGE]);
-        return existing.id;
-      }
-
-      const createResponse = await api.post("/api/v1/ai/conversations", {}, authHeaders());
-      const id = createResponse.data?.data?.id;
-      setAiConversationId(id);
-      return id;
+      setAiConversations(listResponse.data?.data?.data || listResponse.data?.data || []);
     } catch (error) {
       const code = error?.response?.data?.code;
       if (code === "AI_CONSENT_REQUIRED") setIsConsentRequired(true);
       if (code === "BLUE_BADGE_REQUIRED") setGateError("Xilolo AI is available to Blue Badge subscribers.");
       throw error;
+    } finally {
+      setAiListLoading(false);
     }
-  }, [aiConversationId, hasAccess]);
+  }, [hasAccess]);
+
+  const openAiConversation = useCallback(async (conversationId) => {
+    if (!conversationId || !hasAccess) return "";
+
+    const showResponse = await api.get(`/api/v1/ai/conversations/${conversationId}`, authHeaders());
+    const loaded = normalizeMessages(showResponse.data?.data?.messages || []);
+    setAiConversationId(conversationId);
+    setAiMessages(loaded.length ? loaded : [INITIAL_AI_MESSAGE]);
+    setAiView("chat");
+    return conversationId;
+  }, [hasAccess]);
+
+  const startNewAiConversation = useCallback(async () => {
+    if (!hasAccess) return "";
+
+    const createResponse = await api.post("/api/v1/ai/conversations", {}, authHeaders());
+    const conversation = createResponse.data?.data;
+    const id = conversation?.id;
+    setAiConversationId(id);
+    setAiMessages([INITIAL_AI_MESSAGE]);
+    setAiView("chat");
+    if (conversation) {
+      setAiConversations((items) => [conversation, ...items.filter((item) => item.id !== id)]);
+    }
+    return id;
+  }, [hasAccess]);
+
+  const loadAiConversation = useCallback(async () => {
+    if (aiConversationId) return aiConversationId;
+    return startNewAiConversation();
+  }, [aiConversationId, startNewAiConversation]);
 
   const acceptConsent = async () => {
     setIsSending(true);
     try {
       await api.post("/api/v1/ai/consent", {}, authHeaders());
       setIsConsentRequired(false);
-      await loadAiConversation();
+      await loadAiConversations();
     } finally {
       setIsSending(false);
     }
@@ -152,8 +177,8 @@ export default function XiloloAssistantWidget() {
 
   useEffect(() => {
     if (!isOpen || !hasAccess) return;
-    loadAiConversation().catch(() => { });
-  }, [hasAccess, isOpen, loadAiConversation]);
+    loadAiConversations().catch(() => { });
+  }, [hasAccess, isOpen, loadAiConversations]);
 
   const sendAiMessage = async (message) => {
     const conversationId = await loadAiConversation();
@@ -252,8 +277,10 @@ export default function XiloloAssistantWidget() {
     setIsSending(true);
     try {
       await api.delete(`/api/v1/ai/conversations/${aiConversationId}`, authHeaders());
+      setAiConversations((items) => items.filter((item) => item.id !== aiConversationId));
       setAiConversationId("");
       setAiMessages([INITIAL_AI_MESSAGE]);
+      setAiView("list");
     } finally {
       setIsSending(false);
     }
@@ -278,11 +305,33 @@ export default function XiloloAssistantWidget() {
               <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[0.76rem] tw:font-extrabold tw:uppercase tw:text-[#111111]">
                 <Sparkles size={14} /> Xilolo
               </span>
-              <span className="tw:block tw:mt-1 tw:text-[1.08rem] tw:font-extrabold tw:leading-tight tw:text-zinc-900">
-                AI Assistant
-              </span>
+              <div className="tw:flex tw:items-center tw:gap-2">
+                {aiView === "chat" && (
+                  <button
+                    type="button"
+                    onClick={() => setAiView("list")}
+                    className="tw:grid tw:h-7 tw:w-7 tw:place-items-center tw:rounded-lg tw:bg-zinc-100 tw:text-zinc-700"
+                    aria-label="Back to AI conversations"
+                  >
+                    <ArrowLeft size={15} />
+                  </button>
+                )}
+                <span className="tw:block tw:mt-1 tw:text-[1.08rem] tw:font-extrabold tw:leading-tight tw:text-zinc-900">
+                  {aiView === "list" ? "Conversations" : "AI Assistant"}
+                </span>
+              </div>
             </div>
             <div className="tw:flex tw:gap-1.5">
+              {aiView === "list" && hasAccess && (
+                <button
+                  type="button"
+                  onClick={startNewAiConversation}
+                  className="tw:grid tw:h-[34px] tw:w-[34px] tw:place-items-center tw:rounded-lg tw:border-0 tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-zinc-200"
+                  aria-label="Start new AI conversation"
+                >
+                  <Plus size={17} />
+                </button>
+              )}
               {aiConversationId && (
                 <button
                   type="button"
@@ -308,6 +357,45 @@ export default function XiloloAssistantWidget() {
             {accessMessage ? (
               <div className="tw:m-auto tw:w-full tw:rounded-xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-3.5 tw:text-center tw:text-[0.92rem] tw:text-zinc-600">
                 {accessMessage}
+              </div>
+            ) : aiView === "list" ? (
+              <div className="tw:flex tw:flex-col tw:gap-3">
+                <button
+                  type="button"
+                  onClick={startNewAiConversation}
+                  className="tw:flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-[#111111] tw:px-4 tw:py-3 tw:text-sm tw:font-extrabold tw:text-white tw:transition hover:tw:bg-black"
+                >
+                  <Plus size={17} />
+                  Start new conversation
+                </button>
+
+                {aiListLoading ? (
+                  <div className="tw:grid tw:min-h-40 tw:place-items-center tw:text-zinc-500">
+                    <Loader2 className="tw:animate-spin" size={24} />
+                  </div>
+                ) : aiConversations.length === 0 ? (
+                  <div className="tw:rounded-2xl tw:border tw:border-dashed tw:border-zinc-300 tw:bg-white tw:p-4 tw:text-center tw:text-sm tw:font-medium tw:text-zinc-600">
+                    No AI conversations yet. Start one when you need help with your account, events, or streaming.
+                  </div>
+                ) : (
+                  <div className="tw:flex tw:flex-col tw:gap-2">
+                    {aiConversations.map((conversation) => (
+                      <button
+                        key={conversation.id}
+                        type="button"
+                        onClick={() => openAiConversation(conversation.id)}
+                        className="tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-white tw:p-3 tw:text-left tw:transition hover:tw:border-zinc-300 hover:tw:bg-zinc-50"
+                      >
+                        <span className="tw:block tw:truncate tw:text-sm tw:font-extrabold tw:text-zinc-900">
+                          {conversation.title || "Xilolo AI conversation"}
+                        </span>
+                        <span className="tw:mt-1 tw:block tw:text-xs tw:font-medium tw:text-zinc-500">
+                          {conversation.total_messages || 0} messages
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <>
@@ -367,6 +455,7 @@ export default function XiloloAssistantWidget() {
             </div>
           )}
 
+          {aiView === "chat" && !accessMessage ? (
           <form className="tw:grid tw:grid-cols-[44px_1fr_44px] tw:gap-2 tw:border-t tw:border-gray-100 tw:bg-white tw:p-3" onSubmit={handleSubmit}>
             <input
               ref={fileInputRef}
@@ -406,6 +495,7 @@ export default function XiloloAssistantWidget() {
               {isSending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}
             </button>
           </form>
+          ) : null}
         </section>
       )}
 
