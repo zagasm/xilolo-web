@@ -181,9 +181,9 @@ export default function SupportChatPage() {
   };
 
   return (
-    <main className="tw:min-h-[calc(100vh-84px)] tw:bg-[#f6f3ee] tw:px-4 tw:py-6 tw:md:px-6 tw:md:py-10">
+    <main className="tw:min-h-[calc(100vh-84px)] tw:bg-[#f6f3ee] tw:px-4 tw:py-6 tw:md:px-6 tw:md:py-10 tw:pb-28">
       <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-5xl tw:flex-col tw:gap-4">
-        <div className="tw:md:mt-10 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
+        <div className="tw:mt-15 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
           <div>
             <button
             style={{
@@ -196,13 +196,13 @@ export default function SupportChatPage() {
               <ArrowLeft size={16} />
               Back
             </button>
-            <span className="tw:mt-1 tw:block tw:text-2xl tw:font-black tw:leading-tight tw:text-[#111111] tw:md:text-4xl">
+            <span className="tw:mt-1 tw:block tw:text-2xl tw:font-black tw:leading-tight tw:text-primary tw:md:text-4xl">
               Xilolo Support Chat
             </span>
           </div>
         </div>
 
-        <section className="tw:flex tw:h-[min(760px,calc(100vh-180px))] tw:min-h-[560px] tw:flex-col tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-black/10 tw:bg-white tw:shadow-[0_24px_65px_rgba(17,17,17,0.12)]">
+        <section className="tw:flex tw:h-[min(760px,calc(100vh-180px))] tw:min-h-[560px] tw:flex-col tw:overflow-hidden tw:rounded-3xl tw:border tw:border-black/10 tw:bg-white tw:shadow-[0_24px_65px_rgba(17,17,17,0.12)]">
           
 
           {error && (
@@ -231,10 +231,10 @@ export default function SupportChatPage() {
                   <div
                     key={message.id}
                     className={[
-                      "tw:max-w-[82%] tw:whitespace-pre-wrap tw:break-words tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:leading-relaxed tw:md:max-w-[620px] tw:md:text-base",
+                      "tw:max-w-[82%] tw:whitespace-pre-wrap tw:wrap-break-word tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:leading-relaxed tw:md:max-w-[620px] tw:md:text-base",
                       message.sender_type === "admin"
                         ? "tw:self-start tw:border tw:border-gray-200 tw:bg-white tw:text-gray-800"
-                        : "tw:self-end tw:bg-[#111111] tw:text-white",
+                        : "tw:self-end tw:bg-primary tw:text-white",
                     ].join(" ")}
                   >
                     {message.body}
@@ -259,7 +259,7 @@ export default function SupportChatPage() {
             <button
               type="submit"
               disabled={!input.trim() || !hasAccess || sending}
-              className="tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-xl tw:bg-[#111111] tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-xl tw:bg-primary tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
               aria-label="Send message"
             >
               {sending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}
