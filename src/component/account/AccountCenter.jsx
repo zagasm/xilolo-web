@@ -147,6 +147,15 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
   ];
 
   const supportItems = [
+    ...(hasActiveSubscription
+      ? [
+        {
+          iconComponent: PiHeadset,
+          label: "Chat with Xilolo Support",
+          to: "/support-chat",
+        },
+      ]
+      : []),
     {
       iconComponent: PiHeadset,
       label: "Community Guidelines",

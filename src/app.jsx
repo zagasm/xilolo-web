@@ -44,6 +44,7 @@ import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
 import Landing from "./pages/LandingPage/index.jsx";
 import { ToastHost } from "./component/ui/toast.jsx";
 import Support from "./pages/support/index.jsx";
+import SupportChatPage from "./pages/support/SupportChatPage.jsx";
 import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
@@ -88,6 +89,7 @@ import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
 import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage.jsx";
 import SecurityPage from "./pages/Account/SecurityPage.jsx";
 import TwoFactorSecurityPrompt from "./component/auth/TwoFactorSecurityPrompt.jsx";
+import XiloloAssistantWidget from "./features/xiloloAssistant/XiloloAssistantWidget.jsx";
 
 const MainLayout = () => (
   <>
@@ -266,6 +268,7 @@ export function App() {
       <ForcedLogoutModalHost />
       <TwoFactorSecurityPrompt />
       <NetworkStatus />
+      <XiloloAssistantWidget />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
@@ -353,6 +356,7 @@ export function App() {
             </Route>
             <Route path="/creator/channel/new" element={<StreamingPage />} />
             <Route path="/subscription" element={<SubscriptionsPage />} />
+            <Route path="/support-chat" element={<SupportChatPage />} />
             <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />

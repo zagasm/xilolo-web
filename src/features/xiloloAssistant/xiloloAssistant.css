@@ -1,0 +1,258 @@
+.xilolo-assistant {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.xilolo-assistant-fab {
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #111111;
+  color: #fff;
+  box-shadow: 0 18px 38px rgba(17, 17, 17, 0.28);
+  cursor: pointer;
+}
+
+.xilolo-assistant-panel {
+  width: min(520px, calc(100vw - 28px));
+  height: min(610px, calc(100vh - 112px));
+  margin-bottom: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+  color: #18181b;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.xilolo-assistant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid #eeeeee;
+  background: #ffffff;
+}
+
+.xilolo-assistant-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #111111;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.xilolo-assistant-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.08rem;
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+.xilolo-assistant-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.xilolo-assistant-header-actions button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #f4f4f5;
+  color: #3f3f46;
+  cursor: pointer;
+}
+
+.xilolo-assistant-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.xilolo-assistant-message {
+  max-width: 86%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.xilolo-assistant-message.assistant {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid #eceff4;
+  color: #27272a;
+}
+
+.xilolo-assistant-message.user {
+  align-self: flex-end;
+  background: #111111;
+  color: #fff;
+}
+
+.xilolo-assistant-message strong {
+  font-weight: 800;
+}
+
+.xilolo-assistant-upload-preview {
+  display: block;
+  width: min(260px, 100%);
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid #e4e4e7;
+}
+
+.xilolo-assistant-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.xilolo-assistant-suggestions button {
+  border: 1px solid #d4d4d8;
+  border-radius: 999px;
+  background: #fff;
+  color: #27272a;
+  padding: 8px 11px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.xilolo-assistant-suggestions button:hover {
+  background: #111111;
+  border-color: #111111;
+  color: #fff;
+}
+
+.xilolo-assistant-note,
+.xilolo-assistant-gate {
+  margin: auto;
+  width: 100%;
+  border: 1px dashed #d8d2e8;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  color: #52525b;
+  background: #fff;
+  font-size: 0.92rem;
+}
+
+.xilolo-assistant-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff7ed;
+  color: #7c2d12;
+  border-top: 1px solid #fed7aa;
+  font-size: 0.84rem;
+}
+
+.xilolo-assistant-alert button {
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  background: #111111;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.xilolo-assistant-form {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid #eef0f4;
+  background: #fff;
+}
+
+.xilolo-assistant-file-input {
+  display: none;
+}
+
+.xilolo-assistant-form input {
+  min-width: 0;
+  height: 44px;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 0.95rem;
+}
+
+.xilolo-assistant-form input:focus {
+  outline: none;
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.12);
+}
+
+.xilolo-assistant-form button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #111111;
+  color: #fff;
+  cursor: pointer;
+}
+
+.xilolo-assistant-form button.xilolo-assistant-attach {
+  background: #f4f4f5;
+  color: #111111;
+  border: 1px solid #e4e4e7;
+}
+
+.xilolo-assistant-form button:disabled,
+.xilolo-assistant-form input:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: xilolo-spin 0.8s linear infinite;
+}
+
+@keyframes xilolo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .xilolo-assistant {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .xilolo-assistant-panel {
+    height: min(600px, calc(100vh - 92px));
+  }
+}

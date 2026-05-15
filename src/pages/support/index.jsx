@@ -222,7 +222,7 @@ function Support() {
 
       <section className="feedback-section">
         
-        <p className="tw:block tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2" className="footer">âœ¨ Thank you for your feedback! âœ¨</p>
+        <p className="tw:block tw:text-secondary tw:text-lg tw:md:text-xl tw:mt-2 footer">âœ¨ Thank you for your feedback! âœ¨</p>
       </section>
     </div>
   );
