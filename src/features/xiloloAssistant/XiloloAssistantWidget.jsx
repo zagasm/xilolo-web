@@ -10,7 +10,6 @@ import {
   X,
 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
-import "./xiloloAssistant.css";
 
 const INITIAL_AI_MESSAGE = {
   id: "ai-welcome",
@@ -58,8 +57,8 @@ function renderMessageText(text = "") {
 function isSubscriptionActive(status) {
   return Boolean(
     status?.has_active_subscription ||
-      status?.subscription?.isActive ||
-      status?.subscription?.status === "active"
+    status?.subscription?.isActive ||
+    status?.subscription?.status === "active"
   );
 }
 
@@ -153,7 +152,7 @@ export default function XiloloAssistantWidget() {
 
   useEffect(() => {
     if (!isOpen || !hasAccess) return;
-    loadAiConversation().catch(() => {});
+    loadAiConversation().catch(() => { });
   }, [hasAccess, isOpen, loadAiConversation]);
 
   const sendAiMessage = async (message) => {
@@ -268,52 +267,79 @@ export default function XiloloAssistantWidget() {
   }, [hasAccess, hasToken, statusLoading]);
 
   return (
-    <div className="xilolo-assistant">
+    <div className="tw:fixed tw:bottom-4 tw:right-4 tw:z-[1050] tw:flex tw:flex-col tw:items-end tw:font-sans tw:md:bottom-[22px] tw:md:right-[22px]">
       {isOpen && (
-        <section className="xilolo-assistant-panel" aria-label="Xilolo assistant">
-          <header className="xilolo-assistant-header">
+        <section
+          className="tw:mb-3.5 tw:flex tw:h-[min(610px,calc(100vh-112px))] tw:w-[min(520px,calc(100vw-28px))] tw:flex-col tw:overflow-hidden tw:rounded-[18px] tw:border tw:border-gray-900/10 tw:bg-white tw:text-zinc-900 tw:shadow-[0_24px_70px_rgba(15,23,42,0.22)] max-[520px]:tw:h-[min(600px,calc(100vh-92px))]"
+          aria-label="Xilolo assistant"
+        >
+          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-gray-200 tw:bg-white tw:px-[18px] tw:pb-3.5 tw:pt-[18px]">
             <div>
-              <span className="xilolo-assistant-kicker">
+              <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[0.76rem] tw:font-extrabold tw:uppercase tw:text-[#111111]">
                 <Sparkles size={14} /> Xilolo
               </span>
-              <h2>AI Assistant</h2>
+              <span className="tw:block tw:mt-1 tw:text-[1.08rem] tw:font-extrabold tw:leading-tight tw:text-zinc-900">
+                AI Assistant
+              </span>
             </div>
-            <div className="xilolo-assistant-header-actions">
+            <div className="tw:flex tw:gap-1.5">
               {aiConversationId && (
-                <button type="button" onClick={resetAiConversation} aria-label="Delete AI conversation">
+                <button
+                  type="button"
+                  onClick={resetAiConversation}
+                  className="tw:grid tw:h-[34px] tw:w-[34px] tw:place-items-center tw:rounded-lg tw:border-0 tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-zinc-200"
+                  aria-label="Delete AI conversation"
+                >
                   <Trash2 size={16} />
                 </button>
               )}
-              <button type="button" onClick={() => setIsOpen(false)} aria-label="Minimize assistant">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="tw:grid tw:h-[34px] tw:w-[34px] tw:place-items-center tw:rounded-lg tw:border-0 tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-zinc-200"
+                aria-label="Minimize assistant"
+              >
                 <Minus size={16} />
               </button>
             </div>
-          </header>
+          </div>
 
-          <div className="xilolo-assistant-body">
+          <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-2.5 tw:overflow-y-auto tw:bg-slate-50 tw:p-4">
             {accessMessage ? (
-              <div className="xilolo-assistant-gate">{accessMessage}</div>
+              <div className="tw:m-auto tw:w-full tw:rounded-xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-3.5 tw:text-center tw:text-[0.92rem] tw:text-zinc-600">
+                {accessMessage}
+              </div>
             ) : (
               <>
                 {aiMessages.map((message) => (
                   <div
                     key={message.id}
-                    className={`xilolo-assistant-message ${message.role === "user" || message.sender_type === "user" ? "user" : "assistant"}`}
+                    className={[
+                      "tw:max-w-[86%] tw:whitespace-pre-wrap tw:break-words tw:rounded-[14px] tw:px-3 tw:py-2.5 tw:text-[0.92rem] tw:leading-[1.45] [&_strong]:tw:font-extrabold",
+                      message.role === "user" || message.sender_type === "user"
+                        ? "tw:self-end tw:bg-[#111111] tw:text-white"
+                        : "tw:self-start tw:border tw:border-gray-200 tw:bg-white tw:text-zinc-800",
+                    ].join(" ")}
                   >
                     {renderMessageText(message.content)}
                     {message.imageUrl && (
-                      <img className="xilolo-assistant-upload-preview" src={message.imageUrl} alt="Uploaded event poster" />
+                      <img
+                        className="tw:mt-2.5 tw:block tw:w-[min(260px,100%)] tw:rounded-[10px] tw:border tw:border-zinc-200"
+                        src={message.imageUrl}
+                        alt="Uploaded event poster"
+                      />
                     )}
                   </div>
                 ))}
                 {aiMessages.length <= 1 && (
-                  <div className="xilolo-assistant-suggestions">
+                  <div className="tw:mt-0.5 tw:flex tw:flex-wrap tw:gap-2">
                     {SUGGESTED_PROMPTS.map((prompt) => (
                       <button
                         key={prompt}
                         type="button"
                         onClick={() => handleSuggestedPrompt(prompt)}
                         disabled={isSending}
+                        className="tw:rounded-full tw:border tw:border-zinc-300 tw:bg-white tw:px-3 tw:py-2 tw:text-[0.82rem] tw:font-bold tw:text-zinc-800 tw:transition hover:tw:border-[#111111] hover:tw:bg-[#111111] hover:tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                       >
                         {prompt}
                       </button>
@@ -326,53 +352,76 @@ export default function XiloloAssistantWidget() {
           </div>
 
           {(gateError || isConsentRequired) && (
-            <div className="xilolo-assistant-alert">
+            <div className="tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:border-t tw:border-orange-200 tw:bg-orange-50 tw:px-3 tw:py-2.5 tw:text-[0.84rem] tw:text-orange-900">
               <span>{isConsentRequired ? "Accept Xilolo AI terms before using AI chat." : gateError}</span>
               {isConsentRequired && (
-                <button type="button" onClick={acceptConsent} disabled={isSending}>
+                <button
+                  type="button"
+                  onClick={acceptConsent}
+                  disabled={isSending}
+                  className="tw:rounded-lg tw:border-0 tw:bg-[#111111] tw:px-2.5 tw:py-1.5 tw:font-extrabold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                >
                   Accept
                 </button>
               )}
             </div>
           )}
 
-          <form className="xilolo-assistant-form" onSubmit={handleSubmit}>
+          <form className="tw:grid tw:grid-cols-[44px_1fr_44px] tw:gap-2 tw:border-t tw:border-gray-100 tw:bg-white tw:p-3" onSubmit={handleSubmit}>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/jpeg,image/png,image/jpg,image/webp"
-              className="xilolo-assistant-file-input"
+              className="tw:hidden"
               onChange={handleImageChange}
             />
             <button
+              style={{
+                borderRadius: input ? "10px" : "50%",
+              }}
               type="button"
-              className="xilolo-assistant-attach"
+              className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-[10px] tw:border tw:border-zinc-200 tw:bg-zinc-100 tw:text-[#111111] tw:transition hover:tw:bg-zinc-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
               onClick={() => fileInputRef.current?.click()}
               disabled={!hasAccess || isSending || isUploadingImage}
               aria-label="Attach event poster"
             >
-              {isUploadingImage ? <Loader2 className="spin" size={18} /> : <ImagePlus size={18} />}
+              {isUploadingImage ? <Loader2 className="tw:animate-spin" size={18} /> : <ImagePlus size={18} />}
             </button>
             <input
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder="Ask Xilolo AI..."
               disabled={!hasAccess || isSending}
+              className="tw:h-11 tw:min-w-0 tw:rounded-[10px] tw:border tw:border-zinc-200 tw:px-3 tw:text-[0.95rem] tw:text-zinc-900 tw:outline-none tw:transition focus:tw:border-[#111111] focus:tw:ring-4 focus:tw:ring-black/10 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
             />
-            <button type="submit" disabled={!input.trim() || !hasAccess || isSending} aria-label="Send message">
-              {isSending ? <Loader2 className="spin" size={18} /> : <Send size={18} />}
+            <button
+              style={{
+                borderRadius: input ? "10px" : "50%",
+              }}
+              type="submit"
+              disabled={!input.trim() || !hasAccess || isSending}
+              className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-[10px] tw:border-0 tw:bg-[#111111] tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+              aria-label="Send message"
+            >
+              {isSending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}
             </button>
           </form>
         </section>
       )}
 
       <button
+        style={{
+          borderRadius: isOpen ? "18px" : "44px",
+        }}
         type="button"
-        className="xilolo-assistant-fab"
+        className="tw:grid tw:h-[58px] tw:w-[148px] tw:place-items-center tw:rounded-full tw:border-0 tw:bg-[#111111] tw:text-white tw:shadow-[0_18px_38px_rgba(17,17,17,0.28)] tw:transition hover:tw:bg-black"
         onClick={() => setIsOpen((open) => !open)}
         aria-label={isOpen ? "Close Xilolo assistant" : "Open Xilolo assistant"}
       >
-        {isOpen ? <X size={24} /> : <MessageCircle size={25} />}
+        {isOpen ? <X size={24} /> : <span className="tw:inline-flex tw:items-center tw:gap-2">
+          <Sparkles size={25} />
+          <span className="tw:text-sm tw:font-medium tew:text-white">Xilolo AI</span>
+        </span>}
       </button>
     </div>
   );
