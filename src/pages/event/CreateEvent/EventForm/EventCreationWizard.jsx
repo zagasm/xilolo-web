@@ -48,7 +48,6 @@ function mapEventToDefaults(event) {
       },
       media: {
         posterImages: [],
-        posterVideos: [],
         existingPoster: [],
       },
     };
@@ -129,12 +128,13 @@ function mapEventToDefaults(event) {
     },
     media: {
       posterImages: [],
-      posterVideos: [],
-      existingPoster: (currentEvent.poster || []).map((media, index) => ({
-        id: media.id || index,
-        type: media.type,
-        url: media.url,
-      })),
+      existingPoster: (currentEvent.poster || [])
+        .filter((media) => media.type === "image")
+        .map((media, index) => ({
+          id: media.id || index,
+          type: media.type,
+          url: media.url,
+        })),
     },
   };
 }
@@ -159,9 +159,6 @@ export default function EventCreationWizard({
   const [collected, setCollected] = useState({});
   const [posterImages, setPosterImages] = useState(
     mapped.media.posterImages || []
-  );
-  const [posterVideos, setPosterVideos] = useState(
-    mapped.media.posterVideos || []
   );
   const [existingPoster, setExistingPoster] = useState(
     mapped.media.existingPoster || []
@@ -237,14 +234,6 @@ export default function EventCreationWizard({
           `poster_images[${index}]`,
           file,
           file.name || `poster_image_${index}`
-        );
-      });
-
-      posterVideos.forEach((file, index) => {
-        payload.append(
-          `poster_videos[${index}]`,
-          file,
-          file.name || `poster_video_${index}`
         );
       });
 
@@ -386,8 +375,6 @@ export default function EventCreationWizard({
           onNext={handleInfoNext}
           posterImages={posterImages}
           setPosterImages={setPosterImages}
-          posterVideos={posterVideos}
-          setPosterVideos={setPosterVideos}
           existingPoster={existingPoster}
           setExistingPoster={setExistingPoster}
         />
@@ -410,7 +397,6 @@ export default function EventCreationWizard({
           onPublish={handlePublish}
           onGoToStep={goToStep}
           posterImages={posterImages}
-          posterVideos={posterVideos}
           existingPoster={existingPoster}
         />
       )}
