@@ -267,7 +267,7 @@ export default function XiloloAssistantWidget() {
   }, [hasAccess, hasToken, statusLoading]);
 
   return (
-    <div className="tw:fixed tw:bottom-4 tw:right-4 tw:z-[1050] tw:flex tw:flex-col tw:items-end tw:font-sans tw:md:bottom-[22px] tw:md:right-[22px]">
+    <div className="tw:fixed tw:bottom-16 tw:right-4 tw:z-1050 tw:flex tw:flex-col tw:items-end tw:font-sans tw:md:bottom-[22px] tw:md:right-[22px]">
       {isOpen && (
         <section
           className="tw:mb-3.5 tw:flex tw:h-[min(610px,calc(100vh-112px))] tw:w-[min(520px,calc(100vw-28px))] tw:flex-col tw:overflow-hidden tw:rounded-[18px] tw:border tw:border-gray-900/10 tw:bg-white tw:text-zinc-900 tw:shadow-[0_24px_70px_rgba(15,23,42,0.22)] max-[520px]:tw:h-[min(600px,calc(100vh-92px))]"
@@ -414,13 +414,13 @@ export default function XiloloAssistantWidget() {
           borderRadius: isOpen ? "18px" : "44px",
         }}
         type="button"
-        className="tw:grid tw:h-[58px] tw:w-[148px] tw:place-items-center tw:rounded-full tw:border-0 tw:bg-[#111111] tw:text-white tw:shadow-[0_18px_38px_rgba(17,17,17,0.28)] tw:transition hover:tw:bg-black"
+        className="tw:grid tw:px-4 tw:py-3 tw:md:h-[58px] tw:md:w-[148px] tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:shadow-[0_18px_38px_rgba(17,17,17,0.28)] tw:transition hover:tw:bg-black"
         onClick={() => setIsOpen((open) => !open)}
         aria-label={isOpen ? "Close Xilolo assistant" : "Open Xilolo assistant"}
       >
         {isOpen ? <X size={24} /> : <span className="tw:inline-flex tw:items-center tw:gap-2">
-          <Sparkles size={25} />
-          <span className="tw:text-sm tw:font-medium tew:text-white">Xilolo AI</span>
+          <Sparkles className="tw:size-5 tw:md:size-7" />
+          <span className="tw:block tw:text-xs tw:md:text-sm tw:font-medium tw:text-white">Xilolo AI</span>
         </span>}
       </button>
     </div>
