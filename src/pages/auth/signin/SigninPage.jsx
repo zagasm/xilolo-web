@@ -15,6 +15,7 @@ import defaultAvatar from "../../../assets/avater_pix.avif";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { isAppleAuthConfigured } from "../../../lib/appleAuth";
 import { getWebDevicePayload } from "../../../lib/deviceName";
+import { getAuthLocationPayload } from "../../../lib/authLocation";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 import TwoFactorLoginForm from "../components/TwoFactorLoginForm.jsx";
@@ -353,6 +354,7 @@ export function Signin() {
         input: formData.email,
         password: formData.password,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       };
 
       const response = await api.post("/api/v1/login", payload);
@@ -399,6 +401,7 @@ export function Signin() {
       const { data } = await api.post("/api/v1/google/login", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (data?.two_factor_required) {
@@ -439,6 +442,7 @@ export function Signin() {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (data?.two_factor_required) {

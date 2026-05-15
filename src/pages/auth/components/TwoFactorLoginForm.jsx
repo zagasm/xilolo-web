@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from "react";
 import AuthContainer from "../assets/auth_container";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { getWebDevicePayload } from "../../../lib/deviceName";
+import { getAuthLocationPayload } from "../../../lib/authLocation";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
 export default function TwoFactorLoginForm({
@@ -62,6 +63,7 @@ export default function TwoFactorLoginForm({
         challenge_id: challenge?.challenge_id,
         code: verificationCode,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
         remember_device: rememberDevice,
       });
 
