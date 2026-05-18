@@ -24,6 +24,7 @@ export default function TicketPromptModal({
   buying = false,
 }) {
   const [selectedPurchaseType, setSelectedPurchaseType] = useState("ticket_only");
+  const [quantity, setQuantity] = useState(1);
 
   const poster = event?.poster?.[0]?.url || "/images/event-dummy.jpg";
   const priceLabel = priceText(event);
@@ -93,12 +94,30 @@ export default function TicketPromptModal({
   React.useEffect(() => {
     if (!open) return;
     setSelectedPurchaseType(options[0]?.value || "ticket_only");
+    setQuantity(1);
   }, [open, options]);
 
   if (!event) return null;
 
   const selectedOption =
     options.find((option) => option.value === selectedPurchaseType) || options[0];
+  const canChooseQuantity =
+    selectedOption?.value === "ticket_only" ||
+    selectedOption?.value === "ticket_and_manual";
+  const normalizedQuantity = canChooseQuantity
+    ? Math.min(100, Math.max(1, Number(quantity) || 1))
+    : 1;
+  const selectedBaseAmount =
+    selectedOption?.value === "ticket_and_manual"
+      ? ticketAmount * normalizedQuantity + manualAmount
+      : selectedOption?.value === "manual_only"
+        ? manualAmount
+        : ticketAmount * normalizedQuantity;
+  const selectedTotalLabel =
+    selectedBaseAmount > 0
+      ? `${event?.currency?.symbol || ""}${selectedBaseAmount.toLocaleString("en-NG")}`
+      : "Free";
+  const sponsoredCount = Math.max(0, normalizedQuantity - 1);
 
   return (
     <Transition.Root show={open} as={Fragment} appear>
@@ -241,17 +260,57 @@ export default function TicketPromptModal({
                     </div>
                   )}
 
+                  {canChooseQuantity && (
+                    <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-3 tw:sm:p-4">
+                      <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                        <div>
+                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                            Ticket quantity
+                          </div>
+                          <div className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-slate-500 tw:sm:text-xs">
+                            1 ticket is for you. Extra tickets become paid tickets other users can claim.
+                          </div>
+                        </div>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={quantity}
+                          onChange={(event) => setQuantity(event.target.value)}
+                          onBlur={() => setQuantity(normalizedQuantity)}
+                          className="tw:h-10 tw:w-20 tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:text-right tw:text-sm tw:font-semibold tw:outline-none focus:tw:border-primary"
+                        />
+                      </div>
+                      <div className="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-2 tw:text-xs">
+                        <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
+                          <span className="tw:block tw:text-slate-500">For you</span>
+                          <span className="tw:font-semibold tw:text-slate-900">1 ticket</span>
+                        </div>
+                        <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
+                          <span className="tw:block tw:text-slate-500">Sponsored</span>
+                          <span className="tw:font-semibold tw:text-slate-900">
+                            {sponsoredCount} ticket{sponsoredCount === 1 ? "" : "s"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="tw:mt-3 tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:bg-primary/5 tw:p-3">
+                        <span className="tw:text-xs tw:font-medium tw:text-slate-600">Wallet total</span>
+                        <span className="tw:text-sm tw:font-bold tw:text-slate-900">{selectedTotalLabel}</span>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-1">
                     {selectedOption && (
                       <button
                         type="button"
-                        onClick={() => onBuy(selectedOption.value)}
+                        onClick={() => onBuy(selectedOption.value, normalizedQuantity)}
                         disabled={buying}
                         className="tw:w-full tw:rounded-[16px] tw:bg-primary tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
                       >
                         {buying
                           ? "Processing purchase..."
-                          : `Continue with ${selectedOption.label} (${selectedOption.amountLabel})`}
+                          : `Continue with ${selectedOption.label} (${selectedTotalLabel})`}
                       </button>
                     )}
 

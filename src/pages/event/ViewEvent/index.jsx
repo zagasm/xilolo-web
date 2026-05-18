@@ -37,7 +37,10 @@ import TicketPurchaseSuccessModal from "../../../features/wallet/components/Tick
 import WalletFundingRequiredModal from "../../../features/wallet/components/WalletFundingRequiredModal";
 import { useEventShareFlow } from "../../../features/eventShare/hooks/useEventShareFlow";
 import { normalizeEventRecord } from "../../../features/eventShare/shareUtils";
-import { usePurchaseTicketWithWallet } from "../../../features/wallet/hooks/usePurchaseTicketWithWallet";
+import {
+  useClaimSponsoredTicket,
+  usePurchaseTicketWithWallet,
+} from "../../../features/wallet/hooks/usePurchaseTicketWithWallet";
 import {
   clearPendingPurchaseIntent,
   setPendingPurchaseIntent,
@@ -270,6 +273,13 @@ export default function ViewEvent() {
     },
   });
 
+  const claimSponsoredTicketMutation = useClaimSponsoredTicket({
+    onSuccess: () => {
+      refreshEventDetailSilently();
+      showSuccess("Paid ticket claimed successfully.");
+    },
+  });
+
   function initialsFromName(name = "") {
     const parts = String(name).trim().split(/\s+/).filter(Boolean);
     const first = parts[0]?.[0] || "";
@@ -425,7 +435,7 @@ export default function ViewEvent() {
     window.open(manualDownloadUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleGetTicket = async (purchaseType = "ticket_only") => {
+  const handleGetTicket = async (purchaseType = "ticket_only", quantity = 1) => {
     if (event?.is_sold_out || purchaseTicketMutation.isPending) return;
 
     if (!token) {
@@ -437,7 +447,7 @@ export default function ViewEvent() {
     try {
       await purchaseTicketMutation.mutateAsync({
         event_id: event.id,
-        quantity: 1,
+        quantity,
         purchase_type: purchaseType,
       });
     } catch (paymentError) {
@@ -456,7 +466,7 @@ export default function ViewEvent() {
           setPendingPurchaseIntent({
             eventId: event.id,
             eventTitle: event.title,
-            quantity: 1,
+            quantity,
             purchaseType,
             sourcePage: "event_detail",
             eventPath: location.pathname,
@@ -493,6 +503,23 @@ export default function ViewEvent() {
 
       showError(errorMessage);
       console.error("Wallet purchase error:", paymentError);
+    }
+  };
+
+  const handleClaimSponsoredTicket = async () => {
+    if (!event?.id || claimSponsoredTicketMutation.isPending) return;
+
+    if (!token) {
+      showError("Please log in to claim a paid ticket.");
+      navigate("/auth/signin");
+      return;
+    }
+
+    try {
+      await claimSponsoredTicketMutation.mutateAsync(event.id);
+    } catch (claimError) {
+      showError(getApiErrorMessage(claimError, "Unable to claim paid ticket."));
+      refreshEventDetailSilently();
     }
   };
 
@@ -547,6 +574,9 @@ export default function ViewEvent() {
   );
   const canBuyManualOnly = hasPaid && manualOnlyAvailable;
   const canDownloadManual = manualAvailable && manualHasAccess;
+  const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
+  const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
+  const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
   const replay = event?.replay || {};
   const replayEnabled = !!event?.enable_replay;
   const hasReplay = !!event?.has_replay;
@@ -584,7 +614,8 @@ export default function ViewEvent() {
   const ctaDisabled =
     (!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
     (hasPaid && !isLiveNow && !canBuyManualOnly) ||
-    purchaseTicketMutation.isPending;
+    purchaseTicketMutation.isPending ||
+    claimSponsoredTicketMutation.isPending;
 
   const handleEnterLive = () => {
     if (hasPaid && isLiveNow) {
@@ -1157,6 +1188,31 @@ export default function ViewEvent() {
 
                     {isOwnerEvent ? (
                       <>
+                        {hasSponsoredTicketsAvailable && !hasPaid && (
+                          <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
+                            <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                              Someone has paid for tickets for this event.
+                            </div>
+                            <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
+                              You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
+                            </div>
+                            <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                              <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
+                                {sponsoredTicketsAvailableCount} available
+                              </span>
+                              {canClaimSponsoredTicket && (
+                                <button
+                                  type="button"
+                                  onClick={handleClaimSponsoredTicket}
+                                  disabled={claimSponsoredTicketMutation.isPending}
+                                  className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                                >
+                                  {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         <button
                           style={{
                             borderRadius: 24
@@ -1380,7 +1436,7 @@ export default function ViewEvent() {
         open={purchaseModalOpen}
         onClose={closePurchaseModal}
         event={event}
-        onBuy={(purchaseType) => handleGetTicket(purchaseType)}
+        onBuy={(purchaseType, quantity) => handleGetTicket(purchaseType, quantity)}
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
       />

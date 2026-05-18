@@ -23,7 +23,7 @@ function buildEcho(token) {
   const host = import.meta.env.VITE_REVERB_HOST;
   const port = import.meta.env.VITE_REVERB_PORT;
   const scheme = import.meta.env.VITE_REVERB_SCHEME || "https";
-  const apiUrl = import.meta.env.VITE_API_URL || "";
+  const apiUrl = import.meta.env.VITE_API_URL || "https://api.xilolo.com";
 
   if (!token || !key || !host || !port || !apiUrl) return null;
 
@@ -497,7 +497,7 @@ export default function SupportChatPage() {
                     <div
                       key={message.id}
                       className={[
-                        "tw:max-w-[82%] tw:whitespace-pre-wrap tw:break-words tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:leading-relaxed tw:md:max-w-[620px] tw:md:text-base",
+                        "tw:max-w-[82%] tw:whitespace-pre-wrap tw:wrap-break-word tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:leading-relaxed tw:md:max-w-[620px] tw:md:text-base",
                         message.sender_type === "admin"
                           ? "tw:self-start tw:border tw:border-gray-200 tw:bg-white tw:text-gray-800"
                           : "tw:self-end tw:bg-primary tw:text-white",

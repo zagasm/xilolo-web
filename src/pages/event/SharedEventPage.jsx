@@ -22,7 +22,10 @@ import TicketPurchaseSuccessModal from "../../features/wallet/components/TicketP
 import WalletFundingRequiredModal from "../../features/wallet/components/WalletFundingRequiredModal";
 import { useSharedEventPage } from "../../features/eventShare/hooks/useSharedEventPage";
 import { useEventShareFlow } from "../../features/eventShare/hooks/useEventShareFlow";
-import { usePurchaseTicketWithWallet } from "../../features/wallet/hooks/usePurchaseTicketWithWallet";
+import {
+  useClaimSponsoredTicket,
+  usePurchaseTicketWithWallet,
+} from "../../features/wallet/hooks/usePurchaseTicketWithWallet";
 import { useAuth } from "../auth/AuthContext";
 import {
   getEventDescription,
@@ -169,6 +172,26 @@ export default function SharedEventPage() {
     },
   });
 
+  const claimSponsoredTicketMutation = useClaimSponsoredTicket({
+    onSuccess: () => {
+      setLocalEvent((previous) =>
+        previous
+          ? {
+              ...previous,
+              hasPaid: true,
+              user_has_ticket: true,
+              can_claim_sponsored_ticket: false,
+              sponsored_tickets_available_count: Math.max(
+                0,
+                Number(previous.sponsored_tickets_available_count || 0) - 1
+              ),
+            }
+          : previous
+      );
+      showSuccess("Paid ticket claimed successfully.");
+    },
+  });
+
   const structuredData = useMemo(() => {
     if (!event) return [];
 
@@ -236,6 +259,9 @@ export default function SharedEventPage() {
     `${event?.currency?.symbol || "₦"}${event?.price || "0"}`;
   const isSoldOut = !!event?.is_sold_out;
   const hasPaid = !!event?.hasPaid;
+  const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
+  const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
+  const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
 
   const handleDownloadManual = async () => {
     if (!event?.id) return;
@@ -279,7 +305,7 @@ export default function SharedEventPage() {
     }
   };
 
-  const handleGetTicket = async (purchaseType = "ticket_only") => {
+  const handleGetTicket = async (purchaseType = "ticket_only", quantity = 1) => {
     if (!event?.id || event?.is_sold_out || purchaseTicketMutation.isPending) {
       return;
     }
@@ -294,7 +320,7 @@ export default function SharedEventPage() {
     try {
       await purchaseTicketMutation.mutateAsync({
         event_id: event.id,
-        quantity: 1,
+        quantity,
         purchase_type: purchaseType,
       });
     } catch (paymentError) {
@@ -313,7 +339,7 @@ export default function SharedEventPage() {
           setPendingPurchaseIntent({
             eventId: event.id,
             eventTitle: event.title,
-            quantity: 1,
+            quantity,
             purchaseType,
             sourcePage: "shared_event",
             eventPath: location.pathname,
@@ -352,13 +378,30 @@ export default function SharedEventPage() {
     }
   };
 
+  const handleClaimSponsoredTicket = async () => {
+    if (!event?.id || claimSponsoredTicketMutation.isPending) return;
+
+    if (!token) {
+      navigate("/auth/signin", {
+        state: { from: location.pathname },
+      });
+      return;
+    }
+
+    try {
+      await claimSponsoredTicketMutation.mutateAsync(event.id);
+    } catch (claimError) {
+      showError(getApiErrorMessage(claimError, "Unable to claim paid ticket."));
+    }
+  };
+
   const handlePrimaryAction = () => {
     if (hasPaid) {
       navigate("/tickets");
       return;
     }
 
-    if (isSoldOut || purchaseTicketMutation.isPending) return;
+    if (isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending) return;
 
     if (shouldChoosePurchaseType) {
       setPurchaseModalOpen(true);
@@ -562,6 +605,31 @@ export default function SharedEventPage() {
                   </p>
 
                   <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3">
+                    {hasSponsoredTicketsAvailable && !hasPaid && (
+                      <div className="tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
+                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                          Someone has paid for tickets for this event.
+                        </div>
+                        <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
+                          You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
+                        </div>
+                        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                          <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
+                            {sponsoredTicketsAvailableCount} available
+                          </span>
+                          {canClaimSponsoredTicket && (
+                            <button
+                              type="button"
+                              onClick={handleClaimSponsoredTicket}
+                              disabled={claimSponsoredTicketMutation.isPending}
+                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                            >
+                              {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     <button
                     style={{
 
@@ -569,7 +637,7 @@ export default function SharedEventPage() {
                     }}
                       type="button"
                       onClick={handlePrimaryAction}
-                      disabled={isSoldOut || purchaseTicketMutation.isPending}
+                      disabled={isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending}
                       className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
                     >
                       {primaryActionLabel}
@@ -636,7 +704,7 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={handlePrimaryAction}
-              disabled={isSoldOut || purchaseTicketMutation.isPending}
+              disabled={isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending}
               className="tw:flex tw:min-w-[168px] tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
             >
               {hasPaid ? "View my ticket" : isSoldOut ? "Sold out" : "Buy ticket"}
@@ -661,7 +729,7 @@ export default function SharedEventPage() {
         open={purchaseModalOpen}
         onClose={() => setPurchaseModalOpen(false)}
         event={event}
-        onBuy={(purchaseType) => handleGetTicket(purchaseType)}
+        onBuy={(purchaseType, quantity) => handleGetTicket(purchaseType, quantity)}
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
       />
