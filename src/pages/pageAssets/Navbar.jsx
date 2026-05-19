@@ -10,6 +10,7 @@ import {
   UserCircle2,
   LogOut,
   LayoutGrid,
+  Sparkles,
 } from "lucide-react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAuth } from "../auth/AuthContext";
@@ -147,6 +148,20 @@ export default function Navbar() {
         </div>
 
         <div className="tw:flex tw:items-center tw:gap-3 tw:md:gap-3.5">
+          <Link
+            to="/xilolo-ai"
+            className={[
+              "xilolo-ai-nav-button tw:hidden tw:lg:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3.5 tw:text-sm tw:font-extrabold tw:shadow-[0_10px_26px_rgba(17,17,17,0.18)] tw:transition hover:tw:-translate-y-0.5",
+              location.pathname === "/xilolo-ai"
+                ? "tw:border-primary tw:bg-primary text-white"
+                : "tw:border-gray-200 tw:bg-white tw:text-primary",
+            ].join(" ")}
+            aria-label="Open Xilolo AI"
+          >
+            <Sparkles className="tw:size-4" />
+            <span>Xilolo AI</span>
+          </Link>
+
           <form
             onSubmit={handleDesktopSearchSubmit}
             className="tw:hidden tw:lg:flex tw:h-10 tw:w-[220px] tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-3"

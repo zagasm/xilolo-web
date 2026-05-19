@@ -179,6 +179,15 @@ export function App() {
         },
       },
       {
+        matcher: /^\/xilolo-ai/,
+        meta: {
+          title: "Xilolo AI Assistant",
+          description:
+            "Chat with Xilolo AI for help with your wallet, events, streaming, KYC, and event setup.",
+          keywords: "Xilolo AI, assistant, events help, wallet help, streaming setup",
+        },
+      },
+      {
         matcher: /^\/support/,
         meta: {
           title: "Xilolo Support Center",
@@ -268,7 +277,6 @@ export function App() {
       <ForcedLogoutModalHost />
       <TwoFactorSecurityPrompt />
       <NetworkStatus />
-      <XiloloAssistantWidget />
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
@@ -340,6 +348,7 @@ export function App() {
               element={<WalletFundingCancelPage />}
             />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/xilolo-ai" element={<XiloloAssistantWidget />} />
             <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
