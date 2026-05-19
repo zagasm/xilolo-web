@@ -686,7 +686,7 @@ export default function XiloloAssistantWidget() {
 
                         <div
                           className={[
-                            "tw:whitespace-pre-wrap tw:break-words tw:rounded-3xl tw:px-4 tw:py-3 tw:text-[0.93rem] tw:leading-[1.55] tw:shadow-sm [&_strong]:tw:font-extrabold",
+                            "tw:whitespace-pre-wrap tw:wrap-break-word tw:rounded-3xl tw:px-4 tw:py-3 tw:text-[0.93rem] tw:leading-[1.55] tw:shadow-sm [&_strong]:tw:font-extrabold",
                             isUser
                               ? "tw:rounded-br-lg tw:bg-primary tw:text-white"
                               : "tw:rounded-bl-lg tw:border tw:border-zinc-200 tw:bg-white tw:text-zinc-800",
