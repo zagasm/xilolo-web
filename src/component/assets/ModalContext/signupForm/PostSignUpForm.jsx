@@ -8,9 +8,10 @@ import {
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import PostSignupFormModal from "./ModalContainer";
-import SignUpCodecomponent from "./SignUpCodecomponent";
+import PhoneEmailPostSignup from "./PhoneEmailPostSignup";
 import "./postSignupStyle.css";
 import { useAuth } from "../../../../pages/auth/AuthContext";
+import { useModal } from "..";
 import { showToast } from "../../../ToastAlert";
 import { showError, showSuccess } from "../../../ui/toast";
 import { api } from "../../../../lib/apiClient";
@@ -21,6 +22,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
+  const { closeModal } = useModal();
   const navigate = useNavigate();
 
   // ✅ hooks must always run, every render
@@ -88,11 +90,19 @@ const PostSignupForm = () => {
       }
 
       if (response.status === 200 || response.status === 201) {
+        const updatedUser = response.data?.user || response.data?.data?.user || user;
         showSuccess(
           response.data.message ||
             "Date of Birth and Gender updated successfully!"
         );
-        settosendUserdata(response.data.user);
+        settosendUserdata(updatedUser);
+
+        if (updatedUser?.email_verified || updatedUser?.email_verified_at) {
+          login({ token, user: updatedUser });
+          closeModal();
+          return;
+        }
+
         setFormSubmitted(true);
         return;
       }
@@ -140,10 +150,10 @@ const PostSignupForm = () => {
 
   if (formSubmitted) {
     return (
-      <SignUpCodecomponent
+      <PhoneEmailPostSignup
         token={token}
         userupdate={tosendUserdata}
-        type="phone"
+        type="email"
       />
     );
   }

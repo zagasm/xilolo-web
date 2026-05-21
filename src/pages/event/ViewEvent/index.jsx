@@ -376,7 +376,12 @@ export default function ViewEvent() {
       typeof window !== "undefined" &&
       window.localStorage.getItem(promptKey) === "1";
 
-    if (!event?.hasPaid && hasPurchaseOptions && !hasSeenPrompt) {
+    if (
+      !event?.hasPaid &&
+      !event?.can_claim_sponsored_ticket &&
+      hasPurchaseOptions &&
+      !hasSeenPrompt
+    ) {
       if (typeof window !== "undefined") {
         window.localStorage.setItem(promptKey, "1");
       }
@@ -601,6 +606,8 @@ export default function ViewEvent() {
     primaryCtaLabel = "Buy Manual";
   } else if (hasPaid && !isLiveNow) {
     primaryCtaLabel = "Ticket Purchased";
+  } else if (canClaimSponsoredTicket) {
+    primaryCtaLabel = claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim Paid Ticket";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
   } else if (purchaseTicketMutation.isPending) {
@@ -612,10 +619,11 @@ export default function ViewEvent() {
   }
 
   const ctaDisabled =
-    (!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
-    (hasPaid && !isLiveNow && !canBuyManualOnly) ||
     purchaseTicketMutation.isPending ||
-    claimSponsoredTicketMutation.isPending;
+    claimSponsoredTicketMutation.isPending ||
+    (!canClaimSponsoredTicket &&
+      ((!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
+        (hasPaid && !isLiveNow && !canBuyManualOnly)));
 
   const handleEnterLive = () => {
     if (hasPaid && isLiveNow) {
@@ -628,6 +636,11 @@ export default function ViewEvent() {
 
     if (hasPaid && isLiveNow) {
       handleEnterLive();
+      return;
+    }
+
+    if (canClaimSponsoredTicket) {
+      handleClaimSponsoredTicket();
       return;
     }
 
@@ -1186,33 +1199,34 @@ export default function ViewEvent() {
                       </div>
                     )}
 
+                    {hasSponsoredTicketsAvailable && !hasPaid && (
+                      <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
+                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                          Someone has paid for tickets for this event.
+                        </div>
+                        <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
+                          You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
+                        </div>
+                        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                          <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
+                            {sponsoredTicketsAvailableCount} available
+                          </span>
+                          {canClaimSponsoredTicket && (
+                            <button
+                              type="button"
+                              onClick={handleClaimSponsoredTicket}
+                              disabled={claimSponsoredTicketMutation.isPending}
+                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                            >
+                              {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {isOwnerEvent ? (
                       <>
-                        {hasSponsoredTicketsAvailable && !hasPaid && (
-                          <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
-                            <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                              Someone has paid for tickets for this event.
-                            </div>
-                            <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
-                              You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
-                            </div>
-                            <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                              <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
-                                {sponsoredTicketsAvailableCount} available
-                              </span>
-                              {canClaimSponsoredTicket && (
-                                <button
-                                  type="button"
-                                  onClick={handleClaimSponsoredTicket}
-                                  disabled={claimSponsoredTicketMutation.isPending}
-                                  className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
-                                >
-                                  {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        )}
                         <button
                           style={{
                             borderRadius: 24
@@ -1250,7 +1264,7 @@ export default function ViewEvent() {
                             }`}
                         >
                           {primaryCtaLabel}
-                          {!ctaDisabled && !hasPaid && !shouldChoosePurchaseType && (
+                          {!ctaDisabled && !hasPaid && !canClaimSponsoredTicket && !shouldChoosePurchaseType && (
                             <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
                               ({priceText(event)})
                             </span>
@@ -1264,6 +1278,8 @@ export default function ViewEvent() {
                               : canBuyManualOnly
                                 ? "Your ticket is secured. You can still unlock the event manual."
                                 : "Your ticket is secured. We will notify you when the event starts."
+                            : canClaimSponsoredTicket
+                              ? "A paid ticket is available for you to claim now. You can still buy or sponsor tickets from the purchase options."
                             : shouldChoosePurchaseType
                               ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
                               : "Secure checkout and fast access to your purchased ticket."}

@@ -13,6 +13,7 @@ import {
   Radio,
   Signal,
   Square,
+  Users,
   Video,
 } from "lucide-react";
 import SideBarNav from "../pageAssets/SideBarNav";
@@ -296,6 +297,151 @@ function ActionButton({
   );
 }
 
+function normaliseViewer(viewer) {
+  const user = viewer?.user || viewer || {};
+  return {
+    id: viewer?.user_id || user?.id || user?.uuid || viewer?.id,
+    name:
+      viewer?.name ||
+      user?.name ||
+      [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
+      user?.user_name ||
+      user?.username ||
+      "Viewer",
+    username: viewer?.username || user?.user_name || user?.username || "",
+    profilePicture:
+      viewer?.profile_picture ||
+      viewer?.profile_url ||
+      user?.profile_picture ||
+      user?.profile_url ||
+      user?.profile?.image ||
+      "",
+    joinedAt: viewer?.joined_at || viewer?.viewed_at || "",
+    leftAt: viewer?.left_at || "",
+  };
+}
+
+function ViewerList({ viewers }) {
+  if (!viewers.length) {
+    return (
+      <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#ded6cd] tw:p-4 tw:text-sm tw:text-gray-500">
+        No viewers recorded yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="tw:max-h-[320px] tw:space-y-3 tw:overflow-y-auto tw:pr-1">
+      {viewers.map((viewer) => (
+        <div
+          key={`${viewer.id}-${viewer.joinedAt || viewer.name}`}
+          className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#f0ebff] tw:bg-[#faf7f3] tw:p-3"
+        >
+          {viewer.profilePicture ? (
+            <img
+              src={viewer.profilePicture}
+              alt={viewer.name}
+              className="tw:h-11 tw:w-11 tw:shrink-0 tw:rounded-full tw:object-cover"
+            />
+          ) : (
+            <div className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-sm tw:font-semibold tw:text-primary">
+              {viewer.name.slice(0, 1).toUpperCase()}
+            </div>
+          )}
+
+          <div className="tw:min-w-0 tw:flex-1">
+            <div className="tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900">
+              {viewer.name}
+            </div>
+            <div className="tw:truncate tw:text-xs tw:text-gray-500">
+              {viewer.username ? `@${viewer.username}` : "Xilolo user"}
+            </div>
+          </div>
+
+          <div className="tw:text-right tw:text-xs tw:text-gray-500">
+            {viewer.leftAt ? "Left" : "Watching"}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
+  const currentViewers = (analytics?.current_viewers || []).map(normaliseViewer);
+  const allTimeViewers = (analytics?.all_time_viewers || []).map(normaliseViewer);
+
+  return (
+    <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+      <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+        <div>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <Users className="tw:h-5 tw:w-5 tw:text-primary" />
+            <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+              Viewer analytics
+            </span>
+          </div>
+          <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+            Current viewers update while the event is live. Historical viewers remain after the event ends.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={loading}
+          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-[#f3ede6] disabled:tw:opacity-60"
+        >
+          {loading ? <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" /> : null}
+          Refresh
+        </button>
+      </div>
+
+      <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-3">
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Current
+          </div>
+          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
+            {analytics?.current_viewer_count ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Unique
+          </div>
+          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
+            {analytics?.total_unique_viewer_count ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Peak
+          </div>
+          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
+            {analytics?.peak_viewer_count ?? 0}
+          </div>
+        </div>
+      </div>
+
+      <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-5 tw:lg:grid-cols-2">
+        <div>
+          <div className="tw:mb-3 tw:text-sm tw:font-semibold tw:text-gray-900">
+            Watching now
+          </div>
+          <ViewerList viewers={currentViewers} />
+        </div>
+        <div>
+          <div className="tw:mb-3 tw:text-sm tw:font-semibold tw:text-gray-900">
+            All-time viewers
+          </div>
+          <ViewerList viewers={allTimeViewers} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function EventStreamControlPage() {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -310,7 +456,26 @@ export default function EventStreamControlPage() {
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
   const [closeTicketSalesOnGoLive, setCloseTicketSalesOnGoLive] = useState(false);
+  const [viewerAnalytics, setViewerAnalytics] = useState(null);
+  const [viewerAnalyticsLoading, setViewerAnalyticsLoading] = useState(false);
   const copyTimeoutRef = useRef(null);
+
+  const loadViewerAnalytics = useCallback(async () => {
+    if (!eventId || !token) return;
+
+    setViewerAnalyticsLoading(true);
+    try {
+      const response = await api.get(
+        `/api/v1/events/${eventId}/live/viewers/analytics`,
+        authHeaders(token),
+      );
+      setViewerAnalytics(response?.data?.data || response?.data || null);
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not load viewer analytics."));
+    } finally {
+      setViewerAnalyticsLoading(false);
+    }
+  }, [eventId, token]);
 
   const loadEventDetails = useCallback(
     async ({ background = false } = {}) => {
@@ -380,6 +545,20 @@ export default function EventStreamControlPage() {
   useEffect(() => {
     loadEventDetails();
   }, [loadEventDetails]);
+
+  useEffect(() => {
+    loadViewerAnalytics();
+  }, [loadViewerAnalytics]);
+
+  useEffect(() => {
+    if (!eventId || !token) return undefined;
+
+    const interval = window.setInterval(() => {
+      loadViewerAnalytics();
+    }, 15000);
+
+    return () => window.clearInterval(interval);
+  }, [eventId, loadViewerAnalytics, token]);
 
   useEffect(() => {
     return () => {
@@ -1033,6 +1212,12 @@ export default function EventStreamControlPage() {
                 </section>
               </>
             )}
+
+            <ViewerAnalyticsPanel
+              analytics={viewerAnalytics}
+              loading={viewerAnalyticsLoading}
+              onRefresh={loadViewerAnalytics}
+            />
           </div>
         </div>
       </div>

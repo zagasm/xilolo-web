@@ -401,7 +401,14 @@ export default function SharedEventPage() {
       return;
     }
 
-    if (isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending) return;
+    if (purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending) return;
+
+    if (canClaimSponsoredTicket) {
+      handleClaimSponsoredTicket();
+      return;
+    }
+
+    if (isSoldOut) return;
 
     if (shouldChoosePurchaseType) {
       setPurchaseModalOpen(true);
@@ -413,6 +420,10 @@ export default function SharedEventPage() {
 
   const primaryActionLabel = hasPaid
     ? "View my ticket"
+    : canClaimSponsoredTicket
+      ? claimSponsoredTicketMutation.isPending
+        ? "Claiming..."
+        : "Claim paid ticket"
     : isSoldOut
       ? "Sold out"
       : purchaseTicketMutation.isPending
@@ -637,7 +648,11 @@ export default function SharedEventPage() {
                     }}
                       type="button"
                       onClick={handlePrimaryAction}
-                      disabled={isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending}
+                      disabled={
+                        purchaseTicketMutation.isPending ||
+                        claimSponsoredTicketMutation.isPending ||
+                        (!canClaimSponsoredTicket && isSoldOut)
+                      }
                       className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
                     >
                       {primaryActionLabel}
@@ -704,10 +719,22 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={handlePrimaryAction}
-              disabled={isSoldOut || purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending}
+              disabled={
+                purchaseTicketMutation.isPending ||
+                claimSponsoredTicketMutation.isPending ||
+                (!canClaimSponsoredTicket && isSoldOut)
+              }
               className="tw:flex tw:min-w-[168px] tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
             >
-              {hasPaid ? "View my ticket" : isSoldOut ? "Sold out" : "Buy ticket"}
+              {hasPaid
+                ? "View my ticket"
+                : canClaimSponsoredTicket
+                  ? claimSponsoredTicketMutation.isPending
+                    ? "Claiming..."
+                    : "Claim paid ticket"
+                  : isSoldOut
+                    ? "Sold out"
+                    : "Buy ticket"}
             </button>
           </div>
         </div>

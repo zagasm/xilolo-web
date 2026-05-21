@@ -52,6 +52,19 @@ export default function TicketPromptModal({
       });
     }
 
+    if (event?.user_can_sponsor_tickets && ticketAmount > 0) {
+      list.push({
+        value: "sponsored_only",
+        label: "Sponsor tickets",
+        amountLabel: getAmountLabel(
+          ticketAmount,
+          event?.price_display,
+          event?.currency?.symbol || ""
+        ),
+        description: "Pay for tickets that other users can claim.",
+      });
+    }
+
     if (purchaseOptions.ticket_and_manual && !hasManualAccess) {
       list.push({
         value: "ticket_and_manual",
@@ -82,6 +95,7 @@ export default function TicketPromptModal({
     combinedAmount,
     event?.currency?.symbol,
     event?.price_display,
+    event?.user_can_sponsor_tickets,
     hasManualAccess,
     manual?.price_display,
     manualAmount,
@@ -103,7 +117,8 @@ export default function TicketPromptModal({
     options.find((option) => option.value === selectedPurchaseType) || options[0];
   const canChooseQuantity =
     selectedOption?.value === "ticket_only" ||
-    selectedOption?.value === "ticket_and_manual";
+    selectedOption?.value === "ticket_and_manual" ||
+    selectedOption?.value === "sponsored_only";
   const normalizedQuantity = canChooseQuantity
     ? Math.min(100, Math.max(1, Number(quantity) || 1))
     : 1;
@@ -117,7 +132,11 @@ export default function TicketPromptModal({
     selectedBaseAmount > 0
       ? `${event?.currency?.symbol || ""}${selectedBaseAmount.toLocaleString("en-NG")}`
       : "Free";
-  const sponsoredCount = Math.max(0, normalizedQuantity - 1);
+  const buyerTicketCount = selectedOption?.value === "sponsored_only" ? 0 : 1;
+  const sponsoredCount =
+    selectedOption?.value === "sponsored_only"
+      ? normalizedQuantity
+      : Math.max(0, normalizedQuantity - 1);
 
   return (
     <Transition.Root show={open} as={Fragment} appear>
@@ -221,7 +240,7 @@ export default function TicketPromptModal({
                     </div>
                   </div>
 
-                  {!hasManualAccess && options.length > 0 && (
+                  {options.length > 0 && (
                     <div className="tw:space-y-2 tw:sm:space-y-3">
                       <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
                         Choose access
@@ -268,7 +287,9 @@ export default function TicketPromptModal({
                             Ticket quantity
                           </div>
                           <div className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-slate-500 tw:sm:text-xs">
-                            1 ticket is for you. Extra tickets become paid tickets other users can claim.
+                            {selectedOption?.value === "sponsored_only"
+                              ? "All selected tickets become paid tickets other users can claim."
+                              : "1 ticket is for you. Extra tickets become paid tickets other users can claim."}
                           </div>
                         </div>
                         <input
@@ -284,7 +305,9 @@ export default function TicketPromptModal({
                       <div className="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-2 tw:text-xs">
                         <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
                           <span className="tw:block tw:text-slate-500">For you</span>
-                          <span className="tw:font-semibold tw:text-slate-900">1 ticket</span>
+                          <span className="tw:font-semibold tw:text-slate-900">
+                            {buyerTicketCount} ticket{buyerTicketCount === 1 ? "" : "s"}
+                          </span>
                         </div>
                         <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
                           <span className="tw:block tw:text-slate-500">Sponsored</span>
