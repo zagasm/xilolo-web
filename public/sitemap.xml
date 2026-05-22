@@ -1,76 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-
-    <!-- Homepage -->
-    <url>
-        <loc>https://xilolo.com/</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-
-    <!-- Organizers Page -->
-    <url>
-        <loc>https://xilolo.com/organizers</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-
-    <!-- Create Event Page -->
-    <url>
-        <loc>https://xilolo.com/event/select-event-type</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
-    <!-- Saved Events Page -->
-    <url>
-        <loc>https://xilolo.com/event/saved-events</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
-
-    <!-- Profile Page -->
-    <url>
-        <loc>https://xilolo.com/profile</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
-    </url>
-
-    <!-- Notification Page -->
-    <url>
-        <loc>https://xilolo.com/notification</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.4</priority>
-    </url>
-
-    <!-- Account Settings -->
-    <url>
-        <loc>https://xilolo.com/account</loc>
-        <lastmod>2025-10-07</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
-    </url>
-
-    <!-- 
-    Note: Individual event pages and user profiles should be added dynamically
-    Example event URL: https://xilolo.com/event/view/{eventId}
-    Example profile URL: https://xilolo.com/profile/{userId}
-    
-    Consider creating a dynamic sitemap generator that fetches:
-    - All public events
-    - All public organizer profiles
-    - Recently updated content
-    -->
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://xilolo.com/</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/about</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/contact</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/ads</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/support</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/marketing</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/data-protection</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/privacy-policy</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/terms-of-service</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/community-guidelines</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://xilolo.com/signal-deck</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
 </urlset>
