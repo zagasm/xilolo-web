@@ -17,17 +17,10 @@ import { HelmetProvider } from "react-helmet-async";
 import { ModalProvider } from "./component/assets/ModalContext/index.jsx";
 import { store } from "./store";
 
-// import { initGA } from "./lib/analytics";
-// import AnalyticsTracker from "./component/AnalyticsTracker";
+import { initGA } from "./analytics";
+import GoogleAnalyticsTracker from "./GoogleAnalyticsTracker.jsx";
 
-// initGA();
-
-// window.onerror = (msg, url, line) => {
-//   debugger;
-// };
-// window.onunhandledrejection = (e) => {
-//   debugger;
-// };
+initGA();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,7 +41,7 @@ const RootWrapper = () => {
 
   return (
     <BrowserRouter>
-      {/* <AnalyticsTracker /> */}
+      <GoogleAnalyticsTracker />
       <App />
     </BrowserRouter>
   );
