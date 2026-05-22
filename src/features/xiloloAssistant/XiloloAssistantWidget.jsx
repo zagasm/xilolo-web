@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Menu, Transition } from "@headlessui/react";
 import {
   ArrowLeft,
   Bot,
@@ -6,18 +7,20 @@ import {
   ImagePlus,
   Loader2,
   MessageCircle,
+  MoreHorizontal,
   Plus,
+  Search,
   Send,
   Sparkles,
   Trash2,
+  X,
 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 
 const INITIAL_AI_MESSAGE = {
   id: "ai-welcome",
   role: "assistant",
-  content:
-    "Hi, I am Xilolo AI. Ask about your wallet, events, streaming, KYC, or event setup.",
+  content: "Hi, I am Xilolo AI. How can I help?",
 };
 
 const SUGGESTED_PROMPTS = [
@@ -28,6 +31,10 @@ const SUGGESTED_PROMPTS = [
 ];
 
 const TYPEWRITER_SPEED = 14;
+const HIDDEN_SCROLLBAR_STYLE = {
+  scrollbarWidth: "none",
+  msOverflowStyle: "none",
+};
 
 function getToken() {
   return localStorage.getItem("token") || "";
@@ -66,14 +73,14 @@ function renderMessageText(text = "") {
 function isSubscriptionActive(status) {
   return Boolean(
     status?.has_active_subscription ||
-    status?.subscription?.isActive ||
-    status?.subscription?.status === "active"
+      status?.subscription?.isActive ||
+      status?.subscription?.status === "active"
   );
 }
 
 function ThinkingBubble() {
   return (
-    <div className="tw:flex tw:max-w-[86%] tw:self-start tw:items-center tw:gap-2 tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-zinc-600 tw:shadow-sm">
+    <div className="tw:flex tw:max-w-[78%] tw:self-start tw:items-center tw:gap-2 tw:rounded-[22px] tw:bg-white/70 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-[#444]">
       <span className="tw:grid tw:h-7 tw:w-7 tw:place-items-center tw:rounded-full tw:bg-primary/10 tw:text-primary">
         <Bot size={15} />
       </span>
@@ -89,18 +96,86 @@ function ThinkingBubble() {
   );
 }
 
+function ConversationMenuItem({
+  conversation,
+  active,
+  onOpen,
+  onDelete,
+}) {
+  return (
+    <div
+      className={[
+        "tw:relative tw:flex tw:h-12 tw:items-center tw:gap-2 tw:rounded-[20px] tw:px-4 tw:transition",
+        active ? "tw:bg-white tw:shadow-sm" : "tw:bg-white/70 hover:tw:bg-white",
+      ].join(" ")}
+      style={{ borderRadius: 36 }}
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-left tw:text-sm tw:font-bold tw:text-primary"
+      >
+        {conversation.title || "Xilolo AI conversation"}
+      </button>
+
+      <Menu as="div" className="tw:relative tw:shrink-0">
+        <Menu.Button
+          type="button"
+          className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-[#f7f2eb]"
+          aria-label="Conversation options"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <MoreHorizontal size={18} />
+        </Menu.Button>
+
+        <Transition
+          enter="tw:transition tw:duration-100 tw:ease-out"
+          enterFrom="tw:scale-95 tw:opacity-0"
+          enterTo="tw:scale-100 tw:opacity-100"
+          leave="tw:transition tw:duration-75 tw:ease-in"
+          leaveFrom="tw:scale-100 tw:opacity-100"
+          leaveTo="tw:scale-95 tw:opacity-0"
+        >
+          <Menu.Items className="tw:absolute tw:right-0 tw:z-50 tw:mt-2 tw:w-36 tw:origin-top-right tw:rounded-2xl tw:border tw:border-[#e6ded4] tw:bg-white tw:p-1 tw:shadow-xl focus:tw:outline-none">
+            <Menu.Item>
+              {({ active: menuActive }) => (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete();
+                  }}
+                  className={[
+                    "tw:flex tw:w-full tw:items-center tw:gap-2 tw:rounded-xl tw:px-3 tw:py-2 tw:text-left tw:text-sm tw:font-bold tw:text-red-600",
+                    menuActive ? "tw:bg-red-50" : "",
+                  ].join(" ")}
+                >
+                  <Trash2 size={15} />
+                  Delete
+                </button>
+              )}
+            </Menu.Item>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+    </div>
+  );
+}
+
 export default function XiloloAssistantWidget() {
   const isOpen = true;
 
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
-  const [statusLoading, setStatusLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(() => Boolean(getToken()));
   const [gateError, setGateError] = useState("");
 
   const [aiConversations, setAiConversations] = useState([]);
-  const [aiView, setAiView] = useState("list");
+  const [aiView, setAiView] = useState("chat");
   const [aiListLoading, setAiListLoading] = useState(false);
   const [aiConversationId, setAiConversationId] = useState("");
   const [aiMessages, setAiMessages] = useState([INITIAL_AI_MESSAGE]);
+  const [conversationSearch, setConversationSearch] = useState("");
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -109,11 +184,19 @@ export default function XiloloAssistantWidget() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const fileInputRef = useRef(null);
+  const chatInputRef = useRef(null);
   const endRef = useRef(null);
   const typingRequestRef = useRef(0);
 
   const hasToken = Boolean(getToken());
   const hasAccess = hasToken && isSubscriptionActive(subscriptionStatus);
+
+  const focusChatInput = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (!hasAccess || isSending) return;
+      chatInputRef.current?.focus({ preventScroll: true });
+    });
+  }, [hasAccess, isSending]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -124,6 +207,18 @@ export default function XiloloAssistantWidget() {
   useEffect(() => {
     if (isOpen) scrollToBottom();
   }, [aiMessages.length, assistantStatus, isOpen, scrollToBottom]);
+
+  useEffect(() => {
+    if (!isOpen || !hasAccess || aiView !== "chat") return;
+    focusChatInput();
+  }, [
+    aiMessages.length,
+    assistantStatus,
+    aiView,
+    focusChatInput,
+    hasAccess,
+    isOpen,
+  ]);
 
   useEffect(() => {
     if (!isOpen || !hasToken) return;
@@ -173,8 +268,8 @@ export default function XiloloAssistantWidget() {
 
       if (code === "AI_CONSENT_REQUIRED") setIsConsentRequired(true);
 
-      if (code === "BLUE_BADGE_REQUIRED") {
-        setGateError("Xilolo AI is available to Blue Badge subscribers.");
+      if (code === "BLUE_BADGE_REQUIRED" || code === "XILOLO_BADGE_REQUIRED") {
+        setGateError("Xilolo AI is available to Xilolo Badge subscribers.");
       }
 
       throw error;
@@ -197,13 +292,25 @@ export default function XiloloAssistantWidget() {
       setAiConversationId(conversationId);
       setAiMessages(loaded.length ? loaded : [INITIAL_AI_MESSAGE]);
       setAiView("chat");
+      setMobileDrawerOpen(false);
+      focusChatInput();
 
       return conversationId;
     },
-    [hasAccess]
+    [focusChatInput, hasAccess]
   );
 
-  const startNewAiConversation = useCallback(async () => {
+  const startNewAiConversation = useCallback(() => {
+    if (!hasAccess) return;
+
+    setAiConversationId("");
+    setAiMessages([INITIAL_AI_MESSAGE]);
+    setAiView("chat");
+    setMobileDrawerOpen(false);
+    focusChatInput();
+  }, [focusChatInput, hasAccess]);
+
+  const createAiConversation = useCallback(async () => {
     if (!hasAccess) return "";
 
     const createResponse = await api.post(
@@ -216,8 +323,8 @@ export default function XiloloAssistantWidget() {
     const id = conversation?.id;
 
     setAiConversationId(id);
-    setAiMessages([INITIAL_AI_MESSAGE]);
     setAiView("chat");
+    focusChatInput();
 
     if (conversation) {
       setAiConversations((items) => [
@@ -227,64 +334,61 @@ export default function XiloloAssistantWidget() {
     }
 
     return id;
-  }, [hasAccess]);
+  }, [focusChatInput, hasAccess]);
 
   const loadAiConversation = useCallback(async () => {
     if (aiConversationId) return aiConversationId;
-    return startNewAiConversation();
-  }, [aiConversationId, startNewAiConversation]);
+    return createAiConversation();
+  }, [aiConversationId, createAiConversation]);
 
-  const typeAssistantReply = useCallback(
-    async (reply, messageId) => {
-      const requestId = Date.now();
-      typingRequestRef.current = requestId;
+  const typeAssistantReply = useCallback(async (reply, messageId) => {
+    const requestId = Date.now();
+    typingRequestRef.current = requestId;
 
-      setAssistantStatus("typing");
+    setAssistantStatus("typing");
 
-      setAiMessages((messages) => [
-        ...messages,
-        {
-          id: messageId,
-          role: "assistant",
-          content: "",
-          isTyping: true,
-        },
-      ]);
+    setAiMessages((messages) => [
+      ...messages,
+      {
+        id: messageId,
+        role: "assistant",
+        content: "",
+        isTyping: true,
+      },
+    ]);
 
-      for (let index = 1; index <= reply.length; index += 1) {
-        if (typingRequestRef.current !== requestId) return;
+    for (let index = 1; index <= reply.length; index += 1) {
+      if (typingRequestRef.current !== requestId) return;
 
-        const nextText = reply.slice(0, index);
-
-        setAiMessages((messages) =>
-          messages.map((message) =>
-            message.id === messageId
-              ? {
-                ...message,
-                content: nextText,
-                isTyping: index < reply.length,
-              }
-              : message
-          )
-        );
-
-        await sleep(TYPEWRITER_SPEED);
-      }
+      const nextText = reply.slice(0, index);
 
       setAiMessages((messages) =>
         messages.map((message) =>
           message.id === messageId
             ? {
+                ...message,
+                content: nextText,
+                isTyping: index < reply.length,
+              }
+            : message
+        )
+      );
+
+      await sleep(TYPEWRITER_SPEED);
+    }
+
+    setAiMessages((messages) =>
+      messages.map((message) =>
+        message.id === messageId
+          ? {
               ...message,
               content: reply,
               isTyping: false,
             }
-            : message
-        )
-      );
-    },
-    []
-  );
+          : message
+      )
+    );
+  }, []);
 
   const acceptConsent = async () => {
     setIsSending(true);
@@ -301,7 +405,7 @@ export default function XiloloAssistantWidget() {
   useEffect(() => {
     if (!isOpen || !hasAccess) return;
 
-    loadAiConversations().catch(() => { });
+    loadAiConversations().catch(() => {});
   }, [hasAccess, isOpen, loadAiConversations]);
 
   const sendAiMessage = async (message) => {
@@ -352,6 +456,7 @@ export default function XiloloAssistantWidget() {
     } finally {
       setAssistantStatus("idle");
       setIsSending(false);
+      focusChatInput();
     }
   };
 
@@ -419,403 +524,530 @@ export default function XiloloAssistantWidget() {
       ]);
 
       setAiView("chat");
+      focusChatInput();
     } catch (error) {
       setGateError(
         error?.response?.data?.message ||
-        "Image upload failed. Please try again."
+          "Image upload failed. Please try again."
       );
     } finally {
       setIsUploadingImage(false);
     }
   };
 
-  const resetAiConversation = async () => {
-    if (!aiConversationId) return;
+  const deleteAiConversation = async (conversationId) => {
+    if (!conversationId) return;
 
     setIsSending(true);
 
     try {
       await api.delete(
-        `/api/v1/ai/conversations/${aiConversationId}`,
+        `/api/v1/ai/conversations/${conversationId}`,
         authHeaders()
       );
 
       setAiConversations((items) =>
-        items.filter((item) => item.id !== aiConversationId)
+        items.filter((item) => item.id !== conversationId)
       );
 
-      setAiConversationId("");
-      setAiMessages([INITIAL_AI_MESSAGE]);
-      setAiView("list");
+      if (conversationId === aiConversationId) {
+        setAiConversationId("");
+        setAiMessages([INITIAL_AI_MESSAGE]);
+        setAiView("chat");
+        focusChatInput();
+      }
     } finally {
       setIsSending(false);
     }
   };
 
+  const resetAiConversation = async () => {
+    await deleteAiConversation(aiConversationId);
+  };
+
   const accessMessage = useMemo(() => {
     if (!hasToken) return "Sign in to use Xilolo AI.";
     if (statusLoading) return "Checking your subscription...";
-    if (!hasAccess) return "Xilolo AI is available to active subscribers.";
+    if (!hasAccess) {
+      return "Subscribe to Xilolo badge to unlock Xilolo AI and other features.";
+    }
     return "";
   }, [hasAccess, hasToken, statusLoading]);
 
+  const filteredConversations = useMemo(() => {
+    const term = conversationSearch.trim().toLowerCase();
+    if (!term) return aiConversations;
+
+    return aiConversations.filter((conversation) =>
+      String(conversation.title || "Xilolo AI conversation")
+        .toLowerCase()
+        .includes(term)
+    );
+  }, [aiConversations, conversationSearch]);
+
+  const showChatSurface =
+    aiView === "chat" || aiConversationId || aiMessages.length > 1;
+
   return (
-    <main className="tw:min-h-screen tw:bg-[radial-gradient(circle_at_top_left,rgba(124,58,237,0.12),transparent_34%),linear-gradient(180deg,#f8fafc_0%,#eef2f7_100%)] tw:px-3 tw:pb-24 tw:pt-[92px] tw:font-sans tw:md:px-6 tw:md:pb-10 tw:md:pt-[104px]">
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-5xl tw:flex-col tw:gap-4">
-        <div className="tw:flex tw:flex-col tw:gap-4">
-          <div className="tw:flex tw:flex-col tw:gap-3">
+    <main className="tw:min-h-screen tw:bg-white tw:px-2 tw:pb-2 tw:pt-[72px] tw:font-sans tw:text-primary tw:sm:px-3 tw:sm:pb-4 tw:md:px-5 tw:md:pt-[88px]">
+      <style>{`
+        .xilolo-ai-scroll::-webkit-scrollbar{display:none;}
+        .xilolo-ai-noise{background-image:radial-gradient(rgba(17,17,17,.045) .7px, transparent .7px);background-size:6px 6px;}
+        @supports (height: 100dvh) {
+          .xilolo-ai-shell{height:calc(100dvh - 96px);}
+          @media (max-width:520px){.xilolo-ai-shell{height:calc(100dvh - 78px);}}
+        }
+      `}</style>
+
+      <Transition show={mobileDrawerOpen}>
+        <div className="tw:fixed tw:inset-0 tw:z-70 tw:lg:hidden">
+          <Transition.Child
+            enter="tw:transition-opacity tw:duration-200"
+            enterFrom="tw:opacity-0"
+            enterTo="tw:opacity-100"
+            leave="tw:transition-opacity tw:duration-150"
+            leaveFrom="tw:opacity-100"
+            leaveTo="tw:opacity-0"
+          >
             <button
+              type="button"
+              aria-label="Close recent chats"
+              className="tw:absolute tw:inset-0 tw:bg-black/35"
+              onClick={() => setMobileDrawerOpen(false)}
+            />
+          </Transition.Child>
+
+          <Transition.Child
+            enter="tw:transition tw:duration-200 tw:ease-out"
+            enterFrom="tw:-translate-x-full"
+            enterTo="tw:translate-x-0"
+            leave="tw:transition tw:duration-150 tw:ease-in"
+            leaveFrom="tw:translate-x-0"
+            leaveTo="tw:-translate-x-full"
+          >
+            <aside className="tw:relative tw:flex tw:h-full tw:w-[min(84vw,330px)] tw:flex-col tw:bg-[#e9e0d5] tw:p-4 tw:shadow-2xl">
+              <div className="tw:flex tw:items-center tw:justify-between">
+                <button
+                  style={{ borderRadius: 36 }}
+                  type="button"
+                  onClick={startNewAiConversation}
+                  disabled={!hasAccess || isSending}
+                  className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/75 tw:px-4 tw:text-sm tw:font-black tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                >
+                  <Plus size={16} />
+                  New chat
+                </button>
+
+                <button
+                  style={{ borderRadius: 36 }}
+                  type="button"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/75 tw:text-primary"
+                  aria-label="Close recent chats"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
+                <input
+                  value={conversationSearch}
+                  onChange={(event) => setConversationSearch(event.target.value)}
+                  placeholder="Search"
+                  className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+                />
+                <Search size={18} />
+              </div>
+
+              <div
+                className="xilolo-ai-scroll tw:mt-5 tw:flex tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto"
+                style={HIDDEN_SCROLLBAR_STYLE}
+              >
+                <div className="tw:text-base tw:font-black">Recent</div>
+                {aiListLoading ? (
+                  <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold">
+                    <Loader2 className="tw:animate-spin" size={16} />
+                    Loading chats
+                  </div>
+                ) : filteredConversations.length === 0 ? (
+                  <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+                    Your AI chats will appear here.
+                  </div>
+                ) : (
+                  <div className="tw:flex tw:flex-col tw:gap-3">
+                    {filteredConversations.map((conversation) => (
+                      <ConversationMenuItem
+                        key={conversation.id}
+                        conversation={conversation}
+                        active={conversation.id === aiConversationId}
+                        onOpen={() => openAiConversation(conversation.id)}
+                        onDelete={() => deleteAiConversation(conversation.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </aside>
+          </Transition.Child>
+        </div>
+      </Transition>
+
+      <section
+        className="xilolo-ai-shell xilolo-ai-noise tw:mx-auto tw:flex tw:h-[calc(100vh-104px)] tw:min-h-0 tw:w-full tw:max-w-[1500px] tw:overflow-hidden tw:rounded-3xl tw:bg-white tw:shadow-[0_18px_60px_rgba(17,17,17,0.12)] max-[520px]:tw:h-[calc(100vh-82px)] max-[520px]:tw:rounded-[18px] tw:lg:rounded-[34px]"
+        aria-label="Xilolo assistant"
+      >
+        <aside className="tw:hidden tw:w-[290px] tw:shrink-0 tw:flex-col tw:bg-[#e9e0d5]/90 tw:p-4 tw:lg:flex">
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <div className="tw:flex tw:items-center tw:gap-3">
+              <button
               style={{
-                borderRadius: 24,
-                fontSize: 12
+                borderRadius: 36
               }}
+                type="button"
+                onClick={startNewAiConversation}
+                disabled={!hasAccess || isSending}
+                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                aria-label="Start new AI conversation"
+              >
+                <Plus size={17} />
+              </button>
+
+              <button
+              style={{
+                borderRadius: 36
+              }}
+                type="button"
+                onClick={resetAiConversation}
+                disabled={!aiConversationId || isSending}
+                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-35"
+                aria-label="Delete current conversation"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            <button
+            style={{
+              borderRadius: 36
+            }}
               type="button"
               onClick={() => window.history.back()}
-              className="tw:inline-flex tw:w-24 tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-zinc-200 tw:bg-white tw:px-3 tw:text-sm tw:font-bold tw:text-zinc-700 tw:shadow-sm tw:transition hover:tw:bg-zinc-50"
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70"
+              aria-label="Close Xilolo AI"
             >
               <ChevronLeft size={18} />
-              Back
+            </button>
+          </div>
+
+          <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
+            <input
+              value={conversationSearch}
+              onChange={(event) => setConversationSearch(event.target.value)}
+              placeholder="Search"
+              className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+            />
+            <Search size={18} />
+          </div>
+
+          <div
+            className="xilolo-ai-scroll tw:mt-5 tw:flex tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto"
+            style={HIDDEN_SCROLLBAR_STYLE}
+          >
+            {aiListLoading ? (
+              <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold">
+                <Loader2 className="tw:animate-spin" size={16} />
+                Loading chats
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+                Your AI chats will appear here.
+              </div>
+            ) : (
+              <div className="tw:flex tw:flex-col tw:gap-5">
+                <div className="tw:text-base tw:font-black">Recent</div>
+
+                <div className="tw:flex tw:flex-col tw:gap-3">
+                  {filteredConversations.map((conversation) => (
+                    <ConversationMenuItem
+                      key={conversation.id}
+                      conversation={conversation}
+                      active={conversation.id === aiConversationId}
+                      onOpen={() => openAiConversation(conversation.id)}
+                      onDelete={() => deleteAiConversation(conversation.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {!hasAccess && !statusLoading && (
+            <div className="tw:mt-4 tw:rounded-3xl tw:bg-white/65 tw:p-4">
+              <div className="tw:text-sm tw:font-black tw:leading-6">
+                Subscribe to Xilolo badge to unlock Xilolo AI and other
+                features.
+              </div>
+
+              <div className="tw:mt-4 tw:flex tw:items-center tw:justify-between">
+                <span className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-black">
+                  <Sparkles size={15} /> XILOLO
+                </span>
+
+                <span className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:border tw:border-primary">
+                  <ArrowLeft className="tw:rotate-180" size={15} />
+                </span>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          <div className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:px-3 tw:lg:hidden">
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={() => setMobileDrawerOpen(true)}
+              className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/80 tw:px-4 tw:text-sm tw:font-black tw:text-primary"
+            >
+              <MessageCircle size={17} />
+              Recent
             </button>
 
-            <div>
-              <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-[0.76rem] tw:font-extrabold tw:uppercase tw:tracking-wide tw:text-primary">
-                <Sparkles size={14} /> Xilolo AI
-              </span>
-
-              <span className="tw:block tw:mt-1 tw:text-2xl tw:font-black tw:leading-tight tw:text-zinc-950 tw:md:text-3xl">
-                Your smart Xilolo assistant
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <section
-          className="tw:flex tw:h-[calc(100vh-182px)] tw:min-h-[560px] tw:w-full tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-white/80 tw:bg-white/85 tw:text-zinc-900 tw:shadow-[0_30px_100px_rgba(15,23,42,0.14)] tw:backdrop-blur-xl max-[520px]:tw:h-[calc(100vh-166px)] max-[520px]:tw:min-h-[500px]"
-          aria-label="Xilolo assistant"
-        >
-          <aside className="tw:hidden tw:w-[290px] tw:flex-col tw:border-r tw:border-zinc-200/80 tw:bg-white/70 tw:p-4 tw:lg:flex">
             <button
-              style={{
-                borderRadius: 24,
-                fontSize: 12
-              }}
+              style={{ borderRadius: 36 }}
               type="button"
               onClick={startNewAiConversation}
               disabled={!hasAccess || isSending}
-              className="tw:flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-extrabold tw:text-white tw:shadow-lg tw:shadow-primary/20 tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/80 tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              aria-label="New chat"
             >
-              <Plus size={17} />
-              New chat
+              <Plus size={18} />
             </button>
+          </div>
 
-            <div className="tw:mt-5 tw:flex tw:items-center tw:justify-between">
-              <span className="tw:block tw:text-xs tw:font-black tw:uppercase tw:tracking-wide tw:text-zinc-400">
-                Conversations
-              </span>
-
-              {aiListLoading && (
-                <Loader2 className="tw:animate-spin tw:text-zinc-400" size={15} />
-              )}
-            </div>
-
-            <div className="tw:mt-3 tw:flex tw:flex-1 tw:flex-col tw:gap-2 tw:overflow-y-auto tw:pr-1">
-              {aiConversations.length === 0 ? (
-                <div className="tw:rounded-2xl tw:border tw:border-dashed tw:border-zinc-300 tw:bg-white tw:p-4 tw:text-sm tw:font-medium tw:text-zinc-500">
-                  Your AI chats will appear here.
-                </div>
-              ) : (
-                aiConversations.map((conversation) => (
-                  <button
-                    style={{
-                      borderRadius: 24,
-                      fontSize: 12
-                    }}
-                    key={conversation.id}
-                    type="button"
-                    onClick={() => openAiConversation(conversation.id)}
-                    className={[
-                      "tw:rounded-2xl tw:border tw:p-3 tw:text-left tw:transition",
-                      conversation.id === aiConversationId
-                        ? "tw:border-primary/30 tw:bg-primary/10"
-                        : "tw:border-zinc-200 tw:bg-white hover:tw:border-zinc-300 hover:tw:bg-zinc-50",
-                    ].join(" ")}
-                  >
-                    <span className="tw:block tw:truncate tw:text-sm tw:font-extrabold tw:text-zinc-900">
-                      {conversation.title || "Xilolo AI conversation"}
-                    </span>
-
-                    <span className="tw:mt-1 tw:block tw:text-xs tw:font-semibold tw:text-zinc-500">
-                      {conversation.total_messages || 0} messages
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          </aside>
-
-          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-            <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-zinc-200/80 tw:bg-white/85 tw:px-4 tw:py-3.5 tw:backdrop-blur-xl tw:md:px-5">
-              <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
-                {aiView === "chat" && (
-                  <button
-                    type="button"
-                    onClick={() => setAiView("list")}
-                    className="tw:grid tw:h-9 tw:w-9 tw:place-items-center tw:rounded-full tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-zinc-200 tw:lg:hidden"
-                    aria-label="Back to AI conversations"
-                  >
-                    <ArrowLeft size={17} />
-                  </button>
-                )}
-
-                <div className="tw:grid tw:h-10 tw:w-10 tw:shrink-0 tw:place-items-center tw:rounded-2xl tw:bg-primary tw:text-white tw:shadow-lg tw:shadow-primary/20">
-                  <Bot size={20} />
+          <div
+            className="xilolo-ai-scroll tw:flex tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-3 tw:pb-3 tw:sm:px-4 tw:md:px-6"
+            style={HIDDEN_SCROLLBAR_STYLE}
+          >
+            {accessMessage ? (
+              <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center">
+                <div className="tw:mx-auto tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white">
+                  <Sparkles size={23} />
                 </div>
 
-                <div className="tw:min-w-0">
-                  <span className="tw:block tw:truncate tw:text-base tw:font-black tw:text-zinc-950">
-                    {aiView === "list" ? "Conversations" : "Xilolo AI"}
-                  </span>
-
-                  <span className="tw:block tw:truncate tw:text-xs tw:font-semibold tw:text-zinc-500">
-                    {assistantStatus === "thinking"
-                      ? "Thinking..."
-                      : assistantStatus === "typing"
-                        ? "Typing response..."
-                        : "Wallet, events, streaming and account help"}
-                  </span>
+                <div className="tw:mt-4 tw:text-sm tw:font-black tw:leading-6">
+                  {accessMessage}
                 </div>
               </div>
+            ) : aiView === "list" && !showChatSurface ? (
+              <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-4 tw:lg:hidden">
+                <button
+                style={{
+                  borderRadius: 36
+                }}
+                  type="button"
+                  onClick={startNewAiConversation}
+                  className="tw:flex tw:h-12 tw:items-center tw:justify-center tw:gap-2 tw:rounded-[20px] tw:bg-primary tw:px-4 tw:text-sm tw:font-black tw:text-white"
+                >
+                  <Plus size={17} />
+                  Start new conversation
+                </button>
 
-              <div className="tw:flex tw:items-center tw:gap-2">
-                {aiView === "list" && hasAccess && (
-                  <button
-                    type="button"
-                    onClick={startNewAiConversation}
-                    className="tw:grid tw:h-9 tw:w-9 tw:place-items-center tw:rounded-full tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-zinc-200 tw:lg:hidden"
-                    aria-label="Start new AI conversation"
-                  >
-                    <Plus size={17} />
-                  </button>
-                )}
-
-                {aiConversationId && (
-                  <button
-                    type="button"
-                    onClick={resetAiConversation}
-                    disabled={isSending}
-                    className="tw:grid tw:h-9 tw:w-9 tw:place-items-center tw:rounded-full tw:bg-zinc-100 tw:text-zinc-700 tw:transition hover:tw:bg-red-50 hover:tw:text-red-600 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                    aria-label="Delete AI conversation"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-slate-50/80 tw:p-4 tw:md:p-5">
-              {accessMessage ? (
-                <div className="tw:m-auto tw:w-full tw:max-w-md tw:rounded-3xl tw:border tw:border-dashed tw:border-zinc-300 tw:bg-white tw:p-6 tw:text-center tw:shadow-sm">
-                  <div className="tw:mx-auto tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-2xl tw:bg-primary/10 tw:text-primary">
-                    <Sparkles size={21} />
+                {aiListLoading ? (
+                  <div className="tw:grid tw:min-h-40 tw:place-items-center">
+                    <Loader2 className="tw:animate-spin" size={24} />
                   </div>
+                ) : filteredConversations.length === 0 ? (
+                  <div className="tw:rounded-3xl tw:bg-white/70 tw:p-5 tw:text-center tw:text-sm tw:font-semibold">
+                    No chats yet.
+                  </div>
+                ) : (
+                  <div className="tw:flex tw:flex-col tw:gap-3">
+                    {filteredConversations.map((conversation) => (
+                      <ConversationMenuItem
+                        key={conversation.id}
+                        conversation={conversation}
+                        active={conversation.id === aiConversationId}
+                        onOpen={() => openAiConversation(conversation.id)}
+                        onDelete={() => deleteAiConversation(conversation.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="tw:mx-auto tw:flex tw:min-h-full tw:w-full tw:max-w-5xl tw:flex-col">
+                <div className="tw:pb-4 tw:pt-4 tw:text-center tw:sm:pt-6 tw:md:pb-6 tw:md:pt-7">
+                  <div className="tw:mx-auto tw:mb-4 tw:h-14 tw:w-14 tw:rounded-full tw:border-10 tw:border-[#d8d0c5] tw:bg-white tw:shadow-[inset_0_0_18px_rgba(17,17,17,.12)] tw:opacity-70 tw:sm:h-16 tw:sm:w-16 tw:sm:border-12" />
 
-                  <span className="tw:block tw:mt-4 tw:text-sm tw:font-bold tw:text-zinc-700">
-                    {accessMessage}
+                  <span className="tw:block tw:text-2xl tw:font-black tw:tracking-tight tw:sm:text-3xl tw:md:text-4xl">
+                    Xilolo AI
+                  </span>
+
+                  <span className="tw:mt-2 tw:text-sm tw:tracking-wide tw:text-[#6b625a] tw:md:text-base">
+                    Ask anything about your account, events, or streaming.
                   </span>
                 </div>
-              ) : aiView === "list" ? (
-                <div className="tw:flex tw:flex-col tw:gap-3 tw:lg:hidden">
-                  <button
-                    type="button"
-                    onClick={startNewAiConversation}
-                    className="tw:flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-extrabold tw:text-white tw:shadow-lg tw:shadow-primary/20 tw:transition hover:tw:bg-black"
-                  >
-                    <Plus size={17} />
-                    Start new conversation
-                  </button>
 
-                  {aiListLoading ? (
-                    <div className="tw:grid tw:min-h-40 tw:place-items-center tw:text-zinc-500">
-                      <Loader2 className="tw:animate-spin" size={24} />
-                    </div>
-                  ) : aiConversations.length === 0 ? (
-                    <div className="tw:rounded-2xl tw:border tw:border-dashed tw:border-zinc-300 tw:bg-white tw:p-5 tw:text-center tw:text-sm tw:font-medium tw:text-zinc-600">
-                      No AI conversations yet. Start one when you need help
-                      with your account, events, or streaming.
-                    </div>
-                  ) : (
-                    <div className="tw:flex tw:flex-col tw:gap-2">
-                      {aiConversations.map((conversation) => (
-                        <button
-                          key={conversation.id}
-                          type="button"
-                          onClick={() => openAiConversation(conversation.id)}
-                          className="tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-white tw:p-3.5 tw:text-left tw:shadow-sm tw:transition hover:tw:border-zinc-300 hover:tw:bg-zinc-50"
-                        >
-                          <span className="tw:block tw:truncate tw:text-sm tw:font-extrabold tw:text-zinc-900">
-                            {conversation.title || "Xilolo AI conversation"}
-                          </span>
+                <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-1 tw:flex-col tw:gap-4 tw:pb-4">
+                  <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-4">
+                    {aiMessages.map((message) => {
+                      const isUser =
+                        message.role === "user" ||
+                        message.sender_type === "user";
 
-                          <span className="tw:mt-1 tw:block tw:text-xs tw:font-medium tw:text-zinc-500">
-                            {conversation.total_messages || 0} messages
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  {aiMessages.map((message) => {
-                    const isUser =
-                      message.role === "user" || message.sender_type === "user";
-
-                    return (
-                      <div
-                        key={message.id}
-                        className={[
-                          "tw:flex tw:max-w-[88%] tw:gap-2.5",
-                          isUser ? "tw:self-end" : "tw:self-start",
-                        ].join(" ")}
-                      >
-                        {!isUser && (
-                          <span className="tw:mt-1 tw:grid tw:h-8 tw:w-8 tw:shrink-0 tw:place-items-center tw:rounded-full tw:bg-primary/10 tw:text-primary">
-                            <Bot size={16} />
-                          </span>
-                        )}
-
+                      return (
                         <div
+                          key={message.id}
                           className={[
-                            "tw:whitespace-pre-wrap tw:wrap-break-word tw:rounded-3xl tw:px-4 tw:py-3 tw:text-[0.93rem] tw:leading-[1.55] tw:shadow-sm [&_strong]:tw:font-extrabold",
-                            isUser
-                              ? "tw:rounded-br-lg tw:bg-primary tw:text-white"
-                              : "tw:rounded-bl-lg tw:border tw:border-zinc-200 tw:bg-white tw:text-zinc-800",
+                            "tw:flex tw:w-full",
+                            isUser ? "tw:justify-end" : "tw:justify-start",
                           ].join(" ")}
                         >
-                          {renderMessageText(message.content)}
+                          <div
+                            className={[
+                              "tw:max-w-[86%] tw:whitespace-pre-wrap tw:wrap-break-word tw:text-sm tw:font-medium tw:leading-6 tw:sm:max-w-[78%] [&_strong]:tw:font-black",
+                              isUser
+                                ? "tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-white"
+                                : "tw:text-[#5f5a55]",
+                            ].join(" ")}
+                          >
+                            {renderMessageText(message.content)}
 
-                          {message.isTyping && (
-                            <span className="tw:ml-0.5 tw:inline-block tw:h-4 tw:w-1 tw:animate-pulse tw:rounded-full tw:bg-zinc-400 tw:align-middle" />
-                          )}
+                            {message.isTyping && (
+                              <span className="tw:ml-0.5 tw:inline-block tw:h-4 tw:w-1 tw:animate-pulse tw:rounded-full tw:bg-primary tw:align-middle" />
+                            )}
 
-                          {message.imageUrl && (
-                            <img
-                              className="tw:mt-3 tw:block tw:w-[min(280px,100%)] tw:rounded-2xl tw:border tw:border-zinc-200"
-                              src={message.imageUrl}
-                              alt="Uploaded event poster"
-                            />
-                          )}
+                            {message.imageUrl && (
+                              <img
+                                className="tw:mt-3 tw:block tw:w-[min(280px,100%)] tw:rounded-[22px] tw:border tw:border-[#d8d0c5]"
+                                src={message.imageUrl}
+                                alt="Uploaded event poster"
+                              />
+                            )}
+                          </div>
                         </div>
+                      );
+                    })}
+
+                    {assistantStatus === "thinking" && <ThinkingBubble />}
+
+                    {aiMessages.length <= 1 && assistantStatus === "idle" && (
+                      <div className="tw:grid tw:gap-2 tw:sm:grid-cols-2">
+                        {SUGGESTED_PROMPTS.map((prompt) => (
+                          <button
+                          style={{
+                            borderRadius: 36
+                          }}
+                            key={prompt}
+                            type="button"
+                            onClick={() => handleSuggestedPrompt(prompt)}
+                            disabled={isSending}
+                            className="tw:flex tw:items-center tw:gap-2 tw:rounded-[18px] tw:bg-white/65 tw:px-3 tw:py-2.5 tw:text-left tw:text-xs tw:font-bold tw:text-primary tw:transition hover:tw:bg-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60 sm:tw:text-sm"
+                          >
+                            <MessageCircle size={16} className="tw:shrink-0" />
+                            {prompt}
+                          </button>
+                        ))}
                       </div>
-                    );
-                  })}
+                    )}
 
-                  {assistantStatus === "thinking" && <ThinkingBubble />}
-
-                  {aiMessages.length <= 1 && assistantStatus === "idle" && (
-                    <div className="tw:mt-1 tw:grid tw:gap-2 tw:sm:grid-cols-2">
-                      {SUGGESTED_PROMPTS.map((prompt) => (
-                        <button
-                          key={prompt}
-                          type="button"
-                          onClick={() => handleSuggestedPrompt(prompt)}
-                          disabled={isSending}
-                          className="tw:flex tw:items-center tw:gap-2 tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-white tw:px-3 tw:py-3 tw:text-left tw:text-[0.84rem] tw:font-bold tw:text-zinc-800 tw:shadow-sm tw:transition hover:tw:border-primary/30 hover:tw:bg-primary/5 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                        >
-                          <MessageCircle
-                            size={16}
-                            className="tw:shrink-0 tw:text-primary"
-                          />
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  <div ref={endRef} />
-                </>
-              )}
-            </div>
-
-            {(gateError || isConsentRequired) && (
-              <div className="tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:border-t tw:border-orange-200 tw:bg-orange-50 tw:px-4 tw:py-2.5 tw:text-[0.84rem] tw:font-semibold tw:text-orange-900">
-                <span>
-                  {isConsentRequired
-                    ? "Accept Xilolo AI terms before using AI chat."
-                    : gateError}
-                </span>
-
-                {isConsentRequired && (
-                  <button
-                    type="button"
-                    onClick={acceptConsent}
-                    disabled={isSending}
-                    className="tw:rounded-full tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-extrabold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                  >
-                    Accept
-                  </button>
-                )}
+                    <div ref={endRef} />
+                  </div>
+                </div>
               </div>
             )}
-
-            {aiView === "chat" && !accessMessage ? (
-              <form
-                className="tw:grid tw:grid-cols-[44px_1fr_44px] tw:gap-2 tw:border-t tw:border-zinc-200/80 tw:bg-white/90 tw:p-3 tw:backdrop-blur-xl"
-                onSubmit={handleSubmit}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/jpg,image/webp"
-                  className="tw:hidden"
-                  onChange={handleImageChange}
-                />
-
-                <button
-                  type="button"
-                  className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-zinc-100 tw:text-primary tw:transition hover:tw:bg-zinc-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={!hasAccess || isSending || isUploadingImage}
-                  aria-label="Attach event poster"
-                >
-                  {isUploadingImage ? (
-                    <Loader2 className="tw:animate-spin" size={18} />
-                  ) : (
-                    <ImagePlus size={18} />
-                  )}
-                </button>
-
-                <textarea
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={
-                    assistantStatus === "thinking"
-                      ? "Xilolo is thinking..."
-                      : "Ask Xilolo AI..."
-                  }
-                  disabled={!hasAccess || isSending}
-                  rows={1}
-                  className="tw:max-h-32 tw:min-h-11 tw:min-w-0 tw:resize-none tw:rounded-2xl tw:border tw:border-zinc-200 tw:bg-white tw:px-4 tw:py-3 tw:text-[0.95rem] tw:font-medium tw:text-zinc-900 tw:outline-none tw:transition placeholder:tw:text-zinc-400 focus:tw:border-primary/40 focus:tw:ring-4 focus:tw:ring-primary/10 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                />
-
-                <button
-                  type="submit"
-                  disabled={!input.trim() || !hasAccess || isSending}
-                  className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-2xl tw:border-0 tw:bg-primary tw:text-white tw:shadow-lg tw:shadow-primary/20 tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                  aria-label="Send message"
-                >
-                  {isSending ? (
-                    <Loader2 className="tw:animate-spin" size={18} />
-                  ) : (
-                    <Send size={18} />
-                  )}
-                </button>
-              </form>
-            ) : null}
           </div>
-        </section>
-      </div>
+
+          {(gateError || isConsentRequired) && (
+            <div className="tw:mx-4 tw:mb-3 tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:rounded-[18px] tw:bg-white/75 tw:px-4 tw:py-2.5 tw:text-[0.84rem] tw:font-bold tw:text-primary tw:md:mx-8">
+              <span>
+                {isConsentRequired
+                  ? "Accept Xilolo AI terms before using AI chat."
+                  : gateError}
+              </span>
+
+              {isConsentRequired && (
+                <button
+                style={{
+                  borderRadius: 36
+                }}
+                  type="button"
+                  onClick={acceptConsent}
+                  disabled={isSending}
+                  className="tw:rounded-full tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-black tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                >
+                  Accept
+                </button>
+              )}
+            </div>
+          )}
+
+          {(aiView === "chat" || showChatSurface) && !accessMessage ? (
+            <form
+              className="tw:grid tw:grid-cols-[38px_1fr_44px] tw:gap-2 tw:px-3 tw:pb-16 tw:md:pb-3 tw:sm:px-4 tw:md:px-6"
+              onSubmit={handleSubmit}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/jpg,image/webp"
+                className="tw:hidden"
+                onChange={handleImageChange}
+              />
+
+              <button
+              style={{
+                borderRadius: 36
+              }}
+                type="button"
+                className="tw:grid tw:h-10 tw:w-9 tw:place-items-center tw:rounded-full tw:bg-transparent tw:text-primary tw:transition hover:tw:bg-white/65 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!hasAccess || isSending || isUploadingImage}
+                aria-label="Attach event poster"
+              >
+                {isUploadingImage ? (
+                  <Loader2 className="tw:animate-spin" size={19} />
+                ) : (
+                  <ImagePlus size={19} />
+                )}
+              </button>
+
+              <textarea
+                ref={chatInputRef}
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={focusChatInput}
+                placeholder={
+                  assistantStatus === "thinking"
+                    ? "Xilolo is thinking..."
+                    : "Ask Xilolo AI..."
+                }
+                disabled={!hasAccess || isSending}
+                rows={1}
+                className="tw:max-h-24 tw:min-h-10 tw:min-w-0 tw:resize-none tw:rounded-[16px] tw:border tw:border-[#d8d0c5] tw:bg-white/50 tw:px-3 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary tw:outline-none tw:transition placeholder:tw:text-[#8b8580] focus:tw:border-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+              />
+
+              <button
+              style={{
+                borderRadius: 36
+              }}
+                type="submit"
+                disabled={!input.trim() || !hasAccess || isSending}
+                className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                aria-label="Send message"
+              >
+                {isSending ? (
+                  <Loader2 className="tw:animate-spin" size={18} />
+                ) : (
+                  <Send size={18} />
+                )}
+              </button>
+            </form>
+          ) : null}
+        </div>
+      </section>
     </main>
   );
 }

@@ -90,6 +90,7 @@ import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage
 import SecurityPage from "./pages/Account/SecurityPage.jsx";
 import TwoFactorSecurityPrompt from "./component/auth/TwoFactorSecurityPrompt.jsx";
 import XiloloAssistantWidget from "./features/xiloloAssistant/XiloloAssistantWidget.jsx";
+import MaintenancePage from "./pages/MaintenancePage.jsx";
 
 const MainLayout = () => (
   <>
@@ -396,6 +397,7 @@ export function App() {
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
       <Routes>
+        <Route path="/maintenance" element={<MaintenancePage />} />
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />

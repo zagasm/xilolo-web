@@ -65,6 +65,17 @@ api.interceptors.response.use(
       console.log("[api] response status:", status, "url:", url);
     }
 
+    if (status === 503 && payload?.code === "MAINTENANCE_MODE") {
+      if (typeof window !== "undefined" && window.location.pathname !== "/maintenance") {
+        window.sessionStorage.setItem(
+          "xilolo_maintenance_message",
+          payload?.message || "Xilolo is currently on maintenance please try again later."
+        );
+        window.location.assign("/maintenance");
+      }
+      return Promise.reject(error);
+    }
+
     if (status === 403) {
       maybeToastDeactivated(payload);
       return Promise.reject(error);

@@ -9,6 +9,11 @@ import { FileText, X } from "lucide-react";
 import { formatEventDateTime } from "../../utils/ui";
 import { priceText } from "./SingleEvent";
 
+const hiddenScrollbarStyle = {
+  scrollbarWidth: "none",
+  msOverflowStyle: "none",
+};
+
 function getAmountLabel(amount, fallback, prefix = "") {
   if (fallback) return fallback;
   if (!amount) return "Free";
@@ -153,7 +158,7 @@ export default function TicketPromptModal({
           <DialogBackdrop className="tw:fixed tw:inset-0 tw:z-40 tw:bg-black/60" />
         </Transition.Child>
 
-        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:p-2 tw:sm:items-center tw:sm:p-4">
+        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:p-3 tw:sm:items-center tw:sm:p-4">
           <Transition.Child
             as={Fragment}
             enter="tw:ease-out tw:duration-300"
@@ -163,8 +168,8 @@ export default function TicketPromptModal({
             leaveFrom="tw:opacity-100 tw:scale-100"
             leaveTo="tw:opacity-0 tw:scale-95"
           >
-            <DialogPanel className="tw:relative tw:z-50 tw:flex tw:w-full tw:max-w-xl tw:max-h-[86dvh] tw:flex-col tw:overflow-hidden tw:rounded-2xl tw:bg-white tw:p-2 tw:text-left tw:shadow-xl tw:sm:max-h-[88vh] tw:sm:rounded-3xl tw:sm:p-6">
-              <div className="tw:flex tw:justify-end tw:pb-1 tw:sm:pb-2">
+            <DialogPanel className="tw:relative tw:z-50 tw:flex tw:w-full tw:max-w-lg tw:max-h-[76dvh] tw:flex-col tw:overflow-hidden tw:rounded-2xl tw:bg-white tw:p-2 tw:text-left tw:shadow-xl tw:sm:max-h-[78vh] tw:sm:rounded-3xl tw:sm:p-4">
+              <div className="tw:flex tw:justify-end tw:pb-1">
                 <button
                   type="button"
                   onClick={onClose}
@@ -174,21 +179,25 @@ export default function TicketPromptModal({
                 </button>
               </div>
 
-              <div className="tw:flex-1 tw:overflow-y-auto tw:pr-1">
-                <div className="tw:space-y-2 tw:sm:space-y-5">
-                  <div className="tw:grid tw:grid-cols-1 tw:gap-1.5 tw:sm:gap-4 tw:md:grid-cols-[220px_minmax(0,1fr)]">
+              <div
+                className="tw:flex-1 tw:overflow-y-auto"
+                style={hiddenScrollbarStyle}
+              >
+                <style>{`.xilolo-ticket-modal-scroll::-webkit-scrollbar{display:none;}`}</style>
+                <div className="xilolo-ticket-modal-scroll tw:space-y-2 tw:overflow-y-auto tw:pr-1 tw:sm:space-y-3" style={hiddenScrollbarStyle}>
+                  <div className="tw:grid tw:grid-cols-1 tw:gap-1.5 tw:sm:gap-3 tw:md:grid-cols-[160px_minmax(0,1fr)]">
                     <div className="tw:hidden tw:md:block tw:overflow-hidden tw:rounded-2xl tw:bg-gray-100 tw:shadow-inner">
                       <img
                         src={poster}
                         alt={event?.title || "Event"}
-                        className="tw:h-20 tw:w-full tw:object-cover tw:sm:h-36 tw:md:h-full tw:md:min-h-[180px]"
+                        className="tw:h-20 tw:w-full tw:object-cover tw:sm:h-32 tw:md:h-full tw:md:min-h-[132px]"
                         loading="lazy"
                       />
                     </div>
 
-                    <div className="tw:space-y-1.5 tw:sm:space-y-3">
+                    <div className="tw:space-y-1.5 tw:sm:space-y-2">
                       <div className="tw:space-y-1">
-                        <span className="tw:block tw:text-base tw:font-semibold tw:text-gray-900 tw:sm:text-lg tw:md:text-xl">
+                        <span className="tw:block tw:text-base tw:font-semibold tw:leading-tight tw:text-gray-900 tw:sm:text-lg">
                           {event?.title}
                         </span>
                         <span className="tw:block tw:text-[11px] tw:text-gray-500 tw:sm:text-sm">
@@ -196,17 +205,17 @@ export default function TicketPromptModal({
                         </span>
                       </div>
 
-                      <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-2 tw:sm:p-4">
+                      <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-2 tw:sm:p-3">
                         <span className="tw:block tw:text-[11px] tw:text-gray-500 tw:sm:text-sm">
                           Ticket price
                         </span>
-                        <span className="tw:block tw:text-lg tw:font-bold tw:text-black tw:sm:text-xl tw:md:text-2xl">
+                        <span className="tw:block tw:text-lg tw:font-bold tw:text-black tw:sm:text-xl">
                           {priceLabel}
                         </span>
                       </div>
 
                       {manual?.available && (
-                        <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-2 tw:sm:p-4">
+                        <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-2 tw:sm:p-3">
                           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                             <div className="tw:flex tw:items-center tw:gap-2">
                               <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-[#f3f4ff] tw:text-primary">
@@ -241,8 +250,8 @@ export default function TicketPromptModal({
                   </div>
 
                   {options.length > 0 && (
-                    <div className="tw:space-y-2 tw:sm:space-y-3">
-                      <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                    <div className="tw:space-y-2">
+                      <div className="tw:text-xs tw:font-semibold tw:text-slate-900">
                         Choose access
                       </div>
                       <div className="tw:grid tw:grid-cols-1 tw:gap-2">
@@ -250,18 +259,20 @@ export default function TicketPromptModal({
                           const selected = option.value === selectedPurchaseType;
                           return (
                             <button
+                              style={{
+                                borderRadius: 16,
+                              }}
                               key={option.value}
                               type="button"
                               onClick={() => setSelectedPurchaseType(option.value)}
-                              className={`tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${
-                                selected
-                                  ? "tw:border-primary tw:bg-primary/5"
-                                  : "tw:border-gray-200 tw:bg-white hover:tw:border-primary/30"
-                              }`}
+                              className={`tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${selected
+                                ? "tw:border-primary tw:bg-primary/5"
+                                : "tw:border-gray-200 tw:bg-white hover:tw:border-primary/30"
+                                }`}
                             >
                               <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
                                 <div>
-                                  <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                                  <div className="tw:text-xs tw:font-semibold tw:text-slate-900">
                                     {option.label}
                                   </div>
                                   <div className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-slate-500 tw:sm:text-xs tw:sm:leading-5">
@@ -280,10 +291,10 @@ export default function TicketPromptModal({
                   )}
 
                   {canChooseQuantity && (
-                    <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-3 tw:sm:p-4">
+                    <div className="tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:p-3">
                       <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                         <div>
-                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                          <div className="tw:text-xs tw:font-semibold tw:text-slate-900">
                             Ticket quantity
                           </div>
                           <div className="tw:mt-1 tw:text-[11px] tw:leading-4 tw:text-slate-500 tw:sm:text-xs">
@@ -302,7 +313,7 @@ export default function TicketPromptModal({
                           className="tw:h-10 tw:w-20 tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:text-right tw:text-sm tw:font-semibold tw:outline-none focus:tw:border-primary"
                         />
                       </div>
-                      <div className="tw:mt-3 tw:grid tw:grid-cols-2 tw:gap-2 tw:text-xs">
+                      <div className="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2 tw:text-xs">
                         <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
                           <span className="tw:block tw:text-slate-500">For you</span>
                           <span className="tw:font-semibold tw:text-slate-900">
@@ -316,7 +327,7 @@ export default function TicketPromptModal({
                           </span>
                         </div>
                       </div>
-                      <div className="tw:mt-3 tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:bg-primary/5 tw:p-3">
+                      <div className="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:rounded-xl tw:bg-primary/5 tw:p-2.5">
                         <span className="tw:text-xs tw:font-medium tw:text-slate-600">Wallet total</span>
                         <span className="tw:text-sm tw:font-bold tw:text-slate-900">{selectedTotalLabel}</span>
                       </div>
@@ -326,6 +337,9 @@ export default function TicketPromptModal({
                   <div className="tw:flex tw:flex-col tw:gap-2 tw:pb-1">
                     {selectedOption && (
                       <button
+                        style={{
+                          borderRadius: 24,
+                        }}
                         type="button"
                         onClick={() => onBuy(selectedOption.value, normalizedQuantity)}
                         disabled={buying}
@@ -338,6 +352,9 @@ export default function TicketPromptModal({
                     )}
 
                     <button
+                      style={{
+                        borderRadius: 24,
+                      }}
                       type="button"
                       onClick={onClose}
                       className="tw:w-full tw:rounded-[16px] tw:border tw:border-gray-200 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"

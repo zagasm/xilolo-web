@@ -582,6 +582,14 @@ export default function ViewEvent() {
   const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
   const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
+  const canOpenPurchaseOptions =
+    !isOwnerEvent &&
+    !isSoldOut &&
+    !hasPaid &&
+    (ticketOnlyAvailable ||
+      ticketAndManualAvailable ||
+      manualOnlyAvailable ||
+      !!event?.user_can_sponsor_tickets);
   const replay = event?.replay || {};
   const replayEnabled = !!event?.enable_replay;
   const hasReplay = !!event?.has_replay;
@@ -651,6 +659,19 @@ export default function ViewEvent() {
     }
 
     handleGetTicket(ticketAndManualAvailable ? "ticket_and_manual" : "ticket_only");
+  };
+
+  const handleOpenPurchaseOptions = () => {
+    if (!canOpenPurchaseOptions || purchaseTicketMutation.isPending) return;
+
+    if (!token) {
+      showError("Please log in to buy or sponsor tickets.");
+      navigate("/auth/signin");
+      return;
+    }
+
+    setPurchaseModalOpen(true);
+    setModalAutoTrigger(false);
   };
 
   const handleOwnerStreamAction = async () => {
@@ -1211,16 +1232,7 @@ export default function ViewEvent() {
                           <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
                             {sponsoredTicketsAvailableCount} available
                           </span>
-                          {canClaimSponsoredTicket && (
-                            <button
-                              type="button"
-                              onClick={handleClaimSponsoredTicket}
-                              disabled={claimSponsoredTicketMutation.isPending}
-                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
-                            >
-                              {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
-                            </button>
-                          )}
+                          
                         </div>
                       </div>
                     )}
@@ -1271,19 +1283,36 @@ export default function ViewEvent() {
                           )}
                         </button>
 
-                        <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                        {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
+                          <button
+                            style={{
+                              borderRadius: 24,
+                              marginTop: 12
+                            }}
+                            type="button"
+                            disabled={purchaseTicketMutation.isPending}
+                            onClick={handleOpenPurchaseOptions}
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                          >
+                            {purchaseTicketMutation.isPending
+                              ? "Processing..."
+                              : "Buy or Sponsor Tickets"}
+                          </button>
+                        ) : null}
+
+                        <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
                           {hasPaid
                             ? isLiveNow
                               ? "You already have access. Tap the button above to join the live experience."
                               : canBuyManualOnly
-                                ? "Your ticket is secured. You can still unlock the event manual."
+                                ? "Your ticket is secured. You can still buy the event manual."
                                 : "Your ticket is secured. We will notify you when the event starts."
                             : canClaimSponsoredTicket
                               ? "A paid ticket is available for you to claim now. You can still buy or sponsor tickets from the purchase options."
                             : shouldChoosePurchaseType
                               ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
                               : "Secure checkout and fast access to your purchased ticket."}
-                        </p>
+                        </span>
                       </>
                     )}
                   </div>
@@ -1407,18 +1436,31 @@ export default function ViewEvent() {
                 {startingStream ? "Starting..." : isLiveNow || isPaused ? "Manage stream" : "Start stream"}
               </button>
             ) : (
-              <button
-                style={{ borderRadius: 18 }}
-                type="button"
-                disabled={ctaDisabled}
-                onClick={handlePrimaryAction}
-                className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
-                  ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                  : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
-                  }`}
-              >
-                {primaryCtaLabel}
-              </button>
+              <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2">
+                <button
+                  style={{ borderRadius: 18 }}
+                  type="button"
+                  disabled={ctaDisabled}
+                  onClick={handlePrimaryAction}
+                  className={`tw:flex tw:h-10 tw:min-w-[138px] tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
+                    ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                    : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                    }`}
+                >
+                  {primaryCtaLabel}
+                </button>
+                {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
+                  <button
+                    style={{ borderRadius: 18 }}
+                    type="button"
+                    disabled={purchaseTicketMutation.isPending}
+                    onClick={handleOpenPurchaseOptions}
+                    className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                  >
+                    Sponsor more
+                  </button>
+                ) : null}
+              </div>
             )}
           </div>
         </div>
