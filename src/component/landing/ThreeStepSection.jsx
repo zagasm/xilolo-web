@@ -104,7 +104,7 @@ export default function ThreeStepSection({
                     delay: i * 0.06,
                   }}
                 >
-                  <div className="tw:font-dela tw:relative tw:inline-block">
+                  <div className="tw:font-league tw:relative tw:inline-block">
                     <div
                       className={[
                         "tw:font-extrabold tw:leading-tight tw:tracking-tight tw:transition-all tw:duration-300",

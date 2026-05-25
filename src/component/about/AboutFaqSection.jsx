@@ -47,7 +47,7 @@ export default function AboutFaqSection() {
         <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
           FAQ
         </span>
-        <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+        <span className="tw:font-league tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
           Quick answers before you start.
         </span>
         <span className="tw:mt-1 tw:block tw:text-sm tw:text-slate-600 tw:max-w-xl">

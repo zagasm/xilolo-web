@@ -31,6 +31,13 @@ const SUGGESTED_PROMPTS = [
 ];
 
 const TYPEWRITER_SPEED = 14;
+const LONG_REPLY_TYPEWRITER_LIMIT = 260;
+const THINKING_MESSAGES = [
+  "Xilolo AI is reading your request",
+  "Checking your events, tickets, and account context",
+  "Connecting the useful details",
+  "Shaping a clear answer for you",
+];
 const HIDDEN_SCROLLBAR_STYLE = {
   scrollbarWidth: "none",
   msOverflowStyle: "none",
@@ -78,14 +85,15 @@ function isSubscriptionActive(status) {
   );
 }
 
-function ThinkingBubble() {
+function ThinkingBubble({ message }) {
   return (
-    <div className="tw:flex tw:max-w-[78%] tw:self-start tw:items-center tw:gap-2 tw:rounded-[22px] tw:bg-white/70 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-[#444]">
-      <span className="tw:grid tw:h-7 tw:w-7 tw:place-items-center tw:rounded-full tw:bg-primary/10 tw:text-primary">
+    <div className="tw:flex tw:max-w-[86%] tw:self-start tw:items-center tw:gap-3 tw:rounded-[24px] tw:bg-white/75 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-[#444] tw:shadow-sm tw:sm:max-w-[78%]">
+      <span className="tw:relative tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:bg-primary/10 tw:text-primary">
+        <span className="tw:absolute tw:inset-0 tw:animate-ping tw:rounded-full tw:bg-primary/15" />
         <Bot size={15} />
       </span>
 
-      <span>Xilolo is thinking</span>
+      <span className="tw:min-w-0 tw:flex-1">{message}</span>
 
       <span className="tw:inline-flex tw:items-center tw:gap-1">
         <span className="tw:h-1.5 tw:w-1.5 tw:animate-bounce tw:rounded-full tw:bg-zinc-400 [animation-delay:-0.2s]" />
@@ -180,6 +188,7 @@ export default function XiloloAssistantWidget() {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [assistantStatus, setAssistantStatus] = useState("idle");
+  const [thinkingMessageIndex, setThinkingMessageIndex] = useState(0);
   const [isConsentRequired, setIsConsentRequired] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
@@ -344,6 +353,10 @@ export default function XiloloAssistantWidget() {
   const typeAssistantReply = useCallback(async (reply, messageId) => {
     const requestId = Date.now();
     typingRequestRef.current = requestId;
+    const shouldShortType = reply.length > LONG_REPLY_TYPEWRITER_LIMIT;
+    const typedLength = shouldShortType
+      ? Math.min(LONG_REPLY_TYPEWRITER_LIMIT, reply.length)
+      : reply.length;
 
     setAssistantStatus("typing");
 
@@ -357,7 +370,7 @@ export default function XiloloAssistantWidget() {
       },
     ]);
 
-    for (let index = 1; index <= reply.length; index += 1) {
+    for (let index = 1; index <= typedLength; index += 1) {
       if (typingRequestRef.current !== requestId) return;
 
       const nextText = reply.slice(0, index);
@@ -368,13 +381,17 @@ export default function XiloloAssistantWidget() {
             ? {
                 ...message,
                 content: nextText,
-                isTyping: index < reply.length,
+                isTyping: true,
               }
             : message
         )
       );
 
       await sleep(TYPEWRITER_SPEED);
+    }
+
+    if (shouldShortType) {
+      await sleep(140);
     }
 
     setAiMessages((messages) =>
@@ -389,6 +406,19 @@ export default function XiloloAssistantWidget() {
       )
     );
   }, []);
+
+  useEffect(() => {
+    if (assistantStatus !== "thinking") {
+      setThinkingMessageIndex(0);
+      return undefined;
+    }
+
+    const interval = window.setInterval(() => {
+      setThinkingMessageIndex((index) => (index + 1) % THINKING_MESSAGES.length);
+    }, 1400);
+
+    return () => window.clearInterval(interval);
+  }, [assistantStatus]);
 
   const acceptConsent = async () => {
     setIsSending(true);
@@ -930,7 +960,9 @@ export default function XiloloAssistantWidget() {
                       );
                     })}
 
-                    {assistantStatus === "thinking" && <ThinkingBubble />}
+                    {assistantStatus === "thinking" && (
+                      <ThinkingBubble message={THINKING_MESSAGES[thinkingMessageIndex]} />
+                    )}
 
                     {aiMessages.length <= 1 && assistantStatus === "idle" && (
                       <div className="tw:grid tw:gap-2 tw:sm:grid-cols-2">

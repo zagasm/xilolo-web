@@ -63,7 +63,7 @@ export default function AutomationSection({
             </motion.div> */}
 
             <motion.span
-              className="tw:font-dela tw:block tw:mb-4 tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
+              className="tw:font-league tw:block tw:mb-4 tw:text-3xl tw:md:text-[40px] tw:lg:text-5xl tw:font-[900] tw:leading-[0.95] tw:tracking-tight tw:text-gray-900"
               variants={textVariants}
               custom={1}
             >

@@ -89,6 +89,17 @@ function getTicketPromptStorageKey(eventIdentifier) {
   return `xilolo:event-ticket-prompt-seen:${eventIdentifier}`;
 }
 
+function getViewerId(user = {}) {
+  return (
+    user?.id ||
+    user?.user_id ||
+    user?.userId ||
+    user?.uuid ||
+    user?.data?.id ||
+    ""
+  );
+}
+
 function resolveManualDownloadUrl(manual = {}) {
   const directCandidates = [
     manual?.cdn_url,
@@ -216,6 +227,7 @@ export default function ViewEvent() {
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
   const [purchaseSummary, setPurchaseSummary] = useState(null);
   const [replayUploadOpen, setReplayUploadOpen] = useState(false);
+  const [preferredPurchaseType, setPreferredPurchaseType] = useState(null);
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const shareFlow = useEventShareFlow();
@@ -243,7 +255,14 @@ export default function ViewEvent() {
         previous
           ? {
             ...previous,
-            hasPaid: purchaseType === "manual_only" ? !!previous?.hasPaid : true,
+            hasPaid:
+              purchaseType === "manual_only" || purchaseType === "sponsored_only"
+                ? !!previous?.hasPaid
+                : true,
+            user_has_sponsored_tickets:
+              purchaseType === "sponsored_only"
+                ? true
+                : previous?.user_has_sponsored_tickets,
             manual: previous?.manual
               ? {
                 ...previous.manual,
@@ -251,7 +270,10 @@ export default function ViewEvent() {
                   includesManual || previous.manual.viewer_has_access,
                 viewer_has_purchased:
                   includesManual || previous.manual.viewer_has_purchased,
-                viewer_has_ticket: true,
+                viewer_has_ticket:
+                  purchaseType === "sponsored_only"
+                    ? previous.manual.viewer_has_ticket
+                    : true,
               }
               : previous?.manual,
           }
@@ -266,6 +288,8 @@ export default function ViewEvent() {
       showSuccess(
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
+          : purchaseType === "sponsored_only"
+            ? "Sponsored tickets purchased successfully."
           : includesManual
             ? "Ticket and manual purchased successfully."
             : "Ticket purchased successfully."
@@ -275,6 +299,26 @@ export default function ViewEvent() {
 
   const claimSponsoredTicketMutation = useClaimSponsoredTicket({
     onSuccess: () => {
+      setEvent((previous) =>
+        previous
+          ? {
+            ...previous,
+            hasPaid: true,
+            user_has_ticket: true,
+            can_claim_sponsored_ticket: false,
+            sponsored_tickets_available_count: Math.max(
+              0,
+              Number(previous.sponsored_tickets_available_count || 0) - 1
+            ),
+            manual: previous?.manual
+              ? {
+                ...previous.manual,
+                viewer_has_ticket: true,
+              }
+              : previous?.manual,
+          }
+          : previous
+      );
       refreshEventDetailSilently();
       showSuccess("Paid ticket claimed successfully.");
     },
@@ -401,13 +445,18 @@ export default function ViewEvent() {
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
   const manual = event?.manual || {};
   const purchaseOptions = event?.purchase_options || {};
+  const hasPaid = !!event?.hasPaid || !!event?.user_has_ticket;
   const manualAvailable = !!manual?.available;
   const manualHasAccess = !!manual?.viewer_has_access;
   const ticketOnlyAvailable =
     !event?.is_sold_out &&
-    (!!purchaseOptions.ticket_only || (!event?.hasPaid && Number(event?.price ?? 0) > 0));
+    !hasPaid &&
+    (!!purchaseOptions.ticket_only || Number(event?.price ?? 0) > 0);
   const ticketAndManualAvailable =
-    manualAvailable && !!purchaseOptions.ticket_and_manual && !manualHasAccess;
+    !hasPaid &&
+    manualAvailable &&
+    !!purchaseOptions.ticket_and_manual &&
+    !manualHasAccess;
   const manualOnlyAvailable =
     manualAvailable && !!purchaseOptions.manual_only && !manualHasAccess;
   const purchaseChoiceCount = [
@@ -569,7 +618,6 @@ export default function ViewEvent() {
   const isPaused = event?.status === "paused";
   const isEnded = event?.status === "ended";
   const isSoldOut = !!event?.is_sold_out;
-  const hasPaid = !!event?.hasPaid;
   const isOwnerEvent = !!(
     event?.isOwner ||
     event?.is_owner ||
@@ -581,15 +629,33 @@ export default function ViewEvent() {
   const canDownloadManual = manualAvailable && manualHasAccess;
   const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
   const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
+  const sponsoredTicketSponsors = Array.isArray(event?.sponsored_ticket_sponsors)
+    ? event.sponsored_ticket_sponsors
+    : [];
+  const viewerId = String(getViewerId(user));
+  const viewerHasSponsoredTickets =
+    !!event?.user_has_sponsored_tickets ||
+    (!!viewerId &&
+      sponsoredTicketSponsors.some(
+        (sponsor) => String(sponsor?.id || sponsor?.user_id || "") === viewerId
+      ));
+  const firstSponsor = sponsoredTicketSponsors[0];
+  const sponsorDisplayName = firstSponsor?.username
+    ? `@${firstSponsor.username}`
+    : firstSponsor?.name || "Someone";
+  const sponsorHeadline =
+    sponsoredTicketSponsors.length > 1
+      ? `${sponsorDisplayName} and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} sponsored tickets for this event.`
+      : `${sponsorDisplayName} sponsored tickets for this event.`;
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
   const canOpenPurchaseOptions =
     !isOwnerEvent &&
     !isSoldOut &&
-    !hasPaid &&
     (ticketOnlyAvailable ||
       ticketAndManualAvailable ||
       manualOnlyAvailable ||
-      !!event?.user_can_sponsor_tickets);
+      !!event?.user_can_sponsor_tickets ||
+      viewerHasSponsoredTickets);
   const replay = event?.replay || {};
   const replayEnabled = !!event?.enable_replay;
   const hasReplay = !!event?.has_replay;
@@ -612,8 +678,10 @@ export default function ViewEvent() {
     primaryCtaLabel = "Join Live Event";
   } else if (canBuyManualOnly) {
     primaryCtaLabel = "Buy Manual";
+  } else if (viewerHasSponsoredTickets) {
+    primaryCtaLabel = "Sponsor More Tickets";
   } else if (hasPaid && !isLiveNow) {
-    primaryCtaLabel = "Ticket Purchased";
+    primaryCtaLabel = event?.user_can_sponsor_tickets ? "Sponsor Tickets" : "Ticket Purchased";
   } else if (canClaimSponsoredTicket) {
     primaryCtaLabel = claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim Paid Ticket";
   } else if (isSoldOut) {
@@ -631,7 +699,11 @@ export default function ViewEvent() {
     claimSponsoredTicketMutation.isPending ||
     (!canClaimSponsoredTicket &&
       ((!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
-        (hasPaid && !isLiveNow && !canBuyManualOnly)));
+        (hasPaid &&
+          !isLiveNow &&
+          !canBuyManualOnly &&
+          !event?.user_can_sponsor_tickets &&
+          !viewerHasSponsoredTickets)));
 
   const handleEnterLive = () => {
     if (hasPaid && isLiveNow) {
@@ -652,7 +724,17 @@ export default function ViewEvent() {
       return;
     }
 
-    if (shouldChoosePurchaseType || canBuyManualOnly) {
+    if (viewerHasSponsoredTickets) {
+      setPreferredPurchaseType("sponsored_only");
+      setPurchaseModalOpen(true);
+      setModalAutoTrigger(false);
+      return;
+    }
+
+    if (shouldChoosePurchaseType || canBuyManualOnly || (hasPaid && event?.user_can_sponsor_tickets)) {
+      setPreferredPurchaseType(
+        hasPaid && event?.user_can_sponsor_tickets ? "sponsored_only" : null
+      );
       setPurchaseModalOpen(true);
       setModalAutoTrigger(false);
       return;
@@ -671,6 +753,9 @@ export default function ViewEvent() {
     }
 
     setPurchaseModalOpen(true);
+    setPreferredPurchaseType(
+      viewerHasSponsoredTickets ? "sponsored_only" : null
+    );
     setModalAutoTrigger(false);
   };
 
@@ -1143,7 +1228,7 @@ export default function ViewEvent() {
 
               <aside className="tw:flex tw:flex-col tw:gap-6">
                 <div className="tw:px-1 tw:py-2 tw:md:sticky tw:md:top-28">
-                  <div className="tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
+                  <div className="tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
                     <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
                       <div>
                         <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
@@ -1223,15 +1308,20 @@ export default function ViewEvent() {
                     {hasSponsoredTicketsAvailable && !hasPaid && (
                       <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
                         <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                          Someone has paid for tickets for this event.
+                          {sponsoredTicketSponsors.length ? sponsorHeadline : "A kind sponsor has covered tickets for this event. "}
                         </div>
                         <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
-                          You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
+                          You can grab one of the prepaid tickets, get your own ticket, or chip in to sponsor someone else!
                         </div>
                         <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
                             {sponsoredTicketsAvailableCount} available
                           </span>
+                          {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
+                            <span key={sponsor.id || sponsor.username} className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
+                              {sponsor.username ? `@${sponsor.username}` : sponsor.name}
+                            </span>
+                          ))}
                           
                         </div>
                       </div>
@@ -1257,9 +1347,9 @@ export default function ViewEvent() {
                                 : "Start stream"}
                         </button>
 
-                        <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                        <span className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
                           Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
-                        </p>
+                        </span>
                       </>
                     ) : (
                       <>
@@ -1317,9 +1407,9 @@ export default function ViewEvent() {
                     )}
                   </div>
 
-                  <div className="tw:mt-4 tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                  <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
                     <div className="tw:flex tw:items-start tw:gap-4">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-[#f7f2eb]">
+                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-white">
                         {hostHasImage ? (
                           <img
                             src={event.hostImage}
@@ -1497,6 +1587,7 @@ export default function ViewEvent() {
         onBuy={(purchaseType, quantity) => handleGetTicket(purchaseType, quantity)}
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
+        preferredPurchaseType={preferredPurchaseType}
       />
       <WalletFundingRequiredModal
         open={fundingRequiredOpen}

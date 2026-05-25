@@ -12,7 +12,11 @@ const DownloadAppModal = ({
   onApkDownload = () => { },
   onSkip = () => { },
   apkCtaText = "Get it on Google Play",
+  platform = "all",
 }) => {
+  const showIosDownload = platform === "ios" || platform === "all";
+  const showAndroidDownload = platform === "android" || platform === "all";
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="tw:relative tw:z-9999" onClose={onClose}>
@@ -55,65 +59,71 @@ const DownloadAppModal = ({
                     </button>
                   </div>
                   <span className="tw:mt-2 tw:text-sm tw:text-gray-600">
-                    Choose your platform and start using the app in seconds.
+                    {platform === "all"
+                      ? "Choose your platform and start using the app in seconds."
+                      : "Download the app for your device and start using it in seconds."}
                   </span>
 
                   <div className="tw:mt-6 tw:space-y-3">
-                    <button
-                      style={{
-                        borderRadius: 16,
-                      }}
-                      type="button"
-                      onClick={onAppStoreDownload}
-                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:via-primarySecond tw:to-[#3a3a3a] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-black/20 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#cfc4b8]"
-                    >
-                      <span className="tw:flex tw:items-center tw:gap-3">
-                        <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-white/15 tw:ring-1 tw:ring-white/30">
-                          <img
-                            src="/images/icons/as.png"
-                            alt="App Store"
-                            className="tw:h-5 tw:w-5 tw:object-contain"
-                          />
-                        </span>
-                        <span className="tw:text-left">
-                          <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-80">
-                            App Store
+                    {showIosDownload && (
+                      <button
+                        style={{
+                          borderRadius: 16,
+                        }}
+                        type="button"
+                        onClick={onAppStoreDownload}
+                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:via-primarySecond tw:to-[#3a3a3a] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-black/20 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#cfc4b8]"
+                      >
+                        <span className="tw:flex tw:items-center tw:gap-3">
+                          <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-white/15 tw:ring-1 tw:ring-white/30">
+                            <img
+                              src="/images/icons/as.png"
+                              alt="App Store"
+                              className="tw:h-5 tw:w-5 tw:object-contain"
+                            />
                           </span>
-                          <span className="tw:block tw:text-sm tw:font-semibold">
-                            Download for iOS
+                          <span className="tw:text-left">
+                            <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:opacity-80">
+                              App Store
+                            </span>
+                            <span className="tw:block tw:text-sm tw:font-semibold">
+                              Download for iOS
+                            </span>
                           </span>
                         </span>
-                      </span>
-                      <Download className="tw:size-5 tw:opacity-80" />
-                    </button>
+                        <Download className="tw:size-5 tw:opacity-80" />
+                      </button>
+                    )}
 
-                    <button
-                      style={{
-                        borderRadius: 16,
-                      }}
-                      type="button"
-                      onClick={onApkDownload}
-                      className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-[#cfc4b8] tw:hover:shadow-black/5 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
-                    >
-                      <span className="tw:flex tw:items-center tw:gap-3">
-                        <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-lightPurple tw:text-primary">
-                          <img
-                            src="/images/icons/ps.png"
-                            alt="Google Play"
-                            className="tw:h-5 tw:w-5 tw:object-contain"
-                          />
-                        </span>
-                        <span className="tw:text-left">
-                          <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:text-[#5f5a55]">
-                            Google Play
+                    {showAndroidDownload && (
+                      <button
+                        style={{
+                          borderRadius: 16,
+                        }}
+                        type="button"
+                        onClick={onApkDownload}
+                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-[#cfc4b8] tw:hover:shadow-black/5 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
+                      >
+                        <span className="tw:flex tw:items-center tw:gap-3">
+                          <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-lightPurple tw:text-primary">
+                            <img
+                              src="/images/icons/ps.png"
+                              alt="Google Play"
+                              className="tw:h-5 tw:w-5 tw:object-contain"
+                            />
                           </span>
-                          <span className="tw:block tw:text-sm tw:font-semibold">
-                            {apkCtaText}
+                          <span className="tw:text-left">
+                            <span className="tw:block tw:text-xs tw:uppercase tw:tracking-wide tw:text-[#5f5a55]">
+                              Google Play
+                            </span>
+                            <span className="tw:block tw:text-sm tw:font-semibold">
+                              {apkCtaText}
+                            </span>
                           </span>
                         </span>
-                      </span>
-                      <Download className="tw:size-5 tw:opacity-80" />
-                    </button>
+                        <Download className="tw:size-5 tw:opacity-80" />
+                      </button>
+                    )}
                   </div>
 
                   <div className="tw:mt-4 tw:flex tw:justify-center">

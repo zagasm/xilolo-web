@@ -47,7 +47,7 @@ export default function ContactHero() {
             </span>
           </motion.div>
 
-          <span className="tw:font-dela tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-semibold tw:leading-tight tw:mb-3">
+          <span className="tw:font-league tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-5xl tw:font-[900] tw:leading-[1] tw:mb-3">
             Let’s plan your next{" "}
             <span className="tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:bg-clip-text tw:text-transparent">
               live event

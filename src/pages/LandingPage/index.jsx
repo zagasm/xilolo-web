@@ -6,6 +6,7 @@ import AutomationSection from "../../component/landing/AutomationSection";
 import ThreeStepSection from "../../component/landing/ThreeStepSection";
 import LiveHighlightsSection from "../../component/landing/LiveHighlightSection";
 import LivePipelineSection from "../../component/landing/LivePipelineSection";
+import XiloloAiSection from "../../component/landing/XiloloAiSection";
 
 export default function ZagasmLanding() {
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -43,6 +44,8 @@ export default function ZagasmLanding() {
         />
 
         <LiveHighlightsSection />
+
+        <XiloloAiSection />
 
         <AutomationSection
           title="Go live once. We handle the setup"

@@ -71,6 +71,7 @@ api.interceptors.response.use(
           "xilolo_maintenance_message",
           payload?.message || "Xilolo is currently on maintenance please try again later."
         );
+        window.sessionStorage.setItem("xilolo_maintenance_redirected_at", String(Date.now()));
         window.location.assign("/maintenance");
       }
       return Promise.reject(error);

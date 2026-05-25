@@ -105,7 +105,7 @@ export default function LivePipelineSection() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="tw:font-dela tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-semibold tw:text-white tw:tracking-tight"
+            className="tw:font-league tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-[900] tw:text-white tw:tracking-tight"
           >
             From
             <strong className="tw:font-semibold tw:text-red-600">

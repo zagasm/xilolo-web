@@ -44,7 +44,7 @@ function FlowHeadline({
   );
 
   return (
-    <div className="tw:relative tw:mb-4 tw:font-bold tw:font-dela">
+    <div className="tw:relative tw:mb-4 tw:font-bold tw:font-league">
       {/* Continuous sheen across the whole headline */}
       <motion.span
         aria-hidden
@@ -69,7 +69,7 @@ function FlowHeadline({
           variants={localSentence}
           initial="hidden"
           animate="show"
-          className="tw:block tw:text-center tw:font-extrabold tw:leading-[0.95] tw:tracking-tight tw:text-[30px] tw:md:text-[40px] tw:lg:text-[53px] tw:text-gray-900"
+          className="tw:block tw:text-center tw:font-[900] tw:leading-[0.95] tw:tracking-tight tw:text-[30px] tw:md:text-[40px] tw:lg:text-[53px] tw:text-gray-900"
         >
           {line1Words.map((w, i) => (
             <motion.span

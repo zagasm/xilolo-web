@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Transition } from "@headlessui/react";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 import {
-  ArrowLeft,
+  ChevronLeft,
   Headphones,
   Loader2,
+  MessageCircle,
   MessageSquarePlus,
+  Plus,
+  Search,
   Send,
+  X,
   XCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -78,6 +83,11 @@ function statusLabel(status) {
   return String(status || "open").replaceAll("_", " ");
 }
 
+const HIDDEN_SCROLLBAR_STYLE = {
+  scrollbarWidth: "none",
+  msOverflowStyle: "none",
+};
+
 export default function SupportChatPage() {
   const navigate = useNavigate();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
@@ -91,11 +101,24 @@ export default function SupportChatPage() {
   const [creating, setCreating] = useState(false);
   const [closing, setClosing] = useState(false);
   const [error, setError] = useState("");
+  const [conversationSearch, setConversationSearch] = useState("");
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const echoRef = useRef(null);
   const endRef = useRef(null);
 
   const hasAccess = isSubscriptionActive(subscriptionStatus);
   const isClosed = activeConversation?.status === "closed";
+  const filteredConversations = useMemo(() => {
+    const term = conversationSearch.trim().toLowerCase();
+    if (!term) return conversations;
+
+    return conversations.filter((conversation) => {
+      const label = `${conversation.subject || "Support chat"} ${
+        conversation.latest_message?.body || ""
+      }`;
+      return label.toLowerCase().includes(term);
+    });
+  }, [conversationSearch, conversations]);
 
   const upsertConversation = useCallback((conversation) => {
     if (!conversation?.id) return;
@@ -340,210 +363,359 @@ export default function SupportChatPage() {
     }
   };
 
-  return (
-    <main className="tw:min-h-[calc(100vh-84px)] tw:bg-[#f6f3ee] tw:px-4 tw:pb-28 tw:pt-6 tw:md:px-6 tw:md:py-10">
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-6xl tw:flex-col tw:gap-4">
-        <div className="tw:mt-15 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
-          <div>
-            <button
-              style={{ borderRadius: "9999px" }}
-              type="button"
-              onClick={() => navigate(-1)}
-              className="tw:mb-3 tw:inline-flex tw:items-center tw:gap-2 tw:border tw:border-black/10 tw:bg-white/80 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-800 tw:shadow-sm tw:transition hover:tw:bg-white"
-            >
-              <ArrowLeft size={16} />
-              Back
-            </button>
-            <span className="tw:mt-1 tw:block tw:text-2xl tw:font-black tw:leading-tight tw:text-primary tw:md:text-4xl">
-              Xilolo Support Chat
-            </span>
-          </div>
+  const conversationList = (
+    <div
+      className="xilolo-support-scroll tw:mt-5 tw:flex tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto"
+      style={HIDDEN_SCROLLBAR_STYLE}
+    >
+      <div className="tw:flex tw:items-center tw:justify-between">
+        <span className="tw:text-base tw:font-black">Recent</span>
+        <span className="tw:rounded-full tw:bg-white/70 tw:px-2.5 tw:py-1 tw:text-xs tw:font-black">
+          {conversations.length}
+        </span>
+      </div>
 
-          {hasAccess ? (
-            <button
-              type="button"
-              onClick={createConversation}
-              disabled={creating}
-              className="tw:inline-flex tw:w-fit tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-bold tw:text-white tw:shadow-[0_14px_34px_rgba(17,17,17,0.18)] tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-            >
-              {creating ? (
-                <Loader2 className="tw:animate-spin" size={17} />
-              ) : (
-                <MessageSquarePlus size={17} />
-              )}
-              New chat
-            </button>
-          ) : null}
+      {loading ? (
+        <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold">
+          <Loader2 className="tw:animate-spin" size={16} />
+          Loading support chats
         </div>
+      ) : !hasAccess ? (
+        <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+          Support chat is available with an active Xilolo subscription.
+        </div>
+      ) : filteredConversations.length === 0 ? (
+        <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+          No matching chats yet.
+        </div>
+      ) : (
+        <div className="tw:flex tw:flex-col tw:gap-3">
+          {filteredConversations.map((conversation) => {
+            const active = activeConversation?.id === conversation.id;
 
-        {error && (
-          <div className="tw:rounded-2xl tw:border tw:border-orange-200 tw:bg-orange-50 tw:px-5 tw:py-3 tw:text-sm tw:font-medium tw:text-orange-800">
-            {error}
-          </div>
-        )}
-
-        <section className="tw:grid tw:min-h-[620px] tw:overflow-hidden tw:rounded-3xl tw:border tw:border-black/10 tw:bg-white tw:shadow-[0_24px_65px_rgba(17,17,17,0.12)] tw:lg:grid-cols-[320px_1fr]">
-          <aside className="tw:border-b tw:border-gray-100 tw:bg-white tw:lg:border-b-0 tw:lg:border-r">
-            <div className="tw:flex tw:items-center tw:justify-between tw:border-b tw:border-gray-100 tw:px-4 tw:py-4">
-              <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-black tw:text-gray-900">
-                <Headphones size={18} />
-                Chat history
-              </div>
-              <span className="tw:rounded-full tw:bg-gray-100 tw:px-2 tw:py-1 tw:text-xs tw:font-bold tw:text-gray-500">
-                {conversations.length}
-              </span>
-            </div>
-
-            <div className="tw:max-h-[220px] tw:overflow-y-auto tw:lg:max-h-[640px]">
-              {loading ? (
-                <div className="tw:grid tw:min-h-32 tw:place-items-center tw:text-gray-400">
-                  <Loader2 className="tw:animate-spin" size={22} />
-                </div>
-              ) : !hasAccess ? (
-                <div className="tw:p-4 tw:text-sm tw:font-medium tw:text-gray-500">
-                  Support chat is available to users with an active subscription.
-                </div>
-              ) : conversations.length === 0 ? (
-                <div className="tw:p-4 tw:text-sm tw:font-medium tw:text-gray-500">
-                  No support chats yet. Start a new chat when you need help.
-                </div>
-              ) : (
-                conversations.map((conversation) => (
-                  <button
-                    key={conversation.id}
-                    type="button"
-                    onClick={() => openConversation(conversation)}
+            return (
+              <button
+                key={conversation.id}
+                type="button"
+                onClick={() => {
+                  openConversation(conversation);
+                  setMobileDrawerOpen(false);
+                }}
+                className={[
+                  "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-[22px] tw:px-4 tw:py-3 tw:text-left tw:transition",
+                  active ? "tw:bg-white tw:shadow-sm" : "tw:bg-white/70 hover:tw:bg-white",
+                ].join(" ")}
+              >
+                <span className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+                  <span className="tw:min-w-0 tw:truncate tw:text-sm tw:font-black tw:text-primary">
+                    {conversation.subject || "Support chat"}
+                  </span>
+                  <span
                     className={[
-                      "tw:block tw:w-full tw:border-b tw:border-gray-100 tw:px-4 tw:py-3 tw:text-left tw:transition hover:tw:bg-gray-50",
-                      activeConversation?.id === conversation.id
-                        ? "tw:bg-gray-100"
-                        : "tw:bg-white",
+                      "tw:shrink-0 tw:rounded-full tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-black tw:uppercase",
+                      conversation.status === "closed"
+                        ? "tw:bg-primary/10 tw:text-primary"
+                        : "tw:bg-emerald-50 tw:text-emerald-700",
                     ].join(" ")}
                   >
-                    <div className="tw:mb-1 tw:flex tw:items-center tw:justify-between tw:gap-2">
-                      <span className="tw:truncate tw:text-sm tw:font-bold tw:text-gray-900">
-                        {conversation.subject || "Support chat"}
-                      </span>
-                      <span
-                        className={[
-                          "tw:shrink-0 tw:rounded-full tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-black tw:uppercase",
-                          conversation.status === "closed"
-                            ? "tw:bg-gray-200 tw:text-gray-600"
-                            : "tw:bg-emerald-50 tw:text-emerald-700",
-                        ].join(" ")}
-                      >
-                        {statusLabel(conversation.status)}
-                      </span>
-                    </div>
-                    <p className="tw:line-clamp-2 tw:text-xs tw:leading-5 tw:text-gray-500">
-                      {conversation.latest_message?.body || "No messages yet"}
-                    </p>
-                  </button>
-                ))
-              )}
-            </div>
-          </aside>
-
-          <div className="tw:flex tw:min-h-[620px] tw:flex-col">
-            <header className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-gray-100 tw:bg-white tw:px-4 tw:py-4 tw:md:px-5">
-              <div className="tw:min-w-0">
-                <span className="tw:block tw:truncate tw:text-base tw:font-black tw:text-gray-900 tw:md:text-lg">
-                  {activeConversation?.subject || "Support chat"}
+                    {statusLabel(conversation.status)}
+                  </span>
                 </span>
-                <span className="tw:mt-0.5 tw:block tw:text-xs tw:font-semibold tw:text-gray-500">
+                <span className="tw:line-clamp-2 tw:text-xs tw:font-semibold tw:leading-5 tw:text-[#6b625a]">
+                  {conversation.latest_message?.body || "No messages yet"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <main className="tw:min-h-screen tw:bg-white tw:px-2 tw:pb-2 tw:pt-[72px] tw:font-sans tw:text-primary tw:sm:px-3 tw:sm:pb-4 tw:md:px-5 tw:md:pt-[88px]">
+      <style>{`
+        .xilolo-support-scroll::-webkit-scrollbar{display:none;}
+        .xilolo-support-noise{background-image:radial-gradient(rgba(17,17,17,.045) .7px, transparent .7px);background-size:6px 6px;}
+        @supports (height: 100dvh) {
+          .xilolo-support-shell{height:calc(100dvh - 96px);}
+          @media (max-width:520px){.xilolo-support-shell{height:calc(100dvh - 78px);}}
+        }
+      `}</style>
+
+      <Transition show={mobileDrawerOpen}>
+        <div className="tw:fixed tw:inset-0 tw:z-70 tw:lg:hidden">
+          <Transition.Child
+            enter="tw:transition-opacity tw:duration-200"
+            enterFrom="tw:opacity-0"
+            enterTo="tw:opacity-100"
+            leave="tw:transition-opacity tw:duration-150"
+            leaveFrom="tw:opacity-100"
+            leaveTo="tw:opacity-0"
+          >
+            <button
+              type="button"
+              aria-label="Close support history"
+              className="tw:absolute tw:inset-0 tw:bg-black/35"
+              onClick={() => setMobileDrawerOpen(false)}
+            />
+          </Transition.Child>
+
+          <Transition.Child
+            enter="tw:transition tw:duration-200 tw:ease-out"
+            enterFrom="tw:-translate-x-full"
+            enterTo="tw:translate-x-0"
+            leave="tw:transition tw:duration-150 tw:ease-in"
+            leaveFrom="tw:translate-x-0"
+            leaveTo="tw:-translate-x-full"
+          >
+            <aside className="tw:relative tw:flex tw:h-full tw:w-[min(84vw,330px)] tw:flex-col tw:bg-[#e9e0d5] tw:p-4 tw:shadow-2xl">
+              <div className="tw:flex tw:items-center tw:justify-between">
+                <button
+                  style={{ borderRadius: 36 }}
+                  type="button"
+                  onClick={createConversation}
+                  disabled={!hasAccess || creating}
+                  className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/75 tw:px-4 tw:text-sm tw:font-black tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                >
+                  {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <Plus size={16} />}
+                  New chat
+                </button>
+
+                <button
+                  style={{ borderRadius: 36 }}
+                  type="button"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/75 tw:text-primary"
+                  aria-label="Close support history"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
+                <input
+                  value={conversationSearch}
+                  onChange={(event) => setConversationSearch(event.target.value)}
+                  placeholder="Search"
+                  className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+                />
+                <Search size={18} />
+              </div>
+
+              {conversationList}
+            </aside>
+          </Transition.Child>
+        </div>
+      </Transition>
+
+      <section
+        className="xilolo-support-shell xilolo-support-noise tw:mx-auto tw:flex tw:h-[calc(100vh-104px)] tw:min-h-0 tw:w-full tw:max-w-[1500px] tw:overflow-hidden tw:rounded-3xl tw:bg-white tw:shadow-[0_18px_60px_rgba(17,17,17,0.12)] max-[520px]:tw:h-[calc(100vh-82px)] max-[520px]:tw:rounded-[18px] tw:lg:rounded-[34px]"
+        aria-label="Xilolo support chat"
+      >
+        <aside className="tw:hidden tw:w-[290px] tw:shrink-0 tw:flex-col tw:bg-[#e9e0d5]/90 tw:p-4 tw:lg:flex">
+          <div className="tw:flex tw:items-center tw:justify-between">
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={createConversation}
+              disabled={!hasAccess || creating}
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              aria-label="Start new support chat"
+            >
+              {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <Plus size={17} />}
+            </button>
+
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={() => navigate(-1)}
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70"
+              aria-label="Close support chat"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          </div>
+
+          <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
+            <input
+              value={conversationSearch}
+              onChange={(event) => setConversationSearch(event.target.value)}
+              placeholder="Search"
+              className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+            />
+            <Search size={18} />
+          </div>
+
+          {conversationList}
+        </aside>
+
+        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
+          <div className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:px-3 tw:lg:hidden">
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={() => setMobileDrawerOpen(true)}
+              className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/80 tw:px-4 tw:text-sm tw:font-black tw:text-primary"
+            >
+              <MessageCircle size={17} />
+              Recent
+            </button>
+
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={createConversation}
+              disabled={!hasAccess || creating}
+              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/80 tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              aria-label="New support chat"
+            >
+              {creating ? <Loader2 className="tw:animate-spin" size={18} /> : <Plus size={18} />}
+            </button>
+          </div>
+
+          <div
+            className="xilolo-support-scroll tw:flex tw:flex-1 tw:flex-col tw:overflow-y-auto tw:px-3 tw:pb-3 tw:sm:px-4 tw:md:px-6"
+            style={HIDDEN_SCROLLBAR_STYLE}
+          >
+            <div className="tw:mx-auto tw:flex tw:min-h-full tw:w-full tw:max-w-5xl tw:flex-col">
+              <div className="tw:pb-4 tw:pt-4 tw:text-center tw:sm:pt-6 tw:md:pb-6 tw:md:pt-7">
+                <div className="tw:mx-auto tw:mb-4 tw:grid tw:h-14 tw:w-14 tw:place-items-center tw:rounded-full tw:border-10 tw:border-[#d8d0c5] tw:bg-white tw:shadow-[inset_0_0_18px_rgba(17,17,17,.12)] tw:opacity-80 tw:sm:h-16 tw:sm:w-16 tw:sm:border-12">
+                  <Headphones size={22} />
+                </div>
+
+                <span className="tw:block tw:text-2xl tw:font-black tw:tracking-tight tw:sm:text-3xl tw:md:text-4xl">
+                  Xilolo Support
+                </span>
+
+                <span className="tw:mt-2 tw:text-sm tw:tracking-wide tw:text-[#6b625a] tw:md:text-base">
                   {activeConversation
                     ? `Status: ${statusLabel(activeConversation.status)}`
-                    : "Create or select a chat to begin"}
+                    : "Start a chat and our team can reply in real time."}
                 </span>
               </div>
 
-              {activeConversation && !isClosed ? (
-                <button
-                  type="button"
-                  onClick={closeConversation}
-                  disabled={closing}
-                  className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:border tw:border-red-200 tw:bg-red-50 tw:px-3 tw:py-2 tw:text-xs tw:font-bold tw:text-red-700 tw:transition hover:tw:bg-red-100 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-                >
-                  {closing ? (
-                    <Loader2 className="tw:animate-spin" size={15} />
-                  ) : (
-                    <XCircle size={15} />
-                  )}
-                  Close chat
-                </button>
-              ) : null}
-            </header>
-
-            <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-3 tw:overflow-y-auto tw:bg-slate-50 tw:p-4 tw:md:p-6">
-              {threadLoading ? (
-                <div className="tw:m-auto tw:grid tw:w-full tw:max-w-md tw:place-items-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-6 tw:text-center tw:text-gray-500">
-                  <Loader2 className="tw:animate-spin" size={24} />
+              {error && (
+                <div className="tw:mx-auto tw:mb-4 tw:w-full tw:max-w-4xl tw:rounded-[18px] tw:bg-white/75 tw:px-4 tw:py-2.5 tw:text-sm tw:font-bold tw:text-primary">
+                  {error}
                 </div>
-              ) : !hasAccess ? (
-                <div className="tw:m-auto tw:w-full tw:max-w-md tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-6 tw:text-center tw:text-sm tw:font-medium tw:text-gray-600">
-                  Support chat is available to users with an active subscription.
-                </div>
-              ) : !activeConversation ? (
-                <div className="tw:m-auto tw:w-full tw:max-w-md tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-6 tw:text-center tw:text-sm tw:font-medium tw:text-gray-600">
-                  Start a new chat or select one from your history.
-                </div>
-              ) : messages.length === 0 ? (
-                <div className="tw:m-auto tw:w-full tw:max-w-md tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:p-6 tw:text-center tw:text-sm tw:font-medium tw:text-gray-600">
-                  Send your first message and Xilolo Support can reply in real time.
-                </div>
-              ) : (
-                <>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={[
-                        "tw:max-w-[82%] tw:whitespace-pre-wrap tw:wrap-break-word tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:leading-relaxed tw:md:max-w-[620px] tw:md:text-base",
-                        message.sender_type === "admin"
-                          ? "tw:self-start tw:border tw:border-gray-200 tw:bg-white tw:text-gray-800"
-                          : "tw:self-end tw:bg-primary tw:text-white",
-                      ].join(" ")}
-                    >
-                      {message.body}
-                    </div>
-                  ))}
-                  <div ref={endRef} />
-                </>
               )}
-            </div>
 
-            <form
-              className="tw:grid tw:grid-cols-[1fr_48px] tw:gap-3 tw:border-t tw:border-gray-100 tw:bg-white tw:p-4"
-              onSubmit={handleSubmit}
-            >
-              <input
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder={
-                  isClosed
-                    ? "This chat is closed"
-                    : activeConversation
-                      ? "Message Xilolo Support..."
-                      : "Create a new chat to send a message..."
-                }
-                disabled={!hasAccess || loading || sending || isClosed}
-                className="tw:min-w-0 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:text-base tw:text-gray-900 tw:outline-none tw:transition focus:tw:border-[#111111] focus:tw:ring-4 focus:tw:ring-black/10 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || !hasAccess || sending || isClosed}
-                className="tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-xl tw:bg-primary tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
-                aria-label="Send message"
-              >
-                {sending ? (
-                  <Loader2 className="tw:animate-spin" size={18} />
-                ) : (
-                  <Send size={18} />
-                )}
-              </button>
-            </form>
+              <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-1 tw:flex-col tw:gap-4 tw:pb-4">
+                <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-4">
+                  {threadLoading || loading ? (
+                    <div className="tw:m-auto tw:flex tw:items-center tw:gap-2 tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-sm tw:font-black">
+                      <Loader2 className="tw:animate-spin" size={18} />
+                      Loading support chat
+                    </div>
+                  ) : !hasAccess ? (
+                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center">
+                      <div className="tw:mx-auto tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white">
+                        <Headphones size={22} />
+                      </div>
+                      <div className="tw:mt-4 tw:text-sm tw:font-black tw:leading-6">
+                        Support chat is available to users with an active subscription.
+                      </div>
+                    </div>
+                  ) : !activeConversation ? (
+                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center">
+                      <div className="tw:text-sm tw:font-black tw:leading-6">
+                        Start a new support chat or select one from your recent chats.
+                      </div>
+                      <button
+                        style={{ borderRadius: 36 }}
+                        type="button"
+                        onClick={createConversation}
+                        disabled={creating}
+                        className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-black tw:text-white disabled:tw:opacity-60"
+                      >
+                        {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <MessageSquarePlus size={16} />}
+                        New chat
+                      </button>
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center tw:text-sm tw:font-black tw:leading-6">
+                      Send your first message. Xilolo Support will reply here.
+                    </div>
+                  ) : (
+                    <>
+                      {messages.map((message) => {
+                        const isUser = message.sender_type === "user";
+
+                        return (
+                          <div
+                            key={message.id}
+                            className={[
+                              "tw:flex tw:w-full",
+                              isUser ? "tw:justify-end" : "tw:justify-start",
+                            ].join(" ")}
+                          >
+                            <div
+                              className={[
+                                "tw:max-w-[86%] tw:whitespace-pre-wrap tw:wrap-break-word tw:text-sm tw:font-medium tw:leading-6 tw:sm:max-w-[78%]",
+                                isUser
+                                  ? "tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-white"
+                                  : "tw:text-[#5f5a55]",
+                              ].join(" ")}
+                            >
+                              {message.body}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div ref={endRef} />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
-      </div>
+
+          {activeConversation && !isClosed && (
+            <div className="tw:mx-4 tw:mb-3 tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:rounded-[18px] tw:bg-white/75 tw:px-4 tw:py-2.5 tw:text-[0.84rem] tw:font-bold tw:text-primary tw:md:mx-8">
+              <span>Done with this issue?</span>
+              <button
+                style={{ borderRadius: 36 }}
+                type="button"
+                onClick={closeConversation}
+                disabled={closing}
+                className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-black tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+              >
+                {closing ? <Loader2 className="tw:animate-spin" size={14} /> : <XCircle size={14} />}
+                Close chat
+              </button>
+            </div>
+          )}
+
+          <form
+            className="tw:grid tw:grid-cols-[1fr_44px] tw:gap-2 tw:px-3 tw:pb-16 tw:md:pb-3 tw:sm:px-4 tw:md:px-6"
+            onSubmit={handleSubmit}
+          >
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              placeholder={
+                isClosed
+                  ? "This chat is closed"
+                  : activeConversation
+                    ? "Message Xilolo Support..."
+                    : "Create a new chat to send a message..."
+              }
+              disabled={!hasAccess || loading || sending || isClosed}
+              className="tw:min-h-10 tw:min-w-0 tw:rounded-[16px] tw:border tw:border-[#d8d0c5] tw:bg-white/50 tw:px-3 tw:text-sm tw:font-semibold tw:text-primary tw:outline-none tw:transition placeholder:tw:text-[#8b8580] focus:tw:border-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+            />
+            <button
+              style={{ borderRadius: 36 }}
+              type="submit"
+              disabled={!input.trim() || !hasAccess || sending || isClosed}
+              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              aria-label="Send message"
+            >
+              {sending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}
+            </button>
+          </form>
+        </div>
+      </section>
     </main>
   );
 }

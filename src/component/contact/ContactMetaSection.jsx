@@ -17,7 +17,7 @@ export default function ContactMetaSection() {
             <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
               What happens after you reach out
             </span>
-            <span className="tw:font-dela tw:block tw:mt-2 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+            <span className="tw:font-league tw:block tw:mt-2 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
               A short call, a clear plan, and a smooth launch.
             </span>
             <span className="tw:block tw:mt-1.5 tw:text-[12px] tw:md:text-[13px] tw:text-slate-600">

@@ -25,7 +25,7 @@ export default function AboutEcosystemSection() {
           Made for real events
         </span>
 
-        <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+        <span className="tw:font-league tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
           Built for organisers, performers, and fans.
         </span>
 

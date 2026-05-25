@@ -339,6 +339,7 @@ export function App() {
   }, [location.pathname]);
 
   const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadPlatform, setDownloadPlatform] = useState("all");
 
   const APP_STORE_URL =
     "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
@@ -346,11 +347,31 @@ export function App() {
   const PLAY_STORE_URL =
     "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
 
+  function detectDownloadPlatform() {
+    if (typeof window === "undefined" || typeof navigator === "undefined") {
+      return "all";
+    }
+
+    const userAgent = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+    const maxTouchPoints = navigator.maxTouchPoints || 0;
+    const isIpadOS =
+      platform === "MacIntel" && maxTouchPoints > 1 && /Safari/i.test(userAgent);
+    const isIos = /iPad|iPhone|iPod/i.test(userAgent) || isIpadOS;
+    const isAndroid = /Android/i.test(userAgent);
+
+    if (isIos) return "ios";
+    if (isAndroid) return "android";
+    return "all";
+  }
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const modalFlag = "zagasm-download-modal-shown";
     const hasSeenModal = Boolean(localStorage.getItem(modalFlag));
+
+    setDownloadPlatform(detectDownloadPlatform());
 
     if (!hasSeenModal) {
       setShowDownloadModal(true);
@@ -532,6 +553,7 @@ export function App() {
         onSkip={handleSkip}
         onAppStoreDownload={handleAppStoreDownload}
         onApkDownload={handleApkDownload}
+        platform={downloadPlatform}
       />
     </Fragment>
   );

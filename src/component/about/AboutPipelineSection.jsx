@@ -32,7 +32,7 @@ export default function AboutPipelineSection() {
           How it works
         </span>
 
-        <span className="tw:font-dela tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+        <span className="tw:font-league tw:mt-2 tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
           From setup to showtime, all in one flow.
         </span>
 

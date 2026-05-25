@@ -68,7 +68,7 @@ export default function LiveHighlightsSection() {
             <span className="tw:size-1.5 tw:rounded-full tw:bg-red-500 tw:animate-pulse" />
             Live streaming, reimagined
           </span>
-          <span className="tw:font-dela tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-semibold text-white tw:tracking-tight">
+          <span className="tw:font-league tw:block tw:text-4xl tw:md:text-5xl tw:lg:text-6xl tw:font-[900] text-white tw:tracking-tight">
             Make every <span className="tw:text-red-600">LIVE </span> moment
             unforgettable
           </span>
