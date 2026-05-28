@@ -1,6 +1,9 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
+import { api, authHeaders } from "../../lib/apiClient";
+import { showError } from "../ui/toast";
 import {
   formatPaymentMethodLabel,
   formatTicketDate,
@@ -11,6 +14,7 @@ import {
 
 export default function TicketReceiptModal({ open, onClose, ticket }) {
   const navigate = useNavigate();
+  const [isDownloading, setIsDownloading] = useState(false);
   const event = ticket?.event || {};
   const organiser = ticket?.organiser || {};
   const user = ticket?.user || {};
@@ -35,6 +39,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
   const paymentMethodLabel = formatPaymentMethodLabel(
     payment.payment_method || ticket?.payment_method
   );
+  const qrCodeValue = ticket?.qr_code || ticket?.qrCode || ticket?.code || "";
   const organiserProfileId =
     organiser?.user_id ||
     organiser?.userId ||
@@ -60,6 +65,44 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
 
     onClose?.();
     navigate(`/profile/${organiserProfileId}`);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!ticket?.ticket_id || isDownloading) return;
+
+    setIsDownloading(true);
+
+    try {
+      const response = await api.get(
+        `/api/v1/ticket/${ticket.ticket_id}/download`,
+        {
+          ...authHeaders(),
+          responseType: "blob",
+        }
+      );
+
+      const disposition = response.headers?.["content-disposition"] || "";
+      const filenameMatch = disposition.match(/filename="?([^"]+)"?/i);
+      const filename =
+        filenameMatch?.[1] ||
+        `xilolo-ticket-${ticket?.code?.slice(-8) || ticket.ticket_id}.pdf`;
+
+      const blobUrl = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      showError(
+        error?.response?.data?.message ||
+          "Unable to download this ticket right now."
+      );
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -119,6 +162,22 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
 
                 <div className="tw:flex tw:overflow-hidden tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm">
                   <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-2.5 tw:p-3 tw:sm:gap-3 tw:sm:p-4">
+                    {qrCodeValue ? (
+                      <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-4">
+                        <div className="tw:rounded-2xl tw:bg-white tw:p-3 tw:shadow-sm">
+                          <QRCodeSVG
+                            value={qrCodeValue}
+                            size={156}
+                            level="M"
+                            includeMargin={false}
+                          />
+                        </div>
+                        <span className="tw:text-center tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.12em] tw:text-gray-500">
+                          Ticket QR Code
+                        </span>
+                      </div>
+                    ) : null}
+
                     <div className="tw:space-y-1">
                       <span className="tw:block tw:text-xs tw:font-semibold tw:text-gray-900 tw:sm:text-sm">
                         {dateLabel}
@@ -215,6 +274,15 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                   </span>
 
                   <div className="tw:flex tw:w-full tw:flex-col tw:gap-2 tw:sm:w-auto tw:sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={handleDownloadPdf}
+                      disabled={!ticket?.ticket_id || isDownloading}
+                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-60 tw:sm:text-xs"
+                    >
+                      {isDownloading ? "Downloading..." : "Download PDF"}
+                    </button>
+
                     <button
                       type="button"
                       onClick={handleViewEvent}
