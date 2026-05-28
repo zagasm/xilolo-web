@@ -185,7 +185,7 @@ function Support() {
         <ul>
           <li>
             ðŸ“§ Email: <a style={{
-              color: "#111111",
+              color: "#050505",
               textDecoration: "underline",
               fontWeight: "500",
             }} className="tw:text-primary tw:underline" href="mailto:support@xilolo.com">support@xilolo.com</a>
@@ -193,7 +193,7 @@ function Support() {
           <li>
             ðŸŒ Website:{" "}
             <a style={{
-              color: "#111111",
+              color: "#050505",
               textDecoration: "underline",
               fontWeight: "500",
             }} className="tw:text-primary tw:underline"

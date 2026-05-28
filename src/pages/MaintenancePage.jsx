@@ -29,7 +29,7 @@ function MaintenancePage() {
       <section className="tw:mx-auto tw:flex tw:min-h-[calc(100vh-5rem)] tw:w-full tw:max-w-5xl tw:items-center">
         <div className="tw:grid tw:w-full tw:gap-8 tw:lg:grid-cols-[1fr_360px] tw:lg:items-center">
           <div>
-            <div className="tw:mb-8 tw:inline-grid tw:size-16 tw:place-items-center tw:rounded-2xl tw:bg-white tw:text-2xl tw:font-black tw:text-[#111111]">
+            <div className="tw:mb-8 tw:inline-grid tw:size-16 tw:place-items-center tw:rounded-2xl tw:bg-white tw:text-2xl tw:font-black tw:text-[#050505]">
               XI
             </div>
             <p className="tw:text-sm tw:font-semibold tw:uppercase tw:tracking-[0.22em] tw:text-[#9bd2ff]">

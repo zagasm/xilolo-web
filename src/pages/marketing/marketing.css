@@ -59,7 +59,7 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(180deg, #111111 0%, #2b2b2b 100%);
+  background: linear-gradient(180deg, #050505 0%, #2b2b2b 100%);
   color: #fff;
   text-align: center;
   padding: 120px 20px;
@@ -80,7 +80,7 @@
 .cta {
   display: inline-block;
   padding: 12px 25px;
-  background: #111111;
+  background: #050505;
   color: #fff;
   border-radius: 30px;
   text-decoration: none;
@@ -141,7 +141,7 @@
 }
 
 .download .download-buttons a {
-  background: linear-gradient(180deg, #111111 0%, #2b2b2b 100%);
+  background: linear-gradient(180deg, #050505 0%, #2b2b2b 100%);
   color: #fff;
   padding: 12px 20px;
   border-radius: 25px;
@@ -167,7 +167,7 @@
 
 .newsletter button {
   padding: 10px 20px;
-  background: linear-gradient(180deg, #111111 0%, #2b2b2b 100%);
+  background: linear-gradient(180deg, #050505 0%, #2b2b2b 100%);
   color: #fff;
   border: none;
   border-radius: 25px;

@@ -319,7 +319,7 @@ export default function WalletFundingCallbackPage() {
               </div>
 
               {pendingPurchase?.eventId ? (
-                <div className="tw:mt-6 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#f7f2eb,#ffffff)] tw:p-4 tw:text-left">
+                <div className="tw:mt-6 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#e5e4e2,#ffffff)] tw:p-4 tw:text-left">
                   <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
                     <Ticket className="tw:h-4 tw:w-4 tw:text-primary" />
                     Ticket purchase continuation

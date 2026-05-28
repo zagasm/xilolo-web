@@ -348,7 +348,7 @@ function EditProfile() {
           width: 30px;
           height: 30px;
           border: 3px solid #e5e7eb;
-          border-top-color: #111111;
+          border-top-color: #050505;
           border-radius: 50%;
           animation: spin 0.9s linear infinite;
         }

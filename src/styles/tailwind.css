@@ -10,8 +10,8 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
-  --color-white: #f7f2eb;
-  --color-primary: #111111;
+  --color-white: #e5e4e2;
+  --color-primary: #050505;
   --color-lightPurple: #ece4da;
   --color-primarySecond: #2b2b2b;
   --font-sans: "Montserrat", sans-serif;

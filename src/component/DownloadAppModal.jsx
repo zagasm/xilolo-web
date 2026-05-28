@@ -44,7 +44,7 @@ const DownloadAppModal = ({
               leaveTo="tw:opacity-0 tw:scale-95 tw:translate-y-2"
             >
               <Dialog.Panel className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-3xl tw:bg-white/90 tw:shadow-2xl tw:ring-1 tw:ring-[#ddd4ca] tw:backdrop-blur">
-                <div className="tw:absolute tw:inset-0 tw:z-0 tw:opacity-80 tw:bg-[radial-gradient(circle_at_15%_20%,#f1ebe4_0,transparent_32%),radial-gradient(circle_at_85%_15%,#f7f2eb_0,transparent_28%),radial-gradient(circle_at_50%_100%,#e5ddd3_0,transparent_38%)]" />
+                <div className="tw:absolute tw:inset-0 tw:z-0 tw:opacity-80 tw:bg-[radial-gradient(circle_at_15%_20%,#f1ebe4_0,transparent_32%),radial-gradient(circle_at_85%_15%,#e5e4e2_0,transparent_28%),radial-gradient(circle_at_50%_100%,#e5ddd3_0,transparent_38%)]" />
                 <div className="tw:relative tw:z-10 tw:p-6">
                   <div className="tw:flex tw:items-start tw:justify-between">
                     <span className="tw:text-xl tw:md:text-2xl tw:font-bold tw:text-gray-900">

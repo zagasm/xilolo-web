@@ -525,7 +525,7 @@ export default function Hero() {
                     layoutId="hero-slider-dot"
                     className="tw:absolute tw:inset-0 tw:rounded-full"
                     style={{
-                      background: "linear-gradient(90deg,#111111,#2b2b2b)",
+                      background: "linear-gradient(90deg,#050505,#2b2b2b)",
                     }}
                   />
                 )}

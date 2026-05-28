@@ -896,7 +896,7 @@ export default function EventStreamControlPage() {
             </div>
 
             {isEnded ? (
-              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#f7f2eb_52%,#efe7de_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
+              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#e5e4e2_52%,#efe7de_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
                 <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[1.15fr_0.85fr]">
                   <div>
                     <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/90 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:shadow-sm">

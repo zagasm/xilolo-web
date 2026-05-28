@@ -104,7 +104,7 @@ export default function PlanCard({
     level,
   ]);
 
-  const planAccent = color || "#111111";
+  const planAccent = color || "#050505";
 
   return (
     <div className="tw:relative tw:group tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:flex tw:flex-col tw:gap-4 tw:shadow-[0_18px_45px_rgba(15,23,42,0.06)] tw:hover:border-primary/70 tw:hover:shadow-[0_20px_55px_rgba(15,23,42,0.12)] tw:transition-all tw:duration-300">

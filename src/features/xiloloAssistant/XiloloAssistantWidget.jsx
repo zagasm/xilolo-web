@@ -129,7 +129,7 @@ function ConversationMenuItem({
       <Menu as="div" className="tw:relative tw:shrink-0">
         <Menu.Button
           type="button"
-          className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-[#f7f2eb]"
+          className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-[#e5e4e2]"
           aria-label="Conversation options"
           onClick={(event) => event.stopPropagation()}
         >

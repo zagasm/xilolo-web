@@ -124,7 +124,7 @@ export default function AddWalletModal({
               <Dialog.Panel className="tw:w-full tw:max-w-xl tw:max-h-[70vh] tw:sm:max-h-[85vh] tw:overflow-y-auto tw:rounded-3xl tw:bg-white tw:border tw:border-[#ded6cd] tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:p-6 tw:sm:p-7 tw:md:p-8">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
                   <div className="tw:space-y-1.5">
-                    <span className="tw:block tw:text-base tw:sm:text-lg tw:font-semibold tw:text-[#111111]">
+                    <span className="tw:block tw:text-base tw:sm:text-lg tw:font-semibold tw:text-[#050505]">
                       Add crypto payout wallet
                     </span>
                     <span className="tw:block tw:text-xs tw:sm:text-sm tw:text-[#5f5a55]">
@@ -172,10 +172,10 @@ export default function AddWalletModal({
                         renderOption={(props, opt) => (
                           <li
                             {...props}
-                            className="tw:flex tw:w-full tw:items-center tw:justify-between tw:px-3.5 tw:py-2.5 tw:cursor-pointer tw:text-sm tw:text-[#111111]"
+                            className="tw:flex tw:w-full tw:items-center tw:justify-between tw:px-3.5 tw:py-2.5 tw:cursor-pointer tw:text-sm tw:text-[#050505]"
                           >
                             <span className="tw:flex tw:flex-col tw:gap-0.5">
-                              <span className="tw:text-sm tw:font-medium tw:text-[#111111]">
+                              <span className="tw:text-sm tw:font-medium tw:text-[#050505]">
                                 {opt.symbol?.toUpperCase()} • {opt.name}
                               </span>
                               <span className="tw:text-[11px] tw:text-[#6d655d]">
@@ -206,7 +206,7 @@ export default function AddWalletModal({
                               },
                               "&.Mui-focused .MuiOutlinedInput-notchedOutline":
                                 {
-                                  borderColor: "#111111",
+                                  borderColor: "#050505",
                                 },
                             }}
                           />
@@ -263,7 +263,7 @@ export default function AddWalletModal({
                         rows={2}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-xs tw:text-[#111111] placeholder:tw:text-[#a89f95] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:resize-none"
+                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-xs tw:text-[#050505] placeholder:tw:text-[#a89f95] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:resize-none"
                         placeholder="Paste the exact address from your wallet app…"
                       />
                     </div>
@@ -333,11 +333,11 @@ export default function AddWalletModal({
                           size="small"
                           sx={{
                             "& .MuiSwitch-switchBase.Mui-checked": {
-                              color: "#111111",
+                              color: "#050505",
                             },
                             "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
                               {
-                                backgroundColor: "#111111",
+                                backgroundColor: "#050505",
                               },
                           }}
                         />
@@ -365,7 +365,7 @@ export default function AddWalletModal({
                         }}
                         type="submit"
                         disabled={submitting}
-                        className="tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
+                        className="tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
                       >
                         {submitting && (
                           <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />

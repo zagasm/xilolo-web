@@ -102,7 +102,7 @@ export default function VerifyWalletModal({
               <Dialog.Panel className="tw:w-full tw:max-w-md tw:rounded-3xl tw:bg-white tw:border tw:border-[#ded6cd] tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:p-6 tw:sm:p-7">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-4">
                   <div className="tw:space-y-1.5">
-                    <span className="tw:block tw:text-base tw:sm:text-lg tw:md:text-xl tw:font-semibold tw:text-[#111111]">
+                    <span className="tw:block tw:text-base tw:sm:text-lg tw:md:text-xl tw:font-semibold tw:text-[#050505]">
                       Verify this wallet
                     </span>
                     <span className="tw:block tw:text-xs tw:sm:text-sm tw:text-[#5f5a55]">
@@ -140,7 +140,7 @@ export default function VerifyWalletModal({
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={5}
-                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#111111] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#a89f95]"
+                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#050505] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#a89f95]"
                         placeholder="0 0 0 0 0"
                       />
                       <span className="tw:text-[10px] tw:text-[#7a736c]">
@@ -169,7 +169,7 @@ export default function VerifyWalletModal({
                       style={{
                         borderRadius: 16,
                       }}
-                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
+                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
                     >
                       {submitting && (
                         <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />

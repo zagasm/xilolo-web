@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet-async";
 import {
@@ -74,6 +74,30 @@ function formatStartsInLabel(startDate) {
   }
 
   return `${minutes}m`;
+}
+
+function sponsorDisplayName(sponsor) {
+  return sponsor?.username || sponsor?.user_name || sponsor?.name || "Someone";
+}
+
+function sponsorProfilePath(sponsor) {
+  const id = sponsor?.user_id || sponsor?.id || sponsor?.sponsor_user_id;
+  return id ? `/profile/${id}` : null;
+}
+
+function SponsorProfileLink({ sponsor, className = "" }) {
+  const name = sponsorDisplayName(sponsor);
+  const path = sponsorProfilePath(sponsor);
+
+  if (!path) {
+    return <span className={className}>{name}</span>;
+  }
+
+  return (
+    <Link to={path} className={className}>
+      {name}
+    </Link>
+  );
 }
 
 function SharedEventShimmer() {
@@ -172,7 +196,7 @@ export default function SharedEventPage() {
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
           : purchaseType === "sponsored_only"
-            ? "Sponsored tickets purchased successfully."
+            ? "Tickets bought for others successfully."
           : includesManual
             ? "Ticket and manual purchased successfully."
             : "Ticket purchased successfully."
@@ -277,13 +301,10 @@ export default function SharedEventPage() {
     ? event.sponsored_ticket_sponsors
     : [];
   const firstSponsor = sponsoredTicketSponsors[0];
-  const sponsorDisplayName = firstSponsor?.username
-    ? `@${firstSponsor.username}`
-    : firstSponsor?.name || "Someone";
-  const sponsorHeadline =
+  const sponsorHeadlineSuffix =
     sponsoredTicketSponsors.length > 1
-      ? `${sponsorDisplayName} and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} sponsored tickets for this event.`
-      : `${sponsorDisplayName} sponsored tickets for this event.`;
+      ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
+      : " bought tickets for others for this event.";
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
 
   const handleDownloadManual = async () => {
@@ -642,19 +663,28 @@ export default function SharedEventPage() {
                     {hasSponsoredTicketsAvailable && !hasPaid && (
                       <div className="tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
                         <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                          {sponsoredTicketSponsors.length ? sponsorHeadline : "Someone has paid for tickets for this event."}
+                          {sponsoredTicketSponsors.length ? (
+                            <>
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary hover:tw:underline" />
+                              {sponsorHeadlineSuffix}
+                            </>
+                          ) : (
+                            "Someone has bought tickets for others for this event."
+                          )}
                         </div>
                         <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
-                          You can claim one free paid ticket, buy your own ticket, or sponsor tickets for others.
+                          You can claim one free paid ticket, buy your own ticket, or buy tickets for others.
                         </div>
                         <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
                             {sponsoredTicketsAvailableCount} available
                           </span>
                           {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
-                            <span key={sponsor.id || sponsor.username} className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
-                              {sponsor.username ? `@${sponsor.username}` : sponsor.name}
-                            </span>
+                            <SponsorProfileLink
+                              key={sponsor.id || sponsor.username}
+                              sponsor={sponsor}
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary hover:tw:bg-white hover:tw:underline"
+                            />
                           ))}
                           {canClaimSponsoredTicket && (
                             <button
@@ -711,14 +741,6 @@ export default function SharedEventPage() {
             </aside>
           </section>
 
-          <div className="tw:mt-10">
-            <YouMayAlsoLike
-              recs={recommended}
-              posterFallback={coverUrl}
-              title="You may also like"
-            />
-          </div>
-
           <EventReviewsSection
             eventId={event?.id}
             eventSummary={event?.reviews}
@@ -728,6 +750,14 @@ export default function SharedEventPage() {
               await sharedEventQuery.refetch();
             }}
           />
+
+          <div className="tw:mt-10">
+            <YouMayAlsoLike
+              recs={recommended}
+              posterFallback={coverUrl}
+              title="You may also like"
+            />
+          </div>
         </div>
       </div>
 

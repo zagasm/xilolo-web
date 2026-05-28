@@ -505,7 +505,7 @@ export function SignUp() {
               },
               "& .MuiFormHelperText-root": {
                 color:
-                  !emailFormatError && showBlackEmailHint ? "#111111" : undefined,
+                  !emailFormatError && showBlackEmailHint ? "#050505" : undefined,
                 marginLeft: 0,
                 whiteSpace: "nowrap",
               },

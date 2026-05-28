@@ -62,13 +62,13 @@ export default function TicketPromptModal({
     if ((event?.user_can_sponsor_tickets || event?.user_has_sponsored_tickets) && ticketAmount > 0) {
       list.push({
         value: "sponsored_only",
-        label: "Sponsor tickets",
+        label: "Buy for others",
         amountLabel: getAmountLabel(
           ticketAmount,
           event?.price_display,
           event?.currency?.symbol || ""
         ),
-        description: "Pay for tickets that other users can claim.",
+        description: "Buy tickets that other users can claim.",
       });
     }
 
@@ -319,7 +319,7 @@ export default function TicketPromptModal({
                       </div>
                       <div className="tw:mt-2 tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">
                         <div className="tw:rounded-xl tw:bg-gray-50 tw:p-2">
-                          <span className="tw:block tw:text-slate-500">Sponsored</span>
+                          <span className="tw:block tw:text-slate-500">For others</span>
                           <span className="tw:font-semibold tw:text-slate-900">
                             {sponsoredCount} ticket{sponsoredCount === 1 ? "" : "s"}
                           </span>

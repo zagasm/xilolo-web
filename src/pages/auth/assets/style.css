@@ -29,7 +29,7 @@ body {
 }
 
 .bar_container {
-  background: linear-gradient(180deg, #111111 0%, #2b2b2b 100%);
+  background: linear-gradient(180deg, #050505 0%, #2b2b2b 100%);
   width: 20px;
   height: 700px;
   /* top:20%; */
@@ -73,7 +73,7 @@ form .input-icon {
 }
 
 .input:focus {
-  border: 2px solid #111111;
+  border: 2px solid #050505;
   /* purple line on focus */
 }
 
@@ -96,7 +96,7 @@ form .inactive_submit_button {
 }
 
 .active_submit_button {
-  background: #111111;
+  background: #050505;
   color: white;
   height: 50px;
   border-radius: 15px;
@@ -224,7 +224,7 @@ form .inactive_submit_button {
 
 
 .footer_text a {
-  color: #111111;
+  color: #050505;
   font-weight: 700;
   text-decoration: underline;
 }
@@ -339,7 +339,7 @@ form .code_container .code {
 }
 
 .active_submit_button {
-  background-color: #111111;
+  background-color: #050505;
   color: white;
   cursor: pointer;
   border: none;

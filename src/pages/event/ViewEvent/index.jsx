@@ -5,7 +5,6 @@ import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showSuccess, showError, showPromise } from "../../../component/ui/toast";
-import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
 import EventReviewsSection from "../../../component/Events/EventReviewsSection.jsx";
 import ReportModal from "../../../component/Events/ReportModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
@@ -76,6 +75,30 @@ export function CountdownPill({ target }) {
         }}
       />
     </div>
+  );
+}
+
+function sponsorDisplayName(sponsor) {
+  return sponsor?.username || sponsor?.user_name || sponsor?.name || "Someone";
+}
+
+function sponsorProfilePath(sponsor) {
+  const id = sponsor?.user_id || sponsor?.id || sponsor?.sponsor_user_id;
+  return id ? `/profile/${id}` : null;
+}
+
+function SponsorProfileLink({ sponsor, className = "" }) {
+  const name = sponsorDisplayName(sponsor);
+  const path = sponsorProfilePath(sponsor);
+
+  if (!path) {
+    return <span className={className}>{name}</span>;
+  }
+
+  return (
+    <Link to={path} className={className}>
+      {name}
+    </Link>
   );
 }
 
@@ -215,7 +238,6 @@ export default function ViewEvent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const [event, setEvent] = useState(null);
-  const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
@@ -289,7 +311,7 @@ export default function ViewEvent() {
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
           : purchaseType === "sponsored_only"
-            ? "Sponsored tickets purchased successfully."
+            ? "Tickets bought for others successfully."
           : includesManual
             ? "Ticket and manual purchased successfully."
             : "Ticket purchased successfully."
@@ -338,15 +360,8 @@ export default function ViewEvent() {
   function syncEventPayload(data = {}) {
     const ev =
       data?.currentEvent || data?.event || data?.data?.event || null;
-    const recommendations =
-      data?.recommendations ||
-      data?.recommended?.data ||
-      data?.recs ||
-      data?.data?.recommendations ||
-      [];
 
     setEvent(normalizeEventRecord(ev));
-    setRecs(recommendations);
     setIsSaved(!!ev?.is_saved);
     setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
   }
@@ -640,13 +655,10 @@ export default function ViewEvent() {
         (sponsor) => String(sponsor?.id || sponsor?.user_id || "") === viewerId
       ));
   const firstSponsor = sponsoredTicketSponsors[0];
-  const sponsorDisplayName = firstSponsor?.username
-    ? `@${firstSponsor.username}`
-    : firstSponsor?.name || "Someone";
-  const sponsorHeadline =
+  const sponsorHeadlineSuffix =
     sponsoredTicketSponsors.length > 1
-      ? `${sponsorDisplayName} and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} sponsored tickets for this event.`
-      : `${sponsorDisplayName} sponsored tickets for this event.`;
+      ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
+      : " bought tickets for others for this event.";
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
   const canOpenPurchaseOptions =
     !isOwnerEvent &&
@@ -679,9 +691,9 @@ export default function ViewEvent() {
   } else if (canBuyManualOnly) {
     primaryCtaLabel = "Buy Manual";
   } else if (viewerHasSponsoredTickets) {
-    primaryCtaLabel = "Sponsor More Tickets";
+    primaryCtaLabel = "Buy More for Others";
   } else if (hasPaid && !isLiveNow) {
-    primaryCtaLabel = event?.user_can_sponsor_tickets ? "Sponsor Tickets" : "Ticket Purchased";
+    primaryCtaLabel = event?.user_can_sponsor_tickets ? "Buy for Others" : "Ticket Purchased";
   } else if (canClaimSponsoredTicket) {
     primaryCtaLabel = claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim Paid Ticket";
   } else if (isSoldOut) {
@@ -747,7 +759,7 @@ export default function ViewEvent() {
     if (!canOpenPurchaseOptions || purchaseTicketMutation.isPending) return;
 
     if (!token) {
-      showError("Please log in to buy or sponsor tickets.");
+      showError("Please log in to buy tickets or buy for others.");
       navigate("/auth/signin");
       return;
     }
@@ -923,7 +935,7 @@ export default function ViewEvent() {
           </div>
 
           <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
-            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#f7f2eb] tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#e5e4e2] tw:blur-3xl tw:md:block" />
             <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f5efe6] tw:blur-3xl tw:md:block" />
 
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
@@ -1308,19 +1320,28 @@ export default function ViewEvent() {
                     {hasSponsoredTicketsAvailable && !hasPaid && (
                       <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
                         <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                          {sponsoredTicketSponsors.length ? sponsorHeadline : "A kind sponsor has covered tickets for this event. "}
+                          {sponsoredTicketSponsors.length ? (
+                            <>
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary hover:tw:underline" />
+                              {sponsorHeadlineSuffix}
+                            </>
+                          ) : (
+                            "A kind person has bought tickets for others for this event."
+                          )}
                         </div>
                         <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
-                          You can grab one of the prepaid tickets, get your own ticket, or chip in to sponsor someone else!
+                          You can grab one of the free tickets, get your own ticket, or chip in to buy for others!
                         </div>
                         <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
                             {sponsoredTicketsAvailableCount} available
                           </span>
                           {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
-                            <span key={sponsor.id || sponsor.username} className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary">
-                              {sponsor.username ? `@${sponsor.username}` : sponsor.name}
-                            </span>
+                            <SponsorProfileLink
+                              key={sponsor.id || sponsor.username}
+                              sponsor={sponsor}
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary hover:tw:bg-white hover:tw:underline"
+                            />
                           ))}
                           
                         </div>
@@ -1386,7 +1407,7 @@ export default function ViewEvent() {
                           >
                             {purchaseTicketMutation.isPending
                               ? "Processing..."
-                              : "Buy or Sponsor Tickets"}
+                              : "Buy Tickets or Buy for Others"}
                           </button>
                         ) : null}
 
@@ -1398,7 +1419,7 @@ export default function ViewEvent() {
                                 ? "Your ticket is secured. You can still buy the event manual."
                                 : "Your ticket is secured. We will notify you when the event starts."
                             : canClaimSponsoredTicket
-                              ? "A paid ticket is available for you to claim now. You can still buy or sponsor tickets from the purchase options."
+                              ? "A free ticket is available for you to claim now. You can still buy a ticket or buy for others from the purchase options."
                             : shouldChoosePurchaseType
                               ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
                               : "Secure checkout and fast access to your purchased ticket."}
@@ -1496,10 +1517,6 @@ export default function ViewEvent() {
             currentUser={user}
             onReviewMutationSuccess={refreshEventDetailSilently}
           />
-
-          <div className="tw:mt-8">
-            <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
-          </div>
         </div>
       </div>
 
@@ -1547,7 +1564,7 @@ export default function ViewEvent() {
                     onClick={handleOpenPurchaseOptions}
                     className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
-                    Sponsor more
+                    Buy for others
                   </button>
                 ) : null}
               </div>

@@ -528,21 +528,21 @@ export function Signin() {
     >
       <style>{`
         .continue-btn {
-          background-color: ${isCredentialFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isCredentialFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isCredentialFilled ? "pointer" : "not-allowed"};
         }
 
         .signin-btn {
-          background-color: ${isPasswordFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isPasswordFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isPasswordFilled ? "pointer" : "not-allowed"};
         }
 
         .verification-btn {
           background-color: transparent;
-          border: 1px solid #111111;
-          color: #111111;
+          border: 1px solid #050505;
+          color: #050505;
         }
       `}</style>
 
@@ -688,7 +688,7 @@ export function Signin() {
                     backgroundColor: "#fff",
                   },
                   "& .MuiFormHelperText-root": {
-                    color: showBlackEmailHint ? "#111111" : undefined,
+                    color: showBlackEmailHint ? "#050505" : undefined,
                     marginLeft: 0,
                     whiteSpace: "nowrap",
                   },
@@ -725,7 +725,7 @@ export function Signin() {
               </div>
               <button
                 style={{
-                  color: '#111111',
+                  color: '#050505',
                   fontSize: 11
                 }}
                 type="button"

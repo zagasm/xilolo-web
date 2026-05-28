@@ -94,12 +94,12 @@ export default function CryptoWalletsPage() {
   const hasWallets = wallets && wallets.length > 0;
 
   return (
-    <div className="tw:min-h-[calc(100vh-80px)] tw:bg-[#FFFFFF] tw:text-[#111111] tw:mt-20 tw:pb-24 tw:px-4 tw:sm:px-6 tw:lgtw:px-12 tw:py-8 tw:flex tw:justify-center">
+    <div className="tw:min-h-[calc(100vh-80px)] tw:bg-[#FFFFFF] tw:text-[#050505] tw:mt-20 tw:pb-24 tw:px-4 tw:sm:px-6 tw:lgtw:px-12 tw:py-8 tw:flex tw:justify-center">
       <div className="tw:w-full tw:max-w-6xl tw:space-y-6">
         {/* Header */}
         <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
           <div className="tw:space-y-1.5">
-            <span className="tw:block tw:text-lg tw:sm:text-2xl tw:font-semibold tw:text-[#111111]">
+            <span className="tw:block tw:text-lg tw:sm:text-2xl tw:font-semibold tw:text-[#050505]">
               Crypto payout wallets
             </span>
             <span className="tw:block tw:text-xs tw:sm:text-sm tw:text-[#5f5a55] tw:max-w-xl">
@@ -115,7 +115,7 @@ export default function CryptoWalletsPage() {
             }}
             type="button"
             onClick={() => setModalOpen(true)}
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:shadow-[0_12px_32px_rgba(0,0,0,0.24)] hover:tw:scale-[1.01] tw:transition disabled:tw:opacity-60"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_32px_rgba(0,0,0,0.24)] hover:tw:scale-[1.01] tw:transition disabled:tw:opacity-60"
           >
             <span className="tw:inline-flex tw:h-5 tw:w-5 tw:items-center tw:justify-center tw:rounded-full tw:bg-white/15 tw:text-xs">
               +
@@ -125,7 +125,7 @@ export default function CryptoWalletsPage() {
         </div>
 
         {/* Highlight strip */}
-        <div className="tw:rounded-3xl tw:border tw:border-[#dcd4cb] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_60%),radial-gradient(circle_at_100%_0%,#f7f2eb,transparent_60%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-4 tw:sm:px-6 tw:py-4 tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
+        <div className="tw:rounded-3xl tw:border tw:border-[#dcd4cb] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_60%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_60%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-4 tw:sm:px-6 tw:py-4 tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
           <div className="tw:flex tw:items-center tw:gap-3">
             <div className="tw:h-10 tw:w-10 tw:rounded-2xl tw:bg-primary/6 tw:flex tw:items-center tw:justify-center tw:shrink-0">
               <span className="tw:text-lg">🪙</span>
@@ -146,7 +146,7 @@ export default function CryptoWalletsPage() {
               <span className="tw:text-[11px] tw:text-[#6c6660]">
                 Connected wallets
               </span>
-              <span className="tw:text-base tw:font-semibold tw:text-[#111111]">
+              <span className="tw:text-base tw:font-semibold tw:text-[#050505]">
                 {loadingWallets ? "…" : wallets.length}
               </span>
             </div>
@@ -155,7 +155,7 @@ export default function CryptoWalletsPage() {
               <span className="tw:text-[11px] tw:text-[#6c6660]">
                 Supported assets
               </span>
-              <span className="tw:text-base tw:font-semibold tw:text-[#111111]">
+              <span className="tw:text-base tw:font-semibold tw:text-[#050505]">
                 {loadingOptions ? "…" : options.length}
               </span>
             </div>
@@ -176,9 +176,9 @@ export default function CryptoWalletsPage() {
               ))}
             </div>
           ) : !hasWallets ? (
-            <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#d8cec3] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_55%),radial-gradient(circle_at_100%_0%,#f7f2eb,transparent_55%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-6 tw:md:px-10 tw:py-10 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:gap-4">
+            <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#d8cec3] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_55%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_55%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-6 tw:md:px-10 tw:py-10 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:gap-4">
               <div className="tw:flex tw:items-center tw:justify-center tw:gap-3">
-                <span className="tw:block tw:text-base tw:sm:text-lg tw:font-semibold tw:text-[#111111]">
+                <span className="tw:block tw:text-base tw:sm:text-lg tw:font-semibold tw:text-[#050505]">
                   No wallets yet. Let’s connect your first one.
                 </span>
               </div>
@@ -194,7 +194,7 @@ export default function CryptoWalletsPage() {
                 }}
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#111111,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.26)] hover:tw:scale-[1.02] tw:transition"
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.26)] hover:tw:scale-[1.02] tw:transition"
               >
                 <span className="tw:text-sm">＋</span>
                 <span>Connect payout wallet</span>
@@ -233,7 +233,7 @@ export default function CryptoWalletsPage() {
                         <span>{wallet.currency?.toUpperCase?.() || "CR"}</span>
                       </div>
                       <div className="tw:flex tw:flex-col tw:gap-0.5 tw:min-w-0">
-                        <span className="tw:text-xs tw:font-semibold tw:text-[#111111] tw:truncate">
+                        <span className="tw:text-xs tw:font-semibold tw:text-[#050505] tw:truncate">
                           {wallet.currency?.toUpperCase?.()} •{" "}
                           {wallet.network_type === "testnet"
                             ? `${wallet.network} (testnet)`
