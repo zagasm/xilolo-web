@@ -130,8 +130,8 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
             leaveFrom="tw:opacity-100 tw:translate-y-0 tw:scale-100"
             leaveTo="tw:opacity-0 tw:translate-y-3 tw:scale-95"
           >
-            <Dialog.Panel className="tw:relative tw:flex tw:w-full tw:max-w-md tw:max-h-[84dvh] tw:flex-col tw:overflow-hidden tw:rounded-2xl tw:bg-linear-to-b tw:from-gray-50 tw:to-white tw:shadow-2xl tw:sm:max-w-lg tw:sm:max-h-[88vh] tw:sm:rounded-3xl">
-              <div className="tw:h-14 tw:w-full tw:overflow-hidden tw:bg-gray-200 tw:sm:h-32">
+            <Dialog.Panel className="tw:relative tw:flex tw:w-full tw:max-w-md tw:max-h-[76dvh] tw:flex-col tw:overflow-hidden tw:rounded-2xl tw:bg-linear-to-b tw:from-gray-50 tw:to-white tw:shadow-2xl tw:sm:max-w-lg tw:sm:max-h-[82vh] tw:sm:rounded-3xl">
+              <div className="tw:h-12 tw:w-full tw:overflow-hidden tw:bg-gray-200 tw:sm:h-24">
                 <img
                   src={event.poster || "/images/banner.png"}
                   alt={event.title || "Event cover"}
@@ -139,7 +139,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                 />
               </div>
 
-              <div className="tw:flex-1 tw:space-y-3 tw:overflow-y-auto tw:p-3 tw:sm:space-y-5 tw:sm:p-5">
+              <div className="tw-no-scrollbar tw:flex-1 tw:space-y-3 tw:overflow-y-auto tw:p-3 tw:sm:space-y-5 tw:sm:p-5">
                 <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
                   <div className="tw:space-y-1">
                     <span className="tw:block tw:text-sm tw:font-semibold tw:leading-snug tw:text-gray-900 tw:sm:text-xl">
