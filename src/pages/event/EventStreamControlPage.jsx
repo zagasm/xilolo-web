@@ -10,8 +10,11 @@ import {
   MonitorPlay,
   PauseCircle,
   PlayCircle,
+  QrCode,
   Radio,
+  RotateCcw,
   Signal,
+  ShieldCheck,
   Square,
   Users,
   Video,
@@ -22,6 +25,7 @@ import { useAuth } from "../auth/AuthContext";
 import {
   showError,
   showPromise,
+  showSuccess,
 } from "../../component/ui/toast";
 import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDownloadModal";
 import { formatEventDateTime } from "../../utils/ui";
@@ -442,6 +446,179 @@ function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
   );
 }
 
+function CheckinAccessPanel({
+  accessList,
+  stats,
+  loading,
+  generatedCode,
+  copiedLabel,
+  onGenerate,
+  onRotate,
+  onRevoke,
+  onCopy,
+  pendingAction,
+}) {
+  const activeAccess =
+    accessList.find((access) => access.is_active && !access.revoked_at) ||
+    accessList[0] ||
+    null;
+
+  const activeSessions = stats?.active_sessions ?? activeAccess?.active_sessions_count ?? 0;
+
+  return (
+    <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+      <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-start tw:lg:justify-between">
+        <div>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <ShieldCheck className="tw:h-5 tw:w-5 tw:text-primary" />
+            <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+              Ticket check-in access
+            </span>
+          </div>
+          <p className="tw:mt-1 tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-gray-600">
+            Generate a check-in code for gate staff without sharing your organiser login.
+          </p>
+        </div>
+
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row">
+          <ActionButton
+            onClick={onGenerate}
+            loading={pendingAction === "checkin-generate"}
+            className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
+            icon={QrCode}
+          >
+            Generate code
+          </ActionButton>
+
+          {activeAccess ? (
+            <ActionButton
+              onClick={() => onRotate(activeAccess)}
+              loading={pendingAction === "checkin-rotate"}
+              className="tw:bg-lightPurple tw:text-primary hover:tw:bg-[#e2d9ce]"
+              icon={RotateCcw}
+            >
+              Rotate
+            </ActionButton>
+          ) : null}
+        </div>
+      </div>
+
+      {generatedCode ? (
+        <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-emerald-200 tw:bg-emerald-50 tw:p-4">
+          <div className="tw:text-sm tw:font-semibold tw:text-emerald-900">
+            Copy this code now. It will not be shown again.
+          </div>
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
+            <code className="tw:break-all tw:text-base tw:font-black tw:text-emerald-950">
+              {generatedCode}
+            </code>
+            <button
+              type="button"
+              onClick={() => onCopy(generatedCode, "Check-in Code")}
+              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white"
+            >
+              <Copy className="tw:h-4 tw:w-4" />
+              {copiedLabel === "Check-in Code" ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:grid-cols-4">
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Sold
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.tickets_sold ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Checked in
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.checked_in ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Remaining
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.remaining ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Sessions
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {activeSessions}
+          </div>
+        </div>
+      </div>
+
+      <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf7f3] tw:p-4">
+        {loading ? (
+          <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-600">
+            <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
+            Loading check-in access
+          </div>
+        ) : activeAccess ? (
+          <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+            <div>
+              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <span
+                  className={cx(
+                    "tw:rounded-full tw:px-3 tw:py-1 tw:text-xs tw:font-bold",
+                    activeAccess.is_active
+                      ? "tw:bg-emerald-100 tw:text-emerald-700"
+                      : "tw:bg-red-100 tw:text-red-700",
+                  )}
+                >
+                  {activeAccess.is_active ? "Active" : "Inactive"}
+                </span>
+                <span className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                  {activeAccess.label || "Event check-in code"}
+                </span>
+              </div>
+              <div className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-gray-600">
+                Last four: {activeAccess.plain_code_last_four || "----"} · Last used:{" "}
+                {activeAccess.last_used_at
+                  ? new Date(activeAccess.last_used_at).toLocaleString()
+                  : "Never"}{" "}
+                · Expires:{" "}
+                {activeAccess.expires_at
+                  ? new Date(activeAccess.expires_at).toLocaleString()
+                  : "No expiry"}
+              </div>
+            </div>
+
+            {activeAccess.is_active ? (
+              <button
+                type="button"
+                onClick={() => onRevoke(activeAccess)}
+                disabled={pendingAction === "checkin-revoke"}
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 hover:tw:bg-red-50 disabled:tw:opacity-60"
+              >
+                {pendingAction === "checkin-revoke" ? (
+                  <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
+                ) : null}
+                Revoke
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <div className="tw:text-sm tw:leading-6 tw:text-gray-600">
+            No check-in access code has been generated for this event yet.
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function EventStreamControlPage() {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -458,6 +635,10 @@ export default function EventStreamControlPage() {
   const [closeTicketSalesOnGoLive, setCloseTicketSalesOnGoLive] = useState(false);
   const [viewerAnalytics, setViewerAnalytics] = useState(null);
   const [viewerAnalyticsLoading, setViewerAnalyticsLoading] = useState(false);
+  const [checkinAccessList, setCheckinAccessList] = useState([]);
+  const [checkinStats, setCheckinStats] = useState(null);
+  const [checkinLoading, setCheckinLoading] = useState(false);
+  const [generatedCheckinCode, setGeneratedCheckinCode] = useState("");
   const copyTimeoutRef = useRef(null);
 
   const loadViewerAnalytics = useCallback(async () => {
@@ -542,6 +723,25 @@ export default function EventStreamControlPage() {
     [eventId, token],
   );
 
+  const loadCheckinData = useCallback(async () => {
+    if (!eventId || !token) return;
+
+    setCheckinLoading(true);
+    try {
+      const [accessResponse, statsResponse] = await Promise.all([
+        api.get(`/api/v1/events/${eventId}/checkin-access`, authHeaders(token)),
+        api.get(`/api/v1/events/${eventId}/checkin-stats`, authHeaders(token)),
+      ]);
+
+      setCheckinAccessList(accessResponse?.data?.data || []);
+      setCheckinStats(statsResponse?.data?.data || null);
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not load check-in access."));
+    } finally {
+      setCheckinLoading(false);
+    }
+  }, [eventId, token]);
+
   useEffect(() => {
     loadEventDetails();
   }, [loadEventDetails]);
@@ -549,6 +749,10 @@ export default function EventStreamControlPage() {
   useEffect(() => {
     loadViewerAnalytics();
   }, [loadViewerAnalytics]);
+
+  useEffect(() => {
+    loadCheckinData();
+  }, [loadCheckinData]);
 
   useEffect(() => {
     if (!eventId || !token) return undefined;
@@ -646,6 +850,72 @@ export default function EventStreamControlPage() {
       }, 900);
     } catch {
       showError(`Could not copy ${label.toLowerCase()}.`);
+    }
+  };
+
+  const handleGenerateCheckinAccess = async () => {
+    setPendingAction("checkin-generate");
+    try {
+      const response = await api.post(
+        `/api/v1/events/${eventId}/checkin-access`,
+        { label: "Event check-in" },
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode(response?.data?.data?.access_code || "");
+      showSuccess("Check-in code generated.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not generate check-in code."));
+    } finally {
+      setPendingAction("");
+    }
+  };
+
+  const handleRotateCheckinAccess = async (access) => {
+    const confirmed = window.confirm(
+      "Rotate this check-in code? Existing staff sessions using this code will be revoked.",
+    );
+
+    if (!confirmed) return;
+
+    setPendingAction("checkin-rotate");
+    try {
+      const response = await api.post(
+        `/api/v1/events/${eventId}/checkin-access/${access.id}/rotate`,
+        {},
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode(response?.data?.data?.access_code || "");
+      showSuccess("Check-in code rotated.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not rotate check-in code."));
+    } finally {
+      setPendingAction("");
+    }
+  };
+
+  const handleRevokeCheckinAccess = async (access) => {
+    const confirmed = window.confirm(
+      "Revoke this check-in code? Active staff scanner sessions will stop working.",
+    );
+
+    if (!confirmed) return;
+
+    setPendingAction("checkin-revoke");
+    try {
+      await api.patch(
+        `/api/v1/events/${eventId}/checkin-access/${access.id}/revoke`,
+        {},
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode("");
+      showSuccess("Check-in access revoked.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not revoke check-in access."));
+    } finally {
+      setPendingAction("");
     }
   };
 
@@ -1210,6 +1480,19 @@ export default function EventStreamControlPage() {
                     ))}
                   </div>
                 </section>
+
+                <CheckinAccessPanel
+                  accessList={checkinAccessList}
+                  stats={checkinStats}
+                  loading={checkinLoading}
+                  generatedCode={generatedCheckinCode}
+                  copiedLabel={copiedLabel}
+                  onGenerate={handleGenerateCheckinAccess}
+                  onRotate={handleRotateCheckinAccess}
+                  onRevoke={handleRevokeCheckinAccess}
+                  onCopy={handleCopy}
+                  pendingAction={pendingAction}
+                />
               </>
             )}
 
