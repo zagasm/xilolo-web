@@ -202,6 +202,15 @@ export default function PrivacyPolicyPage() {
                   obligation. We do not store full card or banking credentials.
                 </p>
 
+                <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4 tw:text-sm tw:text-slate-700">
+                  <strong>Organizer payout percentages:</strong> For ticket
+                  sales, Xilolo retains 10% for physical events and 40% for
+                  online or hybrid events. For paid event manuals or materials,
+                  Xilolo retains 15%. The remaining amount belongs to the
+                  organizer, subject to refunds, reversals, and applicable
+                  payment processing obligations.
+                </div>
+
                 <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
                   1.4 Usage, Technical, and Device Data
                 </span>

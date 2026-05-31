@@ -131,6 +131,7 @@ const schema = z
     ticketLimit: z.string().optional(),
     currencyCode: z.enum(["NGN", "USD"]),
     visibility: z.enum(["public", "private"]),
+    attendanceType: z.enum(["online", "physical", "both"]),
     hasMaterials: z.boolean(),
     enableReplay: z.boolean(),
     replayAvailableAfterMinutes: z.string().optional(),
@@ -263,6 +264,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           : "",
       currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
       visibility: defaultValues.visibility || "public",
+      attendanceType: defaultValues.attendanceType || "online",
       hasMaterials:
         typeof defaultValues.hasMaterials === "boolean"
           ? defaultValues.hasMaterials
@@ -290,6 +292,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const selectedCurrencyCode = watch("currencyCode");
   const maxTickets = watch("maxTickets");
   const visibility = watch("visibility");
+  const attendanceType = watch("attendanceType");
   const hasMaterials = watch("hasMaterials");
   const enableReplay = watch("enableReplay");
   const selectedCurrency = useMemo(
@@ -373,6 +376,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         currency: String(matchedCurrency.id),
         currencyCode: values.currencyCode,
         visibility: values.visibility,
+        attendanceType: values.attendanceType,
         hasMaterials: false,
         enableReplay: values.enableReplay,
         replayAvailableAfterMinutes: Number(
@@ -437,6 +441,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       currency: String(matchedCurrency.id),
       currencyCode: values.currencyCode,
       visibility: values.visibility,
+      attendanceType: values.attendanceType,
       hasMaterials: true,
       enableReplay: values.enableReplay,
       replayAvailableAfterMinutes: Number(
@@ -469,6 +474,18 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       </div>
 
       <div className="tw:space-y-5">
+        <SelectField
+          label="Event location"
+          value={attendanceType}
+          onChange={(value) => setValue("attendanceType", value, { shouldValidate: true })}
+          options={[
+            { value: "online", label: "Online" },
+            { value: "physical", label: "Physical" },
+            { value: "both", label: "Both online and physical" },
+          ]}
+          error={errors?.attendanceType?.message}
+        />
+
         <SelectField
           label="Currency"
           value={selectedCurrencyCode}

@@ -10,6 +10,7 @@ import {
   CalendarDays,
   MoreVertical,
   Upload,
+  QrCode,
 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
@@ -293,6 +294,17 @@ export default function EventCard({
                     </button>
                   )}
                 </Menu.Item>
+
+                {["physical", "both"].includes(event?.attendance_type) ? (
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/event/checkin/${event.id}`); }} className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}>
+                        <QrCode className="tw:h-4 tw:w-4" />
+                        <span>Manage Check-In</span>
+                      </button>
+                    )}
+                  </Menu.Item>
+                ) : null}
 
                 <Menu.Item disabled={!shouldShowRescheduleAction || rescheduleLocked}>
                   {({ active, disabled }) => (

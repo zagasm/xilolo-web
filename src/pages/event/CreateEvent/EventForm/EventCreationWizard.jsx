@@ -10,6 +10,16 @@ import TicketingStep from "./steps/TicketingStep";
 import ReviewStep from "./steps/ReviewStep";
 import EventCreationSuccessModal from "../../../../component/Events/EventCreationSuccessModal";
 
+function normalizeTime(value) {
+  const text = String(value || "").trim();
+  const twelveHour = text.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!twelveHour) return text.slice(0, 5);
+
+  let hour = Number(twelveHour[1]) % 12;
+  if (twelveHour[3].toUpperCase() === "PM") hour += 12;
+  return `${String(hour).padStart(2, "0")}:${twelveHour[2]}`;
+}
+
 function mapEventToDefaults(event) {
   if (!event?.currentEvent) {
     return {
@@ -29,6 +39,7 @@ function mapEventToDefaults(event) {
         ticketLimit: undefined,
         currency: "",
         currencyCode: "NGN",
+        attendanceType: "online",
         hasMaterials: false,
         enableReplay: false,
         replayAvailableAfterMinutes: 120,
@@ -54,8 +65,8 @@ function mapEventToDefaults(event) {
   }
 
   const currentEvent = event.currentEvent;
-  const startDate = currentEvent.start_date || currentEvent.eventDateISO || "";
-  const startTime = currentEvent.start_time || "";
+  const startDate = currentEvent.eventDateISO || currentEvent.event_date || currentEvent.start_date || "";
+  const startTime = normalizeTime(currentEvent.start_time || currentEvent.startTime || "");
   const timezone =
     currentEvent.timezone_id || currentEvent.timezone || "";
   const maxTickets = currentEvent.max_tickets ? "limited" : "unlimited";
@@ -84,6 +95,7 @@ function mapEventToDefaults(event) {
           : undefined,
       currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
       currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+      attendanceType: currentEvent.attendance_type || "online",
       hasMaterials: !!(
         currentEvent.manual?.available ||
         currentEvent.manual?.cover_url ||
@@ -221,8 +233,10 @@ export default function EventCreationWizard({
       payload.append("location", info.location || "Online");
       payload.append("organizer", info.organizer || "");
       payload.append("genre", info.genre || "");
-      payload.append("event_date", info.date || "");
-      payload.append("start_time", info.time || "");
+      if (!isEdit) {
+        payload.append("event_date", info.date || "");
+        payload.append("start_time", info.time || "");
+      }
       payload.append("time_zone_id", info.timezone || "");
 
       if (eventTypeId) {
@@ -244,6 +258,7 @@ export default function EventCreationWizard({
       }
 
       payload.append("price", ticketing.price ?? 0);
+      payload.append("attendance_type", ticketing.attendanceType || "online");
       payload.append("currency_id", ticketing.currency || "");
       payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
       if (ticketing.maxTickets === "limited") {
@@ -315,6 +330,28 @@ export default function EventCreationWizard({
         success: isEdit ? "Event updated" : "Event created",
         error: "Could not save event",
       });
+
+      if (
+        isEdit &&
+        (String(info.date || "") !== String(mapped.info.date || "") ||
+          String(info.time || "") !== String(mapped.info.time || ""))
+      ) {
+        await showPromise(
+          api.patch(
+            `/api/v1/events/${eventId}/reschedule`,
+            {
+              event_date: info.date,
+              start_time: normalizeTime(info.time),
+            },
+            authHeaders(token)
+          ),
+          {
+            loading: "Updating schedule…",
+            success: "Event schedule updated",
+            error: "Could not update event schedule",
+          }
+        );
+      }
 
       const created = response?.data?.data || response?.data || {};
       const createdId = created?.id || eventId;

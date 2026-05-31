@@ -426,7 +426,7 @@ export default function ViewProfile() {
               </span>
             </div>
 
-            <div className="tw:bg-linear-to-r tw:from-[#050505] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
+            <div className="tw:bg-linear-to-r tw:from-primary tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
               <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
                 Do you have an event?
               </span>

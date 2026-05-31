@@ -751,10 +751,6 @@ export default function EventStreamControlPage() {
   }, [loadViewerAnalytics]);
 
   useEffect(() => {
-    loadCheckinData();
-  }, [loadCheckinData]);
-
-  useEffect(() => {
     if (!eventId || !token) return undefined;
 
     const interval = window.setInterval(() => {
@@ -1481,18 +1477,6 @@ export default function EventStreamControlPage() {
                   </div>
                 </section>
 
-                <CheckinAccessPanel
-                  accessList={checkinAccessList}
-                  stats={checkinStats}
-                  loading={checkinLoading}
-                  generatedCode={generatedCheckinCode}
-                  copiedLabel={copiedLabel}
-                  onGenerate={handleGenerateCheckinAccess}
-                  onRotate={handleRotateCheckinAccess}
-                  onRevoke={handleRevokeCheckinAccess}
-                  onCopy={handleCopy}
-                  pendingAction={pendingAction}
-                />
               </>
             )}
 
