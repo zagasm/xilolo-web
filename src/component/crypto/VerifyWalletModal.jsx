@@ -140,7 +140,7 @@ export default function VerifyWalletModal({
                         inputMode="numeric"
                         pattern="[0-9]*"
                         maxLength={5}
-                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#050505] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#a89f95]"
+                        className="tw:block tw:w-full tw:text-center tw:tracking-[0.6em] tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:px-4 tw:py-3 tw:text-lg tw:font-semibold tw:text-[#050505] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:placeholder:tracking-normal placeholder:tw:text-[#a89f95]"
                         placeholder="0 0 0 0 0"
                       />
                       <span className="tw:text-[10px] tw:text-[#7a736c]">

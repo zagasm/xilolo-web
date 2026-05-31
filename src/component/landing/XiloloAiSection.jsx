@@ -72,7 +72,7 @@ export default function XiloloAiSection() {
           transition={{ type: "spring", stiffness: 150, damping: 18 }}
           className="tw:relative"
         >
-          <div className="tw:overflow-hidden tw:rounded-[30px] tw:border tw:border-white/10 tw:bg-[#ece4da] tw:p-3 tw:text-primary tw:shadow-[0_26px_90px_rgba(0,0,0,0.38)] tw:md:p-4">
+          <div className="tw:overflow-hidden tw:rounded-[30px] tw:border tw:border-white/10 tw:bg-[#e5e4e2] tw:p-3 tw:text-primary tw:shadow-[0_26px_90px_rgba(0,0,0,0.38)] tw:md:p-4">
             <div className="tw:flex tw:items-center tw:justify-between tw:rounded-[22px] tw:bg-white/70 tw:px-4 tw:py-3">
               <div className="tw:flex tw:items-center tw:gap-3">
                 <span className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white">

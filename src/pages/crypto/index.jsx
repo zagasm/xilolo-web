@@ -125,7 +125,7 @@ export default function CryptoWalletsPage() {
         </div>
 
         {/* Highlight strip */}
-        <div className="tw:rounded-3xl tw:border tw:border-[#dcd4cb] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_60%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_60%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-4 tw:sm:px-6 tw:py-4 tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
+        <div className="tw:rounded-3xl tw:border tw:border-[#dcd4cb] tw:bg-[radial-gradient(circle_at_0%_0%,#e5e4e2,transparent_60%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_60%),linear-gradient(135deg,#FFFFFF,#e5e4e2)] tw:px-4 tw:sm:px-6 tw:py-4 tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
           <div className="tw:flex tw:items-center tw:gap-3">
             <div className="tw:h-10 tw:w-10 tw:rounded-2xl tw:bg-primary/6 tw:flex tw:items-center tw:justify-center tw:shrink-0">
               <span className="tw:text-lg">🪙</span>
@@ -176,7 +176,7 @@ export default function CryptoWalletsPage() {
               ))}
             </div>
           ) : !hasWallets ? (
-            <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#d8cec3] tw:bg-[radial-gradient(circle_at_0%_0%,#ece4da,transparent_55%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_55%),linear-gradient(135deg,#FFFFFF,#f5efe7)] tw:px-6 tw:md:px-10 tw:py-10 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:gap-4">
+            <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#d8cec3] tw:bg-[radial-gradient(circle_at_0%_0%,#e5e4e2,transparent_55%),radial-gradient(circle_at_100%_0%,#e5e4e2,transparent_55%),linear-gradient(135deg,#FFFFFF,#e5e4e2)] tw:px-6 tw:md:px-10 tw:py-10 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:gap-4">
               <div className="tw:flex tw:items-center tw:justify-center tw:gap-3">
                 <span className="tw:block tw:text-base tw:sm:text-lg tw:font-semibold tw:text-[#050505]">
                   No wallets yet. Let’s connect your first one.
@@ -220,7 +220,7 @@ export default function CryptoWalletsPage() {
                       wallet.id ||
                       `${wallet.currency}-${wallet.network}-${wallet.address}`
                     }
-                    className="tw:relative tw:rounded-2xl tw:border tw:border-[#dfd7cf] tw:bg-[radial-gradient(circle_at_0%_0%,rgba(17,17,17,0.04),transparent_60%),linear-gradient(145deg,#FFFFFF,#f5efe7)] tw:p-4 tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden"
+                    className="tw:relative tw:rounded-2xl tw:border tw:border-[#dfd7cf] tw:bg-[radial-gradient(circle_at_0%_0%,rgba(17,17,17,0.04),transparent_60%),linear-gradient(145deg,#FFFFFF,#e5e4e2)] tw:p-4 tw:flex tw:flex-col tw:gap-3 tw:overflow-hidden"
                   >
                     {wallet.is_primary && (
                       <span className="tw:absolute tw:right-3 tw:top-3 tw:rounded-full tw:bg-[#DCFCE7] tw:border tw:border-[#4ADE80]/60 tw:px-2 tw:py-0.5 tw:text-[10px] tw:uppercase tw:tracking-wide tw:text-[#166534]">

@@ -194,7 +194,7 @@ export default function AddWalletModal({
                             sx={{
                               "& .MuiOutlinedInput-root": {
                                 borderRadius: "16px",
-                                backgroundColor: "#f8f3ee",
+                                backgroundColor: "#e5e4e2",
                                 fontSize: "0.8rem",
                                 paddingRight: "10px",
                               },
@@ -237,7 +237,7 @@ export default function AddWalletModal({
                                 "tw:px-3 tw:py-1.5 tw:rounded-full tw:text-[11px] tw:uppercase tw:tracking-wide tw:border tw:transition tw:flex tw:items-center tw:gap-1.5",
                                 active
                                   ? "tw:border-primary tw:bg-lightPurple tw:text-primary"
-                                  : "tw:border-[#ded6cd] tw:bg-[#fbf8f5] tw:text-[#625c55] tw:hover:border-[#c8beb2]",
+                                  : "tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:text-[#625c55] tw:hover:border-[#c8beb2]",
                               ].join(" ")}
                             >
                               <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
@@ -263,7 +263,7 @@ export default function AddWalletModal({
                         rows={2}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#f8f3ee] tw:px-4 tw:py-3 tw:text-xs tw:text-[#050505] placeholder:tw:text-[#a89f95] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:resize-none"
+                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:px-4 tw:py-3 tw:text-xs tw:text-[#050505] placeholder:tw:text-[#a89f95] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:resize-none"
                         placeholder="Paste the exact address from your wallet app…"
                       />
                     </div>

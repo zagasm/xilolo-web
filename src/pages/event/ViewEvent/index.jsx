@@ -936,7 +936,7 @@ export default function ViewEvent() {
 
           <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
             <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#e5e4e2] tw:blur-3xl tw:md:block" />
-            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f5efe6] tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#e5e4e2] tw:blur-3xl tw:md:block" />
 
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
               <div className="tw:space-y-6">

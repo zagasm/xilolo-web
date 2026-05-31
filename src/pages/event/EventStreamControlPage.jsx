@@ -224,7 +224,7 @@ function DetailCard({
             style={{ borderRadius: 20, fontSize: 12 }}
             type="button"
             onClick={() => onCopy?.(value, label)}
-            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
             aria-label={`Copy ${label}`}
           >
             <Copy className="tw:h-4 tw:w-4" />
@@ -339,7 +339,7 @@ function ViewerList({ viewers }) {
       {viewers.map((viewer) => (
         <div
           key={`${viewer.id}-${viewer.joinedAt || viewer.name}`}
-          className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#f0ebff] tw:bg-[#faf7f3] tw:p-3"
+          className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#f0ebff] tw:bg-[#e5e4e2] tw:p-3"
         >
           {viewer.profilePicture ? (
             <img
@@ -394,7 +394,7 @@ function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
           type="button"
           onClick={onRefresh}
           disabled={loading}
-          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-[#f3ede6] disabled:tw:opacity-60"
+          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-[#e5e4e2] disabled:tw:opacity-60"
         >
           {loading ? <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" /> : null}
           Refresh
@@ -402,7 +402,7 @@ function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
       </div>
 
       <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-3">
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Current
           </div>
@@ -410,7 +410,7 @@ function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
             {analytics?.current_viewer_count ?? 0}
           </div>
         </div>
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Unique
           </div>
@@ -418,7 +418,7 @@ function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
             {analytics?.total_unique_viewer_count ?? 0}
           </div>
         </div>
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Peak
           </div>
@@ -525,7 +525,7 @@ function CheckinAccessPanel({
       ) : null}
 
       <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:grid-cols-4">
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Sold
           </div>
@@ -533,7 +533,7 @@ function CheckinAccessPanel({
             {stats?.tickets_sold ?? 0}
           </div>
         </div>
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Checked in
           </div>
@@ -541,7 +541,7 @@ function CheckinAccessPanel({
             {stats?.checked_in ?? 0}
           </div>
         </div>
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Remaining
           </div>
@@ -549,7 +549,7 @@ function CheckinAccessPanel({
             {stats?.remaining ?? 0}
           </div>
         </div>
-        <div className="tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
           <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
             Sessions
           </div>
@@ -559,7 +559,7 @@ function CheckinAccessPanel({
         </div>
       </div>
 
-      <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf7f3] tw:p-4">
+      <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:p-4">
         {loading ? (
           <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-600">
             <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
@@ -1162,7 +1162,7 @@ export default function EventStreamControlPage() {
             </div>
 
             {isEnded ? (
-              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#e5e4e2_52%,#efe7de_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
+              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#e5e4e2_52%,#e5e4e2_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
                 <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[1.15fr_0.85fr]">
                   <div>
                     <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/90 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:shadow-sm">
@@ -1272,7 +1272,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpServer, "RTMP Server")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
                                 aria-label="Copy RTMP Server"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1295,7 +1295,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpKey, "Stream Key")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
                                 aria-label="Copy Stream Key"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1337,7 +1337,7 @@ export default function EventStreamControlPage() {
                         ) : null}
 
                         {showGoLive && !ticketSalesClosed && !streamStartRequiresTicketPurchase ? (
-                          <label className="tw:flex tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf7f3] tw:p-4">
+                          <label className="tw:flex tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:p-4">
                             <input
                               type="checkbox"
                               checked={closeTicketSalesOnGoLive}
@@ -1425,7 +1425,7 @@ export default function EventStreamControlPage() {
                       ) : null}
                     </div>
 
-                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
                       <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
                         <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
                         What to do next

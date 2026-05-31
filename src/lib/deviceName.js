@@ -1,6 +1,6 @@
 export function getWebDeviceName() {
   if (typeof navigator === "undefined") {
-    return "React Web";
+    return "Website";
   }
 
   const uaData = navigator.userAgentData;
@@ -17,7 +17,7 @@ export function getWebDeviceName() {
             ? "Chrome"
             : "Browser");
 
-  return `React Web - ${browser}`;
+  return `Website - ${browser}`;
 }
 
 const DEVICE_ID_STORAGE_KEY = "xilolo_web_device_id";

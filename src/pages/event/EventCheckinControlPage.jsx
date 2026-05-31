@@ -7,7 +7,7 @@ import { showError, showPromise } from "../../component/ui/toast";
 
 function Stat({ label, value }) {
   return (
-    <div className="tw:rounded-2xl tw:bg-[#f5efe7] tw:p-4">
+    <div className="tw:rounded-2xl tw:bg-[#e5e4e2] tw:p-4">
       <div className="tw:text-xs tw:uppercase tw:tracking-wide tw:text-gray-500">{label}</div>
       <div className="tw:mt-1 tw:text-2xl tw:font-semibold tw:text-gray-900">{value ?? 0}</div>
     </div>
@@ -59,7 +59,7 @@ export default function EventCheckinControlPage() {
   }
 
   return (
-    <main className="tw:min-h-screen tw:bg-[#fff8f0] tw:px-4 tw:py-24">
+    <main className="tw:min-h-screen tw:bg-[#e5e4e2] tw:px-4 tw:py-24">
       <div className="tw:mx-auto tw:max-w-5xl">
         <div className="tw:flex tw:flex-col tw:gap-4 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
           <div>

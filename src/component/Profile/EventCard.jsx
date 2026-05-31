@@ -59,10 +59,10 @@ function formatEventSchedule(event) {
   const dateLabel =
     date && !Number.isNaN(date.getTime())
       ? date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
       : event?.eventDate || "Date not set";
 
   if (!timeValue) return dateLabel;
@@ -261,6 +261,7 @@ export default function EventCard({
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-20">
           <Menu as="div" className="tw:relative">
             <Menu.Button
+              style={{ borderRadius: 9999 }}
               onClick={(e) => e.stopPropagation()}
               className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md hover:tw:bg-slate-50"
             >
@@ -285,9 +286,8 @@ export default function EventCard({
                         e.stopPropagation();
                         navigate(`/event/edit/${event.id}`);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${
-                        active ? "tw:bg-slate-100" : ""
-                      }`}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""
+                        }`}
                     >
                       <Pencil className="tw:h-4 tw:w-4" />
                       <span>Edit Event</span>
@@ -295,7 +295,7 @@ export default function EventCard({
                   )}
                 </Menu.Item>
 
-                {["physical", "both"].includes(event?.attendance_type) ? (
+                {event?.checkin_available || ["physical", "both"].includes(event?.attendance_type) ? (
                   <Menu.Item>
                     {({ active }) => (
                       <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/event/checkin/${event.id}`); }} className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}>
@@ -315,13 +315,12 @@ export default function EventCard({
                         if (disabled) return;
                         setOpenReschedule(true);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
-                        disabled
-                          ? "tw:cursor-not-allowed tw:text-slate-400"
-                          : active
-                            ? "tw:bg-slate-100 tw:text-slate-700"
-                            : "tw:text-slate-700"
-                      }`}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
+                        ? "tw:cursor-not-allowed tw:text-slate-400"
+                        : active
+                          ? "tw:bg-slate-100 tw:text-slate-700"
+                          : "tw:text-slate-700"
+                        }`}
                     >
                       <CalendarDays className="tw:h-4 tw:w-4" />
                       <span>Reschedule Event</span>
@@ -339,13 +338,12 @@ export default function EventCard({
                           if (disabled) return;
                           setOpenReplayUpload(true);
                         }}
-                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
-                          disabled
-                            ? "tw:cursor-not-allowed tw:text-slate-400"
-                            : active
-                              ? "tw:bg-slate-100 tw:text-slate-700"
-                              : "tw:text-slate-700"
-                        }`}
+                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
+                          ? "tw:cursor-not-allowed tw:text-slate-400"
+                          : active
+                            ? "tw:bg-slate-100 tw:text-slate-700"
+                            : "tw:text-slate-700"
+                          }`}
                       >
                         <Upload className="tw:h-4 tw:w-4" />
                         <span>Upload Replay Video</span>
@@ -363,9 +361,8 @@ export default function EventCard({
                         setDeleteError("");
                         setOpenDelete(true);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-red-600 ${
-                        active ? "tw:bg-red-50" : ""
-                      }`}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-red-600 ${active ? "tw:bg-red-50" : ""
+                        }`}
                     >
                       <Trash2 className="tw:h-4 tw:w-4" />
                       <span>Delete Event</span>
@@ -477,12 +474,12 @@ export default function EventCard({
               {startingStream
                 ? "Starting stream..."
                 : normalizedStatus === "live"
-                ? "Manage live stream"
-                : normalizedStatus === "paused"
-                  ? "Resume Event"
-                  : normalizedStatus === "ended"
-                    ? "View Event"
-                    : "Start stream"}
+                  ? "Manage live stream"
+                  : normalizedStatus === "paused"
+                    ? "Resume Event"
+                    : normalizedStatus === "ended"
+                      ? "View Event"
+                      : "Start stream"}
             </span>
           </button>
         ) : (
