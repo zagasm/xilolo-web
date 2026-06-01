@@ -95,9 +95,9 @@ export default function LivePipelineSection() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-white/10 tw:bg-white/5 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-primary"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-white/10 tw:bg-white/5 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-white"
           >
-            <span className="tw:size-1.5 tw:rounded-full tw:bg-primary tw:animate-pulse" />
+            <span className="tw:size-1.5 tw:rounded-full tw:bg-white tw:animate-pulse" />
             Live signal pipeline
           </motion.span>
 

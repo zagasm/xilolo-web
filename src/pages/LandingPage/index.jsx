@@ -33,6 +33,8 @@ export default function ZagasmLanding() {
       <div className="tw:relative tw:z-10 tw:pt-8 tw:md:pt-52">
         <Hero />
 
+        <XiloloAiSection />
+
         <AutomationSection
           title="Sell tickets. Stream. Get paid"
           subtitle="Create ticketed events, schedule replays, post highlights, share everywhere, and track results in one place. Less work. More revenue."
@@ -44,8 +46,6 @@ export default function ZagasmLanding() {
         />
 
         <LiveHighlightsSection />
-
-        <XiloloAiSection />
 
         <AutomationSection
           title="Go live once. We handle the setup"
