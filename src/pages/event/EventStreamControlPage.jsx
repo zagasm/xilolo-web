@@ -776,7 +776,7 @@ export default function EventStreamControlPage() {
   const status = String(eventData?.status || "upcoming").toLowerCase();
   const isLive = status === "live";
   const isPaused = status === "paused" || !!stream?.is_paused;
-  const isEnded = status === "ended";
+  const isEnded = status === "ended" || status === "expired";
   const hasStartedStream = Boolean(
     stream?.id ||
     stream?.stream_key ||
@@ -1135,8 +1135,10 @@ export default function EventStreamControlPage() {
                   Stream Event
                 </span>
                 <p className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
-                  {isEnded
-                    ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
+                  {status === "expired"
+                    ? "This event expired because it did not go live. Streaming controls and OBS setup are no longer available."
+                    : isEnded
+                      ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
                     : "Start the stream to generate your OBS credentials, then switch the event live when you are ready for viewers."}
                 </p>
               </div>
@@ -1149,7 +1151,7 @@ export default function EventStreamControlPage() {
                   )}
                 >
                   <span className="tw:h-2.5 tw:w-2.5 tw:rounded-full tw:bg-current" />
-                  {status === "paused" ? "Paused" : status === "live" ? "Live" : status === "ended" ? "Ended" : "Upcoming"}
+                  {status === "paused" ? "Paused" : status === "live" ? "Live" : status === "ended" ? "Ended" : status === "expired" ? "Expired" : status === "ready_to_go_live" ? "Ready to go live" : "Upcoming"}
                 </span>
 
                 {refreshing ? (

@@ -43,6 +43,8 @@ function normalizeEventStatus(status) {
   if (["live"].includes(normalized)) return "live";
   if (["paused"].includes(normalized)) return "paused";
   if (["ended", "completed", "past"].includes(normalized)) return "ended";
+  if (["expired"].includes(normalized)) return "expired";
+  if (["ready_to_go_live"].includes(normalized)) return "ready_to_go_live";
   if (["upcoming", "soon"].includes(normalized)) return "upcoming";
 
   return "upcoming";
@@ -99,6 +101,7 @@ function isStatusBlockedForReschedule(status) {
 
   return [
     "live",
+    "paused",
     "ended",
     "completed",
     "past",
@@ -163,7 +166,7 @@ export default function EventCard({
   };
 
   const goToStreamControl = async () => {
-    if (normalizedStatus === "ended") {
+    if (normalizedStatus === "ended" || normalizedStatus === "expired") {
       navigate(`/event/stream/${event.id}`);
       return;
     }
@@ -238,9 +241,19 @@ export default function EventCard({
       <span>Upcoming</span>
       <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-white/80" />
     </span>
+  ) : normalizedStatus === "ready_to_go_live" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-amber-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-amber-800">
+      <span>Ready to go live</span>
+      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-amber-500" />
+    </span>
   ) : normalizedStatus === "ended" ? (
     <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-gray-700">
       <span>Ended</span>
+      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-gray-500" />
+    </span>
+  ) : normalizedStatus === "expired" ? (
+    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-gray-700">
+      <span>Expired</span>
       <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-gray-500" />
     </span>
   ) : null;
@@ -479,6 +492,8 @@ export default function EventCard({
                     ? "Resume Event"
                     : normalizedStatus === "ended"
                       ? "View Event"
+                      : normalizedStatus === "expired"
+                        ? "View Event"
                       : "Start stream"}
             </span>
           </button>

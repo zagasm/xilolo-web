@@ -97,7 +97,7 @@ export default function WalletPage() {
 
   return (
     <>
-      <div className="tw:min-h-screen tw:bg-[#F6F7FB] tw:px-4 tw:pb-16 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
+      <div className="tw:min-h-screen tw:bg-white tw:px-4 tw:pb-16 tw:pt-24 tw:font-sans tw:md:px-6 tw:lg:px-8">
         <div className="tw:mx-auto tw:max-w-5xl">
           <div className="tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-center tw:md:justify-between">
             <div>
@@ -139,7 +139,7 @@ export default function WalletPage() {
             )}
           </div>
 
-          <div className="tw:mt-6 tw:rounded-[30px] tw:border tw:border-white/70 tw:bg-white tw:p-5 tw:shadow-[0_18px_50px_rgba(15,23,42,0.08)] tw:md:p-7">
+          <div className="tw:mt-6 tw:rounded-[30px] tw:border tw:border-white/70 tw:bg-[#f6f7fb] tw:p-5 tw:shadow-[0_18px_50px_rgba(15,23,42,0.08)] tw:md:p-7">
             <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-center tw:md:justify-between">
               <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
                 Recent transactions

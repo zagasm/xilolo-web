@@ -24,7 +24,7 @@ export default function OrganizerRowCard({ org, onToggleFollow }) {
       onClick={() => navigate(`/profile/${org.id}`)}
       className="tw:flex tw:w-full tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-3 tw:shadow-sm tw:sm:gap-4 tw:sm:p-4"
     >
-      <div className="tw:relative tw:size-20 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-lightPurple tw:sm:h-[110px] tw:sm:w-[110px]">
+      <div className="tw:relative tw:size-20 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-[#d8d6d2] tw:sm:h-[110px] tw:sm:w-[110px]">
         {showImage ? (
           <img
             src={org.profileImage}

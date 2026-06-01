@@ -8,9 +8,11 @@ export function normalizeStatus(v) {
   if (!v) return "unknown";
   const s = String(v).toLowerCase().trim();
   if (s === "upcoming" || s === "soon") return "upcoming";
+  if (s === "ready_to_go_live") return "ready_to_go_live";
   if (s === "live") return "live";
   if (s === "paused") return "paused";
   if (s === "ended" || s === "past" || s === "completed") return "ended";
+  if (s === "expired") return "expired";
   return s;
 }
 

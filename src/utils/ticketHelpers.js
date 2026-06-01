@@ -11,8 +11,11 @@ const DEFAULT_TIME_OPTIONS = {
 
 const STATUS_MAP = {
   upcoming: "upcoming",
+  ready_to_go_live: "upcoming",
   live: "live",
+  paused: "live",
   ended: "ended",
+  expired: "ended",
 };
 
 function parseNumericAmount(value) {

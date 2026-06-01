@@ -8,7 +8,7 @@ import {
 
 export default function WalletBalanceCard({ summary, loading = false, onFund }) {
   return (
-    <div className="tw:rounded-[30px] tw:border tw:border-white/70 tw:bg-white tw:p-5 tw:shadow-[0_18px_50px_rgba(15,23,42,0.08)] tw:md:p-7">
+    <div className="tw:rounded-[30px] tw:border tw:border-white/70 tw:bg-[#f6f7fb] tw:p-5 tw:shadow-[0_18px_50px_rgba(15,23,42,0.08)] tw:md:p-7">
       <div className="tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-center tw:md:justify-between">
         <div>
           <div className="tw:flex tw:items-center tw:gap-3">

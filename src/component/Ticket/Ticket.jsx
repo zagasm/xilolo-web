@@ -87,12 +87,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
                 </span>
               </div>
 
-              <div className="tw:hidden tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/12 tw:px-3 tw:py-2 tw:text-white/90 tw:backdrop-blur-sm tw:sm:inline-flex">
-                <TicketIcon className="tw:h-4 tw:w-4" />
-                <span className="tw:text-xs tw:font-medium">
-                  #{ticket?.code?.slice(-6) || "—"}
-                </span>
-              </div>
+              
             </div>
           </div>
         </div>

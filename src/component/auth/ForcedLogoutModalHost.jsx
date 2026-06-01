@@ -183,6 +183,10 @@ export default function ForcedLogoutModalHost() {
 
                 <div className="tw:mt-6 tw:space-y-3">
                   <button
+                  style={{
+                    borderRadius: "9999px",
+                    fontSize: 12
+                  }}
                     type="button"
                     onClick={() => {
                       setOpen(false);
