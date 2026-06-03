@@ -317,6 +317,10 @@ export default function TicketingStep({
       DISPLAY_CURRENCIES[0],
     [selectedCurrencyCode]
   );
+  const vodUploadMustFinish =
+    deliveryType === "vod" &&
+    Boolean(vodFile) &&
+    vodUploadState?.status !== "complete";
 
   const manualCoverPreview = useMemo(() => {
     if (!manualCover) return "";
@@ -908,11 +912,11 @@ export default function TicketingStep({
         </button>
         <button
           type="submit"
-          disabled={isUploadingVod}
+          disabled={isUploadingVod || vodUploadMustFinish}
           className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
           style={{ borderRadius: 20 }}
         >
-          {isUploadingVod ? "Uploading video..." : "Continue to preview"}
+          {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Continue to preview"}
         </button>
       </div>
     </form>

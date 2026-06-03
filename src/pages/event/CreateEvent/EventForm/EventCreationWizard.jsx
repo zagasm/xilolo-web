@@ -182,12 +182,12 @@ export default function EventCreationWizard({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
-  const [createdVodEventId, setCreatedVodEventId] = useState(null);
   const [vodUploadState, setVodUploadState] = useState({
     status: "idle",
     progress: 0,
     message: "",
   });
+  const [pendingVodVideo, setPendingVodVideo] = useState(null);
   const vodAbortRef = useRef(null);
   const [successModal, setSuccessModal] = useState({
     open: false,
@@ -303,12 +303,26 @@ export default function EventCreationWizard({
       ticketing.matureContent ? "1" : "0"
     );
 
+    if (ticketing.deliveryType === "vod" && ticketing.vodUpload?.bunny_video_id) {
+      payload.append("vod_bunny_video_id", ticketing.vodUpload.bunny_video_id);
+      payload.append("vod_bunny_library_id", ticketing.vodUpload.bunny_library_id || "");
+      payload.append("vod_bunny_collection_id", ticketing.vodUpload.bunny_collection_id || "");
+      payload.append("vod_title", ticketing.vodUpload.title || ticketing.vodFile?.name || info.title || "");
+      payload.append("vod_embed_url", ticketing.vodUpload.embed_url || "");
+      payload.append("vod_playback_url", ticketing.vodUpload.playback_url || "");
+      payload.append("vod_hls_url", ticketing.vodUpload.hls_url || "");
+    }
+
     return payload;
   };
 
-  const uploadVodForEvent = async ({ eventId: targetEventId, info, ticketing }) => {
+  const startPreEventVodUpload = async (file) => {
+    if (!(file instanceof File) || isEdit) return;
+
+    vodAbortRef.current?.abort();
     const abortController = new AbortController();
     vodAbortRef.current = abortController;
+    setPendingVodVideo(null);
 
     setVodUploadState({
       status: "preparing",
@@ -316,108 +330,77 @@ export default function EventCreationWizard({
       message: "Preparing Bunny Stream upload...",
     });
 
-    const initResponse = await api.post(
-      `/api/v1/events/${targetEventId}/vod/initiate-upload`,
-      {
-        title: ticketing.vodFile.name || info.title,
-        file_name: ticketing.vodFile.name,
-        file_type: ticketing.vodFile.type,
-      },
-      authHeaders(token)
-    );
+    try {
+      const info = collected.step_1 || mapped.info;
+      const initResponse = await api.post(
+        "/api/v1/vod/initiate-upload",
+        {
+          title: file.name || info.title || "Xilolo VOD upload",
+          file_name: file.name,
+          file_type: file.type,
+        },
+        authHeaders(token)
+      );
 
-    setVodUploadState({
-      status: "uploading",
-      progress: 0,
-      message: "Uploading video to Bunny Stream...",
-    });
+      const pendingVideo = initResponse?.data?.data?.pending_video;
 
-    await uploadToBunnyTus({
-      file: ticketing.vodFile,
-      upload: initResponse?.data?.data?.upload,
-      signal: abortController.signal,
-      onProgress: (progress) =>
-        setVodUploadState({
-          status: "uploading",
-          progress,
-          message: `Uploading video... ${progress}%`,
-        }),
-    });
+      setVodUploadState({
+        status: "uploading",
+        progress: 0,
+        message: "Uploading video to Bunny Stream...",
+      });
 
-    setVodUploadState({
-      status: "complete",
-      progress: 100,
-      message: "Upload complete. Bunny Stream is processing the video.",
-    });
-    vodAbortRef.current = null;
+      await uploadToBunnyTus({
+        file,
+        upload: initResponse?.data?.data?.upload,
+        signal: abortController.signal,
+        onProgress: (progress) =>
+          setVodUploadState({
+            status: "uploading",
+            progress,
+            message: `Uploading video... ${progress}%`,
+          }),
+      });
+
+      setPendingVodVideo(pendingVideo);
+      setVodUploadState({
+        status: "complete",
+        progress: 100,
+        message: "Upload complete. You can continue to review.",
+      });
+    } catch (err) {
+      const wasCancelled = err?.name === "AbortError";
+      setVodUploadState({
+        status: wasCancelled ? "cancelled" : "failed",
+        progress: 0,
+        message: wasCancelled
+          ? "Upload cancelled. Choose another video to upload."
+          : err?.response?.data?.error || err?.response?.data?.message || err?.message || "Video upload failed.",
+      });
+      if (!wasCancelled) {
+        showError(err?.response?.data?.error || err?.response?.data?.message || err?.message || "Video upload failed");
+      }
+    } finally {
+      if (vodAbortRef.current === abortController) {
+        vodAbortRef.current = null;
+      }
+    }
   };
 
   const handleTicketingNext = async (values) => {
     if (!isEdit && values.deliveryType === "vod" && values.vodFile instanceof File) {
-      try {
-        setIsSubmitting(true);
-        setFormErrors({});
-        mergeCollected("step_2", values);
-
-        const info = collected.step_1 || mapped.info;
-        let targetEventId = createdVodEventId;
-
-        if (!targetEventId) {
-          setVodUploadState({
-            status: "creating",
-            progress: 0,
-            message: "Creating event before video upload...",
-          });
-
-          const response = await api.post(
-            "/api/v1/event/store",
-            buildEventPayload(info, values),
-            {
-              ...authHeaders(token),
-              headers: {
-                ...authHeaders(token).headers,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-
-          const created = response?.data?.data || response?.data || {};
-          targetEventId = created?.id;
-          setCreatedVodEventId(targetEventId);
-        }
-
-        if (!targetEventId) {
-          throw new Error("Event was created but no event ID was returned.");
-        }
-
-        await uploadVodForEvent({ eventId: targetEventId, info, ticketing: values });
-
-        mergeCollected("step_2", {
-          ...values,
-          vodUploaded: true,
-          createdEventId: targetEventId,
-        });
-        markStepDone(2);
-        setCurrentStep(3);
-      } catch (err) {
-        const data = err?.response?.data;
-        if (data?.errors) {
-          setFormErrors(data.errors);
-        }
-        const wasCancelled = err?.name === "AbortError";
-        setVodUploadState({
-          status: wasCancelled ? "cancelled" : "failed",
-          progress: 0,
-          message: wasCancelled
-            ? "Upload cancelled. Choose another video or try again."
-            : data?.message || err?.message || "Video upload failed.",
-        });
-        if (!wasCancelled) {
-          showError(data?.error || data?.message || err?.message || "Video upload failed");
-        }
-      } finally {
-        setIsSubmitting(false);
+      if (vodUploadState.status !== "complete" || !pendingVodVideo?.bunny_video_id) {
+        showError("Please wait for the VOD upload to finish before continuing.");
+        return;
       }
+
+      mergeCollected("step_2", {
+        ...values,
+        vodUploaded: true,
+        vodUpload: pendingVodVideo,
+      });
+      markStepDone(2);
+      setCurrentStep(3);
       return;
     }
 
@@ -449,14 +432,6 @@ export default function EventCreationWizard({
         ...mapped.ticketing,
         ...mapped.access,
       };
-      if (!isEdit && ticketing.deliveryType === "vod" && createdVodEventId) {
-        setSuccessModal({
-          open: true,
-          eventId: createdVodEventId,
-          variant: "created",
-        });
-        return;
-      }
 
       const payload = buildEventPayload(info, ticketing);
 
@@ -502,37 +477,6 @@ export default function EventCreationWizard({
 
       const created = response?.data?.data || response?.data || {};
       const createdId = created?.id || eventId;
-
-      if (!isEdit && createdId && ticketing.deliveryType === "vod" && ticketing.vodFile instanceof File) {
-        const initResponse = await showPromise(
-          api.post(
-            `/api/v1/events/${createdId}/vod/initiate-upload`,
-            {
-              title: ticketing.vodFile.name || info.title || created.title,
-              file_name: ticketing.vodFile.name,
-              file_type: ticketing.vodFile.type,
-            },
-            authHeaders(token)
-          ),
-          {
-            loading: "Preparing VOD upload…",
-            success: "VOD upload session ready",
-            error: "Could not prepare VOD upload",
-          }
-        );
-
-        await showPromise(
-          uploadToBunnyTus({
-            file: ticketing.vodFile,
-            upload: initResponse?.data?.data?.upload,
-          }),
-          {
-            loading: "Uploading VOD to Bunny Stream…",
-            success: "VOD uploaded. Bunny Stream is processing it.",
-            error: "VOD upload failed",
-          }
-        );
-      }
 
       setSuccessModal({
         open: true,
@@ -601,16 +545,10 @@ export default function EventCreationWizard({
           defaultValues={ticketStepDefaults}
           onBack={() => setCurrentStep(1)}
           onNext={handleTicketingNext}
-          isUploadingVod={["creating", "preparing", "uploading"].includes(vodUploadState.status)}
+          isUploadingVod={["preparing", "uploading"].includes(vodUploadState.status)}
           vodUploadState={vodUploadState}
           onCancelVodUpload={cancelVodUpload}
-          onVodFileChanged={() =>
-            setVodUploadState({
-              status: "idle",
-              progress: 0,
-              message: "",
-            })
-          }
+          onVodFileChanged={(file) => startPreEventVodUpload(file)}
         />
       )}
 
