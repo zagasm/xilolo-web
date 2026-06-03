@@ -6,6 +6,17 @@ export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
 });
 
+api.interceptors.request.use((config) => {
+  const baseURL = String(config.baseURL || "");
+  const url = String(config.url || "");
+
+  if (baseURL.replace(/\/+$/, "").endsWith("/api") && url.startsWith("/api/")) {
+    config.url = url.replace(/^\/api/, "");
+  }
+
+  return config;
+});
+
 export function authHeaders(token) {
   const brToken = localStorage.getItem("token");
   const finalToken = token || brToken;

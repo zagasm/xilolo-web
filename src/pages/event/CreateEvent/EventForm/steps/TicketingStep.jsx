@@ -227,7 +227,15 @@ const schema = z
     }
   });
 
-export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
+export default function TicketingStep({
+  defaultValues = {},
+  onBack,
+  onNext,
+  isUploadingVod = false,
+  vodUploadState,
+  onCancelVodUpload,
+  onVodFileChanged,
+}) {
   const { token } = useAuth();
   const vodInputRef = useRef(null);
   const [currencies, setCurrencies] = useState([]);
@@ -536,14 +544,46 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
               type="file"
               accept="video/*"
               className="tw:sr-only"
-              onChange={(event) => {
-                const file = event.target.files?.[0] || null;
-                setVodFile(file);
-                setVodError("");
-              }}
+                onChange={(event) => {
+                  const file = event.target.files?.[0] || null;
+                  setVodFile(file);
+                  setVodError("");
+                  onVodFileChanged?.(file);
+                }}
             />
             {vodError ? (
               <span className="tw:mt-2 tw:text-xs tw:text-red-500">{vodError}</span>
+            ) : null}
+            {vodUploadState?.status && vodUploadState.status !== "idle" ? (
+              <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-4">
+                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                  <div className="tw:min-w-0">
+                    <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                      {vodUploadState.message || "Preparing upload..."}
+                    </div>
+                    <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
+                      {vodUploadState.status === "complete"
+                        ? "You can continue to the review step."
+                        : "Keep this page open while the upload is running."}
+                    </div>
+                  </div>
+                  {isUploadingVod && (
+                    <button
+                      type="button"
+                      onClick={onCancelVodUpload}
+                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 hover:tw:bg-red-50"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+                <div className="tw:mt-3 tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-slate-100">
+                  <div
+                    className="tw:h-full tw:rounded-full tw:bg-primary tw:transition-all"
+                    style={{ width: `${Math.max(0, Math.min(100, Number(vodUploadState.progress || 0)))}%` }}
+                  />
+                </div>
+              </div>
             ) : null}
           </div>
         )}
@@ -868,10 +908,11 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         </button>
         <button
           type="submit"
-          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond"
+          disabled={isUploadingVod}
+          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
           style={{ borderRadius: 20 }}
         >
-          Continue to preview
+          {isUploadingVod ? "Uploading video..." : "Continue to preview"}
         </button>
       </div>
     </form>

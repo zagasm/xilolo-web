@@ -1,4 +1,4 @@
-export async function uploadToBunnyTus({ file, upload, onProgress }) {
+export async function uploadToBunnyTus({ file, upload, onProgress, signal }) {
   if (!(file instanceof File)) {
     throw new Error("Choose a video file to upload.");
   }
@@ -23,6 +23,7 @@ export async function uploadToBunnyTus({ file, upload, onProgress }) {
 
   const createResponse = await fetch(endpoint, {
     method: "POST",
+    signal,
     headers: {
       ...headers,
       "Tus-Resumable": "1.0.0",
@@ -35,7 +36,8 @@ export async function uploadToBunnyTus({ file, upload, onProgress }) {
     throw new Error(`Unable to create Bunny upload (${createResponse.status}).`);
   }
 
-  const uploadUrl = createResponse.headers.get("Location");
+  const location = createResponse.headers.get("Location");
+  const uploadUrl = location ? new URL(location, endpoint).toString() : "";
   if (!uploadUrl) {
     throw new Error("Bunny did not return an upload URL.");
   }
@@ -47,6 +49,7 @@ export async function uploadToBunnyTus({ file, upload, onProgress }) {
     const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
     const response = await fetch(uploadUrl, {
       method: "PATCH",
+      signal,
       headers: {
         ...headers,
         "Tus-Resumable": "1.0.0",
