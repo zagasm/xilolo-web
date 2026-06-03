@@ -312,9 +312,9 @@ export default function ViewEvent() {
           ? "Manual purchased successfully."
           : purchaseType === "sponsored_only"
             ? "Tickets bought for others successfully."
-          : includesManual
-            ? "Ticket and manual purchased successfully."
-            : "Ticket purchased successfully."
+            : includesManual
+              ? "Ticket and manual purchased successfully."
+              : "Ticket purchased successfully."
       );
     },
   });
@@ -1131,19 +1131,19 @@ export default function ViewEvent() {
                     <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
                       <div>
                         <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                          Video on demand
+                          Event Video
                         </div>
                         <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
                           {vodIsReady ? "Video is ready" : "Video is being prepared"}
                         </div>
                         <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
                           {vodIsReady
-                            ? "Ticket holders can stream this event on demand."
-                            : "Video is still processing the uploaded video."}
+                            ? "Ticket holders can stream this event on now."
+                            : "We're processing the video. It should be ready soon."}
                         </div>
                       </div>
                       <button
-                        style={{borderRadius: 24, fontSize: 12}}
+                        style={{ borderRadius: 24, fontSize: 12 }}
                         type="button"
                         onClick={() => navigate(`/event/vod/${event.id}`)}
                         disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
@@ -1178,6 +1178,7 @@ export default function ViewEvent() {
                                 </div>
                               </div>
                               <button
+                                style={{ borderRadius: 24, fontSize: 12 }}
                                 type="button"
                                 onClick={() => navigate(`/event/vod/${event.id}`)}
                                 className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800"
@@ -1187,7 +1188,7 @@ export default function ViewEvent() {
                               </button>
                             </div>
 
-                            <div className="tw:overflow-hidden tw:rounded-[24px] tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
+                            <div className="tw:overflow-hidden tw:rounded-3xl tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
                               <div className="tw:aspect-video">
                                 <ReactPlayer
                                   url={replayUrl}
@@ -1376,7 +1377,7 @@ export default function ViewEvent() {
                               className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary hover:tw:bg-white hover:tw:underline"
                             />
                           ))}
-                          
+
                         </div>
                       </div>
                     )}
@@ -1453,9 +1454,9 @@ export default function ViewEvent() {
                                 : "Your ticket is secured. We will notify you when the event starts."
                             : canClaimSponsoredTicket
                               ? "A free ticket is available for you to claim now. You can still buy a ticket or buy for others from the purchase options."
-                            : shouldChoosePurchaseType
-                              ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
-                              : "Secure checkout and fast access to your purchased ticket."}
+                              : shouldChoosePurchaseType
+                                ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
+                                : "Secure checkout and fast access to your purchased ticket."}
                         </span>
                       </>
                     )}
