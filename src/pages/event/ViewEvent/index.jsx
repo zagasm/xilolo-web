@@ -1139,10 +1139,11 @@ export default function ViewEvent() {
                         <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
                           {vodIsReady
                             ? "Ticket holders can stream this event on demand."
-                            : "Bunny Stream is still processing the uploaded video."}
+                            : "Video is still processing the uploaded video."}
                         </div>
                       </div>
                       <button
+                        style={{borderRadius: 24, fontSize: 12}}
                         type="button"
                         onClick={() => navigate(`/event/vod/${event.id}`)}
                         disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
