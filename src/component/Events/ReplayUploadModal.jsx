@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Film, Loader2, Upload, X } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
+import { uploadToBunnyTus } from "../../lib/bunnyTusUpload";
 import { showError, showSuccess } from "../ui/toast";
 
 const ACCEPTED_VIDEO_TYPES = [
@@ -112,34 +113,28 @@ export default function ReplayUploadModal({
     setErrorMessage("");
 
     try {
-      const formData = new FormData();
-      formData.append("replay_video", selectedFile, selectedFile.name || "replay-video");
-
       const res = await api.post(
-        `/api/v1/events/${event.id}/replay/upload`,
-        formData,
+        `/api/v1/events/${event.id}/vod/initiate-upload`,
         {
-          ...authHeaders(token),
-          headers: {
-            ...authHeaders(token).headers,
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (progressEvent) => {
-            const total = Number(progressEvent?.total || 0);
-            const loaded = Number(progressEvent?.loaded || 0);
-
-            if (total > 0) {
-              setProgress(Math.min(100, Math.round((loaded / total) * 100)));
-            }
-          },
-        }
+          source_type: "live_replay",
+          title: selectedFile.name || `${event.title || "Event"} replay`,
+          file_name: selectedFile.name,
+          file_type: selectedFile.type,
+        },
+        authHeaders(token)
       );
+
+      await uploadToBunnyTus({
+        file: selectedFile,
+        upload: res?.data?.data?.upload,
+        onProgress: setProgress,
+      });
 
       const responseData = res?.data?.data || res?.data || {};
       const successMessage =
         responseData?.message ||
         res?.data?.message ||
-        "Replay uploaded successfully.";
+        "Replay uploaded. Bunny Stream is processing it.";
 
       showSuccess(successMessage);
       onUploaded?.({

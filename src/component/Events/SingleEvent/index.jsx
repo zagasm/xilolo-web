@@ -17,6 +17,7 @@ import {
 import Countdown from "react-countdown";
 import EventActionsSheet from "../EventsActionSheet";
 import SubscriptionBadge from "../../ui/SubscriptionBadge.jsx";
+import { getEventStatusMeta, normalizeEventStatus } from "../../../utils/eventStatus";
 
 /* ---- Shimmer ---- */
 export const EventShimmer = () => (
@@ -280,15 +281,19 @@ export function EventCard({
 
   const isDedicatedLiveTab = variant === "live";
   const isDedicatedUpcomingTab = variant === "upcoming";
+  const normalizedStatus = normalizeEventStatus(event?.status);
+  const statusMeta = getEventStatusMeta(event?.status);
 
   const isLive =
-    isDedicatedLiveTab || (variant === "all" && event.status === "live");
+    isDedicatedLiveTab || (variant === "all" && normalizedStatus === "live");
   const isPaused =
-    isDedicatedLiveTab || (variant === "all" && event.status === "paused");
+    isDedicatedLiveTab || (variant === "all" && normalizedStatus === "paused");
   const isUpcoming =
     isDedicatedUpcomingTab ||
-    (variant === "all" && event.status === "upcoming");
-  const isEnded = event?.status === "ended";
+    (variant === "all" && normalizedStatus === "upcoming");
+  const isReadyToGoLive = normalizedStatus === "ready_to_go_live";
+  const isEnded = normalizedStatus === "ended";
+  const isExpired = normalizedStatus === "expired";
 
   const ticketLabel = `Buy Ticket ${!hidePrice ? `(${priceText(event)})` : ""} `;
 
@@ -316,30 +321,22 @@ export function EventCard({
     navigate(`/profile/${hostId}`);
   };
 
-  const statusChip = isLive ? (
-    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-red-50 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-red-600">
-      <span>Live now</span>
+  const statusChip = (
+    <span className={`tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold ${statusMeta.pillClass}`}>
+      <span>{statusMeta.label}</span>
+      {isLive ? (
       <img
         src={camera_icon}
         alt="Live"
         className="tw:h-3.5 tw:w-3.5 tw:object-contain"
       />
+      ) : isPaused ? (
+        <Pause className="tw:size-3.5" />
+      ) : (
+        <span className={`tw:inline-block tw:h-2 tw:w-2 tw:rounded-full ${statusMeta.dotClass}`} />
+      )}
     </span>
-  ) : isPaused ? (
-    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-blue-700">
-      <span>Paused</span>
-      <Pause className="tw:size-3.5" />
-    </span>
-  ) : isUpcoming ? (
-    <span className="tw:inline-flex tw:h-6 tw:md:h-8 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-800 tw:px-2.5 tw:text-[10px] tw:md:text-[12px] tw:font-semibold tw:text-white">
-      <span>Upcoming</span>
-      <img
-        src={camera_icon}
-        alt="Upcoming"
-        className="tw:h-3.5 tw:w-3.5 tw:object-contain"
-      />
-    </span>
-  ) : null;
+  );
 
   return (
     <div className="p-0 p-md-2 tw:col-xl-4 col-lg-4 col-md-6 col-sm-6 tw:flex">
@@ -386,7 +383,7 @@ export function EventCard({
           </div>
           <div className=" tw:text-xs tw:text-zinc-600">
             <div className="tw:flex tw:flex-col tw:gap-3">
-              {(isLive || isPaused || isUpcoming) && (
+              {(isLive || isPaused || isUpcoming || isReadyToGoLive || isEnded || isExpired) && (
                 <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                   {statusChip}
                   {isUpcoming && <CountdownPill target={startDate} />}

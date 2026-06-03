@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../../../lib/apiClient";
+import { uploadToBunnyTus } from "../../../../lib/bunnyTusUpload";
 import { useAuth } from "../../../auth/AuthContext";
 import { showPromise, showError } from "../../../../component/ui/toast";
 
@@ -39,6 +40,8 @@ function mapEventToDefaults(event) {
         ticketLimit: undefined,
         currency: "",
         currencyCode: "NGN",
+        deliveryType: "live",
+        vodFile: null,
         attendanceType: "online",
         hasMaterials: false,
         enableReplay: false,
@@ -95,6 +98,8 @@ function mapEventToDefaults(event) {
           : undefined,
       currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
       currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+      deliveryType: currentEvent.delivery_type || "live",
+      vodFile: null,
       attendanceType: currentEvent.attendance_type || "online",
       hasMaterials: !!(
         currentEvent.manual?.available ||
@@ -258,6 +263,7 @@ export default function EventCreationWizard({
       }
 
       payload.append("price", ticketing.price ?? 0);
+      payload.append("delivery_type", ticketing.deliveryType || "live");
       payload.append("attendance_type", ticketing.attendanceType || "online");
       payload.append("currency_id", ticketing.currency || "");
       payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
@@ -355,6 +361,38 @@ export default function EventCreationWizard({
 
       const created = response?.data?.data || response?.data || {};
       const createdId = created?.id || eventId;
+
+      if (!isEdit && createdId && ticketing.deliveryType === "vod" && ticketing.vodFile instanceof File) {
+        const initResponse = await showPromise(
+          api.post(
+            `/api/v1/events/${createdId}/vod/initiate-upload`,
+            {
+              title: ticketing.vodFile.name || info.title || created.title,
+              file_name: ticketing.vodFile.name,
+              file_type: ticketing.vodFile.type,
+            },
+            authHeaders(token)
+          ),
+          {
+            loading: "Preparing VOD upload…",
+            success: "VOD upload session ready",
+            error: "Could not prepare VOD upload",
+          }
+        );
+
+        await showPromise(
+          uploadToBunnyTus({
+            file: ticketing.vodFile,
+            upload: initResponse?.data?.data?.upload,
+          }),
+          {
+            loading: "Uploading VOD to Bunny Stream…",
+            success: "VOD uploaded. Bunny Stream is processing it.",
+            error: "VOD upload failed",
+          }
+        );
+      }
+
       setSuccessModal({
         open: true,
         eventId: createdId,

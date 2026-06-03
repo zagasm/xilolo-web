@@ -185,6 +185,7 @@ export default function ReviewStep({
     description,
     price,
     currencyCode,
+    deliveryType,
     maxTickets,
     ticketLimit,
     visibility,
@@ -402,6 +403,12 @@ export default function ReviewStep({
                 <div className="tw:text-xs tw:text-slate-500">Visibility</div>
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:capitalize tw:text-slate-900">
                   {visibility || "public"}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Event format</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {deliveryType === "vod" ? "Video on demand" : "Live event"}
                 </div>
               </div>
               <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">

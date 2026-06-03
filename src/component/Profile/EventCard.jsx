@@ -20,6 +20,7 @@ import DeleteConfirmModal from "../DeleteConfirmModal";
 import { CountdownPill, eventStartDate } from "../Events/SingleEvent";
 import RescheduleEventModal from "./RescheduleEventModal";
 import ReplayUploadModal from "../Events/ReplayUploadModal";
+import { getEventStatusMeta, normalizeEventStatus } from "../../utils/eventStatus";
 
 function collectMedia(poster = []) {
   const imgs = poster.filter((p) => p.type === "image");
@@ -35,19 +36,6 @@ function getApiErrorMessage(err) {
     return err.message;
 
   return "Something went wrong. Please try again.";
-}
-
-function normalizeEventStatus(status) {
-  const normalized = (status ?? "").toString().toLowerCase().trim();
-
-  if (["live"].includes(normalized)) return "live";
-  if (["paused"].includes(normalized)) return "paused";
-  if (["ended", "completed", "past"].includes(normalized)) return "ended";
-  if (["expired"].includes(normalized)) return "expired";
-  if (["ready_to_go_live"].includes(normalized)) return "ready_to_go_live";
-  if (["upcoming", "soon"].includes(normalized)) return "upcoming";
-
-  return "upcoming";
 }
 
 function formatEventSchedule(event) {
@@ -142,6 +130,7 @@ export default function EventCard({
     () => normalizeEventStatus(event?.status),
     [event?.status],
   );
+  const statusMeta = useMemo(() => getEventStatusMeta(event?.status), [event?.status]);
   const scheduleLabel = useMemo(() => formatEventSchedule(event), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
   const [deleteError, setDeleteError] = useState("");
@@ -226,37 +215,16 @@ export default function EventCard({
     }
   };
 
-  const statusChip = normalizedStatus === "live" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-red-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-red-600">
-      <span>Live now</span>
-      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-red-500" />
+  const statusChip = (
+    <span className={`tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2.5 tw:text-[10px] tw:font-semibold ${statusMeta.pillClass}`}>
+      <span>{statusMeta.label}</span>
+      {normalizedStatus === "paused" ? (
+        <Pause className="tw:size-3.5" />
+      ) : (
+        <span className={`tw:inline-block tw:h-2 tw:w-2 tw:rounded-full ${statusMeta.dotClass}`} />
+      )}
     </span>
-  ) : normalizedStatus === "paused" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-blue-50 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-blue-700">
-      <span>Paused</span>
-      <Pause className="tw:size-3.5" />
-    </span>
-  ) : normalizedStatus === "upcoming" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-emerald-800 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-white">
-      <span>Upcoming</span>
-      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-white/80" />
-    </span>
-  ) : normalizedStatus === "ready_to_go_live" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-amber-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-amber-800">
-      <span>Ready to go live</span>
-      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-amber-500" />
-    </span>
-  ) : normalizedStatus === "ended" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-gray-700">
-      <span>Ended</span>
-      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-gray-500" />
-    </span>
-  ) : normalizedStatus === "expired" ? (
-    <span className="tw:inline-flex tw:h-6 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:text-[10px] tw:font-semibold tw:text-gray-700">
-      <span>Expired</span>
-      <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-gray-500" />
-    </span>
-  ) : null;
+  );
 
   const handleRescheduleSuccess = async ({ event: nextEvent }) => {
     onUpdated?.(nextEvent);

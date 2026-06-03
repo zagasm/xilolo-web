@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { Controller, useForm } from "react-hook-form";
@@ -130,6 +130,7 @@ const schema = z
     maxTickets: z.enum(["limited", "unlimited"]),
     ticketLimit: z.string().optional(),
     currencyCode: z.enum(["NGN", "USD"]),
+    deliveryType: z.enum(["live", "vod"]),
     visibility: z.enum(["public", "private"]),
     attendanceType: z.enum(["online", "physical", "both"]),
     hasMaterials: z.boolean(),
@@ -228,6 +229,7 @@ const schema = z
 
 export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   const { token } = useAuth();
+  const vodInputRef = useRef(null);
   const [currencies, setCurrencies] = useState([]);
   const [manualFile, setManualFile] = useState(() =>
     isBrowserFile(defaultValues.manualFile) ? defaultValues.manualFile : null
@@ -236,14 +238,18 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     isBrowserFile(defaultValues.manualCover) ? defaultValues.manualCover : null
   );
   const [manualErrors, setManualErrors] = useState({});
+  const [vodFile, setVodFile] = useState(() =>
+    isBrowserFile(defaultValues.vodFile) ? defaultValues.vodFile : null
+  );
+  const [vodError, setVodError] = useState("");
 
   const existingManual = defaultValues.existingManual || null;
   const existingManualCover = defaultValues.existingManualCover || null;
   const hasExistingMaterial = Boolean(
     existingManual?.fileName ||
-      existingManual?.name ||
-      existingManualCover?.url ||
-      Number(defaultValues.manualPrice || 0) > 0
+    existingManual?.name ||
+    existingManualCover?.url ||
+    Number(defaultValues.manualPrice || 0) > 0
   );
 
   const {
@@ -263,6 +269,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           ? String(defaultValues.ticketLimit)
           : "",
       currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
+      deliveryType: defaultValues.deliveryType || "live",
       visibility: defaultValues.visibility || "public",
       attendanceType: defaultValues.attendanceType || "online",
       hasMaterials:
@@ -290,6 +297,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   });
 
   const selectedCurrencyCode = watch("currencyCode");
+  const deliveryType = watch("deliveryType");
   const maxTickets = watch("maxTickets");
   const visibility = watch("visibility");
   const attendanceType = watch("attendanceType");
@@ -367,6 +375,11 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     }
 
     if (!values.hasMaterials) {
+      if (values.deliveryType === "vod" && !vodFile) {
+        setVodError("Choose the VOD video before continuing.");
+        return;
+      }
+
       setManualErrors({});
       onNext({
         price: parseAmount(values.priceInput) ?? 0,
@@ -375,6 +388,8 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
           values.maxTickets === "limited" ? Number(values.ticketLimit || 0) : undefined,
         currency: String(matchedCurrency.id),
         currencyCode: values.currencyCode,
+        deliveryType: values.deliveryType,
+        vodFile: values.deliveryType === "vod" ? vodFile : null,
         visibility: values.visibility,
         attendanceType: values.attendanceType,
         hasMaterials: false,
@@ -396,6 +411,9 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     }
 
     const nextManualErrors = {};
+    if (values.deliveryType === "vod" && !vodFile) {
+      setVodError("Choose the VOD video before continuing.");
+    }
     const manualPrice = parseAmount(values.manualPriceInput);
     const hasExistingManual = Boolean(existingManual?.fileName || existingManual?.name);
     const hasManualSource = Boolean(manualFile || hasExistingManual);
@@ -430,7 +448,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
     }
 
     setManualErrors(nextManualErrors);
-    if (Object.keys(nextManualErrors).length > 0) {
+    if (Object.keys(nextManualErrors).length > 0 || (values.deliveryType === "vod" && !vodFile)) {
       return;
     }
 
@@ -440,6 +458,8 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       ticketLimit: values.maxTickets === "limited" ? Number(values.ticketLimit || 0) : undefined,
       currency: String(matchedCurrency.id),
       currencyCode: values.currencyCode,
+      deliveryType: values.deliveryType,
+      vodFile: values.deliveryType === "vod" ? vodFile : null,
       visibility: values.visibility,
       attendanceType: values.attendanceType,
       hasMaterials: true,
@@ -462,7 +482,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
+      className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
     >
       <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
         <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:lg:text-2xl">
@@ -474,6 +494,60 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
       </div>
 
       <div className="tw:space-y-5">
+        <SelectField
+          label="Event format"
+          value={deliveryType}
+          onChange={(value) => {
+            setValue("deliveryType", value, { shouldValidate: true });
+            if (value !== "vod") {
+              setVodError("");
+            }
+          }}
+          options={[
+            { value: "live", label: "Live event" },
+            { value: "vod", label: "Video on demand" },
+          ]}
+          error={errors?.deliveryType?.message}
+        />
+
+        {deliveryType === "vod" && (
+          <div className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4">
+            <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
+              Upload Video
+            </div>
+            {/* <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+              The video uploads directly to Bunny Stream after the event is created.
+            </div> */}
+            <button
+              style={{ borderRadius: 36 }}
+              type="button"
+              onClick={() => vodInputRef.current?.click()}
+              className="tw:mt-4 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-left hover:tw:border-primary/40"
+            >
+              <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-700">
+                {vodFile?.name || "Choose VOD video"}
+              </span>
+              <span className="tw:mt-1 tw:block tw:text-xs tw:text-slate-500">
+                Bunny Stream supports up to 72 hours and 2160p source videos.
+              </span>
+            </button>
+            <input
+              ref={vodInputRef}
+              type="file"
+              accept="video/*"
+              className="tw:sr-only"
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setVodFile(file);
+                setVodError("");
+              }}
+            />
+            {vodError ? (
+              <span className="tw:mt-2 tw:text-xs tw:text-red-500">{vodError}</span>
+            ) : null}
+          </div>
+        )}
+
         <SelectField
           label="Event location"
           value={attendanceType}
@@ -668,7 +742,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
                   <img
                     src={manualCoverPreview || existingManualCover?.url}
                     alt="Material cover preview"
-                    className="tw:h-full tw:max-h-[160px] tw:w-full tw:object-cover"
+                    className="tw:h-full tw:max-h-40 tw:w-full tw:object-cover"
                   />
                 </div>
               )}
@@ -686,7 +760,7 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
         </div>
 
         {enableReplay && (
-          <div className="tw:space-y-5 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50/80 tw:p-4">
+          <div className="tw:space-y-5 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50/80 tw:p-4">
             <div>
               <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
                 Replay becomes available after
@@ -704,11 +778,10 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
                         shouldValidate: true,
                       })
                     }
-                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${
-                      String(watch("replayAvailableAfterMinutes")) === String(minutes)
+                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableAfterMinutes")) === String(minutes)
                         ? "tw:bg-slate-900 tw:text-white"
                         : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
-                    }`}
+                      }`}
                   >
                     {minutes} minutes
                   </button>
@@ -747,11 +820,10 @@ export default function TicketingStep({ defaultValues = {}, onBack, onNext }) {
                         shouldValidate: true,
                       })
                     }
-                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${
-                      String(watch("replayAvailableForMinutes")) === String(minutes)
+                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableForMinutes")) === String(minutes)
                         ? "tw:bg-slate-900 tw:text-white"
                         : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
-                    }`}
+                      }`}
                   >
                     {minutes} minutes
                   </button>

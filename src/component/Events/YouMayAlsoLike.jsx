@@ -13,27 +13,20 @@ import {
   priceText,
 } from "./SingleEvent";
 import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
+import { getEventStatusMeta, normalizeEventStatus } from "../../utils/eventStatus";
 
 function resolvePoster(event, posterFallback) {
   const posterUrl = firstImageFromPoster(event?.poster);
   return posterUrl || posterFallback || "/images/event-dummy.jpg";
 }
 
-function getStatusLabel(event) {
-  const status = String(event?.status || "upcoming").toLowerCase();
-  if (status === "live") return "Live";
-  if (status === "paused") return "Paused";
-  if (status === "ended") return "Ended";
-  return "Upcoming";
-}
-
 function RecommendationCard({ event, posterFallback }) {
-  const status = String(event?.status || "upcoming").toLowerCase();
+  const status = normalizeEventStatus(event?.status);
+  const statusMeta = getEventStatusMeta(event?.status);
   const isLive = status === "live";
   const isPaid = !!event?.hasPaid;
   const startDate = eventStartDate(event);
   const host = hostName(event);
-  const statusLabel = getStatusLabel(event);
   const imageUrl = resolvePoster(event, posterFallback);
 
   return (
@@ -58,7 +51,7 @@ function RecommendationCard({ event, posterFallback }) {
             ) : (
               <CalendarDays className="tw:h-3.5 tw:w-3.5 tw:text-emerald-600" />
             )}
-            {statusLabel}
+            {statusMeta.label}
           </div>
 
           <div className="tw:absolute tw:bottom-4 tw:left-4 tw:right-4 tw:flex tw:items-end tw:justify-between tw:gap-3">

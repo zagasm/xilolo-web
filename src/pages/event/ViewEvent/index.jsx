@@ -669,6 +669,10 @@ export default function ViewEvent() {
       !!event?.user_can_sponsor_tickets ||
       viewerHasSponsoredTickets);
   const replay = event?.replay || {};
+  const vod = event?.vod || {};
+  const isVodEvent = event?.delivery_type === "vod";
+  const vodIsReady = !!vod?.is_ready;
+  const canWatchVod = !!vod?.can_watch || !!event?.hasPaid || !!event?.isOwner;
   const replayEnabled = !!event?.enable_replay;
   const hasReplay = !!event?.has_replay;
   const replayAvailableAt =
@@ -676,7 +680,7 @@ export default function ViewEvent() {
   const replayExpiresAt =
     event?.replay_expires_at || replay?.expires_at || "";
   const replayUrl = event?.replay_url || replay?.url || "";
-  const replayIsAvailable = !!(replay?.is_available && replayUrl);
+  const replayIsAvailable = !!((replay?.is_available && replayUrl) || (vod?.source_type === "live_replay" && vodIsReady));
   const replayExpired = !!(
     replayEnabled &&
     !replayUrl &&
@@ -1122,6 +1126,35 @@ export default function ViewEvent() {
                   </div>
                 </div>
 
+                {(isVodEvent || vodIsReady) && (
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
+                    <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
+                      <div>
+                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                          Video on demand
+                        </div>
+                        <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
+                          {vodIsReady ? "Video is ready" : "Video is being prepared"}
+                        </div>
+                        <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                          {vodIsReady
+                            ? "Ticket holders can stream this event on demand."
+                            : "Bunny Stream is still processing the uploaded video."}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/event/vod/${event.id}`)}
+                        disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                      >
+                        <Video className="tw:h-4 tw:w-4" />
+                        <span>{vodIsReady ? "Watch video" : "Processing"}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {replayEnabled && (
                   <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
                     <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
@@ -1143,15 +1176,14 @@ export default function ViewEvent() {
                                     : "Replay is ready to watch."}
                                 </div>
                               </div>
-                              <a
-                                href={replayUrl}
-                                target="_blank"
-                                rel="noreferrer"
+                              <button
+                                type="button"
+                                onClick={() => navigate(`/event/vod/${event.id}`)}
                                 className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800"
                               >
                                 <Video className="tw:h-4 tw:w-4" />
                                 <span>Watch replay</span>
-                              </a>
+                              </button>
                             </div>
 
                             <div className="tw:overflow-hidden tw:rounded-[24px] tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">

@@ -58,6 +58,13 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
     navigate(`/event/view/${event.id}`);
   };
 
+  const handleWatchVod = () => {
+    if (!event?.id) return;
+
+    onClose?.();
+    navigate(`/event/vod/${event.id}`);
+  };
+
   const handleViewOrganiserProfile = () => {
     if (!organiserProfileId) {
       return;
@@ -291,6 +298,17 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     >
                       View Event Details
                     </button>
+
+                    {(event?.delivery_type === "vod" || event?.vod?.is_ready || event?.has_replay) && (
+                      <button
+                        type="button"
+                        onClick={handleWatchVod}
+                        disabled={!event?.id}
+                        className="tw:rounded-full tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-60 tw:sm:text-xs"
+                      >
+                        Watch video
+                      </button>
+                    )}
 
                     <button
                       type="button"

@@ -74,6 +74,7 @@ import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
 import EventCheckinControlPage from "./pages/event/EventCheckinControlPage.jsx";
+import VodWatchPage from "./pages/event/VodWatchPage.jsx";
 import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
 import WalletPage from "./features/wallet/pages/WalletPage.jsx";
 import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
@@ -492,6 +493,7 @@ export function App() {
 
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
+              <Route path="vod/:eventId" element={<VodWatchPage />} />
               <Route path="stream/:eventId" element={<EventStreamControlPage />} />
               <Route path="checkin/:eventId" element={<EventCheckinControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
