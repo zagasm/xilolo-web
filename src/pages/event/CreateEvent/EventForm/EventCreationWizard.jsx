@@ -185,6 +185,8 @@ export default function EventCreationWizard({
   const [vodUploadState, setVodUploadState] = useState({
     status: "idle",
     progress: 0,
+    loaded: 0,
+    total: 0,
     message: "",
   });
   const [pendingVodVideo, setPendingVodVideo] = useState(null);
@@ -317,7 +319,17 @@ export default function EventCreationWizard({
   };
 
   const startPreEventVodUpload = async (file) => {
-    if (!(file instanceof File) || isEdit) return;
+    if (!(file instanceof File) || isEdit) {
+      setPendingVodVideo(null);
+      setVodUploadState({
+        status: "idle",
+        progress: 0,
+        loaded: 0,
+        total: 0,
+        message: "",
+      });
+      return;
+    }
 
     vodAbortRef.current?.abort();
     const abortController = new AbortController();
@@ -327,6 +339,8 @@ export default function EventCreationWizard({
     setVodUploadState({
       status: "preparing",
       progress: 0,
+      loaded: 0,
+      total: file.size,
       message: "Preparing Bunny Stream upload...",
     });
 
@@ -347,6 +361,8 @@ export default function EventCreationWizard({
       setVodUploadState({
         status: "uploading",
         progress: 0,
+        loaded: 0,
+        total: file.size,
         message: "Uploading video to Bunny Stream...",
       });
 
@@ -354,11 +370,13 @@ export default function EventCreationWizard({
         file,
         upload: initResponse?.data?.data?.upload,
         signal: abortController.signal,
-        onProgress: (progress) =>
+        onProgress: ({ loaded, total, percentage }) =>
           setVodUploadState({
             status: "uploading",
-            progress,
-            message: `Uploading video... ${progress}%`,
+            progress: percentage,
+            loaded,
+            total,
+            message: `Uploading video... ${percentage}%`,
           }),
       });
 
@@ -366,6 +384,8 @@ export default function EventCreationWizard({
       setVodUploadState({
         status: "complete",
         progress: 100,
+        loaded: file.size,
+        total: file.size,
         message: "Upload complete. You can continue to review.",
       });
     } catch (err) {
@@ -373,6 +393,8 @@ export default function EventCreationWizard({
       setVodUploadState({
         status: wasCancelled ? "cancelled" : "failed",
         progress: 0,
+        loaded: 0,
+        total: file.size,
         message: wasCancelled
           ? "Upload cancelled. Choose another video to upload."
           : err?.response?.data?.error || err?.response?.data?.message || err?.message || "Video upload failed.",

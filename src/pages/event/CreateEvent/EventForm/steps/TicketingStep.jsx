@@ -120,6 +120,19 @@ function fileLabel(file) {
   return file?.name || "";
 }
 
+function formatBytes(value) {
+  const bytes = Number(value || 0);
+  if (!Number.isFinite(bytes) || bytes <= 0) return "0 MB";
+  const units = ["B", "KB", "MB", "GB"];
+  let size = bytes;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) {
+    size /= 1024;
+    unit += 1;
+  }
+  return `${size.toFixed(unit === 0 ? 0 : 2)} ${units[unit]}`;
+}
+
 function isBrowserFile(value) {
   return typeof File !== "undefined" && value instanceof File;
 }
@@ -569,6 +582,12 @@ export default function TicketingStep({
                       {vodUploadState.status === "complete"
                         ? "You can continue to the review step."
                         : "Keep this page open while the upload is running."}
+                    </div>
+                    <div className="tw:mt-2 tw:text-xs tw:font-medium tw:text-slate-700">
+                      {formatBytes(vodUploadState.loaded)} / {formatBytes(vodUploadState.total || vodFile?.size)}
+                      <span className="tw:ml-2 tw:text-slate-500">
+                        {Math.max(0, Math.min(100, Number(vodUploadState.progress || 0)))}%
+                      </span>
                     </div>
                   </div>
                   {isUploadingVod && (

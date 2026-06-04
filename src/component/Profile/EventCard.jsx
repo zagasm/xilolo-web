@@ -130,6 +130,7 @@ export default function EventCard({
     () => normalizeEventStatus(event?.status),
     [event?.status],
   );
+  const isVodEvent = event?.delivery_type === "vod";
   const statusMeta = useMemo(() => getEventStatusMeta(event?.status), [event?.status]);
   const scheduleLabel = useMemo(() => formatEventSchedule(event), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
@@ -155,6 +156,11 @@ export default function EventCard({
   };
 
   const goToStreamControl = async () => {
+    if (isVodEvent) {
+      navigate(`/event/view/${event.id}`);
+      return;
+    }
+
     if (normalizedStatus === "ended" || normalizedStatus === "expired") {
       navigate(`/event/stream/${event.id}`);
       return;
@@ -454,6 +460,8 @@ export default function EventCard({
             <span className="tw:mr-2">
               {startingStream
                 ? "Starting stream..."
+                : isVodEvent
+                  ? "View event"
                 : normalizedStatus === "live"
                   ? "Manage live stream"
                   : normalizedStatus === "paused"

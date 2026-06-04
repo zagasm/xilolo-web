@@ -1,4 +1,53 @@
-export async function uploadToBunnyTus({ file, upload, onProgress, signal }) {
+const DEFAULT_CHUNK_SIZE = 32 * 1024 * 1024;
+
+function patchChunk({ url, headers, chunk, offset, signal, onProgress }) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("PATCH", url);
+    Object.entries({
+      ...headers,
+      "Tus-Resumable": "1.0.0",
+      "Upload-Offset": String(offset),
+      "Content-Type": "application/offset+octet-stream",
+    }).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        xhr.setRequestHeader(key, String(value));
+      }
+    });
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress?.(offset + event.loaded);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status < 200 || xhr.status >= 300) {
+        reject(new Error(`Bunny upload failed (${xhr.status}).`));
+        return;
+      }
+
+      const nextOffset = Number(xhr.getResponseHeader("Upload-Offset"));
+      resolve(Number.isFinite(nextOffset) && nextOffset > offset ? nextOffset : offset + chunk.size);
+    };
+
+    xhr.onerror = () => reject(new Error("Bunny upload failed due to a network error."));
+    xhr.onabort = () => reject(new DOMException("Upload cancelled.", "AbortError"));
+
+    if (signal) {
+      if (signal.aborted) {
+        xhr.abort();
+        return;
+      }
+      signal.addEventListener("abort", () => xhr.abort(), { once: true });
+    }
+
+    xhr.send(chunk);
+  });
+}
+
+export async function uploadToBunnyTus({ file, upload, onProgress, signal, chunkSize = DEFAULT_CHUNK_SIZE }) {
   if (!(file instanceof File)) {
     throw new Error("Choose a video file to upload.");
   }
@@ -42,30 +91,31 @@ export async function uploadToBunnyTus({ file, upload, onProgress, signal }) {
     throw new Error("Bunny did not return an upload URL.");
   }
 
-  const chunkSize = 8 * 1024 * 1024;
   let offset = 0;
 
   while (offset < file.size) {
     const chunk = file.slice(offset, Math.min(offset + chunkSize, file.size));
-    const response = await fetch(uploadUrl, {
-      method: "PATCH",
+    const nextOffset = await patchChunk({
+      url: uploadUrl,
+      headers,
+      chunk,
+      offset,
       signal,
-      headers: {
-        ...headers,
-        "Tus-Resumable": "1.0.0",
-        "Upload-Offset": String(offset),
-        "Content-Type": "application/offset+octet-stream",
+      onProgress: (uploadedBytes) => {
+        onProgress?.({
+          loaded: Math.min(uploadedBytes, file.size),
+          total: file.size,
+          percentage: Math.min(100, Math.round((uploadedBytes / file.size) * 100)),
+        });
       },
-      body: chunk,
     });
 
-    if (!response.ok) {
-      throw new Error(`Bunny upload failed (${response.status}).`);
-    }
-
-    const nextOffset = Number(response.headers.get("Upload-Offset"));
     offset = Number.isFinite(nextOffset) && nextOffset > offset ? nextOffset : offset + chunk.size;
-    onProgress?.(Math.min(100, Math.round((offset / file.size) * 100)));
+    onProgress?.({
+      loaded: Math.min(offset, file.size),
+      total: file.size,
+      percentage: Math.min(100, Math.round((offset / file.size) * 100)),
+    });
   }
 
   return { uploadUrl, videoId: headers.VideoId };

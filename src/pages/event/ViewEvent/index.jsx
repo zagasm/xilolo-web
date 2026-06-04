@@ -195,7 +195,7 @@ function EventDetailShimmer() {
   return (
     <div className="tw:min-h-screen tw:w-full tw:pb-12 tw:pt-20">
       <div className="tw:mx-auto tw:max-w-7xl tw:px-2 tw:md:px-6 tw:lg:px-8">
-        <div className="tw:mb-4 tw:mt-10 tw:h-[64px] tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
+        <div className="tw:mb-4 tw:mt-10 tw:h-16 tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
 
         <div className="tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/50 tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:md:backdrop-blur-2xl">
           <div className="tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
@@ -660,8 +660,9 @@ export default function ViewEvent() {
       ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
       : " bought tickets for others for this event.";
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
+  const canSponsorOwnEvent = !!(isOwnerEvent && event?.user_can_sponsor_tickets && !isSoldOut);
   const canOpenPurchaseOptions =
-    !isOwnerEvent &&
+    (!isOwnerEvent || canSponsorOwnEvent) &&
     !isSoldOut &&
     (ticketOnlyAvailable ||
       ticketAndManualAvailable ||
@@ -777,6 +778,11 @@ export default function ViewEvent() {
 
   const handleOwnerStreamAction = async () => {
     if (!event?.id) return;
+
+    if (isVodEvent) {
+      navigate(`/event/view/${event.id}`);
+      return;
+    }
 
     if (isEnded) {
       navigate(`/event/stream/${event.id}`);
@@ -939,8 +945,8 @@ export default function ViewEvent() {
           </div>
 
           <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
-            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#e5e4e2] tw:blur-3xl tw:md:block" />
-            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#e5e4e2] tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
 
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
               <div className="tw:space-y-6">
@@ -985,7 +991,7 @@ export default function ViewEvent() {
                     </div>
 
                     <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:p-2.5 tw:md:p-6">
-                      <div className="tw:rounded-[24px] tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
                         <div className="tw:flex tw:flex-col tw:gap-3 tw:md:gap-5">
                           <div className="tw:space-y-2 tw:md:space-y-3">
                             <div className="tw:hidden tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-[#ffffff]/72 tw:md:block">
@@ -1134,12 +1140,12 @@ export default function ViewEvent() {
                           Event Video
                         </div>
                         <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
-                          {vodIsReady ? "Video is ready" : "Video is being prepared"}
+                          {vodIsReady ? "Video is ready" : "Video will be available soon"}
                         </div>
                         <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
                           {vodIsReady
                             ? "Ticket holders can stream this event on now."
-                            : "We're processing the video. It should be ready soon."}
+                            : "We will make the video available here as soon as it is ready."}
                         </div>
                       </div>
                       <button
@@ -1150,7 +1156,7 @@ export default function ViewEvent() {
                         className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
                       >
                         <Video className="tw:h-4 tw:w-4" />
-                        <span>{vodIsReady ? "Watch video" : "Processing"}</span>
+                        <span>{vodIsReady ? "Watch video" : "Available soon"}</span>
                       </button>
                     </div>
                   </div>
@@ -1200,7 +1206,7 @@ export default function ViewEvent() {
                             </div>
                           </div>
                         ) : replayExpired ? (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay is no longer available.
                             </div>
@@ -1209,7 +1215,7 @@ export default function ViewEvent() {
                             </div>
                           </div>
                         ) : hasReplay ? (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay will be available soon
                             </div>
@@ -1223,7 +1229,7 @@ export default function ViewEvent() {
                             )}
                           </div>
                         ) : (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay not uploaded yet
                             </div>
@@ -1384,27 +1390,56 @@ export default function ViewEvent() {
 
                     {isOwnerEvent ? (
                       <>
-                        <button
-                          style={{
-                            borderRadius: 24
-                          }}
-                          type="button"
-                          disabled={startingStream}
-                          onClick={handleOwnerStreamAction}
-                          className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
-                        >
-                          {startingStream
-                            ? "Starting stream..."
-                            : isLiveNow || isPaused
-                              ? "Manage stream"
-                              : isEnded
-                                ? "View stream"
-                                : "Start stream"}
-                        </button>
+                        {!isVodEvent && (
+                          <>
+                            <button
+                              style={{
+                                borderRadius: 24
+                              }}
+                              type="button"
+                              disabled={startingStream}
+                              onClick={handleOwnerStreamAction}
+                              className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                            >
+                              {startingStream
+                                ? "Starting stream..."
+                                : isLiveNow || isPaused
+                                  ? "Manage stream"
+                                  : isEnded
+                                    ? "View stream"
+                                    : "Start stream"}
+                            </button>
 
-                        <span className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
-                          Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
-                        </span>
+                            <span className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                              Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
+                            </span>
+                          </>
+                        )}
+
+                        {isVodEvent && (
+                          <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                            This is a VOD event. Stream controls are not needed.
+                          </span>
+                        )}
+
+                        {canSponsorOwnEvent && (
+                          <button
+                            style={{
+                              borderRadius: 24,
+                              marginTop: 12
+                            }}
+                            type="button"
+                            disabled={purchaseTicketMutation.isPending}
+                            onClick={() => {
+                              setPreferredPurchaseType("sponsored_only");
+                              setPurchaseModalOpen(true);
+                              setModalAutoTrigger(false);
+                            }}
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                          >
+                            {purchaseTicketMutation.isPending ? "Processing..." : "Buy Tickets for Others"}
+                          </button>
+                        )}
                       </>
                     ) : (
                       <>
