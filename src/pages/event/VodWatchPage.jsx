@@ -9,9 +9,9 @@ function pickVideoUrl(vod) {
   const safeVod = vod || {};
 
   return (
+    safeVod.embed_url ||
     safeVod.hls_url ||
     safeVod.playback_url ||
-    safeVod.embed_url ||
     safeVod.url ||
     ""
   );
@@ -106,7 +106,7 @@ export default function VodWatchPage() {
 
   if (state.error || !state.vod || !videoUrl) {
     return (
-      <main className="tw:mx-auto tw:flex tw:min-h-[70vh] tw:max-w-2xl tw:flex-col tw:items-center tw:justify-center tw:px-4 tw:text-center">
+      <div className="tw:mx-auto tw:flex tw:min-h-[70vh] tw:max-w-2xl tw:flex-col tw:items-center tw:justify-center tw:px-4 tw:text-center">
         <div className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-full tw:bg-amber-50 tw:text-amber-700">
           <Lock className="tw:h-6 tw:w-6" />
         </div>
@@ -136,19 +136,18 @@ export default function VodWatchPage() {
             Back to event
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
-  const shouldUseIframe =
-    videoUrl.includes("iframe.mediadelivery.net") && !state.vod?.hls_url;
+  const shouldUseIframe = videoUrl.includes("iframe.mediadelivery.net");
 
   return (
-    <div className="tw:min-h-screen tw:bg-slate-950 tw:text-white">
-      <div className="tw:mx-auto tw:max-w-6xl tw:px-4 tw:py-6 tw:sm:px-6 tw:lg:px-8">
+    <div className="tw:min-h-screen tw:bg-white tw:text-primary">
+      <div className="tw:mx-auto tw:max-w-6xl tw:px-4 tw:py-16 tw:md:py-20 tw:sm:px-6 tw:lg:px-8 tw:">
         <Link
           to={`/event/view/${eventId}`}
-          className="tw:text-sm tw:font-medium tw:text-white/70 hover:tw:text-white"
+          className="tw:text-sm tw:font-medium tw:text-primary/70 tw:hover:text-white"
         >
           Back to event
         </Link>
