@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Dialog, DialogBackdrop, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
+import confetti from "canvas-confetti";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { Controller, useForm } from "react-hook-form";
@@ -35,6 +37,25 @@ const VISIBILITY_OPTIONS = [
 ];
 
 const REPLAY_MINUTE_PRESETS = [30, 60, 120, 180, 720, 1440];
+
+const VOD_UPLOAD_PHRASES = [
+  "Rolling out the red carpet for your video...",
+  "Polishing the spotlight...",
+  "Warming up the big screen...",
+  "Getting your video ready for its debut...",
+  "Setting the stage for your audience...",
+  "Packing the good stuff safely...",
+  "Your video is making its grand entrance...",
+  "Sprinkling a little launch-day magic...",
+  "Almost time for the premiere...",
+  "Making sure every moment arrives nicely...",
+  "Your audience is going to love this...",
+  "The show is loading into place...",
+  "Putting the final touches on the upload...",
+  "Saving your masterpiece...",
+  "Keeping things moving behind the curtain...",
+  "Your event video is on its way...",
+];
 
 const MANUAL_FILE_EXTENSIONS = [
   "pdf",
@@ -131,6 +152,102 @@ function formatBytes(value) {
     unit += 1;
   }
   return `${size.toFixed(unit === 0 ? 0 : 2)} ${units[unit]}`;
+}
+
+function formatReplayMinutes(minutes) {
+  const value = Number(minutes || 0);
+  if (!Number.isFinite(value) || value < 60) {
+    return `${value} minute${value === 1 ? "" : "s"}`;
+  }
+
+  const hours = value / 60;
+  if (Number.isInteger(hours)) {
+    return `${hours} hour${hours === 1 ? "" : "s"}`;
+  }
+
+  return `${hours.toFixed(1)} hours`;
+}
+
+function VideoUploadSuccessModal({ open, fileName, onClose }) {
+  useEffect(() => {
+    if (!open) return;
+
+    const end = Date.now() + 900;
+    const colors = ["#050505", "#10b981", "#f59e0b", "#0ea5e9"];
+
+    const frame = () => {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 65,
+        origin: { x: 0, y: 0.72 },
+        colors,
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 65,
+        origin: { x: 1, y: 0.72 },
+        colors,
+      });
+
+      if (Date.now() < end) {
+        window.requestAnimationFrame(frame);
+      }
+    };
+
+    frame();
+  }, [open]);
+
+  return (
+    <Transition show={open} as={Fragment} appear>
+      <Dialog as="div" className="tw:relative tw:z-50" onClose={onClose}>
+        <TransitionChild
+          as={Fragment}
+          enter="tw:ease-out tw:duration-200"
+          enterFrom="tw:opacity-0"
+          enterTo="tw:opacity-100"
+          leave="tw:ease-in tw:duration-150"
+          leaveFrom="tw:opacity-100"
+          leaveTo="tw:opacity-0"
+        >
+          <DialogBackdrop className="tw:fixed tw:inset-0 tw:bg-black/45" />
+        </TransitionChild>
+
+        <div className="tw:fixed tw:inset-0 tw:flex tw:items-center tw:justify-center tw:px-4">
+          <TransitionChild
+            as={Fragment}
+            enter="tw:ease-out tw:duration-200"
+            enterFrom="tw:opacity-0 tw:scale-95"
+            enterTo="tw:opacity-100 tw:scale-100"
+            leave="tw:ease-in tw:duration-150"
+            leaveFrom="tw:opacity-100 tw:scale-100"
+            leaveTo="tw:opacity-0 tw:scale-95"
+          >
+            <DialogPanel className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-[28px] tw:bg-white tw:p-6 tw:text-center tw:shadow-2xl">
+              <div className="tw:mx-auto tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:text-3xl tw:text-white tw:shadow-lg">
+                ✓
+              </div>
+              <span className="tw:block tw:mt-5 tw:text-xl tw:font-bold tw:text-slate-950">
+                Video uploaded
+              </span>
+              <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-500">
+                {fileName || "Your VOD video"} uploaded successfully. You can continue to the review step.
+              </span>
+              <button
+              style={{ borderRadius: 36, fontSize: 12 }}
+                type="button"
+                onClick={onClose}
+                className="tw:mt-6 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+              >
+                Continue
+              </button>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </Dialog>
+    </Transition>
+  );
 }
 
 function isBrowserFile(value) {
@@ -263,6 +380,9 @@ export default function TicketingStep({
     isBrowserFile(defaultValues.vodFile) ? defaultValues.vodFile : null
   );
   const [vodError, setVodError] = useState("");
+  const [uploadPhraseIndex, setUploadPhraseIndex] = useState(0);
+  const [showVodSuccessModal, setShowVodSuccessModal] = useState(false);
+  const previousVodStatusRef = useRef(vodUploadState?.status || "idle");
 
   const existingManual = defaultValues.existingManual || null;
   const existingManualCover = defaultValues.existingManualCover || null;
@@ -334,6 +454,8 @@ export default function TicketingStep({
     deliveryType === "vod" &&
     Boolean(vodFile) &&
     vodUploadState?.status !== "complete";
+  const uploadProgress = Math.max(0, Math.min(100, Number(vodUploadState?.progress || 0)));
+  const uploadPhrase = VOD_UPLOAD_PHRASES[uploadPhraseIndex % VOD_UPLOAD_PHRASES.length];
 
   const manualCoverPreview = useMemo(() => {
     if (!manualCover) return "";
@@ -347,6 +469,30 @@ export default function TicketingStep({
       }
     };
   }, [manualCoverPreview]);
+
+  useEffect(() => {
+    if (!isUploadingVod) {
+      setUploadPhraseIndex(0);
+      return undefined;
+    }
+
+    const interval = window.setInterval(() => {
+      setUploadPhraseIndex((current) => current + 1);
+    }, 3500);
+
+    return () => window.clearInterval(interval);
+  }, [isUploadingVod]);
+
+  useEffect(() => {
+    const previousStatus = previousVodStatusRef.current;
+    const currentStatus = vodUploadState?.status || "idle";
+
+    if (previousStatus !== "complete" && currentStatus === "complete") {
+      setShowVodSuccessModal(true);
+    }
+
+    previousVodStatusRef.current = currentStatus;
+  }, [vodUploadState?.status]);
 
   useEffect(() => {
     let mounted = true;
@@ -509,6 +655,12 @@ export default function TicketingStep({
       onSubmit={handleSubmit(onSubmit)}
       className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
     >
+      <VideoUploadSuccessModal
+        open={showVodSuccessModal}
+        fileName={vodFile?.name}
+        onClose={() => setShowVodSuccessModal(false)}
+      />
+
       <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
         <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:lg:text-2xl">
           Ticketing
@@ -581,17 +733,18 @@ export default function TicketingStep({
                     <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
                       {vodUploadState.status === "complete"
                         ? "You can continue to the review step."
-                        : "Keep this page open while the upload is running."}
+                        : uploadPhrase}
                     </div>
                     <div className="tw:mt-2 tw:text-xs tw:font-medium tw:text-slate-700">
                       {formatBytes(vodUploadState.loaded)} / {formatBytes(vodUploadState.total || vodFile?.size)}
                       <span className="tw:ml-2 tw:text-slate-500">
-                        {Math.max(0, Math.min(100, Number(vodUploadState.progress || 0)))}%
+                        {uploadProgress}%
                       </span>
                     </div>
                   </div>
                   {isUploadingVod && (
                     <button
+                      style={{ borderRadius: 36, fontSize: 12 }}
                       type="button"
                       onClick={onCancelVodUpload}
                       className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 hover:tw:bg-red-50"
@@ -602,8 +755,8 @@ export default function TicketingStep({
                 </div>
                 <div className="tw:mt-3 tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-slate-100">
                   <div
-                    className="tw:h-full tw:rounded-full tw:bg-primary tw:transition-all"
-                    style={{ width: `${Math.max(0, Math.min(100, Number(vodUploadState.progress || 0)))}%` }}
+                    className="tw:h-full tw:rounded-full tw:bg-primary tw:bg-[linear-gradient(45deg,rgba(255,255,255,.22)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.22)_50%,rgba(255,255,255,.22)_75%,transparent_75%,transparent)] tw:bg-[length:22px_22px] tw:transition-all tw:duration-300 tw:ease-out tw:animate-[upload-stripes_0.8s_linear_infinite]"
+                    style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
               </div>
@@ -834,6 +987,7 @@ export default function TicketingStep({
               <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
                 {REPLAY_MINUTE_PRESETS.map((minutes) => (
                   <button
+                    style={{ borderRadius: 36, fontSize: 12 }}
                     key={`after-${minutes}`}
                     type="button"
                     onClick={() =>
@@ -846,7 +1000,7 @@ export default function TicketingStep({
                         : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
                       }`}
                   >
-                    {minutes} minutes
+                    {formatReplayMinutes(minutes)}
                   </button>
                 ))}
               </div>
@@ -859,9 +1013,9 @@ export default function TicketingStep({
                   placeholder="Minutes after the event ends"
                 />
                 {errors.replayAvailableAfterMinutes && (
-                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+                  <span className="tw:mt-1 tw:text-xs tw:text-red-500">
                     {errors.replayAvailableAfterMinutes.message}
-                  </p>
+                  </span>
                 )}
               </div>
             </div>
@@ -876,6 +1030,7 @@ export default function TicketingStep({
               <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
                 {REPLAY_MINUTE_PRESETS.map((minutes) => (
                   <button
+                    style={{ borderRadius: 36, fontSize: 12 }}
                     key={`for-${minutes}`}
                     type="button"
                     onClick={() =>
@@ -888,7 +1043,7 @@ export default function TicketingStep({
                         : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
                       }`}
                   >
-                    {minutes} minutes
+                    {formatReplayMinutes(minutes)}
                   </button>
                 ))}
               </div>
@@ -901,9 +1056,9 @@ export default function TicketingStep({
                   placeholder="Minutes replay stays online"
                 />
                 {errors.replayAvailableForMinutes && (
-                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
+                  <span className="tw:mt-1 tw:text-xs tw:text-red-500">
                     {errors.replayAvailableForMinutes.message}
-                  </p>
+                  </span>
                 )}
               </div>
             </div>
@@ -925,7 +1080,7 @@ export default function TicketingStep({
           type="button"
           onClick={onBack}
           className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 hover:tw:bg-gray-50"
-          style={{ borderRadius: 20 }}
+          style={{ borderRadius: 20, fontSize: 12 }}
         >
           Back
         </button>
@@ -933,7 +1088,7 @@ export default function TicketingStep({
           type="submit"
           disabled={isUploadingVod || vodUploadMustFinish}
           className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
-          style={{ borderRadius: 20 }}
+          style={{ borderRadius: 20, fontSize: 12 }}
         >
           {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Continue to preview"}
         </button>

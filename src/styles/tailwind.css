@@ -89,6 +89,15 @@ body {
   }
 }
 
+@keyframes upload-stripes {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 22px 0;
+  }
+}
+
 @keyframes signal-rise {
   0% {
     opacity: 0;

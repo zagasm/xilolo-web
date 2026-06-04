@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { showToast } from "../../../component/ToastAlert";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
-import authCodeImg from "../../../assets/authCode.png";
 import axios from "axios";
-import '../signin/signInStyle.css';
 import { ChangePassword } from "../ChangePassword";
 import { showSuccess, showError } from "../../../component/ui/toast";
 
@@ -21,7 +17,6 @@ export function CodeVerification({ verificationData }) {
   const [inputError, setInputError] = useState('');
   const inputsRef = useRef([]);
   const inputRef = useRef(null);
-  const navigate = useNavigate();
 
   // Destructure verificationData with defaults
   const {
@@ -74,7 +69,7 @@ export function CodeVerification({ verificationData }) {
   const buttonVariants = {
     hover: {
       scale: 1.02,
-      boxShadow: "0 4px 12px rgba(143, 7, 231, 0.3)"
+      boxShadow: "0 4px 12px rgba(5, 5, 5, 0.18)"
     },
     tap: { scale: 0.98 }
   };
@@ -105,7 +100,7 @@ export function CodeVerification({ verificationData }) {
       return false;
     }
 
-    if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test.test(value)) {
+    if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       setInputError('Please enter a valid email address');
       return false;
     }
@@ -183,15 +178,16 @@ export function CodeVerification({ verificationData }) {
     setIsLoading(true);
     setErrors({});
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/password/verify-code`, {
-        code: verificationCode,
-        input: editedInput,
-      }, {
+      const formData = new URLSearchParams();
+      formData.append("code", verificationCode);
+      formData.append("input", editedInput);
+
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/password/verify-code`, formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         }
       });
-       console.log(response);
+
       const data = response.data;
       if (data.reset_token != null || data.reset_token != undefined) {
         showSuccess(data.message || "Verification successful!");
@@ -223,53 +219,30 @@ export function CodeVerification({ verificationData }) {
       privacy={false}
       haveAccount={true}
     >
-      <style>{`
-        .submit-btn {
-          background-color: ${isCodeComplete ? 'rgba(143, 7, 231, 1)' : 'rgba(169, 169, 169, 0.7)'};
-          color: white;
-          cursor: ${isCodeComplete ? 'pointer' : 'not-allowed'};
-          height: 50px;
-          border-radius: 8px;
-          font-size: 16px;
-          font-weight: 500;
-          border: none;
-          width: 100%;
-          transition: background-color 0.3s;
-        }
-      `}</style>
       <motion.form 
         autoComplete="off" 
-        className="pr-3 pl-3 shadow-s signIncodeForm" 
+        className="tw:px-3 tw:pb-2"
         variants={containerVariants} 
         initial="hidden" 
         animate="visible" 
         onSubmit={handleSubmit}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '30px' }}>
-          <img src={authCodeImg} alt="Verification Code" className="verification-image" />
+        <div className="tw:rounded-[28px] tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:text-center tw:shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+          <div className="tw:mx-auto tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:text-xl tw:font-bold tw:text-white">
+            OTP
+          </div>
+          <span className="tw:block tw:mt-5 tw:text-xl tw:font-bold tw:text-slate-950">
+            5-digit verification
+          </span>
+          <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-500">
+            Enter the code sent to your {isEmail ? "email" : "phone"}{" "}
+            <span className="tw:font-semibold tw:text-primary">{maskInput(editedInput)}</span>
+          </span>
         </div>
-        <div className='text-center' style={{ marginBottom: '30px' }}>
-          <motion.h5 
-            initial={{ opacity: 0, x: -70 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.9, ease: "easeOut" }} 
-            className="font-weight-bold mt-3 container_heading_text text-center"
-          >
-            5-Digit OTP Verification
-          </motion.h5>
-          <motion.p 
-            initial={{ opacity: 0, x: 70 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.9, ease: "easeOut" }} 
-            className="text-muted heading_content mb-2 text-center"
-          >
-            We have sent the OTP verification code to your {isEmail ? 'Email' : 'Phone'} <span style={{ color: 'rgba(143, 7, 231, 1)' }}>{maskInput(editedInput)}</span>
-          </motion.p>
-        </div>
-        <p>Code: {verificationData.code}</p>
+
         {errors.server && (
           <motion.div 
-            className="alert alert-danger mb-4" 
+            className="tw:mt-4 tw:rounded-2xl tw:border tw:border-red-200 tw:bg-red-50 tw:px-4 tw:py-3 tw:text-sm tw:text-red-700"
             initial={{ opacity: 0, y: -20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.3 }}
@@ -278,8 +251,8 @@ export function CodeVerification({ verificationData }) {
           </motion.div>
         )}
         
-        <motion.div variants={inputVariants} className="form-group">
-          <div className="code-input-container">
+        <motion.div variants={inputVariants} className="tw:mt-5">
+          <div className="tw:grid tw:grid-cols-5 tw:gap-2 tw:sm:gap-3">
             {[0, 1, 2, 3, 4].map((index) => (
               <input 
                 key={index} 
@@ -290,7 +263,7 @@ export function CodeVerification({ verificationData }) {
                 onKeyDown={(e) => handleKeyDown(e, index)} 
                 onPaste={handlePaste} 
                 ref={(el) => (inputsRef.current[index] = el)} 
-                className="code-input" 
+                className="tw:h-14 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:text-center tw:text-xl tw:font-bold tw:text-slate-950 tw:outline-none tw:transition focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
                 inputMode="numeric" 
                 pattern="[0-9]*" 
               />
@@ -330,9 +303,10 @@ export function CodeVerification({ verificationData }) {
           </button>
         </motion.div> */}
         
-        <motion.div variants={inputVariants} className="mt-4">
+        <motion.div variants={inputVariants} className="tw:mt-5">
           <motion.button 
-            className="submit-btn" 
+            style={{ borderRadius: 28, fontSize: 12}}
+            className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
             type="submit" 
             disabled={!isCodeComplete || isLoading} 
             variants={buttonVariants} 
