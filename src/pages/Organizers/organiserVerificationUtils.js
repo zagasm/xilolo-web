@@ -46,11 +46,11 @@ export function mapDiditStatusCopy(status) {
     case "Not Started":
       return "Your verification session is ready. Start when you are ready to capture your ID and selfie.";
     case "In Progress":
-      return "Your verification has started. Finish the DIDIT steps to continue.";
+      return "Your identity check has started. Finish the DIDIT steps to activate organiser access.";
     case "In Review":
-      return "DIDIT is reviewing your submission. We will update your organiser profile once verification completes.";
+      return "Verification submitted successfully. Your organiser access is active.";
     case "Approved":
-      return "Your verification passed. Your organiser status will update shortly.";
+      return "Your verification passed. Your organiser access is active.";
     case "Declined":
       return "Your verification was declined. Start a new session to retry with a clearer document capture.";
     case "Abandoned":

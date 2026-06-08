@@ -6,11 +6,11 @@ import { showError, showSuccess } from "../../component/ui/toast";
 
 function getStatusMessage(localStatus, providerStatus) {
   if (localStatus === "verified") {
-    return "Your identity verification has been approved. Your organiser status will update shortly.";
+    return "Verification successful. Your organiser account is active and you can start creating events now.";
   }
 
   if (localStatus === "pending") {
-    return `Your DIDIT verification is currently ${providerStatus || "pending"}. We are waiting for the latest review result.`;
+    return `Your DIDIT verification is currently ${providerStatus || "processing"}. Refresh your organiser setup to continue.`;
   }
 
   if (localStatus === "failed") {
@@ -54,7 +54,7 @@ export default function DiditCallback() {
         await refreshUser?.();
 
         if (data?.local_kyc_status === "verified") {
-          showSuccess("Identity verification approved.");
+          showSuccess("Your organiser account is active.");
         }
       } catch (refreshError) {
         if (!active) return;
@@ -158,14 +158,14 @@ export default function DiditCallback() {
                 onClick={() =>
                   navigate(
                     sessionData?.local_kyc_status === "verified"
-                      ? `/profile/${user?.id}`
+                      ? "/event/select-event-type"
                       : "/become-an-organiser",
                   )
                 }
                 className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold"
               >
                 {sessionData?.local_kyc_status === "verified"
-                  ? "Go to profile"
+                  ? "Create an event"
                   : "Back to verification"}
               </button>
             </div>

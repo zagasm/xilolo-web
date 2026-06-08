@@ -17,6 +17,7 @@ import {
   OrganiserNameMismatchDialog,
   OrganiserProfilePhotoRequiredDialog,
   OrganiserProcessingDialog,
+  OrganiserVerificationSuccessDialog,
 } from "./components/OrganiserDialogs";
 import {
   BANK_STEPPER_STEPS,
@@ -43,7 +44,9 @@ const BecomeOrganiser = () => {
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [countriesError, setCountriesError] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [detectedCountry, setDetectedCountry] = useState(null);
   const [countryAutoDetected, setCountryAutoDetected] = useState(false);
+  const [countryStepVisible, setCountryStepVisible] = useState(true);
   const [verificationMethod, setVerificationMethod] = useState(null);
   const countryPrefillDismissedRef = useRef(false);
   const countryPrefillAttemptedRef = useRef(false);
@@ -64,6 +67,7 @@ const BecomeOrganiser = () => {
   const [bvnError, setBvnError] = useState(null);
 
   const [processingOpen, setProcessingOpen] = useState(false);
+  const [verificationSuccessOpen, setVerificationSuccessOpen] = useState(false);
   const [nameMismatchOpen, setNameMismatchOpen] = useState(false);
   const [diditInfoOpen, setDiditInfoOpen] = useState(false);
   const [diditStarting, setDiditStarting] = useState(false);
@@ -110,7 +114,7 @@ const BecomeOrganiser = () => {
     await refreshUser?.();
 
     if (showApprovedToast && data?.local_kyc_status === "verified") {
-      showSuccess("Identity verification approved.");
+      showSuccess("Your organiser account is active.");
     }
 
     return data;
@@ -200,6 +204,7 @@ const BecomeOrganiser = () => {
         if (!matchedCountry) return;
 
         setSelectedCountry(matchedCountry);
+        setDetectedCountry(matchedCountry);
         setCountryAutoDetected(true);
       } catch (error) {
         if (!active || error?.name === "AbortError") return;
@@ -363,14 +368,31 @@ const BecomeOrganiser = () => {
   const handleCountryChange = (_, value) => {
     countryPrefillDismissedRef.current = true;
     setSelectedCountry(value);
-    setCountryAutoDetected(false);
+    setCountryAutoDetected(
+      Boolean(value && detectedCountry && value.code === detectedCountry.code)
+    );
     resetVerificationSelection();
   };
 
   const handleChangeCountryRequest = () => {
     countryPrefillDismissedRef.current = true;
-    setCountryAutoDetected(false);
-    handleCountryChange(null, null);
+    setCountryStepVisible(true);
+    resetVerificationSelection();
+  };
+
+  const handleCountryContinue = () => {
+    if (!selectedCountry) {
+      showError("Please select your country to continue.");
+      return;
+    }
+
+    setCountryStepVisible(false);
+  };
+
+  const showOrganiserSuccess = async () => {
+    await refreshUser?.();
+    setProcessingOpen(false);
+    setVerificationSuccessOpen(true);
   };
 
   const handleSaveBankAndContinue = async () => {
@@ -447,17 +469,11 @@ const BecomeOrganiser = () => {
       const kycStatus = response?.data?.data?.kyc_status;
 
       if (kycStatus === "verified") {
-        showSuccess("Your organiser account is now active.");
-        navigate(`/profile/${user?.id}`);
+        await showOrganiserSuccess();
         return;
       }
 
-      setProcessingOpen(true);
-      window.setTimeout(() => {
-        setProcessingOpen(false);
-        showSuccess("We're reviewing your details");
-        navigate(`/profile/${user?.id}`);
-      }, 2500);
+      await showOrganiserSuccess();
     } catch (error) {
       const message =
         error?.response?.data?.message ||
@@ -513,14 +529,15 @@ const BecomeOrganiser = () => {
                 });
 
                 if (refreshed?.local_kyc_status === "verified") {
-                  navigate(`/profile/${user?.id}`);
+                  await showOrganiserSuccess();
                   return;
                 }
 
                 if (refreshed?.status) {
                   showSuccess(
-                    `Verification submitted. Current status: ${refreshed.status}.`
+                    "Verification submitted successfully. Your organiser account is active."
                   );
+                  await showOrganiserSuccess();
                 }
               } catch (refreshError) {
                 const message =
@@ -633,18 +650,20 @@ const BecomeOrganiser = () => {
             )}
 
             <div className="tw:mt-2">
-              {!selectedCountry && (
+              {countryStepVisible && (
                 <OrganiserCountryStep
                   countries={countries}
                   countriesLoading={countriesLoading}
                   countriesError={countriesError}
                   selectedCountry={selectedCountry}
+                  detectedCountry={detectedCountry}
                   countryAutoDetected={countryAutoDetected}
                   onCountryChange={handleCountryChange}
+                  onContinue={handleCountryContinue}
                 />
               )}
 
-              {selectedCountry && !verificationMethod && (
+              {!countryStepVisible && selectedCountry && !verificationMethod && (
                 <OrganiserMethodChoiceStep
                   selectedCountry={selectedCountry}
                   countryAutoDetected={countryAutoDetected}
@@ -712,6 +731,12 @@ const BecomeOrganiser = () => {
       </div>
 
       <OrganiserProcessingDialog open={processingOpen} />
+
+      <OrganiserVerificationSuccessDialog
+        open={verificationSuccessOpen}
+        onCreateEvent={() => navigate("/event/select-event-type")}
+        onViewProfile={() => navigate(`/profile/${user?.id}`)}
+      />
 
       <OrganiserDiditInfoDialog
         open={diditInfoOpen}

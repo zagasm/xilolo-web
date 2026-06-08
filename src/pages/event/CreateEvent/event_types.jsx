@@ -178,69 +178,52 @@ function EventType() {
     );
   }
 
-  // 2) Organiser but KYC not verified → notice block
+  // 2) Organiser role exists locally but KYC is not verified → send them back to setup.
   if (isOrganiser && !isKycVerified) {
     return (
       <div className="tw:min-h-screen tw:bg-white tw:flex tw:items-center tw:justify-center tw:px-4 tw:py-10">
         <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
-          {/* Top: icon + badge */}
           <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
             <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
-              <div className="tw:h-6 tw:w-6 tw:rounded-full tw:border-[3px] tw:border-primary tw:border-t-transparent tw:animate-spin" />
+              <Edit size={22} className="tw:text-primary" />
             </div>
 
             <div className="tw:flex-1 tw:text-center">
               <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1">
-                <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500 tw:animate-pulse" />
+                <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500" />
                 <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.16em] tw:uppercase tw:text-emerald-700">
-                  KYC in progress
+                  Setup required
                 </span>
               </div>
 
               <span className="tw:block tw:mt-3 tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-                Your organiser account is under review
+                Complete organiser verification
               </span>
 
               <p className="tw:mt-2 tw:text-sm tw:text-slate-600">
-                We&apos;re currently verifying the details you submitted. Once
-                your KYC is approved, you&apos;ll unlock organiser tools like
-                event creation, payouts and more.
+                Organiser access is activated instantly after a successful
+                verification. Finish setup to start creating events.
               </p>
             </div>
           </div>
 
-          {/* Progress bar + copy */}
           <div className="tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:space-y-3">
-            <div className="tw:flex tw:items-center tw:justify-between">
-              <span className="tw:text-xs tw:font-medium tw:text-slate-700">
-                Verification status
-              </span>
-              <span className="tw:text-[11px] tw:font-semibold tw:text-slate-500 tw:uppercase tw:tracking-[0.16em]">
-                Under review
-              </span>
-            </div>
-
-            <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-slate-200">
-              <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-primary tw:transition-all tw:duration-500" />
-            </div>
-
             <ul className="tw:mt-1 tw:space-y-1.5 tw:text-[12px] tw:text-slate-600">
               <li className="tw:flex tw:items-center tw:gap-2">
                 <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                ID & bank details submitted
+                Choose BVN or identity verification.
               </li>
               <li className="tw:flex tw:items-center tw:gap-2">
                 <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
-                Our compliance team is reviewing your information
+                Submit successfully and organiser tools unlock immediately.
               </li>
               <li className="tw:flex tw:items-center tw:gap-2">
-                <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-slate-300" />
-                You&apos;ll be notified once a decision is made
+                <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
+                Then you can create events as usual.
               </li>
             </ul>
           </div>
 
-          {/* Info + actions */}
           <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
             <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
               <button
@@ -248,10 +231,10 @@ function EventType() {
                   borderRadius: 12,
                 }}
                 type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
-              // onClick={() => navigate("/")} // if you have useNavigate
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:hover:shadow-md tw:transition"
+                onClick={() => navigate("/become-an-organiser")}
               >
-                Go to home
+                Complete setup
               </button>
             </div>
           </div>

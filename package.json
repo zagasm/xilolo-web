@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "test:organiser-verification": "node --test src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

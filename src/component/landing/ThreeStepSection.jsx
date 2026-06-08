@@ -15,7 +15,7 @@ function CreatorSetupMockup({ activeStep }) {
         <div>
           <span className="tw:block tw:text-[11px] tw:font-semibold tw:text-gray-500 tw:uppercase tw:tracking-wider tw:mb-1.5">Full name</span>
           <div className="tw:h-9 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:px-3 tw:flex tw:items-center">
-            <span className="tw:text-[13px] tw:text-gray-700">Adaeze Obi</span>
+            <span className="tw:text-[13px] tw:text-gray-700">Adaeze Taiwo</span>
           </div>
         </div>
         <div>
@@ -34,7 +34,7 @@ function CreatorSetupMockup({ activeStep }) {
         </div>
         <motion.div
           whileHover={{ scale: 1.01 }}
-          className="tw:h-10 tw:rounded-xl tw:bg-[#050505] tw:flex tw:items-center tw:justify-center tw:text-white tw:text-[13px] tw:font-bold tw:cursor-pointer tw:mt-1"
+          className="tw:h-10 tw:rounded-xl tw:bg-primary tw:flex tw:items-center tw:justify-center tw:text-white tw:text-[13px] tw:font-bold tw:cursor-pointer tw:mt-1"
         >
           Create Account →
         </motion.div>
@@ -105,7 +105,7 @@ function CreatorSetupMockup({ activeStep }) {
           </div>
         </div>
       </div>
-      <div className="tw:px-4 tw:py-3 tw:bg-[#0a0a0a] tw:border-t tw:border-white/[0.05] tw:flex tw:items-center tw:justify-between">
+      <div className="tw:px-4 tw:py-3 tw:bg-[#0a0a0a] tw:border-t tw:border-white/5 tw:flex tw:items-center tw:justify-between">
         <div className="tw:flex tw:gap-2">
           <div className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-white/10">
             <Radio className="tw:w-3.5 tw:h-3.5 tw:text-white/60" />
@@ -218,9 +218,9 @@ export default function ThreeStepSection({
             transition={{ duration: 0.4 }}
           >
             <span className="tw:text-[11px] tw:tracking-widest tw:uppercase tw:text-primary tw:font-semibold">Three steps to go live</span>
-            <p className="tw:mt-2 tw:text-sm tw:text-gray-500 tw:max-w-sm">
+            <span className="tw:block tw:mt-2 tw:text-sm tw:text-gray-500 tw:max-w-sm">
               From signing up to streaming live — it takes minutes, not hours.
-            </p>
+            </span>
           </motion.div>
 
           <div className="tw:space-y-8">
