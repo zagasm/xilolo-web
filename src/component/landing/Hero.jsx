@@ -228,7 +228,7 @@ function LiveDashboardMockup() {
       <div aria-hidden className="tw:absolute tw:inset-x-0 tw:top-12 tw:pointer-events-none">
         <div
           className="tw:absolute tw:inset-x-16 tw:h-48 tw:rounded-full tw:blur-3xl"
-          style={{ background: "radial-gradient(ellipse, rgba(0,255,209,0.07) 0%, rgba(5,5,5,0.12) 55%, transparent 80%)" }}
+          style={{ background: "radial-gradient(ellipse, rgba(0,245,255,0.08) 0%, rgba(5,5,5,0.12) 55%, transparent 80%)" }}
         />
       </div>
 
@@ -246,7 +246,7 @@ function LiveDashboardMockup() {
             className="tw:rounded-3xl tw:overflow-hidden tw:bg-[#111111] tw:border tw:border-white/7"
             style={{
               boxShadow:
-                "0 50px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), 0 0 60px rgba(0,255,209,0.04)",
+                "0 50px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), 0 0 60px rgba(0,245,255,0.08)",
             }}
           >
             {/* Title bar */}
@@ -287,7 +287,7 @@ function LiveDashboardMockup() {
                 {/* Subtle neon accent beam */}
                 <div
                   className="tw:absolute tw:top-0 tw:right-1/3 tw:w-32 tw:h-24 tw:blur-3xl tw:opacity-40"
-                  style={{ background: "linear-gradient(180deg, rgba(0,255,209,0.08), transparent)" }}
+                  style={{ background: "linear-gradient(180deg, rgba(0,245,255,0.10), transparent)" }}
                 />
                 <div className="tw:absolute tw:bottom-0 tw:inset-x-0 tw:h-1/2 tw:bg-linear-to-t tw:from-black/70 tw:to-transparent" />
                 {/* Subtle scan grid */}
@@ -316,8 +316,8 @@ function LiveDashboardMockup() {
                   background: "rgba(0,0,0,0.55)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(0,255,209,0.12)",
-                  boxShadow: "0 0 12px rgba(0,255,209,0.08)",
+                  border: "1px solid rgba(0,245,255,0.16)",
+                  boxShadow: "0 0 14px rgba(0,245,255,0.10)",
                 }}
               >
                 <div className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-green-400 tw:animate-pulse" />
@@ -388,22 +388,22 @@ function LiveDashboardMockup() {
                   animate={{ width: "68%" }}
                   transition={{ duration: 2.8, delay: 1.4, ease: "easeOut" }}
                   style={{
-                    background: "linear-gradient(90deg, #1a1a1a 0%, #2b2b2b 60%, rgba(0,255,209,0.7) 100%)",
+                    background: "linear-gradient(90deg, #1a1a1a 0%, #2b2b2b 60%, rgba(0,245,255,0.72) 100%)",
                   }}
                 >
                   {/* Neon tip glow */}
                   <div
                     className="tw:absolute tw:right-0 tw:top-1/2 tw:-translate-y-1/2 tw:w-2 tw:h-3 tw:rounded-full"
-                    style={{ background: "#00ffd1", boxShadow: "0 0 8px rgba(0,255,209,0.9)", opacity: 0.8 }}
+                    style={{ background: "#00F5FF", boxShadow: "0 0 8px rgba(0,245,255,0.9)", opacity: 0.8 }}
                   />
                 </motion.div>
               </div>
               <div
                 className="tw:flex tw:items-center tw:gap-1 tw:rounded-full tw:px-3 tw:py-1.5 tw:border"
                 style={{
-                  background: "rgba(0,255,209,0.04)",
-                  borderColor: "rgba(0,255,209,0.12)",
-                  boxShadow: "0 0 12px rgba(0,255,209,0.06)",
+                  background: "rgba(0,245,255,0.05)",
+                  borderColor: "rgba(0,245,255,0.14)",
+                  boxShadow: "0 0 14px rgba(0,245,255,0.08)",
                 }}
               >
                 <span className="tw:text-[9px] tw:text-white/40">$</span>
@@ -458,8 +458,8 @@ function LiveDashboardMockup() {
                 background: "rgba(5,5,5,0.82)",
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
-                border: "1px solid rgba(0,255,209,0.1)",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.45), 0 0 20px rgba(0,255,209,0.05)",
+                border: "1px solid rgba(0,245,255,0.14)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.45), 0 0 24px rgba(0,245,255,0.08)",
                 color: "white",
               }}
             >
@@ -493,7 +493,7 @@ function LiveDashboardMockup() {
                 className="tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:shrink-0"
                 style={{
                   background: "#050505",
-                  boxShadow: "0 0 12px rgba(0,255,209,0.15)",
+                  boxShadow: "0 0 14px rgba(0,245,255,0.18)",
                 }}
               >
                 <span className="tw:text-[11px] tw:font-black tw:text-white">98%</span>
@@ -532,8 +532,7 @@ export default function Hero() {
 
   return (
     <section
-      className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-8 tw:pb-6 tw:relative tw:overflow-hidden"
-      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      className="tw:mx-auto tw:max-w-7xl tw:px-5 tw:pt-8 tw:pb-6 tw:relative tw:overflow-visible"
     >
       {/* Subtle neon top glow */}
       <div
@@ -544,7 +543,7 @@ export default function Hero() {
           style={{
             width: "700px",
             height: "180px",
-            background: "radial-gradient(ellipse at center, rgba(0,255,209,0.055) 0%, transparent 70%)",
+            background: "radial-gradient(ellipse at center, rgba(0,245,255,0.065) 0%, transparent 70%)",
             filter: "blur(30px)",
           }}
         />

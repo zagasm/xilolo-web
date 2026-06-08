@@ -27,7 +27,7 @@ export default function ContactHero() {
       {/* Soft background glow */}
       <div className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:-top-24 tw:-z-10 tw:flex tw:justify-center">
         <motion.div
-          className="tw:h-72 tw:w-72 tw:rounded-full tw:bg-primary/20 tw:blur-3xl tw:opacity-60"
+          className="tw:h-72 tw:w-72 tw:rounded-full tw:bg-neon/12 tw:blur-3xl tw:opacity-60"
           animate={{ scale: [1, 1.08, 1] }}
           transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
         />
@@ -37,7 +37,7 @@ export default function ContactHero() {
         {/* Left: text */}
         <motion.div className="tw:flex-1" variants={itemVariants}>
           <motion.div
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary/5 tw:px-3 tw:py-1 tw:border tw:border-primary/15 tw:mb-4"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary/5 tw:px-3 tw:py-1 tw:border tw:border-neon/20 tw:mb-4 tw:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
             whileHover={{ y: -1, scale: 1.01 }}
           >
             <Sparkles className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
@@ -89,10 +89,10 @@ export default function ContactHero() {
             className="tw:rounded-3xl tw:bg-primary tw:text-white tw:p-5 tw:md:p-6 tw:relative tw:overflow-hidden"
             animate={{ y: [0, -6, 0] }}
             transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            style={{ boxShadow: "0 32px 80px rgba(5,5,5,0.55)" }}
+            style={{ boxShadow: "0 32px 80px rgba(5,5,5,0.55), 0 0 30px rgba(0,245,255,0.10)" }}
           >
             {/* Inner glow accents */}
-            <div aria-hidden className="tw:absolute tw:-right-12 tw:-top-12 tw:h-44 tw:w-44 tw:rounded-full tw:bg-white/6 tw:blur-2xl" />
+            <div aria-hidden className="tw:absolute tw:-right-12 tw:-top-12 tw:h-44 tw:w-44 tw:rounded-full tw:bg-neon/10 tw:blur-2xl" />
             <div aria-hidden className="tw:absolute tw:-left-12 tw:bottom-0 tw:h-40 tw:w-40 tw:rounded-full tw:bg-white/4 tw:blur-2xl" />
 
             <div className="tw:relative">

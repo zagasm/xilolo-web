@@ -40,7 +40,7 @@ export default function AutomationSection({
       {/* Section blur backdrops */}
       <div aria-hidden className="tw:pointer-events-none tw:absolute tw:inset-0">
         <div className="tw:absolute tw:-left-40 tw:top-10 tw:h-[420px] tw:w-[420px] tw:rounded-full tw:blur-[90px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(17,17,17,0.14),rgba(43,43,43,0.07)_55%,transparent_70%)]" />
-        <div className="tw:absolute tw:-right-28 tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[110px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(43,43,43,0.12),rgba(17,17,17,0.06)_55%,transparent_70%)]" />
+        <div className="tw:absolute tw:-right-28 tw:bottom-0 tw:h-[520px] tw:w-[520px] tw:rounded-full tw:blur-[110px] tw:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(0,245,255,0.09),rgba(17,17,17,0.05)_55%,transparent_70%)]" />
       </div>
 
       <div className="tw:relative tw:z-10 tw:mx-auto tw:max-w-6xl tw:px-5">
@@ -85,7 +85,7 @@ export default function AutomationSection({
             >
               <Link
                 to={ctaTo}
-                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-primary/20 tw:text-primary tw:font-semibold tw:shadow-lg tw:hover:shadow-xl tw:transition"
+                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-primary/20 tw:text-primary tw:font-semibold tw:shadow-[0_14px_38px_rgba(0,0,0,0.12),0_0_18px_rgba(0,245,255,0.10)] tw:transition hover:tw:shadow-[0_18px_45px_rgba(0,0,0,0.14),0_0_24px_rgba(0,245,255,0.16)]"
               >
                 {ctaLabel}
                 <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:text-white">
@@ -109,14 +109,14 @@ export default function AutomationSection({
               className="tw:absolute tw:-inset-4 tw:rounded-3xl tw:blur-2xl tw:pointer-events-none"
               style={{
                 background:
-                  "radial-gradient(ellipse at 50% 50%, rgba(5,5,5,0.12), transparent 65%)",
+                  "radial-gradient(ellipse at 50% 50%, rgba(0,245,255,0.08), rgba(5,5,5,0.09) 38%, transparent 65%)",
               }}
             />
 
             {/* Media card */}
             <motion.div
               whileHover={{ y: -4 }}
-              className="tw:relative tw:rounded-2xl tw:overflow-hidden tw:shadow-[0_24px_70px_rgba(0,0,0,0.15)] tw:ring-1 tw:ring-black/8"
+              className="tw:relative tw:rounded-2xl tw:overflow-hidden tw:shadow-[0_24px_70px_rgba(0,0,0,0.15),0_0_28px_rgba(0,245,255,0.08)] tw:ring-1 tw:ring-black/8"
               animate={{ y: -2 }}
               transition={{
                 default: {
@@ -168,7 +168,7 @@ export default function AutomationSection({
                     delay: idx * 0.8,
                   }}
                   className={[
-                    "tw:rounded-2xl tw:px-3.5 tw:py-2.5 tw:shadow-[0_16px_50px_rgba(0,0,0,0.25)]",
+                    "tw:rounded-2xl tw:px-3.5 tw:py-2.5 tw:shadow-[0_16px_50px_rgba(0,0,0,0.25),0_0_18px_rgba(0,245,255,0.08)]",
                     m.dark
                       ? "tw:bg-[#050505] tw:text-white tw:border tw:border-white/10"
                       : "tw:bg-white tw:text-gray-900 tw:border tw:border-black/5",

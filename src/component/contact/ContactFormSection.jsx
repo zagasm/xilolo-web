@@ -36,7 +36,7 @@ export default function ContactFormSection() {
         {/* Form card */}
         <motion.div
           className="tw:relative tw:rounded-3xl tw:bg-white tw:border tw:border-slate-200/70 tw:p-5 tw:md:p-7 tw:overflow-hidden"
-          style={{ boxShadow: "0 24px 70px rgba(15,23,42,0.08)" }}
+          style={{ boxShadow: "0 24px 70px rgba(15,23,42,0.08), 0 0 22px rgba(0,245,255,0.05)" }}
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
@@ -144,7 +144,7 @@ export default function ContactFormSection() {
                     type="submit"
                     disabled={submitting}
                     className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-6 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
-                    style={{ boxShadow: "0 16px 48px rgba(5,5,5,0.3)" }}
+                    style={{ boxShadow: "0 16px 48px rgba(5,5,5,0.3), 0 0 18px rgba(0,245,255,0.10)" }}
                     whileHover={{ scale: submitting ? 1 : 1.02, y: submitting ? 0 : -1 }}
                     whileTap={{ scale: submitting ? 1 : 0.98 }}
                   >
@@ -179,7 +179,7 @@ export default function ContactFormSection() {
             className="tw:relative tw:rounded-3xl tw:overflow-hidden tw:p-5 tw:md:p-6 tw:text-white"
             style={{
               background: "#050505",
-              boxShadow: "0 28px 70px rgba(5,5,5,0.5)",
+              boxShadow: "0 28px 70px rgba(5,5,5,0.5), 0 0 28px rgba(0,245,255,0.10)",
             }}
           >
             <div
@@ -190,7 +190,7 @@ export default function ContactFormSection() {
             <div
               aria-hidden
               className="tw:absolute tw:-left-8 tw:bottom-0 tw:w-40 tw:h-40 tw:rounded-full tw:blur-3xl tw:pointer-events-none"
-              style={{ background: "rgba(0,255,209,0.04)" }}
+              style={{ background: "rgba(0,245,255,0.05)" }}
             />
 
             <div className="tw:relative">

@@ -69,7 +69,7 @@ export default function AboutEcosystemSection() {
                 key={chip}
                 className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:text-slate-700 tw:font-medium tw:shadow-sm"
               >
-                <span className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-primary" />
+                <span className="tw:w-1.5 tw:h-1.5 tw:rounded-full tw:bg-neon tw:shadow-[0_0_8px_rgba(0,245,255,0.45)]" />
                 {chip}
               </span>
             ))}
@@ -86,9 +86,9 @@ export default function AboutEcosystemSection() {
           <motion.div
             whileHover={{ y: -4, scale: 1.02 }}
             transition={{ type: "spring", stiffness: 200, damping: 16 }}
-            className="tw:rounded-2xl tw:bg-primary tw:text-white tw:p-4 tw:flex tw:flex-col tw:justify-between tw:min-h-[140px] tw:relative tw:overflow-hidden"
+            className="tw:rounded-2xl tw:bg-primary tw:text-white tw:p-4 tw:flex tw:flex-col tw:justify-between tw:min-h-[140px] tw:relative tw:overflow-hidden tw:shadow-[0_18px_45px_rgba(0,0,0,0.22),0_0_24px_rgba(0,245,255,0.10)]"
           >
-            <div aria-hidden className="tw:absolute tw:-right-6 tw:-top-6 tw:h-20 tw:w-20 tw:rounded-full tw:bg-white/6 tw:blur-xl" />
+            <div aria-hidden className="tw:absolute tw:-right-6 tw:-top-6 tw:h-20 tw:w-20 tw:rounded-full tw:bg-neon/10 tw:blur-xl" />
             <span className="tw:text-[10px] tw:uppercase tw:tracking-[0.18em] tw:text-white/50 tw:font-semibold">
               Reliability
             </span>
@@ -127,7 +127,7 @@ export default function AboutEcosystemSection() {
             transition={{ type: "spring", stiffness: 200, damping: 16 }}
             className="tw:col-span-2 tw:rounded-2xl tw:bg-linear-to-r tw:from-slate-900 tw:to-primarySecond tw:text-white tw:p-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4 tw:relative tw:overflow-hidden"
           >
-            <div aria-hidden className="tw:absolute tw:-right-10 tw:top-0 tw:h-20 tw:w-32 tw:bg-white/4 tw:blur-2xl tw:rounded-full" />
+            <div aria-hidden className="tw:absolute tw:-right-10 tw:top-0 tw:h-20 tw:w-32 tw:bg-neon/10 tw:blur-2xl tw:rounded-full" />
             <div className="tw:relative">
               <span className="tw:block tw:text-[13px] tw:font-semibold tw:max-w-xs">
                 Built for creators everywhere.

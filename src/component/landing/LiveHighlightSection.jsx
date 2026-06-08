@@ -226,7 +226,7 @@ export default function LiveHighlightsSection() {
 
       {/* Soft glow blob */}
       <motion.div
-        className="tw:absolute tw:-right-20 tw:top-10 tw:h-72 tw:w-72 tw:bg-primary/20 tw:blur-3xl tw:rounded-full tw:pointer-events-none"
+        className="tw:absolute tw:-right-20 tw:top-10 tw:h-72 tw:w-72 tw:bg-neon/12 tw:blur-3xl tw:rounded-full tw:pointer-events-none"
         aria-hidden="true"
         animate={{ y: [0, 20, 0], opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
@@ -283,10 +283,10 @@ export default function LiveHighlightsSection() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
                 whileHover={{ y: -6, scale: 1.02 }}
-                className="tw:relative tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-5 tw:backdrop-blur-xl tw:overflow-hidden tw:flex tw:flex-col tw:gap-3 tw:transition-shadow tw:hover:shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+                className="tw:relative tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-5 tw:backdrop-blur-xl tw:overflow-hidden tw:flex tw:flex-col tw:gap-3 tw:transition-shadow tw:hover:shadow-[0_0_40px_rgba(0,245,255,0.12)]"
               >
                 {/* Glow accent */}
-                <div className="tw:absolute tw:-right-10 tw:-top-10 tw:h-24 tw:w-24 tw:bg-primary/30 tw:blur-3xl tw:opacity-70" />
+                <div className="tw:absolute tw:-right-10 tw:-top-10 tw:h-24 tw:w-24 tw:bg-neon/12 tw:blur-3xl tw:opacity-70" />
 
                 <div className="tw:relative tw:z-10 tw:flex tw:flex-col tw:gap-3">
                   <div className="tw:flex tw:items-center tw:justify-between">

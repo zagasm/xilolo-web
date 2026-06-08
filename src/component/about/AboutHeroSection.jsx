@@ -61,9 +61,9 @@ export default function AboutHeroSection() {
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             className="tw:relative tw:rounded-3xl tw:bg-[#050505] tw:text-white tw:p-5 tw:overflow-hidden"
-            style={{ boxShadow: "0 24px 70px rgba(5,5,5,0.45)" }}
+            style={{ boxShadow: "0 24px 70px rgba(5,5,5,0.45), 0 0 28px rgba(0,245,255,0.10)" }}
           >
-            <div aria-hidden className="tw:absolute tw:-right-10 tw:-top-10 tw:h-32 tw:w-32 tw:rounded-full tw:bg-white/[0.06] tw:blur-2xl" />
+            <div aria-hidden className="tw:absolute tw:-right-10 tw:-top-10 tw:h-32 tw:w-32 tw:rounded-full tw:bg-neon/10 tw:blur-2xl" />
             <div aria-hidden className="tw:absolute tw:-left-8 tw:bottom-0 tw:h-24 tw:w-24 tw:rounded-full tw:bg-white/[0.04] tw:blur-2xl" />
 
             <div className="tw:relative">
@@ -112,14 +112,14 @@ export default function AboutHeroSection() {
               whileHover={{ y: -4, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 200, damping: 16 }}
               className="tw:relative tw:rounded-2xl tw:bg-white tw:border tw:border-slate-200/80 tw:p-4 tw:overflow-hidden"
-              style={{ boxShadow: "0 14px 40px rgba(15,23,42,0.07)" }}
+              style={{ boxShadow: "0 14px 40px rgba(15,23,42,0.07), 0 0 18px rgba(0,245,255,0.05)" }}
             >
               <div aria-hidden className="tw:absolute tw:-right-6 tw:-top-6 tw:h-16 tw:w-16 tw:rounded-full tw:bg-primary/5 tw:blur-xl" />
               <div className="tw:flex tw:items-start tw:justify-between tw:mb-2">
                 <span className="tw:block tw:text-[28px] tw:font-black tw:text-slate-900 tw:font-league tw:leading-none">
                   {stat.value}
                 </span>
-                <div className="tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/8">
+                <div className="tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/8 tw:shadow-[0_0_12px_rgba(0,245,255,0.10)]">
                   <Icon className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
                 </div>
               </div>

@@ -39,7 +39,7 @@ export default function ContactMetaSection() {
     >
       <div
         className="tw:rounded-3xl tw:border tw:border-slate-200/70 tw:px-5 tw:py-6 tw:md:px-8 tw:md:py-8"
-        style={{ background: "rgba(250,250,250,0.85)", boxShadow: "0 20px 55px rgba(15,23,42,0.06)" }}
+        style={{ background: "rgba(250,250,250,0.85)", boxShadow: "0 20px 55px rgba(15,23,42,0.06), 0 0 20px rgba(0,245,255,0.04)" }}
       >
         <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:gap-8">
           {/* Left: label + headline */}
@@ -73,7 +73,7 @@ export default function ContactMetaSection() {
                       ? {
                           background: "#050505",
                           color: "white",
-                          boxShadow: "0 16px 50px rgba(5,5,5,0.4)",
+                          boxShadow: "0 16px 50px rgba(5,5,5,0.4), 0 0 18px rgba(0,245,255,0.10)",
                         }
                       : {
                           background: "white",
@@ -86,7 +86,7 @@ export default function ContactMetaSection() {
                     <div
                       aria-hidden
                       className="tw:absolute tw:-right-8 tw:-top-8 tw:w-24 tw:h-24 tw:rounded-full tw:blur-2xl tw:pointer-events-none"
-                      style={{ background: "rgba(0,255,209,0.06)" }}
+                      style={{ background: "rgba(0,245,255,0.07)" }}
                     />
                   )}
                   <div className="tw:relative">

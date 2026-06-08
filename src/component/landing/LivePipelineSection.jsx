@@ -61,7 +61,7 @@ export default function LivePipelineSection() {
       {/* soft bg gradients (now animated) */}
       <div className="tw:pointer-events-none tw:absolute tw:inset-0">
         <motion.div
-          className="tw:absolute tw:-left-24 tw:top-4 tw:h-64 tw:w-64 tw:bg-primary/20 tw:blur-3xl tw:opacity-60"
+          className="tw:absolute tw:-left-24 tw:top-4 tw:h-64 tw:w-64 tw:bg-neon/10 tw:blur-3xl tw:opacity-60"
           animate={{ x: [0, 20, 0], y: [0, -10, 0] }}
           transition={{
             duration: 18,
@@ -71,7 +71,7 @@ export default function LivePipelineSection() {
           }}
         />
         <motion.div
-          className="tw:absolute tw:-right-24 tw:-bottom-16 tw:h-72 tw:w-72 tw:bg-primary/25 tw:blur-3xl tw:opacity-70"
+          className="tw:absolute tw:-right-24 tw:-bottom-16 tw:h-72 tw:w-72 tw:bg-neon/12 tw:blur-3xl tw:opacity-70"
           animate={{ x: [0, -24, 0], y: [0, 18, 0] }}
           transition={{
             duration: 20,
@@ -134,7 +134,7 @@ export default function LivePipelineSection() {
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 1.1, ease: "easeOut" }}
-            className="tw:origin-left tw:h-px tw:w-full tw:bg-linear-to-r tw:from-primary/10 tw:via-primary tw:to-primary/10 tw:shadow-[0_0_25px_rgba(0,0,0,0.35)]"
+            className="tw:origin-left tw:h-px tw:w-full tw:bg-linear-to-r tw:from-primary/10 tw:via-neon tw:to-primary/10 tw:shadow-[0_0_25px_rgba(0,245,255,0.22)]"
           />
 
           {/* shimmering band running along the line */}
@@ -164,7 +164,7 @@ export default function LivePipelineSection() {
               repeatType: "loop",
               ease: "easeInOut",
             }}
-            className="tw:absolute tw:-top-1 tw:h-3 tw:w-3 tw:rounded-full tw:bg-primary tw:shadow-[0_0_18px_rgba(0,0,0,0.4)]"
+            className="tw:absolute tw:-top-1 tw:h-3 tw:w-3 tw:rounded-full tw:bg-neon tw:shadow-[0_0_18px_rgba(0,245,255,0.5)]"
           />
         </div>
 
@@ -179,11 +179,11 @@ export default function LivePipelineSection() {
                 scale: 1.02,
               }}
               transition={{ type: "spring", stiffness: 220, damping: 18 }}
-              className="tw:relative tw:flex tw:flex-col tw:gap-3 tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-4 tw:backdrop-blur-xl tw:overflow-hidden"
+              className="tw:relative tw:flex tw:flex-col tw:gap-3 tw:rounded-2xl tw:bg-white/5 tw:border tw:border-white/10 tw:p-4 tw:backdrop-blur-xl tw:overflow-hidden tw:shadow-[0_18px_45px_rgba(0,0,0,0.18),0_0_18px_rgba(0,245,255,0.05)]"
             >
               {/* floating ring behind icon (also gently animating) */}
               <motion.div
-                className="tw:absolute tw:-right-8 tw:-top-8 tw:h-20 tw:w-20 tw:rounded-full tw:border tw:border-primary/30 tw:bg-primary/10 tw:blur-xl"
+                className="tw:absolute tw:-right-8 tw:-top-8 tw:h-20 tw:w-20 tw:rounded-full tw:border tw:border-neon/20 tw:bg-neon/8 tw:blur-xl"
                 animate={{
                   scale: [1, 1.15, 1],
                   opacity: [0.7, 1, 0.7],

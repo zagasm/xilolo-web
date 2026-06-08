@@ -33,7 +33,7 @@ export default function XiloloAiSection() {
           style={{
             width: "900px",
             height: "280px",
-            background: "radial-gradient(ellipse at 50% 0%, rgba(0,255,209,0.09) 0%, transparent 65%)",
+            background: "radial-gradient(ellipse at 50% 0%, rgba(0,245,255,0.10) 0%, transparent 65%)",
             filter: "blur(20px)",
           }}
         />
@@ -49,7 +49,7 @@ export default function XiloloAiSection() {
           style={{
             width: "100%",
             height: "100%",
-            background: "radial-gradient(ellipse at 100% 100%, rgba(0,255,209,0.06) 0%, transparent 60%)",
+            background: "radial-gradient(ellipse at 100% 100%, rgba(0,245,255,0.07) 0%, transparent 60%)",
             filter: "blur(30px)",
           }}
         />
@@ -77,9 +77,9 @@ export default function XiloloAiSection() {
           <motion.span
             className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em]"
             style={{
-              background: "rgba(0,255,209,0.07)",
-              border: "1px solid rgba(0,255,209,0.18)",
-              color: "rgba(0,255,209,0.9)",
+              background: "rgba(0,245,255,0.08)",
+              border: "1px solid rgba(0,245,255,0.2)",
+              color: "rgba(0,245,255,0.92)",
             }}
             whileHover={{ scale: 1.03 }}
           >
@@ -99,7 +99,7 @@ export default function XiloloAiSection() {
             <Link
               to="/subscription"
               className="tw:inline-flex tw:h-12 tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:text-sm tw:font-black tw:text-primary tw:transition hover:tw:-translate-y-0.5"
-              style={{ boxShadow: "0 18px 45px rgba(0,0,0,0.3), 0 0 20px rgba(0,255,209,0.08)" }}
+              style={{ boxShadow: "0 18px 45px rgba(0,0,0,0.3), 0 0 22px rgba(0,245,255,0.12)" }}
             >
               Unlock beta
               <span className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white">
@@ -131,15 +131,15 @@ export default function XiloloAiSection() {
           <div
             aria-hidden
             className="tw:absolute tw:inset-x-8 tw:-bottom-6 tw:h-24 tw:rounded-full tw:blur-2xl tw:pointer-events-none"
-            style={{ background: "rgba(0,255,209,0.08)" }}
+            style={{ background: "rgba(0,245,255,0.09)" }}
           />
 
           <div
             className="tw:overflow-hidden tw:rounded-[28px] tw:p-3 tw:text-primary tw:md:p-4"
             style={{
               background: "rgba(229,228,226,0.96)",
-              border: "1px solid rgba(0,255,209,0.12)",
-              boxShadow: "0 30px 90px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,255,209,0.06)",
+              border: "1px solid rgba(0,245,255,0.14)",
+              boxShadow: "0 30px 90px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,245,255,0.07)",
             }}
           >
             {/* Header */}
@@ -163,10 +163,10 @@ export default function XiloloAiSection() {
               <span
                 className="tw:rounded-full tw:px-3 tw:py-1 tw:text-[11px] tw:font-black"
                 style={{
-                  background: "rgba(0,255,209,0.1)",
+                  background: "rgba(0,245,255,0.1)",
                   color: "rgba(5,100,80,1)",
-                  border: "1px solid rgba(0,255,209,0.25)",
-                  boxShadow: "0 0 10px rgba(0,255,209,0.1)",
+                  border: "1px solid rgba(0,245,255,0.25)",
+                  boxShadow: "0 0 12px rgba(0,245,255,0.12)",
                 }}
               >
                 Live
@@ -209,7 +209,7 @@ export default function XiloloAiSection() {
               </div>
               <span
                 className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white"
-                style={{ boxShadow: "0 0 14px rgba(0,255,209,0.12)" }}
+                style={{ boxShadow: "0 0 16px rgba(0,245,255,0.14)" }}
               >
                 <MessageCircle className="tw:h-4 tw:w-4" />
               </span>
@@ -241,7 +241,7 @@ export default function XiloloAiSection() {
             >
               <span
                 className="tw:grid tw:h-11 tw:w-11 tw:place-items-center tw:rounded-full tw:bg-white tw:text-primary"
-                style={{ boxShadow: "0 0 16px rgba(0,255,209,0.1)" }}
+                style={{ boxShadow: "0 0 18px rgba(0,245,255,0.12)" }}
               >
                 <Icon className="tw:h-5 tw:w-5" />
               </span>
