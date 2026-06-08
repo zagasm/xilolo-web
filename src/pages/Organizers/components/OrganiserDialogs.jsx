@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from "react";
 import { Dialog as HeadlessDialog, Transition } from "@headlessui/react";
 import { Dialog as MuiDialog, DialogContent, DialogTitle } from "@mui/material";
 import confetti from "canvas-confetti";
+import { BadgeCheck } from "lucide-react";
 
 export function OrganiserProcessingDialog({ open }) {
   return (
@@ -44,6 +45,7 @@ export function OrganiserVerificationSuccessDialog({
         spread,
         startVelocity: 34,
         scalar: 0.86,
+        zIndex: 99999,
         origin: { x: 0.5, y: 0.22 },
         colors,
       });
@@ -87,24 +89,23 @@ export function OrganiserVerificationSuccessDialog({
             >
               <HeadlessDialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-[28px] tw:bg-white tw:px-5 tw:py-6 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:ring-1 tw:ring-black/5 tw:sm:px-6">
                 <div className="tw:flex tw:items-start tw:gap-4">
-                  <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary/10 tw:text-2xl tw:text-primary">
-                    ✓
+                  <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-emerald-50 tw:text-emerald-600 tw:ring-1 tw:ring-emerald-100">
+                    <BadgeCheck className="tw:h-8 tw:w-8" strokeWidth={2.2} />
                   </div>
                   <div className="tw:min-w-0">
                     <span className="tw:block tw:text-xl tw:font-semibold tw:text-slate-900 tw:sm:text-2xl">
                       Verification successful
                     </span>
                     <span className="tw:mt-2 tw:block tw:text-sm tw:leading-6 tw:text-slate-600">
-                      Your organiser account is active. You can create events,
-                      set up ticketing, and start managing your Xilolo organiser
-                      tools right away.
+                      Congratulations! You are now an organiser. You can create events,
+                      set ticket prices, request payouts, and start managing your Xilolo organiser
+                      account.
                     </span>
                   </div>
                 </div>
 
                 <div className="tw:mt-5 tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:text-sm tw:text-slate-600">
-                  A confirmation has also been sent to your email and push
-                  notifications, where available.
+                  A confirmation has also been sent to your email address.
                 </div>
 
                 <div className="tw:mt-6 tw:flex tw:flex-col-reverse tw:gap-3 tw:sm:flex-row tw:sm:justify-end">

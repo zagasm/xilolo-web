@@ -42,7 +42,7 @@ export default function OrganiserDiditStep({
               Current status
             </span>
             <span className="tw:inline-flex tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-xs tw:font-medium tw:text-slate-700 tw:border tw:border-slate-200">
-              {organiserIsActive ? "Organiser active" : diditStatus || "No session yet"}
+              {organiserIsActive ? "Organiser active" : diditStatus || "Unverified"}
             </span>
           </div>
         </div>

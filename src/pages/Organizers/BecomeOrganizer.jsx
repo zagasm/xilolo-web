@@ -533,12 +533,19 @@ const BecomeOrganiser = () => {
                   return;
                 }
 
-                if (refreshed?.status) {
-                  showSuccess(
-                    "Verification submitted successfully. Your organiser account is active."
-                  );
-                  await showOrganiserSuccess();
+                if (refreshed?.local_kyc_status === "failed") {
+                  const message =
+                    refreshed?.failure_reason ||
+                    "DIDIT verification was not approved. Please start a new verification session and try again.";
+                  setDiditSessionError(message);
+                  showError(message);
+                  return;
                 }
+
+                const message =
+                  "Verification did not activate your organiser account yet. Please try refreshing or start a new verification session.";
+                setDiditSessionError(message);
+                showError(message);
               } catch (refreshError) {
                 const message =
                   refreshError?.response?.data?.message ||

@@ -30,11 +30,24 @@ test("BVN and DIDIT success paths open the organiser success modal", () => {
   assert.doesNotMatch(source, /We're reviewing your details|under review|verification under review/i);
 });
 
+test("DIDIT failed refresh does not open the organiser success modal", () => {
+  const source = readSource("pages/Organizers/BecomeOrganizer.jsx");
+
+  assert.match(source, /refreshed\?\.local_kyc_status === "failed"/);
+  assert.match(source, /DIDIT verification was not approved/);
+  assert.doesNotMatch(
+    source,
+    /if\s*\(\s*refreshed\?\.status\s*\)\s*\{[\s\S]*?showOrganiserSuccess\(\)/
+  );
+});
+
 test("organiser success modal uses canvas-confetti and offers event creation", () => {
   const source = readSource("pages/Organizers/components/OrganiserDialogs.jsx");
 
   assert.match(source, /import confetti from "canvas-confetti"/);
+  assert.match(source, /import \{ BadgeCheck \} from "lucide-react"/);
   assert.match(source, /confetti\(\{/);
+  assert.match(source, /zIndex:\s*99999/);
   assert.match(source, /Verification successful/);
   assert.match(source, /Create an event/);
 });
