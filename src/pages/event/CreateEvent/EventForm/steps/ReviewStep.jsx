@@ -329,7 +329,7 @@ export default function ReviewStep({
         </section>
 
         <div className="tw:space-y-4">
-          <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:p-5">
+          <section className="tw:rounded-[28px] tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-5 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
             <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
               <div>
                 <div className="tw:text-lg tw:font-semibold tw:text-slate-900">

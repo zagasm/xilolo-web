@@ -59,7 +59,7 @@ function SingleNotificationTemplate({ notification, onClick }) {
       <div className="tw:flex tw:items-start tw:gap-3">
         <span
           className={`tw:mt-1 tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
-            isUnread ? "tw:bg-primary" : "tw:bg-slate-300"
+            isUnread ? "tw:bg-neon tw:shadow-[0_0_10px_rgba(0,245,255,0.65)]" : "tw:bg-slate-300"
           }`}
         />
 

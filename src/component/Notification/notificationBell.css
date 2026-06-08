@@ -5,6 +5,7 @@
 .notification-bell__badge {
   background: #dc2626;
   color: #fff;
+  box-shadow: 0 0 12px rgba(0, 245, 255, 0.22);
   border-radius: 999px;
   padding: 0 0.45rem;
   font-size: 0.75rem;
@@ -17,7 +18,7 @@
   background: #fff;
   border-radius: 18px;
   padding: 1rem;
-  box-shadow: 0 20px 35px rgba(15, 23, 42, 0.14);
+  box-shadow: 0 20px 35px rgba(15, 23, 42, 0.14), 0 0 18px rgba(0, 245, 255, 0.08);
   width: 320px;
 }
 
@@ -59,7 +60,7 @@
 .notification-dropdown__item {
   width: 100%;
   border: none;
-  background: #f8f7ff;
+  background: #f8fafc;
   border-radius: 14px;
   padding: 0.75rem;
   display: flex;
@@ -71,7 +72,7 @@
 }
 
 .notification-dropdown__item:hover {
-  background: #efe9ff;
+  background: rgba(0, 245, 255, 0.08);
 }
 
 .notification-dropdown__item-title {
@@ -90,7 +91,8 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #050505;
+  background: #00f5ff;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.65);
 }
 
 .notification-dropdown__item-body {

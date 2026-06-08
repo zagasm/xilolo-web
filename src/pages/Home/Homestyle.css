@@ -101,7 +101,7 @@ img:hover { transform: scale(1.01); }
 
 .tab.active {
   border-color: var(--color-primary, #050505);
-  box-shadow: 0 6px 18px rgba(143, 7, 231, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 245, 255, 0.12);
 }
 
 /* Keep underline cue if you like it */

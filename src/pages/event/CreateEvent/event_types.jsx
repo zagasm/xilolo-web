@@ -108,7 +108,7 @@ function EventType() {
   if (shouldShowBecomeOrganiser) {
     return (
       <div className="tw:w-full tw:min-h-screen tw:pt-20 tw:md:pt-24 tw:px-4 tw:lg:px-4">
-        <div className="tw:relative tw:bg-[#ffffff] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+        <div className="tw:relative tw:bg-[#ffffff] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:border tw:border-slate-100 tw:px-4 tw:py-3 tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)]">
           <button
             type="button"
             onClick={() => navigate("/profile/edit-profile")}
@@ -156,7 +156,7 @@ function EventType() {
         }
 
 
-        <div className="tw:bg-linear-to-r tw:from-[#050505] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
+        <div className="tw:bg-linear-to-r tw:from-[#050505] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white tw:shadow-[0_18px_42px_rgba(0,0,0,0.16),0_0_22px_rgba(0,245,255,0.12)]">
           <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
             Do you have an event?
           </span>
@@ -167,7 +167,7 @@ function EventType() {
 
           <Link
             to="/become-an-organiser"
-            className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center"
+            className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center tw:shadow-[0_0_18px_rgba(0,245,255,0.12)]"
           >
             <span className="tw:block tw:font-semibold">
               Become an Organizer
@@ -182,7 +182,7 @@ function EventType() {
   if (isOrganiser && !isKycVerified) {
     return (
       <div className="tw:min-h-screen tw:bg-white tw:flex tw:items-center tw:justify-center tw:px-4 tw:py-10">
-        <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
+        <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18),0_0_22px_rgba(0,245,255,0.08)] tw:space-y-6">
           <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
             <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
               <Edit size={22} className="tw:text-primary" />
@@ -231,7 +231,7 @@ function EventType() {
                   borderRadius: 12,
                 }}
                 type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:hover:shadow-md tw:transition"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:hover:shadow-md tw:transition"
                 onClick={() => navigate("/become-an-organiser")}
               >
                 Complete setup
@@ -278,7 +278,7 @@ function EventType() {
                 key={event.id}
                 type="button"
                 onClick={() => navigate(`/event/create-event/${event.id}`)}
-                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-[#ffffff] tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-primary tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3 tw:text-primary"
+                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-[#ffffff] tw:p-4 tw:text-left tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:border tw:border-[#f0f0f3] tw:hover:border-neon/40 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)] tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3 tw:text-primary"
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-left tw:md:items-center tw:gap-3">

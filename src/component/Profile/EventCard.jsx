@@ -242,7 +242,7 @@ export default function EventCard({
   };
 
   return (
-    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:bg-[#ffffff]">
+    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:border tw:border-slate-100 tw:bg-[#ffffff] tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)] tw:transition-shadow hover:tw:shadow-[0_18px_46px_rgba(15,23,42,0.08),0_0_24px_rgba(0,245,255,0.08)]">
       {/* Top-right actions (only for owner) */}
       {isOwnerEvent && (
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-20">
@@ -250,7 +250,7 @@ export default function EventCard({
             <Menu.Button
               style={{ borderRadius: 9999 }}
               onClick={(e) => e.stopPropagation()}
-              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md hover:tw:bg-slate-50"
+              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-[0_10px_24px_rgba(15,23,42,0.14),0_0_12px_rgba(0,245,255,0.08)] hover:tw:bg-slate-50"
             >
               <MoreVertical className="tw:h-4 tw:w-4" />
             </Menu.Button>
@@ -264,7 +264,7 @@ export default function EventCard({
               leaveFrom="tw:opacity-100 tw:scale-100"
               leaveTo="tw:opacity-0 tw:scale-95"
             >
-              <Menu.Items className="tw:absolute tw:right-0 tw:mt-2 tw:w-60 tw:origin-top-right tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14)] focus:tw:outline-none">
+              <Menu.Items className="tw:absolute tw:right-0 tw:mt-2 tw:w-60 tw:origin-top-right tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14),0_0_20px_rgba(0,245,255,0.08)] focus:tw:outline-none">
                 <Menu.Item>
                   {({ active }) => (
                     <button
@@ -455,7 +455,7 @@ export default function EventCard({
               goToStreamControl();
             }}
             disabled={startingStream}
-            className="tw:mt-auto tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
+            className="tw:mt-auto tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.14),0_0_16px_rgba(0,245,255,0.12)] tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
               {startingStream
@@ -479,7 +479,7 @@ export default function EventCard({
               e.stopPropagation();
               goToEvent();
             }}
-            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:hover:bg-primary/90"
+            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.14),0_0_16px_rgba(0,245,255,0.12)] tw:hover:bg-primary/90"
           >
             <span className="tw:mr-2">
               {isOrganiserProfile ? "Buy Ticket" : "View event"}

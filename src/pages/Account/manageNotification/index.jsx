@@ -78,7 +78,7 @@ function AccountNotification() {
                 {/* Preferences / Accordions */}
                 <main className="tw:flex tw:flex-col tw:gap-4 tw:md:gap-5">
                   {/* PUSH NOTIFICATIONS */}
-                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm tw:shadow-black/5">
+                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]">
                     {/* Accordion header */}
                     <button
                       type="button"
@@ -273,7 +273,7 @@ function AccountNotification() {
                   </section>
 
                   {/* SMS */}
-                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm tw:shadow-black/5">
+                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]">
                     <button
                       type="button"
                       onClick={() => toggleAccordion("sms")}
@@ -353,7 +353,7 @@ function AccountNotification() {
                   </section>
 
                   {/* EMAIL */}
-                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm tw:shadow-black/5">
+                  <section className="tw:rounded-2xl tw:border tw:border-gray-100 tw:bg-white tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]">
                     <button
                       type="button"
                       onClick={() => toggleAccordion("email")}
@@ -519,7 +519,7 @@ function AccountNotification() {
                       }}
                       type="button"
                       onClick={handleUpdate}
-                      className="tw:inline-flex tw:w-full tw:justify-center tw:md:w-auto tw:items-center tw:rounded-xl tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-primarySecond tw:transition tw:shadow-sm"
+                      className="tw:inline-flex tw:w-full tw:justify-center tw:md:w-auto tw:items-center tw:rounded-xl tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-primarySecond tw:transition tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]"
                     >
                       Update preferences
                     </button>
