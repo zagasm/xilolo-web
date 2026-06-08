@@ -3,6 +3,7 @@ export const BANKS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 export const COUNTRIES_API_URL =
   "https://restcountries.com/v3.1/all?fields=name,cca2,flags";
 export const COUNTRY_GEOLOOKUP_API_URL = "https://api.country.is/";
+export const COUNTRY_GEOLOOKUP_FALLBACK_API_URL = "https://ipapi.co/json/";
 export const DIDIT_RETRYABLE_STATUSES = ["Declined", "Abandoned", "Expired"];
 export const BANK_STEPPER_STEPS = ["Account details", "Verify identity"];
 
@@ -39,6 +40,47 @@ export function normalizeCountry(country) {
     flag: country?.flags?.svg || country?.flags?.png || "",
     flagEmoji: country?.flags?.emoji || "",
   };
+}
+
+export function normalizeCountryCode(value) {
+  const countryCode = String(value || "")
+    .trim()
+    .toUpperCase();
+
+  return /^[A-Z]{2}$/.test(countryCode) ? countryCode : "";
+}
+
+export function extractCountryCodeFromGeoPayload(payload) {
+  return normalizeCountryCode(
+    payload?.country ||
+      payload?.country_code ||
+      payload?.countryCode ||
+      payload?.country_code_iso2
+  );
+}
+
+export function detectCountryCodeFromBrowserLocale() {
+  const browserNavigator = globalThis?.navigator;
+  const localeSources = [
+    Intl.DateTimeFormat().resolvedOptions().locale,
+    ...(Array.isArray(browserNavigator?.languages)
+      ? browserNavigator.languages
+      : []),
+    browserNavigator?.language,
+  ].filter(Boolean);
+
+  for (const locale of localeSources) {
+    try {
+      const region = normalizeCountryCode(new Intl.Locale(locale).region);
+      if (region) return region;
+    } catch {
+      const regionMatch = String(locale).match(/[-_]([A-Z]{2})(?:[-_]|$)/i);
+      const region = normalizeCountryCode(regionMatch?.[1]);
+      if (region) return region;
+    }
+  }
+
+  return "";
 }
 
 export function mapDiditStatusCopy(status) {

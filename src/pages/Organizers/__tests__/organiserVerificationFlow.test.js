@@ -20,6 +20,29 @@ test("organiser verification status copy does not show review state after DIDIT 
   assert.match(mapDiditStatusCopy("Approved"), /organiser access is active/i);
 });
 
+test("country prefill supports multiple lookup response shapes and locale fallback", async () => {
+  const {
+    extractCountryCodeFromGeoPayload,
+    normalizeCountryCode,
+  } = await import("../organiserVerificationUtils.js");
+
+  assert.equal(extractCountryCodeFromGeoPayload({ country: "ng" }), "NG");
+  assert.equal(extractCountryCodeFromGeoPayload({ country_code: "us" }), "US");
+  assert.equal(extractCountryCodeFromGeoPayload({ countryCode: "gb" }), "GB");
+  assert.equal(normalizeCountryCode("Nigeria"), "");
+  assert.equal(normalizeCountryCode("NGA"), "");
+});
+
+test("country auto-prefill keeps users on the country step until they continue", () => {
+  const source = readSource("pages/Organizers/BecomeOrganizer.jsx");
+
+  assert.match(source, /COUNTRY_GEOLOOKUP_FALLBACK_API_URL/);
+  assert.match(source, /detectCountryCodeFromBrowserLocale/);
+  assert.match(source, /setSelectedCountry\(matchedCountry\)/);
+  assert.match(source, /setCountryStepVisible\(true\)/);
+  assert.match(source, /const handleCountryContinue = \(\) => \{[\s\S]*setCountryStepVisible\(false\)/);
+});
+
 test("BVN and DIDIT success paths open the organiser success modal", () => {
   const source = readSource("pages/Organizers/BecomeOrganizer.jsx");
 

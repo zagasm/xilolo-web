@@ -21,9 +21,12 @@ import {
 } from "./components/OrganiserDialogs";
 import {
   BANK_STEPPER_STEPS,
+  COUNTRY_GEOLOOKUP_FALLBACK_API_URL,
   COUNTRY_GEOLOOKUP_API_URL,
   COUNTRIES_API_URL,
   DIDIT_RETRYABLE_STATUSES,
+  detectCountryCodeFromBrowserLocale,
+  extractCountryCodeFromGeoPayload,
   loadBanksFromCache,
   mapDiditStatusCopy,
   normalizeCountry,
@@ -181,8 +184,27 @@ const BecomeOrganiser = () => {
     const preloadCountryFromGeo = async () => {
       countryPrefillAttemptedRef.current = true;
 
-      try {
-        const response = await fetch(COUNTRY_GEOLOOKUP_API_URL, {
+      const applyDetectedCountry = (countryCode) => {
+        const normalizedCountryCode = String(countryCode || "")
+          .trim()
+          .toUpperCase();
+        if (!normalizedCountryCode || !active) return false;
+
+        const matchedCountry = countries.find(
+          (country) => country.code === normalizedCountryCode
+        );
+
+        if (!matchedCountry) return false;
+
+        setSelectedCountry(matchedCountry);
+        setDetectedCountry(matchedCountry);
+        setCountryAutoDetected(true);
+        setCountryStepVisible(true);
+        return true;
+      };
+
+      const fetchCountryCode = async (url) => {
+        const response = await fetch(url, {
           signal: controller.signal,
         });
 
@@ -191,24 +213,23 @@ const BecomeOrganiser = () => {
         }
 
         const payload = await response.json();
-        const countryCode = String(payload?.country || "")
-          .trim()
-          .toUpperCase();
+        return extractCountryCodeFromGeoPayload(payload);
+      };
 
-        if (!countryCode || !active) return;
-
-        const matchedCountry = countries.find(
-          (country) => country.code === countryCode
-        );
-
-        if (!matchedCountry) return;
-
-        setSelectedCountry(matchedCountry);
-        setDetectedCountry(matchedCountry);
-        setCountryAutoDetected(true);
-      } catch (error) {
-        if (!active || error?.name === "AbortError") return;
+      for (const lookupUrl of [
+        COUNTRY_GEOLOOKUP_API_URL,
+        COUNTRY_GEOLOOKUP_FALLBACK_API_URL,
+      ]) {
+        try {
+          if (applyDetectedCountry(await fetchCountryCode(lookupUrl))) {
+            return;
+          }
+        } catch (error) {
+          if (!active || error?.name === "AbortError") return;
+        }
       }
+
+      applyDetectedCountry(detectCountryCodeFromBrowserLocale());
     };
 
     preloadCountryFromGeo();
