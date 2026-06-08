@@ -7,7 +7,10 @@ import {
   TextField,
   FormControl,
 } from "@mui/material";
-import DatePicker from "react-datepicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { DatePicker as MuiDatePicker } from "@mui/x-date-pickers/DatePicker";
+import moment from "moment";
 import {
   FiAlertCircle,
   FiCheckCircle,
@@ -262,24 +265,26 @@ export default function ProfileInfoCard({
       </div>
 
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-        <div>
-          <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
-            Date of Birth
-          </label>
-          <div className="tw:w-full tw:h-11 tw:rounded-2xl tw:border tw:border-gray-200 tw:flex tw:items-center tw:px-3 focus-within:tw:border-primary focus-within:tw:ring-2 focus-within:tw:ring-primary/20">
-            <DatePicker
-              selected={dobDate}
-              onChange={(d) => setDobDate(d)}
-              dateFormat="MM/dd/yyyy"
-              placeholderText="MM/DD/YYYY"
-              showMonthDropdown
-              showYearDropdown
-              dropdownMode="select"
-              maxDate={new Date()}
-              className="tw:w-full tw:outline-none tw:text-sm"
-            />
-          </div>
-        </div>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <MuiDatePicker
+            label="Date of Birth"
+            value={dobDate ? moment(dobDate) : null}
+            onChange={(value) =>
+              setDobDate(value?.isValid?.() ? value.toDate() : null)
+            }
+            disableFuture
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                size: "medium",
+                placeholder: "MM/DD/YYYY",
+                sx: {
+                  "& .MuiOutlinedInput-root": { borderRadius: "12px" },
+                },
+              },
+            }}
+          />
+        </LocalizationProvider>
 
         <FormControl
           fullWidth
