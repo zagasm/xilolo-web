@@ -38,7 +38,7 @@ function ProfilePhoneField({
         <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700">
           {label}
         </label>
-        {verified ? (
+        {/* {verified ? (
           <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-emerald-700 tw:bg-emerald-50 tw:px-2.5 tw:py-1 tw:rounded-full">
             <FiCheckCircle /> Verified
           </span>
@@ -46,7 +46,7 @@ function ProfilePhoneField({
           <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-amber-700 tw:bg-amber-50 tw:px-2.5 tw:py-1 tw:rounded-full">
             <FiAlertCircle /> Unverified
           </span>
-        )}
+        )} */}
       </div>
 
       <div className="tw:grid tw:grid-cols-[minmax(118px,145px)_1fr] tw:gap-2">
