@@ -199,7 +199,7 @@ function PersonRow({ item, onClick }) {
       onClick={onClick}
       className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:transition hover:tw:bg-zinc-50 hover:tw:shadow-[0_0_18px_rgba(0,245,255,0.06)]"
     >
-      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold">
+      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold tw:border tw:border-neon">
         {avatarUrl && !avatarFailed ? (
           <img
             src={avatarUrl}

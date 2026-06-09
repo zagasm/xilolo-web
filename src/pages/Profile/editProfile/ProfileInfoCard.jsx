@@ -105,7 +105,7 @@ function ProfilePhoneField({
           fullWidth
           size="medium"
           variant="outlined"
-          placeholder="8035429908"
+          placeholder="8012345678"
           inputProps={{
             inputMode: "numeric",
             pattern: "[0-9]*",
@@ -247,7 +247,7 @@ export default function ProfileInfoCard({
           value={phoneNumber}
           onChange={setPhoneNumber}
           verified={phoneVerified}
-          helperText="Example: choose Nigeria +234, then enter 8035429908."
+          helperText="Example: choose Nigeria +234, then enter 8012345678."
         />
 
         <ProfilePhoneField

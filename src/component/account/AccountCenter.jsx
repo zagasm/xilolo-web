@@ -19,6 +19,7 @@ import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import { formatWalletMoney } from "../../features/wallet/walletUtils";
 import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
+import { isUserAccountVerified } from "../../lib/userVerification";
 
 const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed }) => {
   const Wrapper = to ? Link : "button";
@@ -103,7 +104,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
     ? `${user.firstName} ${user.lastName || ""}`.trim()
     : user?.username || user?.email || "User";
   const initials = getInitials(fullName);
-  const isVerified = user?.email_verified || user?.phone_verified;
+  const isVerified = isUserAccountVerified(user);
   const isOrganizer = user?.is_organiser_verified;
   const profilePath = `/profile/${user.id}`;
   const hasActiveSubscription =
