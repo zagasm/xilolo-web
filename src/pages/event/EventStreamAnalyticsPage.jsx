@@ -197,6 +197,14 @@ export default function EventStreamAnalyticsPage() {
     try {
       const response = await api.get(`/api/v1/events/${eventId}/analytics/dashboard`, authHeaders(token));
       const nextDashboard = response?.data?.data || null;
+      const attendanceType = String(nextDashboard?.overview?.attendance_type || "").toLowerCase();
+
+      if (attendanceType === "physical") {
+        showError("Stream analytics are only available for streamed events.");
+        navigate(`/event/view/${eventId}`, { replace: true });
+        return;
+      }
+
       setDashboard(nextDashboard);
       setRealtime(nextDashboard?.realtime || null);
     } catch (error) {
@@ -205,7 +213,7 @@ export default function EventStreamAnalyticsPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [eventId, token]);
+  }, [eventId, navigate, token]);
 
   const loadRealtime = useCallback(async () => {
     if (!eventId || !token) return;

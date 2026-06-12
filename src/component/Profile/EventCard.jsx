@@ -132,6 +132,8 @@ export default function EventCard({
     [event?.status],
   );
   const isVodEvent = event?.delivery_type === "vod";
+  const attendanceType = String(event?.attendance_type || event?.attendanceType || "").toLowerCase();
+  const isPhysicalOnlyEvent = attendanceType === "physical";
   const statusMeta = useMemo(() => getEventStatusMeta(event?.status), [event?.status]);
   const scheduleLabel = useMemo(() => formatEventSchedule(event), [event]);
   const [isSaved, setIsSaved] = useState(!!event.is_saved);
@@ -294,21 +296,23 @@ export default function EventCard({
                   </Menu.Item>
                 ) : null}
 
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/event/analytics/${event.id}`);
-                      }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}
-                    >
-                      <BarChart3 className="tw:h-4 tw:w-4" />
-                      <span>Stream Analytics</span>
-                    </button>
-                  )}
-                </Menu.Item>
+                {!isPhysicalOnlyEvent ? (
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/event/analytics/${event.id}`);
+                        }}
+                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}
+                      >
+                        <BarChart3 className="tw:h-4 tw:w-4" />
+                        <span>Stream Analytics</span>
+                      </button>
+                    )}
+                  </Menu.Item>
+                ) : null}
 
                 <Menu.Item disabled={!shouldShowRescheduleAction || rescheduleLocked}>
                   {({ active, disabled }) => (
