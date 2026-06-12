@@ -1171,7 +1171,7 @@ export default function EventStreamControlPage() {
                             />
                             <span>
                               <span className="tw:block tw:text-sm tw:font-semibold tw:text-gray-900">
-                                Close ticket sales when I go live
+                                Close ticket sales
                               </span>
                               <span className="tw:mt-1 tw:block tw:text-sm tw:leading-6 tw:text-gray-600">
                                 New users will not be able to buy tickets after the event goes live. Existing ticket holders keep their tickets.

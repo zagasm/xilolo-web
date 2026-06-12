@@ -82,7 +82,7 @@ function Panel({ title, icon: Icon, children, action }) {
       <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between tw:gap-3">
         <div className="tw:flex tw:items-center tw:gap-2">
           <Icon className="tw:h-5 tw:w-5 tw:text-primary" />
-          <h2 className="tw:text-base tw:font-semibold tw:text-slate-950">{title}</h2>
+          <span className="tw:block tw:text-base tw:font-semibold tw:text-slate-950">{title}</span>
         </div>
         {action}
       </div>
@@ -276,8 +276,7 @@ export default function EventStreamAnalyticsPage() {
 
   return (
     <div className="tw:min-h-screen tw:bg-[#f8fafc] tw:text-slate-900">
-      <SideBarNav />
-      <div className="tw:px-4 tw:py-6 tw:md:ml-[280px] tw:md:px-8">
+      <div className="tw:mt-20 tw:pb-16 tw:px-4 tw:py-6 tw:md:ml-[280px] tw:md:px-8">
         <div className="tw:mx-auto tw:max-w-7xl tw:space-y-6">
           <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
             <div>
