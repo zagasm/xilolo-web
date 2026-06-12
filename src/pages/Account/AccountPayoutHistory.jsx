@@ -345,7 +345,7 @@ export default function AccountPayoutHistory() {
                   key={payout?.id}
                   type="button"
                   onClick={() => setSelectedPayout(payout)}
-                  className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition hover:tw:shadow-md"
+                  className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition tw:hover:shadow-md"
                 >
                   <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div className="tw:min-w-0">

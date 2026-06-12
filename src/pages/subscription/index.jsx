@@ -340,7 +340,7 @@ export default function SubscriptionsPage() {
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
             <Link
               to="/account"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-slate-700 hover:tw:text-slate-900"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:text-slate-900"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
               Back to account
@@ -396,7 +396,7 @@ export default function SubscriptionsPage() {
                   type="button"
                   onClick={handleInitializeSubscription}
                   disabled={loading || initializing || hasActiveSubscription}
-                  className="tw:mt-6 tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:transition hover:tw:bg-white/90 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  className="tw:mt-6 tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:transition tw:hover:bg-white/90 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                 >
                   <Wallet className="tw:h-4 tw:w-4" />
                   <span>
@@ -417,7 +417,7 @@ export default function SubscriptionsPage() {
                     type="button"
                     onClick={handleRenewSubscription}
                     disabled={loading || renewing}
-                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-white/25 tw:bg-white/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-white/15 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-white/25 tw:bg-white/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-white/15 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     <RefreshCw className="tw:h-4 tw:w-4" />
                     <span>{renewing ? "Renewing..." : "Renew subscription"}</span>

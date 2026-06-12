@@ -255,7 +255,7 @@ export default function ReviewStep({
               <li key={path}>
                 <button
                   type="button"
-                  className="tw:text-red-700 tw:underline tw:underline-offset-2 hover:tw:text-red-800"
+                  className="tw:text-red-700 tw:underline tw:underline-offset-2 tw:hover:text-red-800"
                   onClick={() => {
                     const match = path.match(/^step_(\d+)/);
                     if (!match || !onGoToStep) return;

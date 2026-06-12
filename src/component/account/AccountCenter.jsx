@@ -30,7 +30,7 @@ const QuickActionCard = ({ icon, iconComponent: Icon, label, to, onClick, isRed 
       to={to}
       type={to ? undefined : "button"}
       onClick={onClick}
-      className="tw:relative tw:flex tw:min-h-20 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-3 tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[#ffffff]/45 tw:bg-[#ffffff]/70 tw:p-3 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18),0_0_18px_rgba(0,245,255,0.04)] tw:backdrop-blur-2xl tw:transition hover:tw:-translate-y-0.5 hover:tw:border-white/60 hover:tw:bg-white/40 hover:tw:shadow-[0_22px_60px_rgba(148,163,184,0.24),0_0_24px_rgba(0,245,255,0.08)] tw:md:min-h-24 tw:md:gap-4 tw:md:rounded-[28px] tw:md:p-4"
+      className="tw:relative tw:flex tw:min-h-20 tw:w-full tw:flex-col tw:items-start tw:justify-between tw:gap-3 tw:overflow-hidden tw:rounded-3xl tw:border tw:border-[#ffffff]/45 tw:bg-[#ffffff]/70 tw:p-3 tw:text-left tw:shadow-[0_18px_50px_rgba(148,163,184,0.18),0_0_18px_rgba(0,245,255,0.04)] tw:backdrop-blur-2xl tw:transition tw:hover:-translate-y-0.5 tw:hover:border-white/60 tw:hover:bg-white/40 tw:hover:shadow-[0_22px_60px_rgba(148,163,184,0.24),0_0_24px_rgba(0,245,255,0.08)] tw:md:min-h-24 tw:md:gap-4 tw:md:rounded-[28px] tw:md:p-4"
     >
       <span className="tw:pointer-events-none tw:absolute tw:inset-x-3 tw:top-0 tw:h-px tw:bg-white/70" />
       <span className="tw:pointer-events-none tw:absolute tw:-right-8 tw:top-3 tw:h-16 tw:w-16 tw:rounded-full tw:bg-white/25 tw:blur-2xl" />
@@ -199,7 +199,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   navigate(profilePath);
                 }
               }}
-              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-white/45 tw:bg-white/24 tw:p-3 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition hover:tw:bg-white/32 tw:md:gap-4 tw:md:rounded-[30px] tw:md:p-4"
+              className="tw:relative tw:flex tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-white/45 tw:bg-white/24 tw:p-3 tw:shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] tw:backdrop-blur-2xl tw:transition tw:hover:bg-white/32 tw:md:gap-4 tw:md:rounded-[30px] tw:md:p-4"
             >
               <div
                 className={`tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-white/55 tw:shadow-[0_8px_20px_rgba(148,163,184,0.18)] tw:md:h-16 tw:md:w-16 ${showProfileImage ? "tw:bg-white/30" : "tw:bg-white/45"
@@ -254,7 +254,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                   type="button"
                   onClick={() => navigate("/subscription")}
                   style={{ borderRadius: 12 }}
-                  className="tw:inline tw:w-40 tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition hover:tw:bg-white/90"
+                  className="tw:inline tw:w-40 tw:items-center tw:justify-center tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900 tw:transition tw:hover:bg-white/90"
                 >
                   <span className="tw:text-primary">
                     {hasActiveSubscription ? "View Subscription" : "Subscribe Now"}
@@ -277,7 +277,7 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
                 type="button"
                 onClick={() => setIsVerifyModalOpen(true)}
                 style={{ borderRadius: 12 }}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:bg-orange-500 tw:px-4 tw:py-3 tw:text-xs tw:font-semibold tw:text-white tw:transition hover:tw:bg-orange-600"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:bg-orange-500 tw:px-4 tw:py-3 tw:text-xs tw:font-semibold tw:text-white tw:transition tw:hover:bg-orange-600"
               >
                 {isRefreshingProfile ? "Refreshing..." : "Verify Now"}
               </button>

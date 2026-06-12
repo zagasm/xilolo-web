@@ -73,7 +73,7 @@ export default function WalletFundingCancelPage() {
           <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
             <button
               onClick={() => navigate("/account/wallet")}
-              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
               style={{ borderRadius: 16, color: "white" }}
             >
               Go to wallet
@@ -81,7 +81,7 @@ export default function WalletFundingCancelPage() {
             {pendingPurchase?.eventPath ? (
               <Link
                 to={pendingPurchase.eventPath}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                 style={{ borderRadius: 16 }}
               >
                 Return to event
@@ -89,7 +89,7 @@ export default function WalletFundingCancelPage() {
             ) : (
               <Link
                 to="/feed"
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                 style={{ borderRadius: 16 }}
               >
                 View All Events

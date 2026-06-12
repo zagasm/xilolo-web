@@ -115,7 +115,7 @@ export default function CryptoWalletsPage() {
             }}
             type="button"
             onClick={() => setModalOpen(true)}
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_32px_rgba(0,0,0,0.24)] hover:tw:scale-[1.01] tw:transition disabled:tw:opacity-60"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_32px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition disabled:tw:opacity-60"
           >
             <span className="tw:inline-flex tw:h-5 tw:w-5 tw:items-center tw:justify-center tw:rounded-full tw:bg-white/15 tw:text-xs">
               +
@@ -194,7 +194,7 @@ export default function CryptoWalletsPage() {
                 }}
                 type="button"
                 onClick={() => setModalOpen(true)}
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.26)] hover:tw:scale-[1.02] tw:transition"
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:px-5 tw:py-2.5 tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.26)] tw:hover:scale-[1.02] tw:transition"
               >
                 <span className="tw:text-sm">＋</span>
                 <span>Connect payout wallet</span>
@@ -265,7 +265,7 @@ export default function CryptoWalletsPage() {
                           <button
                             type="button"
                             onClick={() => openVerify(wallet, null)}
-                            className="tw:text-[10px] tw:text-[#DC2626] tw:underline tw:underline-offset-2 tw:decoration-dotted hover:tw:text-[#B91C1C] tw:transition"
+                            className="tw:text-[10px] tw:text-[#DC2626] tw:underline tw:underline-offset-2 tw:decoration-dotted tw:hover:text-[#B91C1C] tw:transition"
                           >
                             <span>Verify</span>
                           </button>

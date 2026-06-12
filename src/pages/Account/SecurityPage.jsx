@@ -143,7 +143,7 @@ export default function SecurityPage() {
             type="button"
             onClick={() => navigate(-1)}
             aria-label="Go back"
-            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm tw:transition hover:tw:border-neon/40 hover:tw:bg-gray-50 hover:tw:shadow-[0_0_14px_rgba(0,245,255,0.08)]"
+            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/40 tw:hover:bg-gray-50 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)]"
           >
             <ChevronLeft className="tw:h-5 tw:w-5" />
           </button>

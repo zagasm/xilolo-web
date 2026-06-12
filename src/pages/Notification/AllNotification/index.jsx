@@ -55,7 +55,7 @@ function AllNotification() {
                 borderRadius: 16
               }}
               type="button"
-              className="tw:rounded-full tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:transition hover:tw:border-neon/40 hover:tw:shadow-[0_0_18px_rgba(0,245,255,0.08)] disabled:tw:opacity-60"
+              className="tw:rounded-full tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:border-neon/40 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.08)] disabled:tw:opacity-60"
               onClick={() => markAllAsRead({ toast: true })}
               disabled={unreadCount === 0 || loading}
             >

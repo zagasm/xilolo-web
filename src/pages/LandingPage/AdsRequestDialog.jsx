@@ -321,7 +321,7 @@ export default function AdsRequestDialog({ open, onClose, selectedPackage }) {
                           </div>
                           <button
                             type="button"
-                            className="tw:text-sm tw:font-semibold tw:text-slate-700 tw:px-3 tw:py-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white hover:tw:bg-slate-50"
+                            className="tw:text-sm tw:font-semibold tw:text-slate-700 tw:px-3 tw:py-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:hover:bg-slate-50"
                             onClick={() => field.onChange(null)}
                             disabled={submitting}
                           >
@@ -476,7 +476,7 @@ export default function AdsRequestDialog({ open, onClose, selectedPackage }) {
           }}
             type="button"
             onClick={onClose}
-            className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:py-3 tw:text-slate-700 hover:tw:bg-slate-50"
+            className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:py-3 tw:text-slate-700 tw:hover:bg-slate-50"
             disabled={submitting}
           >
             Cancel
@@ -488,7 +488,7 @@ export default function AdsRequestDialog({ open, onClose, selectedPackage }) {
             fontSize: 12
           }}
             type="submit"
-            className="tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-white tw:font-semibold tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] hover:tw:brightness-95 active:tw:scale-[0.99]"
+            className="tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-white tw:font-semibold tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:hover:brightness-95 active:tw:scale-[0.99]"
             disabled={submitting}
           >
             {submitting ? "Sending..." : "Send request"}

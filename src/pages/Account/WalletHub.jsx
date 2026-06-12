@@ -31,7 +31,7 @@ export default function WalletHub() {
             <div>
               <Link
                 to="/account"
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900"
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 tw:hover:text-gray-900"
               >
                 <ArrowLeft className="tw:h-4 tw:w-4" />
                 <span>Back to account</span>
@@ -51,7 +51,7 @@ export default function WalletHub() {
               <Link
                 key={label}
                 to={to}
-                className="tw:flex tw:items-center tw:justify-between tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:px-4 tw:py-4 tw:transition hover:tw:border-neon/30 hover:tw:bg-white hover:tw:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)] tw:md:p-5"
+                className="tw:flex tw:items-center tw:justify-between tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:px-4 tw:py-4 tw:transition tw:hover:border-neon/30 tw:hover:bg-white tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)] tw:md:p-5"
               >
                 <div className="tw:flex tw:items-center tw:gap-4">
                   <span className="tw:flex tw:size-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-white tw:shadow-sm">

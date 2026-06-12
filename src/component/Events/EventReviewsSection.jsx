@@ -226,7 +226,7 @@ function RatingInput({ value, onChange, disabled }) {
             type="button"
             disabled={disabled}
             onClick={() => onChange(ratingValue)}
-            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:transition hover:tw:border-amber-300 hover:tw:bg-amber-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:transition tw:hover:border-amber-300 tw:hover:bg-amber-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
             aria-label={`Rate ${ratingValue} star${ratingValue > 1 ? "s" : ""}`}
           >
             <Star
@@ -528,7 +528,7 @@ export default function EventReviewsSection({
               <button
                 type="button"
                 onClick={openComposer}
-                className="tw:mt-3 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                className="tw:mt-3 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                 style={{ borderRadius: 9999 }}
               >
                 {hasReviewed ? "Edit your review" : "Write a review"}
@@ -635,7 +635,7 @@ export default function EventReviewsSection({
                 type="button"
                 onClick={closeComposer}
                 disabled={submitting}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:px-5 tw:text-sm tw:font-medium tw:text-slate-700 hover:tw:bg-slate-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:px-5 tw:text-sm tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
                 style={{ borderRadius: 9999 }}
               >
                 Cancel
@@ -646,7 +646,7 @@ export default function EventReviewsSection({
                   type="button"
                   onClick={() => handleDeleteReview(mineReview)}
                   disabled={submitting || deletingReviewId === mineReview.id}
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-red-200 tw:bg-red-50 tw:px-5 tw:text-sm tw:font-medium tw:text-red-600 hover:tw:bg-red-100 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-red-200 tw:bg-red-50 tw:px-5 tw:text-sm tw:font-medium tw:text-red-600 tw:hover:bg-red-100 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
                   style={{ borderRadius: 9999 }}
                 >
                   {deletingReviewId === mineReview.id ? "Deleting..." : "Delete"}
@@ -656,7 +656,7 @@ export default function EventReviewsSection({
               <button
                 type="submit"
                 disabled={submitting || loadingMine}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
                 style={{ borderRadius: 9999 }}
               >
                 {submitting
@@ -682,7 +682,7 @@ export default function EventReviewsSection({
             <button
               type="button"
               onClick={() => loadReviews()}
-              className="tw:text-sm tw:font-medium tw:text-primary hover:tw:text-primarySecond"
+              className="tw:text-sm tw:font-medium tw:text-primary tw:hover:text-primarySecond"
             >
               Refresh
             </button>
@@ -704,7 +704,7 @@ export default function EventReviewsSection({
             <button
               type="button"
               onClick={() => loadReviews()}
-              className="tw:mt-3 tw:text-sm tw:font-medium tw:text-red-600 hover:tw:text-red-700"
+              className="tw:mt-3 tw:text-sm tw:font-medium tw:text-red-600 tw:hover:text-red-700"
             >
               Try again
             </button>
@@ -765,7 +765,7 @@ export default function EventReviewsSection({
                           setForm(fillFormFromReview(review));
                           setComposerOpen(true);
                         }}
-                        className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-medium tw:text-slate-700 hover:tw:bg-slate-50"
+                        className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50"
                         style={{ borderRadius: 9999 }}
                       >
                         <Pencil size={14} />
@@ -776,7 +776,7 @@ export default function EventReviewsSection({
                         type="button"
                         onClick={() => handleDeleteReview(review)}
                         disabled={deletingReviewId === review.id}
-                        className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-red-200 tw:bg-red-50 tw:px-4 tw:text-sm tw:font-medium tw:text-red-600 hover:tw:bg-red-100 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                        className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-red-200 tw:bg-red-50 tw:px-4 tw:text-sm tw:font-medium tw:text-red-600 tw:hover:bg-red-100 disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
                         style={{ borderRadius: 9999 }}
                       >
                         <Trash2 size={14} />

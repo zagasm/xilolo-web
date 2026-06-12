@@ -85,7 +85,7 @@ export default function AutomationSection({
             >
               <Link
                 to={ctaTo}
-                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-primary/20 tw:text-primary tw:font-semibold tw:shadow-[0_14px_38px_rgba(0,0,0,0.12),0_0_18px_rgba(0,245,255,0.10)] tw:transition hover:tw:shadow-[0_18px_45px_rgba(0,0,0,0.14),0_0_24px_rgba(0,245,255,0.16)]"
+                className="tw:group tw:inline-flex tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:py-3 tw:border tw:border-primary/20 tw:text-primary tw:font-semibold tw:shadow-[0_14px_38px_rgba(0,0,0,0.12),0_0_18px_rgba(0,245,255,0.10)] tw:transition tw:hover:shadow-[0_18px_45px_rgba(0,0,0,0.14),0_0_24px_rgba(0,245,255,0.16)]"
               >
                 {ctaLabel}
                 <span className="tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:text-white">

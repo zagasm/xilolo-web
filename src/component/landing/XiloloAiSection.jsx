@@ -98,7 +98,7 @@ export default function XiloloAiSection() {
           <div className="tw:mt-8 tw:flex tw:flex-wrap tw:items-center tw:gap-3">
             <Link
               to="/subscription"
-              className="tw:inline-flex tw:h-12 tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:text-sm tw:font-black tw:text-primary tw:transition hover:tw:-translate-y-0.5"
+              className="tw:inline-flex tw:h-12 tw:items-center tw:gap-3 tw:rounded-full tw:bg-white tw:px-5 tw:text-sm tw:font-black tw:text-primary tw:transition tw:hover:-translate-y-0.5"
               style={{ boxShadow: "0 18px 45px rgba(0,0,0,0.3), 0 0 22px rgba(0,245,255,0.12)" }}
             >
               Unlock beta
@@ -109,7 +109,7 @@ export default function XiloloAiSection() {
 
             <Link
               to="/xilolo-ai"
-              className="tw:inline-flex tw:h-12 tw:items-center tw:gap-2 tw:rounded-full tw:px-5 tw:text-sm tw:font-black tw:text-white tw:transition hover:tw:bg-white/8"
+              className="tw:inline-flex tw:h-12 tw:items-center tw:gap-2 tw:rounded-full tw:px-5 tw:text-sm tw:font-black tw:text-white tw:transition tw:hover:bg-white/8"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.12)",

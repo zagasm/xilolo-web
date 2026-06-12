@@ -222,7 +222,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           <span className="tw:block tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.12em] tw:text-gray-500 tw:sm:text-[11px]">
                             Organiser
                           </span>
-                          <span className="tw:block tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:sm:text-[15px] hover:tw:text-primary">
+                          <span className="tw:block tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900 tw:sm:text-[15px] tw:hover:text-primary">
                             {organiser.name || "Event organiser"}
                           </span>
                           {organiser.user_name && (

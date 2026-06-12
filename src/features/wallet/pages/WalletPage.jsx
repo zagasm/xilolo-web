@@ -103,7 +103,7 @@ export default function WalletPage() {
             <div>
               <button
                 onClick={() => navigate(-1)}
-                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900"
+                className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 tw:hover:text-gray-900"
               >
                 <ArrowLeft className="tw:h-4 tw:w-4" />
                 <span>Back</span>

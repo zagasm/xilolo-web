@@ -118,7 +118,7 @@ function RecommendationCard({ event, posterFallback }) {
             color: "white"
           }}
             to={`/event/view/${event.id}`}
-            className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:no-underline hover:tw:bg-primarySecond"
+            className="tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:no-underline tw:hover:bg-primarySecond"
           >
             {isPaid ? "View event" : `Buy Ticket (${priceText(event)})`}
           </Link>
@@ -197,7 +197,7 @@ export default function YouMayAlsoLike({
             type="button"
             onClick={() => sliderInstanceRef.current?.prev()}
             disabled={!canScrollPrev}
-            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
             aria-label="Show previous events"
           >
             <ArrowLeft className="tw:h-4 tw:w-4" />
@@ -206,7 +206,7 @@ export default function YouMayAlsoLike({
             type="button"
             onClick={() => sliderInstanceRef.current?.next()}
             disabled={!canScrollNext}
-            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
             aria-label="Show more events"
           >
             <ArrowRight className="tw:h-4 tw:w-4" />
@@ -238,7 +238,7 @@ export default function YouMayAlsoLike({
               className={`tw:h-2.5 tw:rounded-full tw:transition-all ${
                 index === selectedIndex
                   ? "tw:w-8 tw:bg-primary"
-                  : "tw:w-2.5 tw:bg-slate-300 hover:tw:bg-slate-400"
+                  : "tw:w-2.5 tw:bg-slate-300 tw:hover:bg-slate-400"
               }`}
               aria-label={`Go to recommendation ${index + 1}`}
             />

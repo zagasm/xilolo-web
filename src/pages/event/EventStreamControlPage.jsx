@@ -16,7 +16,6 @@ import {
   Signal,
   ShieldCheck,
   Square,
-  Users,
   Video,
 } from "lucide-react";
 import SideBarNav from "../pageAssets/SideBarNav";
@@ -224,7 +223,7 @@ function DetailCard({
             style={{ borderRadius: 20, fontSize: 12 }}
             type="button"
             onClick={() => onCopy?.(value, label)}
-            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-[#e5e4e2]"
             aria-label={`Copy ${label}`}
           >
             <Copy className="tw:h-4 tw:w-4" />
@@ -301,151 +300,6 @@ function ActionButton({
   );
 }
 
-function normaliseViewer(viewer) {
-  const user = viewer?.user || viewer || {};
-  return {
-    id: viewer?.user_id || user?.id || user?.uuid || viewer?.id,
-    name:
-      viewer?.name ||
-      user?.name ||
-      [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
-      user?.user_name ||
-      user?.username ||
-      "Viewer",
-    username: viewer?.username || user?.user_name || user?.username || "",
-    profilePicture:
-      viewer?.profile_picture ||
-      viewer?.profile_url ||
-      user?.profile_picture ||
-      user?.profile_url ||
-      user?.profile?.image ||
-      "",
-    joinedAt: viewer?.joined_at || viewer?.viewed_at || "",
-    leftAt: viewer?.left_at || "",
-  };
-}
-
-function ViewerList({ viewers }) {
-  if (!viewers.length) {
-    return (
-      <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-[#ded6cd] tw:p-4 tw:text-sm tw:text-gray-500">
-        No viewers recorded yet.
-      </div>
-    );
-  }
-
-  return (
-    <div className="tw:max-h-[320px] tw:space-y-3 tw:overflow-y-auto tw:pr-1">
-      {viewers.map((viewer) => (
-        <div
-          key={`${viewer.id}-${viewer.joinedAt || viewer.name}`}
-          className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#f0ebff] tw:bg-[#e5e4e2] tw:p-3"
-        >
-          {viewer.profilePicture ? (
-            <img
-              src={viewer.profilePicture}
-              alt={viewer.name}
-              className="tw:h-11 tw:w-11 tw:shrink-0 tw:rounded-full tw:object-cover"
-            />
-          ) : (
-            <div className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-sm tw:font-semibold tw:text-primary">
-              {viewer.name.slice(0, 1).toUpperCase()}
-            </div>
-          )}
-
-          <div className="tw:min-w-0 tw:flex-1">
-            <div className="tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900">
-              {viewer.name}
-            </div>
-            <div className="tw:truncate tw:text-xs tw:text-gray-500">
-              {viewer.username ? `@${viewer.username}` : "Xilolo user"}
-            </div>
-          </div>
-
-          <div className="tw:text-right tw:text-xs tw:text-gray-500">
-            {viewer.leftAt ? "Left" : "Watching"}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ViewerAnalyticsPanel({ analytics, loading, onRefresh }) {
-  const currentViewers = (analytics?.current_viewers || []).map(normaliseViewer);
-  const allTimeViewers = (analytics?.all_time_viewers || []).map(normaliseViewer);
-
-  return (
-    <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
-      <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-        <div>
-          <div className="tw:flex tw:items-center tw:gap-2">
-            <Users className="tw:h-5 tw:w-5 tw:text-primary" />
-            <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-              Viewer analytics
-            </span>
-          </div>
-          <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-            Current viewers update while the event is live. Historical viewers remain after the event ends.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={loading}
-          className="tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-[#e5e4e2] disabled:tw:opacity-60"
-        >
-          {loading ? <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" /> : null}
-          Refresh
-        </button>
-      </div>
-
-      <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-3">
-        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
-          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
-            Current
-          </div>
-          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
-            {analytics?.current_viewer_count ?? 0}
-          </div>
-        </div>
-        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
-          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
-            Unique
-          </div>
-          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
-            {analytics?.total_unique_viewer_count ?? 0}
-          </div>
-        </div>
-        <div className="tw:rounded-3xl tw:bg-[#e5e4e2] tw:p-4">
-          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
-            Peak
-          </div>
-          <div className="tw:mt-2 tw:text-3xl tw:font-bold tw:text-gray-900">
-            {analytics?.peak_viewer_count ?? 0}
-          </div>
-        </div>
-      </div>
-
-      <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-5 tw:lg:grid-cols-2">
-        <div>
-          <div className="tw:mb-3 tw:text-sm tw:font-semibold tw:text-gray-900">
-            Watching now
-          </div>
-          <ViewerList viewers={currentViewers} />
-        </div>
-        <div>
-          <div className="tw:mb-3 tw:text-sm tw:font-semibold tw:text-gray-900">
-            All-time viewers
-          </div>
-          <ViewerList viewers={allTimeViewers} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function CheckinAccessPanel({
   accessList,
   stats,
@@ -484,7 +338,7 @@ function CheckinAccessPanel({
           <ActionButton
             onClick={onGenerate}
             loading={pendingAction === "checkin-generate"}
-            className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
+            className="tw:bg-primary tw:text-white tw:hover:bg-primary/90"
             icon={QrCode}
           >
             Generate code
@@ -494,7 +348,7 @@ function CheckinAccessPanel({
             <ActionButton
               onClick={() => onRotate(activeAccess)}
               loading={pendingAction === "checkin-rotate"}
-              className="tw:bg-lightPurple tw:text-primary hover:tw:bg-[#e2d9ce]"
+              className="tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce]"
               icon={RotateCcw}
             >
               Rotate
@@ -600,7 +454,7 @@ function CheckinAccessPanel({
                 type="button"
                 onClick={() => onRevoke(activeAccess)}
                 disabled={pendingAction === "checkin-revoke"}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 hover:tw:bg-red-50 disabled:tw:opacity-60"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 disabled:tw:opacity-60"
               >
                 {pendingAction === "checkin-revoke" ? (
                   <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
@@ -633,30 +487,11 @@ export default function EventStreamControlPage() {
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
   const [closeTicketSalesOnGoLive, setCloseTicketSalesOnGoLive] = useState(false);
-  const [viewerAnalytics, setViewerAnalytics] = useState(null);
-  const [viewerAnalyticsLoading, setViewerAnalyticsLoading] = useState(false);
   const [checkinAccessList, setCheckinAccessList] = useState([]);
   const [checkinStats, setCheckinStats] = useState(null);
   const [checkinLoading, setCheckinLoading] = useState(false);
   const [generatedCheckinCode, setGeneratedCheckinCode] = useState("");
   const copyTimeoutRef = useRef(null);
-
-  const loadViewerAnalytics = useCallback(async () => {
-    if (!eventId || !token) return;
-
-    setViewerAnalyticsLoading(true);
-    try {
-      const response = await api.get(
-        `/api/v1/events/${eventId}/live/viewers/analytics`,
-        authHeaders(token),
-      );
-      setViewerAnalytics(response?.data?.data || response?.data || null);
-    } catch (err) {
-      showError(getErrorMessage(err, "Could not load viewer analytics."));
-    } finally {
-      setViewerAnalyticsLoading(false);
-    }
-  }, [eventId, token]);
 
   const loadEventDetails = useCallback(
     async ({ background = false } = {}) => {
@@ -745,20 +580,6 @@ export default function EventStreamControlPage() {
   useEffect(() => {
     loadEventDetails();
   }, [loadEventDetails]);
-
-  useEffect(() => {
-    loadViewerAnalytics();
-  }, [loadViewerAnalytics]);
-
-  useEffect(() => {
-    if (!eventId || !token) return undefined;
-
-    const interval = window.setInterval(() => {
-      loadViewerAnalytics();
-    }, 15000);
-
-    return () => window.clearInterval(interval);
-  }, [eventId, loadViewerAnalytics, token]);
 
   useEffect(() => {
     return () => {
@@ -1125,7 +946,7 @@ export default function EventStreamControlPage() {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-gray-500 hover:tw:text-gray-900"
+                  className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-gray-500 tw:hover:text-gray-900"
                 >
                   <ArrowLeft className="tw:h-4 tw:w-4" />
                   <span>Back</span>
@@ -1179,7 +1000,7 @@ export default function EventStreamControlPage() {
                       OBS connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
                       <a
                         href="mailto:support@xilolo.com"
-                        className="tw:font-semibold tw:text-primary hover:tw:underline"
+                        className="tw:font-semibold tw:text-primary tw:hover:underline"
                       >
                         support@xilolo.com
                       </a>
@@ -1230,7 +1051,7 @@ export default function EventStreamControlPage() {
                         Email{" "}
                         <a
                           href="mailto:support@xilolo.com"
-                          className="tw:font-semibold tw:text-primary hover:tw:underline"
+                          className="tw:font-semibold tw:text-primary tw:hover:underline"
                         >
                           support@xilolo.com
                         </a>
@@ -1274,7 +1095,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpServer, "RTMP Server")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-[#e5e4e2]"
                                 aria-label="Copy RTMP Server"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1297,7 +1118,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpKey, "Stream Key")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#e5e4e2]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-[#e5e4e2]"
                                 aria-label="Copy Stream Key"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1375,7 +1196,7 @@ export default function EventStreamControlPage() {
                           }}
                           loading={pendingAction === "start"}
                           disabled={streamStartRequiresTicketPurchase}
-                          className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
+                          className="tw:bg-primary tw:text-white tw:hover:bg-primary/90"
                           icon={Radio}
                         >
                           Start stream
@@ -1387,7 +1208,7 @@ export default function EventStreamControlPage() {
                           onClick={handleGoLive}
                           loading={pendingAction === "go-live"}
                           disabled={streamStartRequiresTicketPurchase}
-                          className="tw:bg-red-500 tw:text-white hover:tw:bg-red-600"
+                          className="tw:bg-red-500 tw:text-white tw:hover:bg-red-600"
                           icon={PlayCircle}
                         >
                           Go live
@@ -1398,7 +1219,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleTogglePause}
                           loading={pendingAction === "pause"}
-                          className="tw:bg-lightPurple tw:text-primary hover:tw:bg-[#e2d9ce]"
+                          className="tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce]"
                           icon={PauseCircle}
                         >
                           {isPaused ? "Resume stream" : "Pause stream"}
@@ -1409,7 +1230,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleEnd}
                           loading={pendingAction === "end"}
-                          className="tw:bg-gray-900 tw:text-white hover:tw:bg-black"
+                          className="tw:bg-gray-900 tw:text-white tw:hover:bg-black"
                           icon={Square}
                         >
                           End stream
@@ -1419,7 +1240,7 @@ export default function EventStreamControlPage() {
                       {showWatch ? (
                         <ActionButton
                           onClick={() => setWatchModalOpen(true)}
-                          className="tw:bg-[#fff4f2] tw:text-[#d93a23] hover:tw:bg-[#ffe9e4]"
+                          className="tw:bg-[#fff4f2] tw:text-[#d93a23] tw:hover:bg-[#ffe9e4]"
                           icon={MonitorPlay}
                         >
                           Join live
@@ -1482,11 +1303,6 @@ export default function EventStreamControlPage() {
               </>
             )}
 
-            <ViewerAnalyticsPanel
-              analytics={viewerAnalytics}
-              loading={viewerAnalyticsLoading}
-              onRefresh={loadViewerAnalytics}
-            />
           </div>
         </div>
       </div>

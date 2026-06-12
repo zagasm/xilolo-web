@@ -66,7 +66,7 @@ export default function TicketPurchaseSuccessModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 hover:tw:bg-gray-200"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 tw:hover:bg-gray-200"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -89,7 +89,7 @@ export default function TicketPurchaseSuccessModal({
                     <button
                       type="button"
                       onClick={onDownloadManual}
-                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/15"
+                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/15"
                       style={{ borderRadius: 16 }}
                     >
                       Download manual
@@ -98,7 +98,7 @@ export default function TicketPurchaseSuccessModal({
                   <Link
                     to="/tickets"
                     onClick={onClose}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                     style={{ borderRadius: 16, color: "#fff" }}
                   >
                     View my tickets
@@ -106,7 +106,7 @@ export default function TicketPurchaseSuccessModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                     style={{ borderRadius: 16 }}
                   >
                     Continue browsing

@@ -913,7 +913,7 @@ export default function ViewEvent() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:md:size-11"
+                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:md:size-11"
                 style={{ borderRadius: "9999px" }}
               >
                 <ArrowLeft className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
@@ -932,7 +932,7 @@ export default function ViewEvent() {
               type="button"
               onClick={handleShareEvent}
               disabled={shareFlow.shareInProgress}
-              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
+              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
               aria-label="Share event"
               style={{ borderRadius: "9999px" }}
             >
@@ -1124,7 +1124,7 @@ export default function ViewEvent() {
                         }}
                         type="button"
                         onClick={() => setReportOpen(true)}
-                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm hover:tw:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
+                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm tw:hover:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
                       >
                         Report this event
                       </button>
@@ -1153,7 +1153,7 @@ export default function ViewEvent() {
                         type="button"
                         onClick={() => navigate(`/event/vod/${event.id}`)}
                         disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
                       >
                         <Video className="tw:h-4 tw:w-4" />
                         <span>{vodIsReady ? "Watch video" : "Available soon"}</span>
@@ -1187,7 +1187,7 @@ export default function ViewEvent() {
                                 style={{ borderRadius: 24, fontSize: 12 }}
                                 type="button"
                                 onClick={() => navigate(`/event/vod/${event.id}`)}
-                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800"
+                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800"
                               >
                                 <Video className="tw:h-4 tw:w-4" />
                                 <span>Watch replay</span>
@@ -1266,7 +1266,7 @@ export default function ViewEvent() {
                           <button
                             type="button"
                             onClick={() => setReplayUploadOpen(true)}
-                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                           >
                             <Upload className="tw:h-4 tw:w-4" />
                             <span>Upload replay video</span>
@@ -1349,7 +1349,7 @@ export default function ViewEvent() {
                             }}
                             type="button"
                             onClick={handleDownloadManual}
-                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
+                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
                           >
                             Download manual
                           </button>
@@ -1362,7 +1362,7 @@ export default function ViewEvent() {
                         <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
                           {sponsoredTicketSponsors.length ? (
                             <>
-                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary hover:tw:underline" />
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary tw:hover:underline" />
                               {sponsorHeadlineSuffix}
                             </>
                           ) : (
@@ -1380,7 +1380,7 @@ export default function ViewEvent() {
                             <SponsorProfileLink
                               key={sponsor.id || sponsor.username}
                               sponsor={sponsor}
-                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary hover:tw:bg-white hover:tw:underline"
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary tw:hover:bg-white tw:hover:underline"
                             />
                           ))}
 
@@ -1399,7 +1399,7 @@ export default function ViewEvent() {
                               type="button"
                               disabled={startingStream}
                               onClick={handleOwnerStreamAction}
-                              className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                              className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
                             >
                               {startingStream
                                 ? "Starting stream..."
@@ -1435,7 +1435,7 @@ export default function ViewEvent() {
                               setPurchaseModalOpen(true);
                               setModalAutoTrigger(false);
                             }}
-                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
                           >
                             {purchaseTicketMutation.isPending ? "Processing..." : "Buy Tickets for Others"}
                           </button>
@@ -1452,7 +1452,7 @@ export default function ViewEvent() {
                           onClick={handlePrimaryAction}
                           className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
                             ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                            : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                            : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
                             }`}
                         >
                           {primaryCtaLabel}
@@ -1472,7 +1472,7 @@ export default function ViewEvent() {
                             type="button"
                             disabled={purchaseTicketMutation.isPending}
                             onClick={handleOpenPurchaseOptions}
-                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
                           >
                             {purchaseTicketMutation.isPending
                               ? "Processing..."
@@ -1548,7 +1548,7 @@ export default function ViewEvent() {
                         disabled={followLoading || !event.hostId}
                         className={`tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:px-3 tw:text-xs tw:font-medium tw:transition tw:md:h-11 tw:md:text-sm ${isFollowing
                           ? "tw:border-primary/25 tw:bg-[#ffffff] tw:text-primary"
-                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 hover:tw:bg-[#ebf1f8]"
+                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 tw:hover:bg-[#ebf1f8]"
                           } ${followLoading ? "tw:cursor-not-allowed tw:opacity-70" : ""
                           }`}
                       >
@@ -1568,7 +1568,7 @@ export default function ViewEvent() {
                             ? `/profile/${event.organiserUserId || event.organiserId}`
                             : "/organizers"
                         }
-                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] hover:tw:bg-primarySecond tw:md:h-11 tw:md:text-sm"
+                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] tw:hover:bg-primarySecond tw:md:h-11 tw:md:text-sm"
                       >
                         View Profile
                       </Link>
@@ -1607,7 +1607,7 @@ export default function ViewEvent() {
                 type="button"
                 disabled={startingStream}
                 onClick={handleOwnerStreamAction}
-                className="tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:bg-primary tw:px-3 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                className="tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:bg-primary tw:px-3 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
               >
                 {startingStream ? "Starting..." : isLiveNow || isPaused ? "Manage stream" : "Start stream"}
               </button>
@@ -1620,7 +1620,7 @@ export default function ViewEvent() {
                   onClick={handlePrimaryAction}
                   className={`tw:flex tw:h-10 tw:min-w-[138px] tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
                     ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                    : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                    : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
                     }`}
                 >
                   {primaryCtaLabel}
@@ -1631,7 +1631,7 @@ export default function ViewEvent() {
                     type="button"
                     disabled={purchaseTicketMutation.isPending}
                     onClick={handleOpenPurchaseOptions}
-                    className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition hover:tw:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                    className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     Buy for others
                   </button>

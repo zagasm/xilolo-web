@@ -306,7 +306,7 @@ export function CodeVerification({ verificationData }) {
         <motion.div variants={inputVariants} className="tw:mt-5">
           <motion.button 
             style={{ borderRadius: 28, fontSize: 12}}
-            className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
             type="submit" 
             disabled={!isCodeComplete || isLoading} 
             variants={buttonVariants} 

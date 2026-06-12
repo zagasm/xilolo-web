@@ -403,7 +403,7 @@ export default function SupportChatPage() {
                 }}
                 className={[
                   "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-[22px] tw:px-4 tw:py-3 tw:text-left tw:transition",
-                  active ? "tw:bg-white tw:shadow-sm" : "tw:bg-white/70 hover:tw:bg-white",
+                  active ? "tw:bg-white tw:shadow-sm" : "tw:bg-white/70 tw:hover:bg-white",
                 ].join(" ")}
               >
                 <span className="tw:flex tw:items-center tw:justify-between tw:gap-2">
@@ -520,7 +520,7 @@ export default function SupportChatPage() {
               type="button"
               onClick={createConversation}
               disabled={!hasAccess || creating}
-              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
               aria-label="Start new support chat"
             >
               {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <Plus size={17} />}
@@ -530,7 +530,7 @@ export default function SupportChatPage() {
               style={{ borderRadius: 36 }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition hover:tw:bg-white/70"
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70"
               aria-label="Close support chat"
             >
               <ChevronLeft size={18} />
@@ -708,7 +708,7 @@ export default function SupportChatPage() {
               style={{ borderRadius: 36 }}
               type="submit"
               disabled={!input.trim() || !hasAccess || sending || isClosed}
-              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition hover:tw:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition tw:hover:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
               aria-label="Send message"
             >
               {sending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}

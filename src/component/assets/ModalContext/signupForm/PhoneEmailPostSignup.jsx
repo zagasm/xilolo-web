@@ -182,7 +182,7 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
             <motion.button
               type="button"
               onClick={skipProcess}
-              className="tw:text-sm tw:font-semibold tw:text-black tw:underline tw:transition tw:duration-200 hover:tw:opacity-90"
+              className="tw:text-sm tw:font-semibold tw:text-black tw:underline tw:transition tw:duration-200 tw:hover:opacity-90"
               whileHover={{ scale: 1.03 }}
             >
               Skip for now

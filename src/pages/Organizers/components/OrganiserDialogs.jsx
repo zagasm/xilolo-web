@@ -322,7 +322,7 @@ export function OrganiserProfilePhotoRequiredDialog({
                   }}
                     type="button"
                     onClick={onEditProfile}
-                    className="tw:w-full tw:rounded-2xl tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition hover:tw:shadow-md tw:sm:w-auto"
+                    className="tw:w-full tw:rounded-2xl tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition tw:hover:shadow-md tw:sm:w-auto"
                   >
                     Update profile picture
                   </button>

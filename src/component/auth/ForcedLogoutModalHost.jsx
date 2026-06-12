@@ -192,7 +192,7 @@ export default function ForcedLogoutModalHost() {
                       setOpen(false);
                       navigate("/auth/signin", { replace: true });
                     }}
-                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-lg tw:shadow-slate-900/15 tw:transition hover:tw:bg-slate-800 active:tw:scale-[0.99]"
+                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-lg tw:shadow-slate-900/15 tw:transition tw:hover:bg-slate-800 active:tw:scale-[0.99]"
                   >
                     Continue to sign in
                   </button>

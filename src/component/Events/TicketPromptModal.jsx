@@ -245,7 +245,7 @@ export default function TicketPromptModal({
                             <button
                               type="button"
                               onClick={onDownloadManual}
-                              className="tw:mt-2 tw:w-full tw:rounded-[16px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
+                              className="tw:mt-2 tw:w-full tw:rounded-[16px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
                             >
                               Download manual
                             </button>
@@ -273,7 +273,7 @@ export default function TicketPromptModal({
                               onClick={() => setSelectedPurchaseType(option.value)}
                               className={`tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${selected
                                 ? "tw:border-primary tw:bg-primary/5"
-                                : "tw:border-gray-200 tw:bg-white hover:tw:border-primary/30"
+                                : "tw:border-gray-200 tw:bg-white tw:hover:border-primary/30"
                                 }`}
                             >
                               <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">

@@ -497,7 +497,7 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:mt-6 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+              className="tw:mt-6 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
               Go back
@@ -542,7 +542,7 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:h-11 tw:w-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white"
+              className="tw:inline-flex tw:h-11 tw:w-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-white"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
             </button>
@@ -563,7 +563,7 @@ export default function SharedEventPage() {
               type="button"
               onClick={handleShare}
               disabled={shareFlow.shareInProgress}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
             >
               {shareFlow.shareInProgress ? (
                 <span className="tw:h-4 tw:w-4 tw:animate-spin tw:rounded-full tw:border-2 tw:border-white/80 tw:border-t-transparent" />
@@ -665,7 +665,7 @@ export default function SharedEventPage() {
                         <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
                           {sponsoredTicketSponsors.length ? (
                             <>
-                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary hover:tw:underline" />
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary tw:hover:underline" />
                               {sponsorHeadlineSuffix}
                             </>
                           ) : (
@@ -683,7 +683,7 @@ export default function SharedEventPage() {
                             <SponsorProfileLink
                               key={sponsor.id || sponsor.username}
                               sponsor={sponsor}
-                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary hover:tw:bg-white hover:tw:underline"
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary tw:hover:bg-white tw:hover:underline"
                             />
                           ))}
                           {canClaimSponsoredTicket && (
@@ -691,7 +691,7 @@ export default function SharedEventPage() {
                               type="button"
                               onClick={handleClaimSponsoredTicket}
                               disabled={claimSponsoredTicketMutation.isPending}
-                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
                             >
                               {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
                             </button>
@@ -712,7 +712,7 @@ export default function SharedEventPage() {
                         claimSponsoredTicketMutation.isPending ||
                         (!canClaimSponsoredTicket && isSoldOut)
                       }
-                      className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
+                      className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
                     >
                       {primaryActionLabel}
                     </button>
@@ -726,7 +726,7 @@ export default function SharedEventPage() {
                       type="button"
                       onClick={handleShare}
                       disabled={shareFlow.shareInProgress}
-                      className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-slate-900 hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
+                      className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-slate-900 tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
                     >
                       {shareFlow.shareInProgress ? (
                         <span className="tw:h-4 tw:w-4 tw:animate-spin tw:rounded-full tw:border-2 tw:border-slate-500/70 tw:border-t-transparent" />

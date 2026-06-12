@@ -151,7 +151,7 @@ export default function Navbar() {
           <Link
             to="/xilolo-ai"
             className={[
-              "xilolo-ai-nav-button tw:hidden tw:lg:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3.5 tw:text-sm tw:font-extrabold tw:shadow-[0_10px_26px_rgba(17,17,17,0.18)] tw:transition hover:tw:-translate-y-0.5",
+              "xilolo-ai-nav-button tw:hidden tw:lg:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3.5 tw:text-sm tw:font-extrabold tw:shadow-[0_10px_26px_rgba(17,17,17,0.18)] tw:transition tw:hover:-translate-y-0.5",
               location.pathname === "/xilolo-ai"
                 ? "tw:border-primary tw:bg-primary text-white"
                 : "tw:border-gray-200 tw:bg-white tw:text-primary",
@@ -263,7 +263,7 @@ export default function Navbar() {
                           onClick={() =>
                             handleMenuNavigation(profilePath, "profile", close)
                           }
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition hover:tw:bg-slate-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:bg-slate-50"
                         >
                           <UserCircle2 className="tw:size-4" />
                           <span>View Profile</span>
@@ -275,7 +275,7 @@ export default function Navbar() {
                           onClick={() =>
                             handleMenuNavigation("/account", "account", close)
                           }
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition hover:tw:bg-slate-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:bg-slate-50"
                         >
                           <LayoutGrid className="tw:size-4" />
                           <span>Account Center</span>
@@ -289,7 +289,7 @@ export default function Navbar() {
                             logout?.();
                             navigate("/auth/signin");
                           }}
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-red-600 tw:transition hover:tw:bg-red-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-red-600 tw:transition tw:hover:bg-red-50"
                         >
                           <LogOut className="tw:size-4" />
                           <span>Logout</span>

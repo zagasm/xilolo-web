@@ -139,7 +139,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
             style={{ borderRadius: 12, fontSize: 11 }}
             type="button"
             onClick={onViewReceipt}
-            className="tw:inline-flex tw:h-10 tw:min-w-[132px] tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-950 tw:px-4 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.16),0_0_16px_rgba(0,245,255,0.12)] tw:transition-colors hover:tw:bg-slate-800 tw:md:h-11 tw:md:min-w-[148px] tw:md:text-sm"
+            className="tw:inline-flex tw:h-10 tw:min-w-[132px] tw:items-center tw:justify-center tw:rounded-xl tw:bg-slate-950 tw:px-4 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.16),0_0_16px_rgba(0,245,255,0.12)] tw:transition-colors tw:hover:bg-slate-800 tw:md:h-11 tw:md:min-w-[148px] tw:md:text-sm"
           >
             View Receipt
           </button>

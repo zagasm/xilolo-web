@@ -253,7 +253,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type = "email" }) => 
             }}
             type="button"
             onClick={skipProcess}
-            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl tw:py-3 hover:tw:opacity-80"
+            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl tw:py-3 tw:hover:opacity-80"
           >
             Skip for now
           </button>

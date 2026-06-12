@@ -48,7 +48,7 @@ function SingleNotificationTemplate({ notification, onClick }) {
 
   return (
     <div
-      className={`tw:cursor-pointer tw:px-4 tw:py-4 tw:transition tw:duration-200 hover:tw:bg-slate-50 ${
+      className={`tw:cursor-pointer tw:px-4 tw:py-4 tw:transition tw:duration-200 tw:hover:bg-slate-50 ${
         isUnread
           ? "tw:bg-[#ffffff]"
           : "tw:bg-[#ffffff]"

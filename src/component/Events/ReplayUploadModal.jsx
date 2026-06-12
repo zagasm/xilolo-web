@@ -193,7 +193,7 @@ export default function ReplayUploadModal({
                     type="button"
                     onClick={handleClose}
                     disabled={uploading}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 hover:tw:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -243,7 +243,7 @@ export default function ReplayUploadModal({
                         type="button"
                         onClick={() => handleFileChange(null)}
                         disabled={uploading}
-                        className="tw:text-sm tw:font-medium tw:text-slate-600 hover:tw:text-slate-900 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:text-sm tw:font-medium tw:text-slate-600 tw:hover:text-slate-900 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                       >
                         Remove
                       </button>
@@ -282,7 +282,7 @@ export default function ReplayUploadModal({
                       type="button"
                       onClick={handleClose}
                       disabled={uploading}
-                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 hover:tw:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                     >
                       Cancel
                     </button>
@@ -290,7 +290,7 @@ export default function ReplayUploadModal({
                       type="button"
                       onClick={handleUpload}
                       disabled={uploading || !uploadAllowed}
-                      className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                      className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                     >
                       {uploading ? (
                         <Loader2 className="tw:h-4 tw:w-4 tw:animate-spin" />

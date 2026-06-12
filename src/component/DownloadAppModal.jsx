@@ -130,7 +130,7 @@ const DownloadAppModal = ({
                     <button
                       type="button"
                       onClick={onSkip}
-                      className="tw:text-xs tw:font-semibold tw:text-primary tw:underline tw:underline-offset-4 hover:tw:text-primarySecond"
+                      className="tw:text-xs tw:font-semibold tw:text-primary tw:underline tw:underline-offset-4 tw:hover:text-primarySecond"
                     >
                       Skip, download later
                     </button>

@@ -567,7 +567,7 @@ function WithdrawDialog({
                     onClick={onClose}
                     disabled={submitting}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition hover:tw:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition tw:hover:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     Cancel
                   </button>
@@ -576,7 +576,7 @@ function WithdrawDialog({
                     onClick={onSubmit}
                     disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     {submitting ? "Submitting..." : "Submit withdrawal"}
                   </button>
@@ -965,7 +965,7 @@ export default function AccountPayouts() {
           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
             <Link
               to="/account/payouts/history"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition hover:tw:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <History className="tw:h-4 tw:w-4" />
               Withdrawal history
@@ -974,14 +974,14 @@ export default function AccountPayouts() {
               type="button"
               onClick={() => setWithdrawOpen(true)}
               style={{ borderRadius: 12 }}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] hover:tw:bg-primarySecond"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:hover:bg-primarySecond"
             >
               <Landmark className="tw:h-4 tw:w-4" />
               Withdraw
             </button>
             <Link
               to="/account/crypto-wallet"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition hover:tw:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <Coins className="tw:h-4 tw:w-4" />
               Crypto wallets
@@ -989,7 +989,7 @@ export default function AccountPayouts() {
             <button
               type="button"
               onClick={loadPage}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition hover:tw:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <RefreshCw className="tw:h-4 tw:w-4" />
               Refresh

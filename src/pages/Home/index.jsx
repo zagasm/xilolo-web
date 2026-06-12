@@ -54,7 +54,7 @@ export default function Home() {
             onClick={() => handleTabChange("all")}
             className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium tw:transition ${activeTab === "all"
               ? "tw:bg-primary tw:text-white tw:shadow-[0_12px_26px_rgba(0,0,0,0.16),0_0_18px_rgba(0,245,255,0.14)]"
-              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200 hover:tw:border-neon/40 hover:tw:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
+              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200 tw:hover:border-neon/40 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
               }`}
           >
             For You
@@ -64,7 +64,7 @@ export default function Home() {
             onClick={() => handleTabChange("live")}
             className={`tw:px-5 tw:md:px-6 tw:py-2 tw:rounded-xl tw:text-[10px] tw:md:text-sm tw:font-medium tw:transition ${activeTab === "live"
               ? "tw:bg-primary tw:text-white tw:shadow-[0_12px_26px_rgba(0,0,0,0.16),0_0_18px_rgba(0,245,255,0.14)]"
-              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200 hover:tw:border-neon/40 hover:tw:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
+              : "tw:bg-[#ffffff] tw:text-gray-500 tw:border tw:border-gray-200 tw:hover:border-neon/40 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
               }`}
           >
             Live

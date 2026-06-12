@@ -11,6 +11,7 @@ import {
   MoreVertical,
   Upload,
   QrCode,
+  BarChart3,
 } from "lucide-react";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showPromise } from "../ui/toast";
@@ -242,7 +243,7 @@ export default function EventCard({
   };
 
   return (
-    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:border tw:border-slate-100 tw:bg-[#ffffff] tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)] tw:transition-shadow hover:tw:shadow-[0_18px_46px_rgba(15,23,42,0.08),0_0_24px_rgba(0,245,255,0.08)]">
+    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:border tw:border-slate-100 tw:bg-[#ffffff] tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)] tw:transition-shadow tw:hover:shadow-[0_18px_46px_rgba(15,23,42,0.08),0_0_24px_rgba(0,245,255,0.08)]">
       {/* Top-right actions (only for owner) */}
       {isOwnerEvent && (
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-20">
@@ -250,7 +251,7 @@ export default function EventCard({
             <Menu.Button
               style={{ borderRadius: 9999 }}
               onClick={(e) => e.stopPropagation()}
-              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-[0_10px_24px_rgba(15,23,42,0.14),0_0_12px_rgba(0,245,255,0.08)] hover:tw:bg-slate-50"
+              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-[0_10px_24px_rgba(15,23,42,0.14),0_0_12px_rgba(0,245,255,0.08)] tw:hover:bg-slate-50"
             >
               <MoreVertical className="tw:h-4 tw:w-4" />
             </Menu.Button>
@@ -292,6 +293,22 @@ export default function EventCard({
                     )}
                   </Menu.Item>
                 ) : null}
+
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/event/analytics/${event.id}`);
+                      }}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}
+                    >
+                      <BarChart3 className="tw:h-4 tw:w-4" />
+                      <span>Stream Analytics</span>
+                    </button>
+                  )}
+                </Menu.Item>
 
                 <Menu.Item disabled={!shouldShowRescheduleAction || rescheduleLocked}>
                   {({ active, disabled }) => (

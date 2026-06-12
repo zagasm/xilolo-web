@@ -36,7 +36,7 @@ export default function WalletBalanceCard({ summary, loading = false, onFund }) 
         <button
           type="button"
           onClick={onFund}
-          className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+          className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
           style={{ borderRadius: 18 }}
         >
           Fund wallet

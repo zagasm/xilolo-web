@@ -238,7 +238,7 @@ function VideoUploadSuccessModal({ open, fileName, onClose }) {
               style={{ borderRadius: 36, fontSize: 12 }}
                 type="button"
                 onClick={onClose}
-                className="tw:mt-6 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                className="tw:mt-6 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
               >
                 Continue
               </button>
@@ -699,7 +699,7 @@ export default function TicketingStep({
               style={{ borderRadius: 36 }}
               type="button"
               onClick={() => vodInputRef.current?.click()}
-              className="tw:mt-4 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-left hover:tw:border-primary/40"
+              className="tw:mt-4 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-left tw:hover:border-primary/40"
             >
               <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-700">
                 {vodFile?.name || "Choose VOD video"}
@@ -747,7 +747,7 @@ export default function TicketingStep({
                       style={{ borderRadius: 36, fontSize: 12 }}
                       type="button"
                       onClick={onCancelVodUpload}
-                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 hover:tw:bg-red-50"
+                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 tw:hover:bg-red-50"
                     >
                       Cancel
                     </button>
@@ -871,7 +871,7 @@ export default function TicketingStep({
             <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-2">
               <div>
                 <label className="tw:mb-1 tw:block tw:text-[15px]">Material file</label>
-                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 hover:tw:border-primary/40">
+                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:hover:border-primary/40">
                   <span className="tw:text-sm tw:font-medium tw:text-slate-700">
                     {fileLabel(manualFile) || existingManual?.fileName || "Choose document"}
                   </span>
@@ -896,7 +896,7 @@ export default function TicketingStep({
 
               <div>
                 <label className="tw:mb-1 tw:block tw:text-[15px]">Material cover</label>
-                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 hover:tw:border-primary/40">
+                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:hover:border-primary/40">
                   <span className="tw:text-sm tw:font-medium tw:text-slate-700">
                     {fileLabel(manualCover) || existingManualCover?.fileName || "Choose cover image"}
                   </span>
@@ -997,7 +997,7 @@ export default function TicketingStep({
                     }
                     className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableAfterMinutes")) === String(minutes)
                         ? "tw:bg-slate-900 tw:text-white"
-                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
+                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 tw:hover:bg-slate-100"
                       }`}
                   >
                     {formatReplayMinutes(minutes)}
@@ -1040,7 +1040,7 @@ export default function TicketingStep({
                     }
                     className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableForMinutes")) === String(minutes)
                         ? "tw:bg-slate-900 tw:text-white"
-                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 hover:tw:bg-slate-100"
+                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 tw:hover:bg-slate-100"
                       }`}
                   >
                     {formatReplayMinutes(minutes)}
@@ -1079,7 +1079,7 @@ export default function TicketingStep({
         <button
           type="button"
           onClick={onBack}
-          className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 hover:tw:bg-gray-50"
+          className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 tw:hover:bg-gray-50"
           style={{ borderRadius: 20, fontSize: 12 }}
         >
           Back
@@ -1087,7 +1087,7 @@ export default function TicketingStep({
         <button
           type="submit"
           disabled={isUploadingVod || vodUploadMustFinish}
-          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
           style={{ borderRadius: 20, fontSize: 12 }}
         >
           {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Continue to preview"}

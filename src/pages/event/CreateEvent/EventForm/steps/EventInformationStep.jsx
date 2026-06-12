@@ -290,7 +290,7 @@ export default function EventInformationStep({
           <button
             type="submit"
             disabled={!isValid}
-            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
             style={{ borderRadius: 20 }}
           >
             Continue to ticketing

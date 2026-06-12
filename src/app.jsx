@@ -73,6 +73,7 @@ import EventEditPage from "./pages/event/EventEditPage.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
+import EventStreamAnalyticsPage from "./pages/event/EventStreamAnalyticsPage.jsx";
 import EventCheckinControlPage from "./pages/event/EventCheckinControlPage.jsx";
 import VodWatchPage from "./pages/event/VodWatchPage.jsx";
 import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
@@ -326,7 +327,7 @@ export function App() {
         },
       },
       {
-        matcher: /^\/(auth|feed|profile|search|payment|wallet|kyc|notifications|mentions|tickets|organizers|event\/(view|select-event-type|create-event|edit|stream|saved-events)|creator\/channel\/new|subscription|support-chat|me|become-an-organiser)\b/,
+        matcher: /^\/(auth|feed|profile|search|payment|wallet|kyc|notifications|mentions|tickets|organizers|event\/(view|select-event-type|create-event|edit|stream|analytics|saved-events)|creator\/channel\/new|subscription|support-chat|me|become-an-organiser)\b/,
         meta: {
           title: "Xilolo",
           description:
@@ -495,6 +496,7 @@ export function App() {
               <Route path="view/:eventId" element={<ViewEvent />} />
               <Route path="vod/:eventId" element={<VodWatchPage />} />
               <Route path="stream/:eventId" element={<EventStreamControlPage />} />
+              <Route path="analytics/:eventId" element={<EventStreamAnalyticsPage />} />
               <Route path="checkin/:eventId" element={<EventCheckinControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
               <Route path="select-event-type" element={<EventType />} />

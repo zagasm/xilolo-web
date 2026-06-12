@@ -315,7 +315,7 @@ export default function BankAccountsPage() {
           <section className="tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08),0_0_20px_rgba(0,245,255,0.05)]">
             <div className="tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-start tw:md:justify-between">
               <div>
-                <Link to="/account/payouts" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900">
+                <Link to="/account/payouts" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 tw:hover:text-gray-900">
                   <ArrowLeft className="tw:h-4 tw:w-4" />
                   <span>Back to payouts</span>
                 </Link>
@@ -410,7 +410,7 @@ export default function BankAccountsPage() {
                         </div>
                         <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           {!account.is_default && (
-                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition hover:tw:border-neon/30 hover:tw:shadow-[0_0_14px_rgba(0,245,255,0.08)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60">
+                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60">
                               {isDefaulting ? <CircularProgress size={16} /> : <Star className="tw:h-4 tw:w-4" />}
                               Set default
                             </button>

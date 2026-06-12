@@ -569,7 +569,7 @@ export function Signin() {
               {rememberedAccounts.map((account) => (
                 <div
                   key={account.id || account.userId || account.email}
-                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer hover:tw:bg-gray-50"
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer tw:hover:bg-gray-50"
                   onClick={() => handleSelectAccount(account)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
