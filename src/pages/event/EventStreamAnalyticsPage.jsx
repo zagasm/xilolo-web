@@ -61,7 +61,7 @@ function money(value) {
 
 function StatCard({ icon: Icon, label, value, hint }) {
   return (
-    <div className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-4 tw:shadow-sm">
+    <div className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-[#f8fafc] tw:p-4 tw:shadow-sm">
       <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
         <div>
           <span className="tw:block tw:text-xs tw:font-semibold tw:uppercase tw:text-slate-500">{label}</span>
@@ -78,7 +78,7 @@ function StatCard({ icon: Icon, label, value, hint }) {
 
 function Panel({ title, icon: Icon, children, action }) {
   return (
-    <section className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-sm">
+    <section className="tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-[#f8fafc] tw:p-5 tw:shadow-sm">
       <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between tw:gap-3">
         <div className="tw:flex tw:items-center tw:gap-2">
           <Icon className="tw:h-5 tw:w-5 tw:text-primary" />
@@ -265,7 +265,7 @@ export default function EventStreamAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="tw:min-h-screen tw:bg-[#f8fafc]">
+      <div className="tw:min-h-screen tw:bg-white">
         <SideBarNav />
         <div className="tw:flex tw:min-h-screen tw:items-center tw:justify-center">
           <LoaderCircle className="tw:h-8 tw:w-8 tw:animate-spin tw:text-primary" />
@@ -275,8 +275,8 @@ export default function EventStreamAnalyticsPage() {
   }
 
   return (
-    <div className="tw:min-h-screen tw:bg-[#f8fafc] tw:text-slate-900">
-      <div className="tw:mt-20 tw:pb-16 tw:px-4 tw:py-6 tw:md:ml-[280px] tw:md:px-8">
+    <div className="tw:min-h-screen tw:bg-white tw:text-slate-900">
+      <div className="tw:mt-20 tw:pb-16 tw:px-2 tw:py-6 tw:md:px-8">
         <div className="tw:mx-auto tw:max-w-7xl tw:space-y-6">
           <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
             <div>
