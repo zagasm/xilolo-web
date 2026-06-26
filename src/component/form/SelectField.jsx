@@ -50,9 +50,14 @@ export default function SelectField({
               {options.map((opt) => (
                 <Listbox.Option
                   key={String(opt.value)}
+                  disabled={Boolean(opt.disabled)}
                   className={({ active }) =>
-                    `tw:cursor-pointer tw:select-none tw:px-3 tw:py-2 tw:text-[15px] ${
-                      active
+                    `tw:select-none tw:px-3 tw:py-2 tw:text-[15px] ${
+                      opt.disabled
+                        ? "tw:cursor-not-allowed tw:opacity-50 tw:text-gray-400"
+                        : "tw:cursor-pointer"
+                    } ${
+                      active && !opt.disabled
                         ? "tw:bg-lightPurple tw:text-primary"
                         : "tw:text-gray-800"
                     }`

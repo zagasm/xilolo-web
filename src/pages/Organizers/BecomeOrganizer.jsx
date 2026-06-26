@@ -132,21 +132,22 @@ const BecomeOrganiser = () => {
       setCountriesError(null);
 
       try {
-        const response = await fetch(COUNTRIES_API_URL, {
+        const response = await api.get(COUNTRIES_API_URL, {
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          throw new Error("Unable to load countries right now.");
-        }
-
-        const payload = await response.json();
+        const payload = Array.isArray(response?.data?.data)
+          ? response.data.data
+          : [];
         const normalized = payload
           .map(normalizeCountry)
           .filter((item) => item.name && item.code)
           .sort((a, b) => a.name.localeCompare(b.name));
 
         if (active) {
+          if (!normalized.length) {
+            throw new Error("Unable to load countries right now.");
+          }
           setCountries(normalized);
         }
       } catch (error) {
@@ -732,7 +733,9 @@ const BecomeOrganiser = () => {
                   bvn={bvn}
                   bvnError={bvnError}
                   bvnLoading={bvnLoading}
-                  onBvnChange={(e) => setBvn(e.target.value.replace(/\D/g, ""))}
+                  onBvnChange={(e) =>
+                    setBvn(e.target.value.replace(/\D/g, "").slice(0, 11))
+                  }
                   onBack={() => setBankStep(0)}
                   onSubmit={handleSubmitBvn}
                 />

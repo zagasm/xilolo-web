@@ -2,7 +2,7 @@ import React from "react";
 import { App } from "./app.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Provider as ReduxProvider } from "react-redux";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -19,20 +19,9 @@ import { store } from "./store";
 
 import { initGA } from "./analytics";
 import GoogleAnalyticsTracker from "./GoogleAnalyticsTracker.jsx";
+import { queryClient } from "./lib/queryClient.js";
 
 initGA();
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 2 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      retry: 1,
-    },
-  },
-});
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 

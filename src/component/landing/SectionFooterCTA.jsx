@@ -59,8 +59,7 @@ export default function Footer() {
                   <span>support@xilolo.com</span>
                 </div>
                 <span className="tw:not-italic tw:text-white tw:mt-2">
-                  16192 Coastal Highway Lewes,{" "}
-                  <br />
+                  16192 Coastal Highway Lewes, <br />
                   Delaware 19958 Sussex County United States
                 </span>
               </div>
@@ -69,20 +68,23 @@ export default function Footer() {
                 {[
                   {
                     Icon: Facebook,
-                    href: "https://www.facebook.com/share/1DKrHA81wi/?mibextid=wwXIfr ",
+                    href: "https://web.facebook.com/xilolohq",
                   },
-                  { Icon: Twitter, href: "https://x.com/zagasmstudios?s=21" },
+                  {
+                    Icon: Twitter,
+                    href: "https://x.com/xilolo_hq?s=20",
+                  },
                   {
                     Icon: Instagram,
-                    href: "https://www.instagram.com/zagasm_studios?igsh=MTM5cjZ4ZXlleHJ6bA%3D%3D&utm_source=qr ",
+                    href: "https://www.instagram.com/xilolo_hq",
                   },
                   {
                     Icon: Youtube,
-                    href: "https://youtube.com/@zagasmstudios?si=vG0YOv9-6MnSqHom",
+                    href: "https://www.youtube.com/@xilolo_hq",
                   },
                   {
                     Icon: FaTiktok,
-                    href: "https://www.tiktok.com/@xilolo_hq?is_from_webapp=1&sender_device=pc",
+                    href: "https://www.tiktok.com/@xilolo_hq",
                   },
                 ].map(({ Icon, href }, i) => (
                   <motion.a

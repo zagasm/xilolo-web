@@ -235,6 +235,32 @@ export default function WalletFundingCallbackPage() {
     }
   };
 
+  useEffect(() => {
+    if (verificationState.status !== "success") {
+      return undefined;
+    }
+
+    if (pendingPurchase?.eventId && purchaseState.status !== "success") {
+      return undefined;
+    }
+
+    const destination = pendingPurchase?.eventPath || (
+      pendingPurchase?.eventId ? "/tickets" : "/account/wallet"
+    );
+
+    const timerId = window.setTimeout(() => {
+      navigate(destination, { replace: true });
+    }, 2000);
+
+    return () => window.clearTimeout(timerId);
+  }, [
+    navigate,
+    pendingPurchase?.eventId,
+    pendingPurchase?.eventPath,
+    purchaseState.status,
+    verificationState.status,
+  ]);
+
   return (
     <div className="tw:min-h-screen tw:bg-[#F6F7FB] tw:px-4 tw:pb-16 tw:pt-24 tw:font-sans">
       <div className="tw:mx-auto tw:max-w-2xl">

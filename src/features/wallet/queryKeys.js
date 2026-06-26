@@ -1,3 +1,19 @@
-export const WALLET_SUMMARY_QUERY_KEY = ["wallet-summary"];
-export const WALLET_PAYMENT_METHODS_QUERY_KEY = ["wallet-payment-methods"];
-export const WALLET_TRANSACTIONS_QUERY_KEY = ["wallet-transactions"];
+function normalizeWalletScope(scope) {
+  if (scope == null || scope === "") {
+    return "anonymous";
+  }
+
+  return String(scope);
+}
+
+export function getWalletSummaryQueryKey(scope) {
+  return ["wallet-summary", normalizeWalletScope(scope)];
+}
+
+export function getWalletPaymentMethodsQueryKey(scope) {
+  return ["wallet-payment-methods", normalizeWalletScope(scope)];
+}
+
+export function getWalletTransactionsQueryKey(scope, filters = {}) {
+  return ["wallet-transactions", normalizeWalletScope(scope), filters];
+}

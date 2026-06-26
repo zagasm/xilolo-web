@@ -42,3 +42,8 @@ export function loadLastWalletFunding() {
 export function persistLastWalletFunding(value) {
   safeWrite(LAST_FUNDING_KEY, value);
 }
+
+export function clearWalletFlowStorage() {
+  safeWrite(PENDING_PURCHASE_KEY, null);
+  safeWrite(LAST_FUNDING_KEY, null);
+}

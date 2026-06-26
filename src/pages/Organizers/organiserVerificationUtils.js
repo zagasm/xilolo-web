@@ -1,11 +1,14 @@
 export const BANKS_CACHE_KEY = "Xilolo_banks_cache_v1";
 export const BANKS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-export const COUNTRIES_API_URL =
-  "https://restcountries.com/v3.1/all?fields=name,cca2,flags";
+export const COUNTRIES_API_URL = "/api/v1/country/code";
 export const COUNTRY_GEOLOOKUP_API_URL = "https://api.country.is/";
 export const COUNTRY_GEOLOOKUP_FALLBACK_API_URL = "https://ipapi.co/json/";
 export const DIDIT_RETRYABLE_STATUSES = ["Declined", "Abandoned", "Expired"];
 export const BANK_STEPPER_STEPS = ["Account details", "Verify identity"];
+
+function isHttpUrl(value) {
+  return /^https?:\/\//i.test(String(value || "").trim());
+}
 
 export function loadBanksFromCache() {
   try {
@@ -34,11 +37,14 @@ export function saveBanksToCache(banks) {
 }
 
 export function normalizeCountry(country) {
+  const countryFlag = country?.flags?.svg || country?.flags?.png || country?.flag || "";
+  const flagIsImage = isHttpUrl(countryFlag);
+
   return {
-    name: country?.name?.common || "",
-    code: country?.cca2 || "",
-    flag: country?.flags?.svg || country?.flags?.png || "",
-    flagEmoji: country?.flags?.emoji || "",
+    name: country?.name?.common || country?.name || "",
+    code: country?.cca2 || country?.iso_code || country?.code || "",
+    flag: flagIsImage ? countryFlag : "",
+    flagEmoji: country?.flags?.emoji || (flagIsImage ? "" : countryFlag),
   };
 }
 
