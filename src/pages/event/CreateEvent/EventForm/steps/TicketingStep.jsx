@@ -20,9 +20,10 @@ const DISPLAY_CURRENCIES = [
   {
     value: "USD",
     label: "US Dollar",
-    subLabel: "Minimum ticket price: $3",
+    subLabel: "Coming later",
     symbol: "$",
     minimum: 3,
+    disabled: true,
   },
 ];
 
@@ -259,7 +260,7 @@ const schema = z
     priceInput: z.string().min(1, "Enter a ticket price"),
     maxTickets: z.enum(["limited", "unlimited"]),
     ticketLimit: z.string().optional(),
-    currencyCode: z.enum(["NGN", "USD"]),
+    currencyCode: z.literal("NGN"),
     deliveryType: z.enum(["live", "vod"]),
     visibility: z.enum(["public", "private"]),
     attendanceType: z.enum(["online", "physical", "both"]),
@@ -409,7 +410,7 @@ export default function TicketingStep({
         defaultValues.ticketLimit !== undefined && defaultValues.ticketLimit !== null
           ? String(defaultValues.ticketLimit)
           : "",
-      currencyCode: defaultValues.currencyCode === "USD" ? "USD" : "NGN",
+      currencyCode: "NGN",
       deliveryType: defaultValues.deliveryType || "live",
       visibility: defaultValues.visibility || "public",
       attendanceType: defaultValues.attendanceType || "online",
@@ -514,7 +515,7 @@ export default function TicketingStep({
           );
           if (matchedById?.code) {
             const code = String(matchedById.code).toUpperCase();
-            if (code === "NGN" || code === "USD") {
+            if (code === "NGN") {
               setValue("currencyCode", code, { shouldValidate: true });
             }
           }

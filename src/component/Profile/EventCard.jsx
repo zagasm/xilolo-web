@@ -148,6 +148,7 @@ export default function EventCard({
   const navigate = useNavigate();
 
   const isOwnerEvent = Boolean(event?.isOwner || isOwnProfile);
+  const hasTicketSales = Boolean(event?.has_ticket_sales);
   const shouldShowRescheduleAction =
     isOwnerEvent && !isStatusBlockedForReschedule(event?.status);
   const rescheduleLocked = hasUsedReschedule(event);
@@ -366,11 +367,16 @@ export default function EventCard({
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (hasTicketSales) return;
                         setDeleteError("");
                         setOpenDelete(true);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-red-600 ${active ? "tw:bg-red-50" : ""
-                        }`}
+                      disabled={hasTicketSales}
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
+                        hasTicketSales
+                          ? "tw:cursor-not-allowed tw:text-slate-400"
+                          : `tw:text-red-600 ${active ? "tw:bg-red-50" : ""}`
+                      }`}
                     >
                       <Trash2 className="tw:h-4 tw:w-4" />
                       <span>Delete Event</span>
@@ -513,7 +519,11 @@ export default function EventCard({
         open={openDelete}
         onClose={() => (deleting ? null : setOpenDelete(false))}
         title="Delete this event?"
-        description="This will permanently remove the event and its details. This action cannot be undone."
+        description={
+          hasTicketSales
+            ? "This event already has ticket sales and cannot be deleted."
+            : "This will permanently remove the event and its details. This action cannot be undone."
+        }
         confirmText="Yes, delete"
         cancelText="Cancel"
         loading={deleting}

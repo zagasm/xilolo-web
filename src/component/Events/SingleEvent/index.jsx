@@ -506,6 +506,7 @@ export default function EventTemplate({
     loading,
     loadingMore,
     loadNext,
+    error,
   } = usePaginatedEvents(endpoint);
 
   const [visibleEvents, setVisibleEvents] = useState([]);
@@ -578,6 +579,16 @@ export default function EventTemplate({
       )}
 
       {/* EMPTY STATE */}
+      {!loading && error && (
+        <div className="tw:mt-12 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:text-red-500">
+          <Frown className="tw:mb-3 tw:h-10 tw:w-10" />
+          <span className="tw:font-medium">Unable to load events</span>
+          <small>
+            {error?.response?.data?.message || error?.message || "Please try again later."}
+          </small>
+        </div>
+      )}
+
       {!loading && visibleEvents.length === 0 && (
         <div className="tw:mt-12 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:text-gray-500">
           <Frown className="tw:mb-3 tw:h-10 tw:w-10" />

@@ -5,6 +5,8 @@ import {
   clearActiveAuthStorage,
   rememberAccount,
 } from "../../../lib/authStorage";
+import { clearWalletFlowStorage } from "../../../features/wallet/walletFlowStorage";
+import { queryClient } from "../../../lib/queryClient";
 
 const AuthContext = createContext();
 
@@ -38,6 +40,8 @@ export const AuthProvider = ({ children }) => {
 
   /** Login (full replace) */
   const login = ({ user: u, token: t, organiser: o, security: s }) => {
+    queryClient.clear();
+    clearWalletFlowStorage();
     setUser(u);
     setOrganiser(o ?? u?.organiser ?? u?.organizer ?? null);
     setToken(t);
@@ -100,10 +104,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    queryClient.clear();
     setUser(null);
     setToken(null);
     setOrganiser(null);
     setSecurity(null);
+    clearWalletFlowStorage();
     clearActiveAuthStorage();
   };
 

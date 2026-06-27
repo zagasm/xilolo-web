@@ -23,6 +23,7 @@ test("organiser verification status copy does not show review state after DIDIT 
 test("country prefill supports multiple lookup response shapes and locale fallback", async () => {
   const {
     extractCountryCodeFromGeoPayload,
+    normalizeCountry,
     normalizeCountryCode,
   } = await import("../organiserVerificationUtils.js");
 
@@ -31,6 +32,15 @@ test("country prefill supports multiple lookup response shapes and locale fallba
   assert.equal(extractCountryCodeFromGeoPayload({ countryCode: "gb" }), "GB");
   assert.equal(normalizeCountryCode("Nigeria"), "");
   assert.equal(normalizeCountryCode("NGA"), "");
+  assert.deepEqual(
+    normalizeCountry({ name: "Nigeria", iso_code: "NG", flag: "🇳🇬" }),
+    {
+      name: "Nigeria",
+      code: "NG",
+      flag: "",
+      flagEmoji: "🇳🇬",
+    }
+  );
 });
 
 test("country auto-prefill keeps users on the country step until they continue", () => {

@@ -1,13 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { getWalletSummary } from "../../../api/walletApi";
 import { useAuth } from "../../../pages/auth/AuthContext";
-import { WALLET_SUMMARY_QUERY_KEY } from "../queryKeys";
+import { getWalletSummaryQueryKey } from "../queryKeys";
 
 export function useWalletSummary(options = {}) {
-  const { token, isAuthenticated } = useAuth();
+  const { token, user, isAuthenticated } = useAuth();
+  const walletScope = user?.id || user?.user_id || token || "anonymous";
 
   return useQuery({
-    queryKey: WALLET_SUMMARY_QUERY_KEY,
+    queryKey: getWalletSummaryQueryKey(walletScope),
     queryFn: () => getWalletSummary(token),
     enabled: options.enabled ?? isAuthenticated,
     retry: 1,

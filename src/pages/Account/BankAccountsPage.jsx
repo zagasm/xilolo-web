@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError, showPromise } from "../../component/ui/toast";
+import { useAuth } from "../auth/AuthContext";
 import {
   addBankAccount,
   clearBankMutationState,
@@ -42,8 +43,6 @@ import {
   selectVerifiedBankAccount,
 } from "../../store/bankAccountsSelectors";
 
-const BANK_ACCOUNTS_QUERY_KEY = ["organiser-bank-accounts"];
-const PRIMARY_BANK_ACCOUNT_QUERY_KEY = ["organiser-primary-bank-account"];
 const BANKS_DIRECTORY_QUERY_KEY = ["banks-directory"];
 
 const maskAccountNumber = (value = "") => {
@@ -63,13 +62,13 @@ const formatDate = (value) => {
     });
 };
 
-const fetchPrimaryBankAccount = async () => {
-  const res = await api.get("/api/v1/organiser/kyc/bank", authHeaders());
+const fetchPrimaryBankAccount = async (token) => {
+  const res = await api.get("/api/v1/organiser/kyc/bank", authHeaders(token));
   return res?.data?.data || null;
 };
 
-const fetchBankAccounts = async () => {
-  const res = await api.get("/api/v1/organiser/kyc/bank-accounts", authHeaders());
+const fetchBankAccounts = async (token) => {
+  const res = await api.get("/api/v1/organiser/kyc/bank-accounts", authHeaders(token));
   return {
     accounts: res?.data?.data || [],
     totalAccounts: Number(res?.data?.total_accounts ?? 0),
@@ -212,20 +211,26 @@ function DeleteAccountDialog({ open, onClose, account, disableDelete, onConfirm 
 export default function BankAccountsPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const { token, user, isAuthenticated } = useAuth();
   const deletingAccountId = useSelector(selectDeletingBankAccountId);
   const defaultingAccountId = useSelector(selectDefaultingBankAccountId);
   const isSettingDefault = useSelector(selectIsSettingDefaultBankAccount);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const accountScope = user?.id || user?.user_id || token || "anonymous";
+  const primaryBankAccountQueryKey = ["organiser-primary-bank-account", String(accountScope)];
+  const bankAccountsQueryKey = ["organiser-bank-accounts", String(accountScope)];
 
   const { data: primaryAccount, isLoading: primaryLoading, refetch: refetchPrimary } = useQuery({
-    queryKey: PRIMARY_BANK_ACCOUNT_QUERY_KEY,
-    queryFn: fetchPrimaryBankAccount,
+    queryKey: primaryBankAccountQueryKey,
+    queryFn: () => fetchPrimaryBankAccount(token),
+    enabled: isAuthenticated,
     retry: 1,
   });
   const { data: accountsPayload, isLoading: accountsLoading, refetch: refetchAccounts } = useQuery({
-    queryKey: BANK_ACCOUNTS_QUERY_KEY,
-    queryFn: fetchBankAccounts,
+    queryKey: bankAccountsQueryKey,
+    queryFn: () => fetchBankAccounts(token),
+    enabled: isAuthenticated,
     retry: 1,
   });
   const { data: banks = [], isLoading: banksLoading } = useQuery({
@@ -250,8 +255,8 @@ export default function BankAccountsPage() {
 
   const invalidateQueries = async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: BANK_ACCOUNTS_QUERY_KEY }),
-      queryClient.invalidateQueries({ queryKey: PRIMARY_BANK_ACCOUNT_QUERY_KEY }),
+      queryClient.invalidateQueries({ queryKey: bankAccountsQueryKey }),
+      queryClient.invalidateQueries({ queryKey: primaryBankAccountQueryKey }),
     ]);
   };
 

@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { getWalletTransactions } from "../../../api/walletApi";
 import { useAuth } from "../../../pages/auth/AuthContext";
-import { WALLET_TRANSACTIONS_QUERY_KEY } from "../queryKeys";
+import { getWalletTransactionsQueryKey } from "../queryKeys";
 import { normalizeWalletTransactionsResponse } from "../walletUtils";
 
 export function useWalletTransactions(filters = {}, options = {}) {
-  const { token, isAuthenticated } = useAuth();
+  const { token, user, isAuthenticated } = useAuth();
+  const walletScope = user?.id || user?.user_id || token || "anonymous";
 
   return useQuery({
-    queryKey: [...WALLET_TRANSACTIONS_QUERY_KEY, filters],
+    queryKey: getWalletTransactionsQueryKey(walletScope, filters),
     queryFn: async () => {
       const payload = await getWalletTransactions(filters, token);
       return normalizeWalletTransactionsResponse(payload);

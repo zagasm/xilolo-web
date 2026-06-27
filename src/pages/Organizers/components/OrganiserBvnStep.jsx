@@ -31,7 +31,12 @@ export default function OrganiserBvnStep({
           fullWidth
           value={bvn}
           onChange={onBvnChange}
-          inputProps={{ maxLength: 11 }}
+          inputProps={{
+            maxLength: 11,
+            inputMode: "numeric",
+            pattern: "[0-9]*",
+            autoComplete: "off",
+          }}
           error={Boolean(bvnError)}
           helperText={bvnError || "Enter the 11-digit BVN linked to this account"}
         />
