@@ -28,38 +28,32 @@ import SubscriptionBadge from "../../component/ui/SubscriptionBadge.jsx";
 const SUBSCRIPTION_BENEFITS = [
   {
     title: "Verified Badge Display",
-    description:
-      "Subscribers receive a visible badge on their profile and during live streams, which distinguishes them from regular users.",
+    description: "Show your verified Xilolo badge across your profile and live activity.",
     icon: BadgeCheck,
   },
   {
-    title: "Priority Visibility in Live Streams",
-    description:
-      "Members’ comments and interactions are given higher visibility during live streams, making it easier for creators and other users to notice them.",
+    title: "Priority Live Visibility",
+    description: "Stand out more clearly in live chats and event interactions.",
     icon: MessageSquareMore,
   },
   {
-    title: "Exclusive Access to Premium Streams and Content",
-    description:
-      "Some live events and replays are restricted to badge members only.",
+    title: "Premium Event Access",
+    description: "Access subscriber-only streams, replays, and event features when available.",
     icon: ShieldCheck,
   },
   {
-    title: "Early Access to Events and Features",
-    description:
-      "Members may gain early access to upcoming live events, tickets, or newly released features.",
-    icon: CalendarClock,
-  },
-  {
-    title: "Enhanced Engagement Features",
-    description:
-      "Includes priority participation in live chats, potential access to exclusive reactions, and engagement tools.",
+    title: "Xilolo AI Beta",
+    description: "Use the Xilolo AI beta for account, event, ticket, wallet, and streaming help.",
     icon: Sparkles,
   },
   {
-    title: "Support for Creators",
-    description:
-      "The subscription helps support content creators on the platform by contributing to the ecosystem.",
+    title: "Early Feature Access",
+    description: "Try selected new Xilolo tools before they roll out widely.",
+    icon: CalendarClock,
+  },
+  {
+    title: "Creator Ecosystem Support",
+    description: "Help fund better creator, event, and community tools on Xilolo.",
     icon: Star,
   },
 ];
@@ -346,7 +340,7 @@ export default function SubscriptionsPage() {
           <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
             <Link
               to="/account"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-slate-700 hover:tw:text-slate-900"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:text-slate-900"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
               Back to account
@@ -363,11 +357,11 @@ export default function SubscriptionsPage() {
                   Verification Badge Subscription
                 </div>
                 <span className="tw:block tw:mt-4 tw:text-3xl tw:font-semibold tw:leading-tight tw:md:text-5xl">
-                  Subscribe once, keep your badge benefits in one place.
+                  Keep your Xilolo badge active every month.
                 </span>
                 <span className="tw:block tw:mt-3 tw:max-w-2xl tw:text-sm tw:text-white/85 tw:md:text-base">
-                  Review your Verification badge benefits, current subscription status,
-                  and initialize your subscription directly from this page.
+                  Manage your monthly badge subscription, unlock subscriber benefits,
+                  and get beta access to Xilolo AI while your plan is active.
                 </span>
               </div>
 
@@ -379,7 +373,7 @@ export default function SubscriptionsPage() {
                       {formattedSubscriptionPrice}
                     </div>
                     <div className="tw:mt-1 tw:text-sm tw:text-white/70">
-                      Charged monthly from your wallet balance.
+                      Monthly billing from your wallet balance.
                     </div>
                   </div>
                   {hasActiveSubscription ? (
@@ -402,7 +396,7 @@ export default function SubscriptionsPage() {
                   type="button"
                   onClick={handleInitializeSubscription}
                   disabled={loading || initializing || hasActiveSubscription}
-                  className="tw:mt-6 tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:transition hover:tw:bg-white/90 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  className="tw:mt-6 tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-5 tw:text-sm tw:font-semibold tw:text-primary tw:transition tw:hover:bg-white/90 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                 >
                   <Wallet className="tw:h-4 tw:w-4" />
                   <span>
@@ -410,7 +404,7 @@ export default function SubscriptionsPage() {
                       ? "Subscription already active"
                       : initializing
                         ? "Initializing subscription..."
-                        : "Subscribe now"}
+                        : "Start monthly subscription"}
                   </span>
                 </button>
 
@@ -423,7 +417,7 @@ export default function SubscriptionsPage() {
                     type="button"
                     onClick={handleRenewSubscription}
                     disabled={loading || renewing}
-                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-white/25 tw:bg-white/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition hover:tw:bg-white/15 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-white/25 tw:bg-white/10 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-white/15 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     <RefreshCw className="tw:h-4 tw:w-4" />
                     <span>{renewing ? "Renewing..." : "Renew subscription"}</span>

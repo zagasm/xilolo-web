@@ -194,7 +194,7 @@ function BlockedUsersPage() {
               type="button"
               style={{ borderRadius: "50%" }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium hover:tw:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -255,7 +255,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
   const followersLabel = formatFollowers(followers_count);
 
   return (
-    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform hover:-tw:translate-y-1 hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
+    <div className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform hover:-tw:translate-y-1 tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)]">
       {/* Avatar / cover */}
       <button
         style={{
@@ -313,7 +313,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
         type="button"
         disabled={isUnblocking}
         onClick={onUnblock}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 hover:tw:bg-gray-50 disabled:tw:opacity-60 disabled:tw:cursor-not-allowed tw:transition"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 disabled:tw:opacity-60 disabled:tw:cursor-not-allowed tw:transition"
       >
         <span>{isUnblocking ? "Unblocking…" : "Unblock"}</span>
       </button>

@@ -1,31 +1,16 @@
 import React from "react";
+import StatusFilter from "../ui/StatusFilter";
 
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "upcoming", label: "Upcoming" },
+  { key: "ready_to_go_live", label: "Ready to go live" },
   { key: "live", label: "Live" },
+  { key: "paused", label: "Paused" },
   { key: "ended", label: "Ended" },
+  { key: "expired", label: "Expired" },
 ];
 
 export default function EventsFilterTabs({ value, onChange }) {
-  return (
-    <div className="tw:flex tw:rounded-3xl tw:bg-[#ffffff] tw:p-1 tw:ring-1 tw:ring-gray-200">
-      {FILTERS.map((f) => (
-        <button
-          key={f.key}
-          style={{ borderRadius: 24 }}
-          type="button"
-          onClick={() => onChange(f.key)}
-          className={`tw:flex-1 tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:md:text-base tw:font-medium tw:transition
-            ${
-              value === f.key
-                ? "tw:bg-primary tw:text-white"
-                : "tw:text-gray-700 tw:hover:bg-gray-100"
-            }`}
-        >
-          {f.label}
-        </button>
-      ))}
-    </div>
-  );
+  return <StatusFilter value={value} onChange={onChange} options={FILTERS} />;
 }

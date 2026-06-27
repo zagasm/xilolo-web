@@ -143,7 +143,7 @@ export default function SecurityPage() {
             type="button"
             onClick={() => navigate(-1)}
             aria-label="Go back"
-            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm hover:tw:bg-gray-50"
+            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/40 tw:hover:bg-gray-50 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)]"
           >
             <ChevronLeft className="tw:h-5 tw:w-5" />
           </button>
@@ -155,7 +155,7 @@ export default function SecurityPage() {
           </span>
         </div>
 
-        <section className="tw:rounded-3xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-5 tw:shadow-sm">
+        <section className="tw:rounded-3xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-5 tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)]">
           <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-start tw:md:justify-between">
             <div className="tw:flex tw:gap-3">
               <span className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-white">
@@ -187,7 +187,7 @@ export default function SecurityPage() {
                 type="button"
                 onClick={startSetup}
                 disabled={working}
-                className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:opacity-60"
+                className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:opacity-60"
               >
                 {working ? "Starting..." : "Enable 2FA"}
               </button>
@@ -233,7 +233,7 @@ export default function SecurityPage() {
                   }
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-black focus:tw:outline-none"
+                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-neon focus:tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
                   placeholder="123456"
                 />
               </label>
@@ -245,7 +245,7 @@ export default function SecurityPage() {
                   }}
                   type="submit"
                   disabled={!/^\d{6}$/.test(confirmCode) || working}
-                  className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:bg-gray-300"
+                  className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:bg-gray-300"
                 >
                   {working ? "Confirming..." : "Confirm setup"}
                 </button>
@@ -279,7 +279,7 @@ export default function SecurityPage() {
                   }
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="tw:min-w-0 tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-black focus:tw:outline-none"
+                  className="tw:min-w-0 tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-neon focus:tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
                   placeholder="Authenticator 6-digit code"
                 />
                 <button

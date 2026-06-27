@@ -60,7 +60,8 @@
 }
 
 .interest_footer .skip_btn span {
-    color: rgba(143, 7, 231, 1);
+    color: #050505;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.18);
     text-decoration: underline;
 }
 
@@ -74,8 +75,9 @@
 }
 
 .interest_footer .save_btn button.active {
-    background: rgba(143, 7, 231, 1);
-    color: white
+    background: #050505;
+    color: white;
+    box-shadow: 0 0 18px rgba(0, 245, 255, 0.16);
 }
 
 

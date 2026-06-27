@@ -6,10 +6,11 @@ import { useAuth } from "../../../../pages/auth/AuthContext";
 import { showSuccess, showError } from "../../../ui/toast";
 import { useModal } from "..";
 import { api, authHeaders } from "../../../../lib/apiClient";
+import { mergeVerifiedContactUser } from "../../../../lib/userVerification";
 
 const DEFAULT_TIMER = 600; // seconds
 
-const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
+const SignUpCodecomponent = ({ Otpcode, token, userupdate, type = "email" }) => {
   const inputRefs = useRef([]);
   const lastAttemptedCodeRef = useRef("");
   const [code, setCode] = useState(["", "", "", "", ""]);
@@ -142,7 +143,11 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
           payload?.message || result?.message || "Verification successful!";
         showSuccess(message);
 
-        const user = userupdate || payload?.user;
+        const user = mergeVerifiedContactUser(
+          userupdate,
+          payload?.user || result?.user,
+          type
+        );
         login({ token, user });
         closeModal();
       } else {
@@ -248,7 +253,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate }) => {
             }}
             type="button"
             onClick={skipProcess}
-            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl tw:py-3 hover:tw:opacity-80"
+            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl tw:py-3 tw:hover:opacity-80"
           >
             Skip for now
           </button>

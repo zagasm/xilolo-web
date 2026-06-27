@@ -44,6 +44,7 @@ import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
 import Landing from "./pages/LandingPage/index.jsx";
 import { ToastHost } from "./component/ui/toast.jsx";
 import Support from "./pages/support/index.jsx";
+import SupportChatPage from "./pages/support/SupportChatPage.jsx";
 import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
@@ -72,6 +73,9 @@ import EventEditPage from "./pages/event/EventEditPage.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
+import EventStreamAnalyticsPage from "./pages/event/EventStreamAnalyticsPage.jsx";
+import EventCheckinControlPage from "./pages/event/EventCheckinControlPage.jsx";
+import VodWatchPage from "./pages/event/VodWatchPage.jsx";
 import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
 import WalletPage from "./features/wallet/pages/WalletPage.jsx";
 import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
@@ -88,6 +92,8 @@ import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
 import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage.jsx";
 import SecurityPage from "./pages/Account/SecurityPage.jsx";
 import TwoFactorSecurityPrompt from "./component/auth/TwoFactorSecurityPrompt.jsx";
+import XiloloAssistantWidget from "./features/xiloloAssistant/XiloloAssistantWidget.jsx";
+import MaintenancePage from "./pages/MaintenancePage.jsx";
 
 const MainLayout = () => (
   <>
@@ -116,26 +122,136 @@ export function App() {
   const pageMetadata = useMemo(() => {
     const routes = [
       {
-        matcher: /^\/(feed)?$/,
+        matcher: /^\/$/,
         meta: {
-          title: "Discover Live Events & Tickets",
+          title: "Discover Live Events, Creators & Tickets",
           description:
-            "Browse trending concerts, workshops, and immersive experiences on Xilolo. Reserve tickets, follow organizers, and share moments.",
+            "Discover live events, streamable experiences, creator communities, and ticketed moments on Xilolo.",
           keywords:
-            "events, live performances, concerts, festivals, workshops, tickets, organizers, Xilolo",
-          image: "/images/hero-event.jpg",
+            "Xilolo, live events, event tickets, online events, event creators, event discovery, streaming events",
+          image: "/img/logo.png",
         },
       },
       {
-        matcher: /^\/event\/view\/.+$/,
+        matcher: /^\/about$/,
         meta: {
-          title: "Event Details & Tickets",
+          title: "About Xilolo",
           description:
-            "See the latest event information, host profile, and secure your spot with fast checkout on Xilolo.",
+            "Learn how Xilolo helps people discover events, connect with organizers, buy tickets, and follow live experiences.",
           keywords:
-            "event details, buy tickets, event host, live stream, Xilolo",
+            "about Xilolo, event platform, creator platform, live experiences",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/contact$/,
+        meta: {
+          title: "Contact Xilolo",
+          description:
+            "Contact Xilolo for support, partnerships, organizer help, ticket questions, and platform enquiries.",
+          keywords:
+            "contact Xilolo, Xilolo support, event platform support, organizer help",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/ads$/,
+        meta: {
+          title: "Advertise Events on Xilolo",
+          description:
+            "Promote events, creators, campaigns, and experiences to the Xilolo community with advertising placements.",
+          keywords:
+            "event advertising, promote events, Xilolo ads, creator marketing",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/support$/,
+        meta: {
+          title: "Xilolo Support Center",
+          description:
+            "Get help with tickets, organizers, event discovery, privacy, and account questions from Xilolo support.",
+          keywords:
+            "Xilolo support, ticket help, organizer help, event platform help",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/marketing$/,
+        meta: {
+          title: "Event Marketing on Xilolo",
+          description:
+            "Use Xilolo marketing tools to reach event audiences, grow organizer visibility, and promote live experiences.",
+          keywords:
+            "event marketing, creator marketing, promote live events, Xilolo marketing",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/data-protection$/,
+        meta: {
+          title: "Data Protection",
+          description:
+            "Read how Xilolo handles privacy rights, data requests, account deletion, and personal information protection.",
+          keywords:
+            "Xilolo data protection, privacy rights, data request, account deletion",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/privacy-policy$/,
+        meta: {
+          title: "Privacy Policy",
+          description:
+            "Review Xilolo's privacy policy for details about personal data, platform security, and user privacy choices.",
+          keywords:
+            "Xilolo privacy policy, privacy, personal data, platform security",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/terms-of-service$/,
+        meta: {
+          title: "Terms of Service",
+          description:
+            "Read the Xilolo terms of service for platform usage, event participation, ticketing, and account rules.",
+          keywords:
+            "Xilolo terms, terms of service, event platform rules, ticketing terms",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/community-guidelines$/,
+        meta: {
+          title: "Community Guidelines",
+          description:
+            "Review Xilolo's community guidelines for safe events, respectful creator engagement, and platform conduct.",
+          keywords:
+            "Xilolo community guidelines, event safety, platform conduct",
+          image: "/img/logo.png",
+        },
+      },
+      {
+        matcher: /^\/events\/.+$/,
+        meta: {
+          title: "Shared Event on Xilolo",
+          description:
+            "View shared event details, organizer information, ticket options, and live experience updates on Xilolo.",
+          keywords:
+            "shared event, event details, tickets, live event, Xilolo",
           image: "/images/event-tile.jpg",
           type: "article",
+        },
+      },
+      {
+        matcher: /^\/(users|organisers)\/.+$/,
+        meta: {
+          title: "Shared Xilolo Profile",
+          description:
+            "View a shared Xilolo profile, organizer presence, and connected public experiences.",
+          keywords:
+            "Xilolo profile, organizer profile, creator profile, shared profile",
+          image: "/img/logo.png",
         },
       },
       {
@@ -146,6 +262,7 @@ export function App() {
             "Launch your own concert, workshop, or meetup with Xilolo' intuitive event builder and ticketing tools.",
           keywords:
             "create event, ticketing, event hosting, Xilolo, organizer tools",
+          noIndex: true,
         },
       },
       {
@@ -155,6 +272,7 @@ export function App() {
           description:
             "Discover verified organizers, follow their upcoming experiences, and collaborate with the Xilolo community.",
           keywords: "organizers, follow, streaming, community, Xilolo",
+          noIndex: true,
         },
       },
       {
@@ -165,6 +283,7 @@ export function App() {
             "Manage your profile, wallets, subscriptions, and saved events securely from your Xilolo account panel.",
           keywords:
             "profile, account, wallet, settings, subscriptions, Xilolo",
+          noIndex: true,
         },
       },
       {
@@ -174,15 +293,17 @@ export function App() {
           description:
             "Access all your purchased tickets and upcoming experiences at a glance.",
           keywords: "tickets, passes, QR code, events, Xilolo",
+          noIndex: true,
         },
       },
       {
-        matcher: /^\/support/,
+        matcher: /^\/xilolo-ai/,
         meta: {
-          title: "Xilolo Support Center",
+          title: "Xilolo AI Assistant",
           description:
-            "Get help with tickets, organizers, and account questions from the Xilolo support team.",
-          keywords: "support, help, ticket assistance, Xilolo",
+            "Chat with Xilolo AI for help with your wallet, events, streaming, KYC, and event setup.",
+          keywords: "Xilolo AI, assistant, events help, wallet help, streaming setup",
+          noIndex: true,
         },
       },
       {
@@ -205,6 +326,15 @@ export function App() {
           image: "/img/logo.png",
         },
       },
+      {
+        matcher: /^\/(auth|feed|profile|search|payment|wallet|kyc|notifications|mentions|tickets|organizers|event\/(view|select-event-type|create-event|edit|stream|analytics|saved-events)|creator\/channel\/new|subscription|support-chat|me|become-an-organiser)\b/,
+        meta: {
+          title: "Xilolo",
+          description:
+            "Secure Xilolo account area for tickets, events, wallet, and profile settings.",
+          noIndex: true,
+        },
+      },
     ];
 
     const match = routes.find((route) => route.matcher.test(location.pathname));
@@ -212,6 +342,7 @@ export function App() {
   }, [location.pathname]);
 
   const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadPlatform, setDownloadPlatform] = useState("all");
 
   const APP_STORE_URL =
     "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
@@ -219,11 +350,31 @@ export function App() {
   const PLAY_STORE_URL =
     "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
 
+  function detectDownloadPlatform() {
+    if (typeof window === "undefined" || typeof navigator === "undefined") {
+      return "all";
+    }
+
+    const userAgent = navigator.userAgent || "";
+    const platform = navigator.platform || "";
+    const maxTouchPoints = navigator.maxTouchPoints || 0;
+    const isIpadOS =
+      platform === "MacIntel" && maxTouchPoints > 1 && /Safari/i.test(userAgent);
+    const isIos = /iPad|iPhone|iPod/i.test(userAgent) || isIpadOS;
+    const isAndroid = /Android/i.test(userAgent);
+
+    if (isIos) return "ios";
+    if (isAndroid) return "android";
+    return "all";
+  }
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
     const modalFlag = "zagasm-download-modal-shown";
     const hasSeenModal = Boolean(localStorage.getItem(modalFlag));
+
+    setDownloadPlatform(detectDownloadPlatform());
 
     if (!hasSeenModal) {
       setShowDownloadModal(true);
@@ -270,6 +421,7 @@ export function App() {
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
       <Routes>
+        <Route path="/maintenance" element={<MaintenancePage />} />
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />
@@ -337,11 +489,15 @@ export function App() {
               element={<WalletFundingCancelPage />}
             />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/xilolo-ai" element={<XiloloAssistantWidget />} />
             <Route path="/mentions" element={<TaggedMentionsPage />} />
 
             <Route path="/event" element={<Event />}>
               <Route path="view/:eventId" element={<ViewEvent />} />
+              <Route path="vod/:eventId" element={<VodWatchPage />} />
               <Route path="stream/:eventId" element={<EventStreamControlPage />} />
+              <Route path="analytics/:eventId" element={<EventStreamAnalyticsPage />} />
+              <Route path="checkin/:eventId" element={<EventCheckinControlPage />} />
               <Route path="edit/:eventId" element={<EventEditPage />} />
               <Route path="select-event-type" element={<EventType />} />
               <Route
@@ -353,6 +509,7 @@ export function App() {
             </Route>
             <Route path="/creator/channel/new" element={<StreamingPage />} />
             <Route path="/subscription" element={<SubscriptionsPage />} />
+            <Route path="/support-chat" element={<SupportChatPage />} />
             <Route path="/account" element={<AccountOutlet />}>
               <Route index exact path="/account" element={<Account />} />
               <Route path="interest" element={<AccountInterest />} />
@@ -402,6 +559,7 @@ export function App() {
         onSkip={handleSkip}
         onAppStoreDownload={handleAppStoreDownload}
         onApkDownload={handleApkDownload}
+        platform={downloadPlatform}
       />
     </Fragment>
   );

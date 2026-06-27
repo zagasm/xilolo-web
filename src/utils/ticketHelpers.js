@@ -9,12 +9,6 @@ const DEFAULT_TIME_OPTIONS = {
   minute: "2-digit",
 };
 
-const STATUS_MAP = {
-  upcoming: "upcoming",
-  live: "live",
-  ended: "ended",
-};
-
 function parseNumericAmount(value) {
   if (typeof value === "number") return value;
   if (!value) return NaN;
@@ -25,13 +19,11 @@ function parseNumericAmount(value) {
 }
 
 export function normalizeTicketStatus(status) {
-  const normalized = (status ?? "").toString().toLowerCase().trim();
-  return STATUS_MAP[normalized] || STATUS_MAP.upcoming;
+  return normalizeEventStatus(status);
 }
 
 export function formatTicketStatusLabel(status) {
-  const normalized = normalizeTicketStatus(status);
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  return getEventStatusMeta(status).label;
 }
 
 export function formatTicketDate(dateStr, options = DEFAULT_DATE_OPTIONS) {
@@ -81,3 +73,4 @@ export function formatPaymentMethodLabel(value) {
     .trim()
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
+import { getEventStatusMeta, normalizeEventStatus } from "./eventStatus";

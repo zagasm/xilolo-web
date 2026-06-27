@@ -10,8 +10,11 @@ import {
   MonitorPlay,
   PauseCircle,
   PlayCircle,
+  QrCode,
   Radio,
+  RotateCcw,
   Signal,
+  ShieldCheck,
   Square,
   Video,
 } from "lucide-react";
@@ -21,6 +24,7 @@ import { useAuth } from "../auth/AuthContext";
 import {
   showError,
   showPromise,
+  showSuccess,
 } from "../../component/ui/toast";
 import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDownloadModal";
 import { formatEventDateTime } from "../../utils/ui";
@@ -96,6 +100,15 @@ function mergeEventData(baseEvent, streamEvent) {
       baseEvent?.stream_status ||
       null,
   };
+}
+
+function streamExists(event) {
+  return Boolean(
+    event?.stream?.id ||
+    event?.stream?.stream_key ||
+    event?.stream_status ||
+    event?.credentials?.rtmp?.stream_key,
+  );
 }
 
 function hasStreamAccessDetails(event) {
@@ -210,7 +223,7 @@ function DetailCard({
             style={{ borderRadius: 20, fontSize: 12 }}
             type="button"
             onClick={() => onCopy?.(value, label)}
-            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
             aria-label={`Copy ${label}`}
           >
             <Copy className="tw:h-4 tw:w-4" />
@@ -287,6 +300,179 @@ function ActionButton({
   );
 }
 
+function CheckinAccessPanel({
+  accessList,
+  stats,
+  loading,
+  generatedCode,
+  copiedLabel,
+  onGenerate,
+  onRotate,
+  onRevoke,
+  onCopy,
+  pendingAction,
+}) {
+  const activeAccess =
+    accessList.find((access) => access.is_active && !access.revoked_at) ||
+    accessList[0] ||
+    null;
+
+  const activeSessions = stats?.active_sessions ?? activeAccess?.active_sessions_count ?? 0;
+
+  return (
+    <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+      <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-start tw:lg:justify-between">
+        <div>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <ShieldCheck className="tw:h-5 tw:w-5 tw:text-primary" />
+            <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+              Ticket check-in access
+            </span>
+          </div>
+          <p className="tw:mt-1 tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-gray-600">
+            Generate a check-in code for gate staff without sharing your organiser login.
+          </p>
+        </div>
+
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row">
+          <ActionButton
+            onClick={onGenerate}
+            loading={pendingAction === "checkin-generate"}
+            className="tw:bg-primary tw:text-white tw:hover:bg-primary/90"
+            icon={QrCode}
+          >
+            Generate code
+          </ActionButton>
+
+          {activeAccess ? (
+            <ActionButton
+              onClick={() => onRotate(activeAccess)}
+              loading={pendingAction === "checkin-rotate"}
+              className="tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce]"
+              icon={RotateCcw}
+            >
+              Rotate
+            </ActionButton>
+          ) : null}
+        </div>
+      </div>
+
+      {generatedCode ? (
+        <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-emerald-200 tw:bg-emerald-50 tw:p-4">
+          <div className="tw:text-sm tw:font-semibold tw:text-emerald-900">
+            Copy this code now. It will not be shown again.
+          </div>
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
+            <code className="tw:break-all tw:text-base tw:font-black tw:text-emerald-950">
+              {generatedCode}
+            </code>
+            <button
+              type="button"
+              onClick={() => onCopy(generatedCode, "Check-in Code")}
+              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white"
+            >
+              <Copy className="tw:h-4 tw:w-4" />
+              {copiedLabel === "Check-in Code" ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:gap-3 tw:lg:grid-cols-4">
+        <div className="tw:rounded-3xl tw:bg-white tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Sold
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.tickets_sold ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-white tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Checked in
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.checked_in ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-white tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Remaining
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {stats?.remaining ?? 0}
+          </div>
+        </div>
+        <div className="tw:rounded-3xl tw:bg-white tw:p-4">
+          <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-gray-500">
+            Sessions
+          </div>
+          <div className="tw:mt-2 tw:text-2xl tw:font-bold tw:text-gray-900">
+            {activeSessions}
+          </div>
+        </div>
+      </div>
+
+      <div className="tw:mt-5 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4">
+        {loading ? (
+          <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-600">
+            <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
+            Loading check-in access
+          </div>
+        ) : activeAccess ? (
+          <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+            <div>
+              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                <span
+                  className={cx(
+                    "tw:rounded-full tw:px-3 tw:py-1 tw:text-xs tw:font-bold",
+                    activeAccess.is_active
+                      ? "tw:bg-emerald-100 tw:text-emerald-700"
+                      : "tw:bg-red-100 tw:text-red-700",
+                  )}
+                >
+                  {activeAccess.is_active ? "Active" : "Inactive"}
+                </span>
+                <span className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                  {activeAccess.label || "Event check-in code"}
+                </span>
+              </div>
+              <div className="tw:mt-2 tw:text-sm tw:leading-6 tw:text-gray-600">
+                Last four: {activeAccess.plain_code_last_four || "----"} · Last used:{" "}
+                {activeAccess.last_used_at
+                  ? new Date(activeAccess.last_used_at).toLocaleString()
+                  : "Never"}{" "}
+                · Expires:{" "}
+                {activeAccess.expires_at
+                  ? new Date(activeAccess.expires_at).toLocaleString()
+                  : "No expiry"}
+              </div>
+            </div>
+
+            {activeAccess.is_active ? (
+              <button
+                type="button"
+                onClick={() => onRevoke(activeAccess)}
+                disabled={pendingAction === "checkin-revoke"}
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 disabled:tw:opacity-60"
+              >
+                {pendingAction === "checkin-revoke" ? (
+                  <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
+                ) : null}
+                Revoke
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <div className="tw:text-sm tw:leading-6 tw:text-gray-600">
+            No check-in access code has been generated for this event yet.
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function EventStreamControlPage() {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -301,6 +487,10 @@ export default function EventStreamControlPage() {
   const [copiedLabel, setCopiedLabel] = useState("");
   const [stageOverride, setStageOverride] = useState("");
   const [closeTicketSalesOnGoLive, setCloseTicketSalesOnGoLive] = useState(false);
+  const [checkinAccessList, setCheckinAccessList] = useState([]);
+  const [checkinStats, setCheckinStats] = useState(null);
+  const [checkinLoading, setCheckinLoading] = useState(false);
+  const [generatedCheckinCode, setGeneratedCheckinCode] = useState("");
   const copyTimeoutRef = useRef(null);
 
   const loadEventDetails = useCallback(
@@ -324,21 +514,33 @@ export default function EventStreamControlPage() {
 
         let merged = getEventFromViewResponse(viewPayload);
 
-        if (
-          merged &&
-          shouldHydrateStartedStream(merged) &&
-          !hasStreamAccessDetails(merged)
-        ) {
-          const startResult = await api.post(
-            `/api/v1/events/${eventId}/streams/start`,
-            {},
+        if (merged) {
+          const streamResult = await api.get(
+            `/api/v1/events/${eventId}/streams`,
             authHeaders(token),
           );
 
           merged = mergeEventData(
             merged,
-            getEventFromStreamResponse(startResult?.data),
+            getEventFromStreamResponse(streamResult?.data),
           );
+
+          if (
+            shouldHydrateStartedStream(merged) &&
+            !hasStreamAccessDetails(merged) &&
+            !streamExists(merged)
+          ) {
+            const startResult = await api.post(
+              `/api/v1/events/${eventId}/streams/start`,
+              {},
+              authHeaders(token),
+            );
+
+            merged = mergeEventData(
+              merged,
+              getEventFromStreamResponse(startResult?.data),
+            );
+          }
         }
 
         if (!merged) {
@@ -355,6 +557,25 @@ export default function EventStreamControlPage() {
     },
     [eventId, token],
   );
+
+  const loadCheckinData = useCallback(async () => {
+    if (!eventId || !token) return;
+
+    setCheckinLoading(true);
+    try {
+      const [accessResponse, statsResponse] = await Promise.all([
+        api.get(`/api/v1/events/${eventId}/checkin-access`, authHeaders(token)),
+        api.get(`/api/v1/events/${eventId}/checkin-stats`, authHeaders(token)),
+      ]);
+
+      setCheckinAccessList(accessResponse?.data?.data || []);
+      setCheckinStats(statsResponse?.data?.data || null);
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not load check-in access."));
+    } finally {
+      setCheckinLoading(false);
+    }
+  }, [eventId, token]);
 
   useEffect(() => {
     loadEventDetails();
@@ -376,7 +597,8 @@ export default function EventStreamControlPage() {
   const status = String(eventData?.status || "upcoming").toLowerCase();
   const isLive = status === "live";
   const isPaused = status === "paused" || !!stream?.is_paused;
-  const isEnded = status === "ended";
+  const isExpired = status === "expired";
+  const isEnded = status === "ended" || isExpired;
   const hasStartedStream = Boolean(
     stream?.id ||
     stream?.stream_key ||
@@ -415,6 +637,8 @@ export default function EventStreamControlPage() {
   const ticketSalesClosed = Boolean(eventData?.ticket_sales_closed);
   const ticketGateMessage =
     "At least one ticket must be purchased before this event can start streaming.";
+  const expiredEventMessage =
+    "This event has expired and can no longer be started or taken live.";
 
   const handleCopy = async (value, label) => {
     if (!value) {
@@ -446,6 +670,72 @@ export default function EventStreamControlPage() {
       }, 900);
     } catch {
       showError(`Could not copy ${label.toLowerCase()}.`);
+    }
+  };
+
+  const handleGenerateCheckinAccess = async () => {
+    setPendingAction("checkin-generate");
+    try {
+      const response = await api.post(
+        `/api/v1/events/${eventId}/checkin-access`,
+        { label: "Event check-in" },
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode(response?.data?.data?.access_code || "");
+      showSuccess("Check-in code generated.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not generate check-in code."));
+    } finally {
+      setPendingAction("");
+    }
+  };
+
+  const handleRotateCheckinAccess = async (access) => {
+    const confirmed = window.confirm(
+      "Rotate this check-in code? Existing staff sessions using this code will be revoked.",
+    );
+
+    if (!confirmed) return;
+
+    setPendingAction("checkin-rotate");
+    try {
+      const response = await api.post(
+        `/api/v1/events/${eventId}/checkin-access/${access.id}/rotate`,
+        {},
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode(response?.data?.data?.access_code || "");
+      showSuccess("Check-in code rotated.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not rotate check-in code."));
+    } finally {
+      setPendingAction("");
+    }
+  };
+
+  const handleRevokeCheckinAccess = async (access) => {
+    const confirmed = window.confirm(
+      "Revoke this check-in code? Active staff scanner sessions will stop working.",
+    );
+
+    if (!confirmed) return;
+
+    setPendingAction("checkin-revoke");
+    try {
+      await api.patch(
+        `/api/v1/events/${eventId}/checkin-access/${access.id}/revoke`,
+        {},
+        authHeaders(token),
+      );
+      setGeneratedCheckinCode("");
+      showSuccess("Check-in access revoked.");
+      await loadCheckinData();
+    } catch (err) {
+      showError(getErrorMessage(err, "Could not revoke check-in access."));
+    } finally {
+      setPendingAction("");
     }
   };
 
@@ -520,6 +810,11 @@ export default function EventStreamControlPage() {
   };
 
   const handleStart = async () => {
+    if (isExpired) {
+      showError(expiredEventMessage);
+      return;
+    }
+
     if (streamStartRequiresTicketPurchase) {
       showError(ticketGateMessage);
       return;
@@ -535,6 +830,11 @@ export default function EventStreamControlPage() {
   };
 
   const handleGoLive = async () => {
+    if (isExpired) {
+      showError(expiredEventMessage);
+      return;
+    }
+
     if (streamStartRequiresTicketPurchase) {
       showError(ticketGateMessage);
       return;
@@ -659,7 +959,7 @@ export default function EventStreamControlPage() {
                 <button
                   type="button"
                   onClick={() => navigate(-1)}
-                  className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-gray-500 hover:tw:text-gray-900"
+                  className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-gray-500 tw:hover:text-gray-900"
                 >
                   <ArrowLeft className="tw:h-4 tw:w-4" />
                   <span>Back</span>
@@ -669,8 +969,10 @@ export default function EventStreamControlPage() {
                   Stream Event
                 </span>
                 <p className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
-                  {isEnded
-                    ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
+                  {status === "expired"
+                    ? "This event expired because it did not go live. Streaming controls and OBS setup are no longer available."
+                    : isEnded
+                      ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
                     : "Start the stream to generate your OBS credentials, then switch the event live when you are ready for viewers."}
                 </p>
               </div>
@@ -683,7 +985,7 @@ export default function EventStreamControlPage() {
                   )}
                 >
                   <span className="tw:h-2.5 tw:w-2.5 tw:rounded-full tw:bg-current" />
-                  {status === "paused" ? "Paused" : status === "live" ? "Live" : status === "ended" ? "Ended" : "Upcoming"}
+                  {status === "paused" ? "Paused" : status === "live" ? "Live" : status === "ended" ? "Ended" : status === "expired" ? "Expired" : status === "ready_to_go_live" ? "Ready to go live" : "Upcoming"}
                 </span>
 
                 {refreshing ? (
@@ -696,7 +998,7 @@ export default function EventStreamControlPage() {
             </div>
 
             {isEnded ? (
-              <section className="tw:overflow-hidden tw:rounded-[32px] tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#f7f2eb_52%,#efe7de_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
+              <section className="tw:overflow-hidden tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#e5e4e2_52%,#e5e4e2_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
                 <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[1.15fr_0.85fr]">
                   <div>
                     <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/90 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:shadow-sm">
@@ -711,7 +1013,7 @@ export default function EventStreamControlPage() {
                       OBS connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
                       <a
                         href="mailto:support@xilolo.com"
-                        className="tw:font-semibold tw:text-primary hover:tw:underline"
+                        className="tw:font-semibold tw:text-primary tw:hover:underline"
                       >
                         support@xilolo.com
                       </a>
@@ -762,7 +1064,7 @@ export default function EventStreamControlPage() {
                         Email{" "}
                         <a
                           href="mailto:support@xilolo.com"
-                          className="tw:font-semibold tw:text-primary hover:tw:underline"
+                          className="tw:font-semibold tw:text-primary tw:hover:underline"
                         >
                           support@xilolo.com
                         </a>
@@ -806,7 +1108,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpServer, "RTMP Server")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
                                 aria-label="Copy RTMP Server"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -829,7 +1131,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpKey, "Stream Key")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary hover:tw:bg-[#f3ede6]"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
                                 aria-label="Copy Stream Key"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -856,8 +1158,14 @@ export default function EventStreamControlPage() {
                       </div>
                     </div>
 
-                    {(streamStartRequiresTicketPurchase || ticketSalesClosed || showGoLive) ? (
+                    {(isExpired || streamStartRequiresTicketPurchase || ticketSalesClosed || showGoLive) ? (
                       <div className="tw:mt-5 tw:space-y-3">
+                        {isExpired ? (
+                          <div className="tw:rounded-3xl tw:border tw:border-red-200 tw:bg-red-50 tw:p-4 tw:text-sm tw:leading-6 tw:text-red-700">
+                            {expiredEventMessage}
+                          </div>
+                        ) : null}
+
                         {streamStartRequiresTicketPurchase ? (
                           <div className="tw:rounded-3xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-4 tw:text-sm tw:leading-6 tw:text-amber-800">
                             {ticketGateMessage}
@@ -871,7 +1179,7 @@ export default function EventStreamControlPage() {
                         ) : null}
 
                         {showGoLive && !ticketSalesClosed && !streamStartRequiresTicketPurchase ? (
-                          <label className="tw:flex tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf7f3] tw:p-4">
+                          <label className="tw:flex tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4">
                             <input
                               type="checkbox"
                               checked={closeTicketSalesOnGoLive}
@@ -882,7 +1190,7 @@ export default function EventStreamControlPage() {
                             />
                             <span>
                               <span className="tw:block tw:text-sm tw:font-semibold tw:text-gray-900">
-                                Close ticket sales when I go live
+                                Close ticket sales
                               </span>
                               <span className="tw:mt-1 tw:block tw:text-sm tw:leading-6 tw:text-gray-600">
                                 New users will not be able to buy tickets after the event goes live. Existing ticket holders keep their tickets.
@@ -894,7 +1202,7 @@ export default function EventStreamControlPage() {
                     ) : null}
 
                     <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
-                      {!hasStartedStream ? (
+                      {!hasStartedStream && !isExpired ? (
                         <ActionButton
                           onClick={async () => {
                             setStageOverride("started");
@@ -906,8 +1214,8 @@ export default function EventStreamControlPage() {
                             }
                           }}
                           loading={pendingAction === "start"}
-                          disabled={streamStartRequiresTicketPurchase}
-                          className="tw:bg-primary tw:text-white hover:tw:bg-primary/90"
+                          disabled={isExpired || streamStartRequiresTicketPurchase}
+                          className="tw:bg-primary tw:text-white tw:hover:bg-primary/90"
                           icon={Radio}
                         >
                           Start stream
@@ -918,8 +1226,8 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleGoLive}
                           loading={pendingAction === "go-live"}
-                          disabled={streamStartRequiresTicketPurchase}
-                          className="tw:bg-red-500 tw:text-white hover:tw:bg-red-600"
+                          disabled={isExpired || streamStartRequiresTicketPurchase}
+                          className="tw:bg-red-500 tw:text-white tw:hover:bg-red-600"
                           icon={PlayCircle}
                         >
                           Go live
@@ -930,7 +1238,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleTogglePause}
                           loading={pendingAction === "pause"}
-                          className="tw:bg-lightPurple tw:text-primary hover:tw:bg-[#e2d9ce]"
+                          className="tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce]"
                           icon={PauseCircle}
                         >
                           {isPaused ? "Resume stream" : "Pause stream"}
@@ -941,7 +1249,7 @@ export default function EventStreamControlPage() {
                         <ActionButton
                           onClick={handleEnd}
                           loading={pendingAction === "end"}
-                          className="tw:bg-gray-900 tw:text-white hover:tw:bg-black"
+                          className="tw:bg-gray-900 tw:text-white tw:hover:bg-black"
                           icon={Square}
                         >
                           End stream
@@ -951,7 +1259,7 @@ export default function EventStreamControlPage() {
                       {showWatch ? (
                         <ActionButton
                           onClick={() => setWatchModalOpen(true)}
-                          className="tw:bg-[#fff4f2] tw:text-[#d93a23] hover:tw:bg-[#ffe9e4]"
+                          className="tw:bg-[#fff4f2] tw:text-[#d93a23] tw:hover:bg-[#ffe9e4]"
                           icon={MonitorPlay}
                         >
                           Join live
@@ -959,7 +1267,7 @@ export default function EventStreamControlPage() {
                       ) : null}
                     </div>
 
-                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-[#f5efe7] tw:p-4">
+                    <div className="tw:mt-5 tw:rounded-3xl tw:bg-white tw:p-4">
                       <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900">
                         <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
                         What to do next
@@ -1010,8 +1318,10 @@ export default function EventStreamControlPage() {
                     ))}
                   </div>
                 </section>
+
               </>
             )}
+
           </div>
         </div>
       </div>

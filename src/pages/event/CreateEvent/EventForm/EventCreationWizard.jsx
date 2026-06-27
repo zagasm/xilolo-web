@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../../../lib/apiClient";
+import { uploadToBunnyTus } from "../../../../lib/bunnyTusUpload";
 import { useAuth } from "../../../auth/AuthContext";
 import { showPromise, showError } from "../../../../component/ui/toast";
 
@@ -9,6 +10,16 @@ import EventInformationStep from "./steps/EventInformationStep";
 import TicketingStep from "./steps/TicketingStep";
 import ReviewStep from "./steps/ReviewStep";
 import EventCreationSuccessModal from "../../../../component/Events/EventCreationSuccessModal";
+
+function normalizeTime(value) {
+  const text = String(value || "").trim();
+  const twelveHour = text.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!twelveHour) return text.slice(0, 5);
+
+  let hour = Number(twelveHour[1]) % 12;
+  if (twelveHour[3].toUpperCase() === "PM") hour += 12;
+  return `${String(hour).padStart(2, "0")}:${twelveHour[2]}`;
+}
 
 function mapEventToDefaults(event) {
   if (!event?.currentEvent) {
@@ -29,6 +40,9 @@ function mapEventToDefaults(event) {
         ticketLimit: undefined,
         currency: "",
         currencyCode: "NGN",
+        deliveryType: "live",
+        vodFile: null,
+        attendanceType: "online",
         hasMaterials: false,
         enableReplay: false,
         replayAvailableAfterMinutes: 120,
@@ -48,15 +62,14 @@ function mapEventToDefaults(event) {
       },
       media: {
         posterImages: [],
-        posterVideos: [],
         existingPoster: [],
       },
     };
   }
 
   const currentEvent = event.currentEvent;
-  const startDate = currentEvent.start_date || currentEvent.eventDateISO || "";
-  const startTime = currentEvent.start_time || "";
+  const startDate = currentEvent.eventDateISO || currentEvent.event_date || currentEvent.start_date || "";
+  const startTime = normalizeTime(currentEvent.start_time || currentEvent.startTime || "");
   const timezone =
     currentEvent.timezone_id || currentEvent.timezone || "";
   const maxTickets = currentEvent.max_tickets ? "limited" : "unlimited";
@@ -85,6 +98,9 @@ function mapEventToDefaults(event) {
           : undefined,
       currency: String(currentEvent.currency?.currencyId || currentEvent.currency?.id || ""),
       currencyCode: String(currentEvent.currency?.code || "NGN").toUpperCase(),
+      deliveryType: currentEvent.delivery_type || "live",
+      vodFile: null,
+      attendanceType: currentEvent.attendance_type || "online",
       hasMaterials: !!(
         currentEvent.manual?.available ||
         currentEvent.manual?.cover_url ||
@@ -129,12 +145,13 @@ function mapEventToDefaults(event) {
     },
     media: {
       posterImages: [],
-      posterVideos: [],
-      existingPoster: (currentEvent.poster || []).map((media, index) => ({
-        id: media.id || index,
-        type: media.type,
-        url: media.url,
-      })),
+      existingPoster: (currentEvent.poster || [])
+        .filter((media) => media.type === "image")
+        .map((media, index) => ({
+          id: media.id || index,
+          type: media.type,
+          url: media.url,
+        })),
     },
   };
 }
@@ -160,14 +177,20 @@ export default function EventCreationWizard({
   const [posterImages, setPosterImages] = useState(
     mapped.media.posterImages || []
   );
-  const [posterVideos, setPosterVideos] = useState(
-    mapped.media.posterVideos || []
-  );
   const [existingPoster, setExistingPoster] = useState(
     mapped.media.existingPoster || []
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState({});
+  const [vodUploadState, setVodUploadState] = useState({
+    status: "idle",
+    progress: 0,
+    loaded: 0,
+    total: 0,
+    message: "",
+  });
+  const [pendingVodVideo, setPendingVodVideo] = useState(null);
+  const vodAbortRef = useRef(null);
   const [successModal, setSuccessModal] = useState({
     open: false,
     eventId: null,
@@ -193,10 +216,223 @@ export default function EventCreationWizard({
     setCurrentStep(2);
   };
 
-  const handleTicketingNext = (values) => {
+  const buildEventPayload = (info, ticketing) => {
+    const payload = new FormData();
+
+    payload.append("title", info.title || "");
+    payload.append("description", info.description || "");
+    payload.append("location", info.location || "Online");
+    payload.append("organizer", info.organizer || "");
+    payload.append("genre", info.genre || "");
+    if (!isEdit) {
+      payload.append("event_date", info.date || "");
+      payload.append("start_time", info.time || "");
+    }
+    payload.append("time_zone_id", info.timezone || "");
+
+    if (eventTypeId) {
+      payload.append("event_type_id", eventTypeId);
+    }
+
+    posterImages.forEach((file, index) => {
+      payload.append(
+        `poster_images[${index}]`,
+        file,
+        file.name || `poster_image_${index}`
+      );
+    });
+
+    if (isEdit && Array.isArray(existingPoster)) {
+      existingPoster.forEach((media, index) => {
+        payload.append(`keep_poster_ids[${index}]`, media.id);
+      });
+    }
+
+    payload.append("price", ticketing.price ?? 0);
+    payload.append("delivery_type", ticketing.deliveryType || "live");
+    payload.append("attendance_type", ticketing.attendanceType || "online");
+    payload.append("currency_id", ticketing.currency || "");
+    payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
+    if (ticketing.maxTickets === "limited") {
+      payload.append("ticket_limit_number", ticketing.ticketLimit || 0);
+    }
+
+    if (ticketing.hasMaterials) {
+      const hasExistingManual = Boolean(ticketing.existingManual?.fileName);
+      if (ticketing.manualFile instanceof File) {
+        payload.append(
+          "manual_file",
+          ticketing.manualFile,
+          ticketing.manualFile.name || "event-manual"
+        );
+      }
+
+      if (ticketing.manualCover instanceof File) {
+        payload.append(
+          "manual_cover",
+          ticketing.manualCover,
+          ticketing.manualCover.name || "event-manual-cover"
+        );
+      }
+
+      if (
+        Number(ticketing.manualPrice || 0) > 0 &&
+        (ticketing.manualFile instanceof File || hasExistingManual)
+      ) {
+        payload.append("manual_price", ticketing.manualPrice);
+      }
+    }
+
+    payload.append(
+      "streaming_option",
+      (mapped.streaming || {}).streamingOption || "in_app"
+    );
+    payload.append("enable_replay", ticketing.enableReplay ? "1" : "0");
+    if (ticketing.enableReplay) {
+      payload.append(
+        "replay_available_after_minutes",
+        String(ticketing.replayAvailableAfterMinutes || 120)
+      );
+      payload.append(
+        "replay_available_for_minutes",
+        String(ticketing.replayAvailableForMinutes || 1440)
+      );
+    }
+
+    payload.append("visibility", ticketing.visibility || "public");
+    payload.append(
+      "post_mature_content",
+      ticketing.matureContent ? "1" : "0"
+    );
+
+    if (ticketing.deliveryType === "vod" && ticketing.vodUpload?.bunny_video_id) {
+      payload.append("vod_bunny_video_id", ticketing.vodUpload.bunny_video_id);
+      payload.append("vod_bunny_library_id", ticketing.vodUpload.bunny_library_id || "");
+      payload.append("vod_bunny_collection_id", ticketing.vodUpload.bunny_collection_id || "");
+      payload.append("vod_title", ticketing.vodUpload.title || ticketing.vodFile?.name || info.title || "");
+      payload.append("vod_embed_url", ticketing.vodUpload.embed_url || "");
+      payload.append("vod_playback_url", ticketing.vodUpload.playback_url || "");
+      payload.append("vod_hls_url", ticketing.vodUpload.hls_url || "");
+    }
+
+    return payload;
+  };
+
+  const startPreEventVodUpload = async (file) => {
+    if (!(file instanceof File) || isEdit) {
+      setPendingVodVideo(null);
+      setVodUploadState({
+        status: "idle",
+        progress: 0,
+        loaded: 0,
+        total: 0,
+        message: "",
+      });
+      return;
+    }
+
+    vodAbortRef.current?.abort();
+    const abortController = new AbortController();
+    vodAbortRef.current = abortController;
+    setPendingVodVideo(null);
+
+    setVodUploadState({
+      status: "preparing",
+      progress: 0,
+      loaded: 0,
+      total: file.size,
+      message: "Preparing Bunny Stream upload...",
+    });
+
+    try {
+      const info = collected.step_1 || mapped.info;
+      const initResponse = await api.post(
+        "/api/v1/vod/initiate-upload",
+        {
+          title: file.name || info.title || "Xilolo VOD upload",
+          file_name: file.name,
+          file_type: file.type,
+        },
+        authHeaders(token)
+      );
+
+      const pendingVideo = initResponse?.data?.data?.pending_video;
+
+      setVodUploadState({
+        status: "uploading",
+        progress: 0,
+        loaded: 0,
+        total: file.size,
+        message: "Uploading video to Bunny Stream...",
+      });
+
+      await uploadToBunnyTus({
+        file,
+        upload: initResponse?.data?.data?.upload,
+        signal: abortController.signal,
+        onProgress: ({ loaded, total, percentage }) =>
+          setVodUploadState({
+            status: "uploading",
+            progress: percentage,
+            loaded,
+            total,
+            message: `Uploading video... ${percentage}%`,
+          }),
+      });
+
+      setPendingVodVideo(pendingVideo);
+      setVodUploadState({
+        status: "complete",
+        progress: 100,
+        loaded: file.size,
+        total: file.size,
+        message: "Upload complete. You can continue to review.",
+      });
+    } catch (err) {
+      const wasCancelled = err?.name === "AbortError";
+      setVodUploadState({
+        status: wasCancelled ? "cancelled" : "failed",
+        progress: 0,
+        loaded: 0,
+        total: file.size,
+        message: wasCancelled
+          ? "Upload cancelled. Choose another video to upload."
+          : err?.response?.data?.error || err?.response?.data?.message || err?.message || "Video upload failed.",
+      });
+      if (!wasCancelled) {
+        showError(err?.response?.data?.error || err?.response?.data?.message || err?.message || "Video upload failed");
+      }
+    } finally {
+      if (vodAbortRef.current === abortController) {
+        vodAbortRef.current = null;
+      }
+    }
+  };
+
+  const handleTicketingNext = async (values) => {
+    if (!isEdit && values.deliveryType === "vod" && values.vodFile instanceof File) {
+      if (vodUploadState.status !== "complete" || !pendingVodVideo?.bunny_video_id) {
+        showError("Please wait for the VOD upload to finish before continuing.");
+        return;
+      }
+
+      mergeCollected("step_2", {
+        ...values,
+        vodUploaded: true,
+        vodUpload: pendingVodVideo,
+      });
+      markStepDone(2);
+      setCurrentStep(3);
+      return;
+    }
+
     mergeCollected("step_2", values);
     markStepDone(2);
     setCurrentStep(3);
+  };
+
+  const cancelVodUpload = () => {
+    vodAbortRef.current?.abort();
   };
 
   const closeSuccessModal = () => {
@@ -213,101 +449,13 @@ export default function EventCreationWizard({
       setIsSubmitting(true);
       setFormErrors({});
 
-      const payload = new FormData();
       const info = collected.step_1 || mapped.info;
       const ticketing = collected.step_2 || {
         ...mapped.ticketing,
         ...mapped.access,
       };
-      payload.append("title", info.title || "");
-      payload.append("description", info.description || "");
-      payload.append("location", info.location || "Online");
-      payload.append("organizer", info.organizer || "");
-      payload.append("genre", info.genre || "");
-      payload.append("event_date", info.date || "");
-      payload.append("start_time", info.time || "");
-      payload.append("time_zone_id", info.timezone || "");
 
-      if (eventTypeId) {
-        payload.append("event_type_id", eventTypeId);
-      }
-
-      posterImages.forEach((file, index) => {
-        payload.append(
-          `poster_images[${index}]`,
-          file,
-          file.name || `poster_image_${index}`
-        );
-      });
-
-      posterVideos.forEach((file, index) => {
-        payload.append(
-          `poster_videos[${index}]`,
-          file,
-          file.name || `poster_video_${index}`
-        );
-      });
-
-      if (isEdit && Array.isArray(existingPoster)) {
-        existingPoster.forEach((media, index) => {
-          payload.append(`keep_poster_ids[${index}]`, media.id);
-        });
-      }
-
-      payload.append("price", ticketing.price ?? 0);
-      payload.append("currency_id", ticketing.currency || "");
-      payload.append("ticket_limit", ticketing.maxTickets || "unlimited");
-      if (ticketing.maxTickets === "limited") {
-        payload.append("ticket_limit_number", ticketing.ticketLimit || 0);
-      }
-
-      if (ticketing.hasMaterials) {
-        const hasExistingManual = Boolean(ticketing.existingManual?.fileName);
-        if (ticketing.manualFile instanceof File) {
-          payload.append(
-            "manual_file",
-            ticketing.manualFile,
-            ticketing.manualFile.name || "event-manual"
-          );
-        }
-
-        if (ticketing.manualCover instanceof File) {
-          payload.append(
-            "manual_cover",
-            ticketing.manualCover,
-            ticketing.manualCover.name || "event-manual-cover"
-          );
-        }
-
-        if (
-          Number(ticketing.manualPrice || 0) > 0 &&
-          (ticketing.manualFile instanceof File || hasExistingManual)
-        ) {
-          payload.append("manual_price", ticketing.manualPrice);
-        }
-      }
-
-      payload.append(
-        "streaming_option",
-        (mapped.streaming || {}).streamingOption || "in_app"
-      );
-      payload.append("enable_replay", ticketing.enableReplay ? "1" : "0");
-      if (ticketing.enableReplay) {
-        payload.append(
-          "replay_available_after_minutes",
-          String(ticketing.replayAvailableAfterMinutes || 120)
-        );
-        payload.append(
-          "replay_available_for_minutes",
-          String(ticketing.replayAvailableForMinutes || 1440)
-        );
-      }
-
-      payload.append("visibility", ticketing.visibility || "public");
-      payload.append(
-        "post_mature_content",
-        ticketing.matureContent ? "1" : "0"
-      );
+      const payload = buildEventPayload(info, ticketing);
 
       const request = api.post(
         isEdit ? `/api/v1/event/${eventId}/edit` : "/api/v1/event/store",
@@ -327,8 +475,31 @@ export default function EventCreationWizard({
         error: "Could not save event",
       });
 
+      if (
+        isEdit &&
+        (String(info.date || "") !== String(mapped.info.date || "") ||
+          String(info.time || "") !== String(mapped.info.time || ""))
+      ) {
+        await showPromise(
+          api.patch(
+            `/api/v1/events/${eventId}/reschedule`,
+            {
+              event_date: info.date,
+              start_time: normalizeTime(info.time),
+            },
+            authHeaders(token)
+          ),
+          {
+            loading: "Updating schedule…",
+            success: "Event schedule updated",
+            error: "Could not update event schedule",
+          }
+        );
+      }
+
       const created = response?.data?.data || response?.data || {};
       const createdId = created?.id || eventId;
+
       setSuccessModal({
         open: true,
         eventId: createdId,
@@ -386,8 +557,6 @@ export default function EventCreationWizard({
           onNext={handleInfoNext}
           posterImages={posterImages}
           setPosterImages={setPosterImages}
-          posterVideos={posterVideos}
-          setPosterVideos={setPosterVideos}
           existingPoster={existingPoster}
           setExistingPoster={setExistingPoster}
         />
@@ -398,6 +567,10 @@ export default function EventCreationWizard({
           defaultValues={ticketStepDefaults}
           onBack={() => setCurrentStep(1)}
           onNext={handleTicketingNext}
+          isUploadingVod={["preparing", "uploading"].includes(vodUploadState.status)}
+          vodUploadState={vodUploadState}
+          onCancelVodUpload={cancelVodUpload}
+          onVodFileChanged={(file) => startPreEventVodUpload(file)}
         />
       )}
 
@@ -410,7 +583,6 @@ export default function EventCreationWizard({
           onPublish={handlePublish}
           onGoToStep={goToStep}
           posterImages={posterImages}
-          posterVideos={posterVideos}
           existingPoster={existingPoster}
         />
       )}

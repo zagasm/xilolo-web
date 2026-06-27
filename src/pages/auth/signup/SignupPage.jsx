@@ -13,6 +13,7 @@ import {
   normalizeEmailInput,
 } from "../../../lib/emailValidation";
 import { getWebDevicePayload } from "../../../lib/deviceName";
+import { getAuthLocationPayload } from "../../../lib/authLocation";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 import TwoFactorLoginForm from "../components/TwoFactorLoginForm.jsx";
@@ -196,6 +197,7 @@ export function SignUp() {
         email: normalizedEmail,
         password: formData.password,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       };
 
       const response = await axios.post(
@@ -237,6 +239,7 @@ export function SignUp() {
       const { data } = await api.post("/api/v1/google/signup", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (!data?.token || !data?.user) {
@@ -279,6 +282,7 @@ export function SignUp() {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (data?.two_factor_required) {
@@ -501,7 +505,7 @@ export function SignUp() {
               },
               "& .MuiFormHelperText-root": {
                 color:
-                  !emailFormatError && showBlackEmailHint ? "#111111" : undefined,
+                  !emailFormatError && showBlackEmailHint ? "#050505" : undefined,
                 marginLeft: 0,
                 whiteSpace: "nowrap",
               },

@@ -135,10 +135,10 @@ export default function Ads() {
             formattedPackages.map((plan) => (
               <article
                 key={plan.id}
-                className="tw:group tw:relative tw:flex tw:flex-col tw:justify-between tw:gap-5 tw:overflow-hidden tw:rounded-4xl tw:border tw:border-white/70 tw:bg-white tw:p-6 tw:shadow-[0_25px_70px_rgba(15,23,42,0.08)] tw:transition tw:duration-200 hover:tw:-translate-y-1"
+                className="tw:group tw:relative tw:flex tw:flex-col tw:justify-between tw:gap-5 tw:overflow-hidden tw:rounded-4xl tw:border tw:border-white/70 tw:bg-white tw:p-6 tw:shadow-[0_25px_70px_rgba(15,23,42,0.08)] tw:transition tw:duration-200 tw:hover:-translate-y-1"
               >
                 {/* subtle accent */}
-                <div className="tw:pointer-events-none tw:absolute tw:-top-24 tw:-right-24 tw:h-56 tw:w-56 tw:rounded-full tw:bg-primary/10 tw:blur-3xl tw:transition tw:duration-200 group-hover:tw:bg-primary/15" />
+                <div className="tw:pointer-events-none tw:absolute tw:-top-24 tw:-right-24 tw:h-56 tw:w-56 tw:rounded-full tw:bg-primary/10 tw:blur-3xl tw:transition tw:duration-200 group-tw:hover:bg-primary/15" />
 
                 <div className="tw:relative">
                   <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -228,7 +228,7 @@ export default function Ads() {
                   }}
                   type="button"
                   onClick={() => setSelectedPackage(plan)}
-                  className="tw:relative tw:w-full tw:rounded-2xl tw:bg-primary tw:px-6 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:transition hover:tw:brightness-95 active:tw:scale-[0.99]"
+                  className="tw:relative tw:w-full tw:rounded-2xl tw:bg-primary tw:px-6 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:transition tw:hover:brightness-95 active:tw:scale-[0.99]"
                 >
                   Choose plan
                 </button>

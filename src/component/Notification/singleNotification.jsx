@@ -48,7 +48,7 @@ function SingleNotificationTemplate({ notification, onClick }) {
 
   return (
     <div
-      className={`tw:cursor-pointer tw:px-4 tw:py-4 tw:transition tw:duration-200 hover:tw:bg-slate-50 ${
+      className={`tw:cursor-pointer tw:px-4 tw:py-4 tw:transition tw:duration-200 tw:hover:bg-slate-50 ${
         isUnread
           ? "tw:bg-[#ffffff]"
           : "tw:bg-[#ffffff]"
@@ -59,21 +59,17 @@ function SingleNotificationTemplate({ notification, onClick }) {
       <div className="tw:flex tw:items-start tw:gap-3">
         <span
           className={`tw:mt-1 tw:h-2 tw:w-2 tw:shrink-0 tw:rounded-full ${
-            isUnread ? "tw:bg-primary" : "tw:bg-slate-300"
+            isUnread ? "tw:bg-neon tw:shadow-[0_0_10px_rgba(0,245,255,0.65)]" : "tw:bg-slate-300"
           }`}
         />
 
         <div className="tw:min-w-0 tw:flex-1">
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
-            <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-900 sm:tw:text-[15px]">
-              {title}
+            <span className="tw:block tw:text-sm tw:text-slate-900 sm:tw:text-[15px]">
+            {messageBody}
             </span>
             <span className="tw:shrink-0 tw:text-xs tw:text-slate-400">{timeLabel}</span>
           </div>
-
-          <span className="tw:block tw:mt-1 tw:text-sm tw:leading-6 tw:text-slate-600">
-            {messageBody}
-          </span>
         </div>
       </div>
     </div>

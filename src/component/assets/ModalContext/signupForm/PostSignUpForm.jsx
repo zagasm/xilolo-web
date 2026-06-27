@@ -1,26 +1,28 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  FaCalendarAlt,
-  FaChevronDown,
   FaMars,
   FaVenus,
   FaGenderless,
 } from "react-icons/fa";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { DatePicker as MuiDatePicker } from "@mui/x-date-pickers/DatePicker";
+import moment from "moment";
 import { motion } from "framer-motion";
 import PostSignupFormModal from "./ModalContainer";
-import SignUpCodecomponent from "./SignUpCodecomponent";
+import PhoneEmailPostSignup from "./PhoneEmailPostSignup";
 import "./postSignupStyle.css";
 import { useAuth } from "../../../../pages/auth/AuthContext";
+import { useModal } from "..";
 import { showToast } from "../../../ToastAlert";
 import { showError, showSuccess } from "../../../ui/toast";
 import { api } from "../../../../lib/apiClient";
 import { clearActiveAuthStorage } from "../../../../lib/authStorage";
 import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 const PostSignupForm = () => {
   const { user, login, token } = useAuth();
+  const { closeModal } = useModal();
   const navigate = useNavigate();
 
   // ✅ hooks must always run, every render
@@ -88,11 +90,19 @@ const PostSignupForm = () => {
       }
 
       if (response.status === 200 || response.status === 201) {
+        const updatedUser = response.data?.user || response.data?.data?.user || user;
         showSuccess(
           response.data.message ||
             "Date of Birth and Gender updated successfully!"
         );
-        settosendUserdata(response.data.user);
+        settosendUserdata(updatedUser);
+
+        if (updatedUser?.email_verified || updatedUser?.email_verified_at) {
+          login({ token, user: updatedUser });
+          closeModal();
+          return;
+        }
+
         setFormSubmitted(true);
         return;
       }
@@ -140,10 +150,10 @@ const PostSignupForm = () => {
 
   if (formSubmitted) {
     return (
-      <SignUpCodecomponent
+      <PhoneEmailPostSignup
         token={token}
         userupdate={tosendUserdata}
-        type="phone"
+        type="email"
       />
     );
   }
@@ -170,30 +180,66 @@ const PostSignupForm = () => {
         {error && <div className="alert alert-danger mb-3">{error}</div>}
 
         <form onSubmit={handleSubmit} className="tw:space-y-5">
-          <div className="form-group">
-            <label>Date of Birth</label>
-            <motion.div
-              className="dob-wrapper"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <FaCalendarAlt className="left-icon" />
-              <DatePicker
-                selected={dob}
-                onChange={(date) => setDob(date)}
-                maxDate={fifteenYearsAgo}
-                minDate={fiveYearsBefore}
-                showMonthDropdown
-                showYearDropdown
-                dropdownMode="select"
-                placeholderText="Select your date of birth"
-                className="dob-input border-0"
-                wrapperClassName="tw:w-full"
-                autoComplete="off"
-                dateFormat="yyyy-MM-dd"
+          <div className="tw:space-y-2">
+            <label className="tw:text-sm tw:font-medium tw:text-gray-700">
+              Date of Birth
+            </label>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <MuiDatePicker
+                value={dob ? moment(dob) : null}
+                onChange={(value) =>
+                  setDob(value?.isValid?.() ? value.toDate() : null)
+                }
+                maxDate={moment(fifteenYearsAgo)}
+                minDate={moment(fiveYearsBefore)}
+                openTo="year"
+                views={["year", "month", "day"]}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: "medium",
+                    placeholder: "Select your date of birth",
+                    sx: {
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "16px",
+                        backgroundColor: "#f9fafb",
+                        transition: "box-shadow 180ms ease, border-color 180ms ease",
+                      },
+                      "& .MuiOutlinedInput-root.Mui-focused": {
+                        boxShadow:
+                          "0 0 0 4px rgba(0,245,255,0.08), 0 10px 24px rgba(15,23,42,0.06)",
+                      },
+                      "& .MuiOutlinedInput-root.Mui-focused fieldset": {
+                        borderColor: "#00F5FF",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#050505",
+                      },
+                    },
+                  },
+                  popper: {
+                    sx: {
+                      "& .MuiPaper-root": {
+                        borderRadius: "20px",
+                        boxShadow:
+                          "0 24px 70px rgba(15,23,42,0.18), 0 0 22px rgba(0,245,255,0.08)",
+                      },
+                    },
+                  },
+                  day: {
+                    sx: {
+                      "&.Mui-selected": {
+                        backgroundColor: "#050505",
+                        boxShadow: "0 0 12px rgba(0,245,255,0.18)",
+                      },
+                      "&.Mui-selected:hover": {
+                        backgroundColor: "#050505",
+                      },
+                    },
+                  },
+                }}
               />
-              <FaChevronDown className="right-icon" />
-            </motion.div>
+            </LocalizationProvider>
           </div>
 
           <div className="form-group">
@@ -226,7 +272,7 @@ const PostSignupForm = () => {
             whileHover={isFormValid ? { scale: 1.02 } : {}}
             className="submit-btn"
             style={{
-              backgroundColor: isFormValid ? "#111111" : "#e6e6e6",
+              backgroundColor: isFormValid ? "#050505" : "#e6e6e6",
               color: isFormValid ? "#fff" : "#999",
               cursor: isFormValid ? "pointer" : "not-allowed",
               marginTop: "20px",

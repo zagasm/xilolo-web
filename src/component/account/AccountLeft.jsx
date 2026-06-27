@@ -7,6 +7,7 @@ import VerificationModal from "./VerificationModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { useAuth } from "../../pages/auth/AuthContext";
 import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
+import { isUserAccountVerified } from "../../lib/userVerification";
 
 const AccountLeft = ({ user }) => {
   const { token, setAuth, refreshUser } = useAuth();
@@ -27,7 +28,7 @@ const AccountLeft = ({ user }) => {
     ? `${user.firstName} ${user.lastName || ""}`.trim()
     : user?.username || user?.email || "User";
   const initials = getInitials(fullName);
-  const isVerified = user?.email_verified || user?.phone_verified;
+  const isVerified = isUserAccountVerified(user);
   const hasActiveSubscription = !!(
     user?.subscription?.isActive || user?.has_active_subscription
   );

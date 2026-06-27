@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "test:organiser-verification": "node --test src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "animate.css": "^4.1.1",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.6",
+    "canvas-confetti": "^1.9.4",
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
     "country-flag-icons": "^1.5.19",
@@ -76,6 +78,7 @@
     "react-dropzone": "^14.3.8",
     "react-fast-marquee": "^1.6.5",
     "react-feather": "^2.0.10",
+    "react-ga4": "^3.0.1",
     "react-google-recaptcha": "^3.1.0",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.54.2",
@@ -100,6 +103,7 @@
     "react-spinners": "^0.15.0",
     "react-toastify": "^11.0.3",
     "react-tooltip": "^5.28.0",
+    "recharts": "^3.8.1",
     "slick-carousel": "^1.8.1",
     "swiper": "^12.1.2",
     "three": "^0.160.0",

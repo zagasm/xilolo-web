@@ -17,12 +17,16 @@ import {
   OrganiserNameMismatchDialog,
   OrganiserProfilePhotoRequiredDialog,
   OrganiserProcessingDialog,
+  OrganiserVerificationSuccessDialog,
 } from "./components/OrganiserDialogs";
 import {
   BANK_STEPPER_STEPS,
+  COUNTRY_GEOLOOKUP_FALLBACK_API_URL,
   COUNTRY_GEOLOOKUP_API_URL,
   COUNTRIES_API_URL,
   DIDIT_RETRYABLE_STATUSES,
+  detectCountryCodeFromBrowserLocale,
+  extractCountryCodeFromGeoPayload,
   loadBanksFromCache,
   mapDiditStatusCopy,
   normalizeCountry,
@@ -43,7 +47,9 @@ const BecomeOrganiser = () => {
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [countriesError, setCountriesError] = useState(null);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [detectedCountry, setDetectedCountry] = useState(null);
   const [countryAutoDetected, setCountryAutoDetected] = useState(false);
+  const [countryStepVisible, setCountryStepVisible] = useState(true);
   const [verificationMethod, setVerificationMethod] = useState(null);
   const countryPrefillDismissedRef = useRef(false);
   const countryPrefillAttemptedRef = useRef(false);
@@ -64,6 +70,7 @@ const BecomeOrganiser = () => {
   const [bvnError, setBvnError] = useState(null);
 
   const [processingOpen, setProcessingOpen] = useState(false);
+  const [verificationSuccessOpen, setVerificationSuccessOpen] = useState(false);
   const [nameMismatchOpen, setNameMismatchOpen] = useState(false);
   const [diditInfoOpen, setDiditInfoOpen] = useState(false);
   const [diditStarting, setDiditStarting] = useState(false);
@@ -110,7 +117,7 @@ const BecomeOrganiser = () => {
     await refreshUser?.();
 
     if (showApprovedToast && data?.local_kyc_status === "verified") {
-      showSuccess("Identity verification approved.");
+      showSuccess("Your organiser account is active.");
     }
 
     return data;
@@ -125,21 +132,22 @@ const BecomeOrganiser = () => {
       setCountriesError(null);
 
       try {
-        const response = await fetch(COUNTRIES_API_URL, {
+        const response = await api.get(COUNTRIES_API_URL, {
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          throw new Error("Unable to load countries right now.");
-        }
-
-        const payload = await response.json();
+        const payload = Array.isArray(response?.data?.data)
+          ? response.data.data
+          : [];
         const normalized = payload
           .map(normalizeCountry)
           .filter((item) => item.name && item.code)
           .sort((a, b) => a.name.localeCompare(b.name));
 
         if (active) {
+          if (!normalized.length) {
+            throw new Error("Unable to load countries right now.");
+          }
           setCountries(normalized);
         }
       } catch (error) {
@@ -177,8 +185,27 @@ const BecomeOrganiser = () => {
     const preloadCountryFromGeo = async () => {
       countryPrefillAttemptedRef.current = true;
 
-      try {
-        const response = await fetch(COUNTRY_GEOLOOKUP_API_URL, {
+      const applyDetectedCountry = (countryCode) => {
+        const normalizedCountryCode = String(countryCode || "")
+          .trim()
+          .toUpperCase();
+        if (!normalizedCountryCode || !active) return false;
+
+        const matchedCountry = countries.find(
+          (country) => country.code === normalizedCountryCode
+        );
+
+        if (!matchedCountry) return false;
+
+        setSelectedCountry(matchedCountry);
+        setDetectedCountry(matchedCountry);
+        setCountryAutoDetected(true);
+        setCountryStepVisible(true);
+        return true;
+      };
+
+      const fetchCountryCode = async (url) => {
+        const response = await fetch(url, {
           signal: controller.signal,
         });
 
@@ -187,23 +214,23 @@ const BecomeOrganiser = () => {
         }
 
         const payload = await response.json();
-        const countryCode = String(payload?.country || "")
-          .trim()
-          .toUpperCase();
+        return extractCountryCodeFromGeoPayload(payload);
+      };
 
-        if (!countryCode || !active) return;
-
-        const matchedCountry = countries.find(
-          (country) => country.code === countryCode
-        );
-
-        if (!matchedCountry) return;
-
-        setSelectedCountry(matchedCountry);
-        setCountryAutoDetected(true);
-      } catch (error) {
-        if (!active || error?.name === "AbortError") return;
+      for (const lookupUrl of [
+        COUNTRY_GEOLOOKUP_API_URL,
+        COUNTRY_GEOLOOKUP_FALLBACK_API_URL,
+      ]) {
+        try {
+          if (applyDetectedCountry(await fetchCountryCode(lookupUrl))) {
+            return;
+          }
+        } catch (error) {
+          if (!active || error?.name === "AbortError") return;
+        }
       }
+
+      applyDetectedCountry(detectCountryCodeFromBrowserLocale());
     };
 
     preloadCountryFromGeo();
@@ -363,14 +390,31 @@ const BecomeOrganiser = () => {
   const handleCountryChange = (_, value) => {
     countryPrefillDismissedRef.current = true;
     setSelectedCountry(value);
-    setCountryAutoDetected(false);
+    setCountryAutoDetected(
+      Boolean(value && detectedCountry && value.code === detectedCountry.code)
+    );
     resetVerificationSelection();
   };
 
   const handleChangeCountryRequest = () => {
     countryPrefillDismissedRef.current = true;
-    setCountryAutoDetected(false);
-    handleCountryChange(null, null);
+    setCountryStepVisible(true);
+    resetVerificationSelection();
+  };
+
+  const handleCountryContinue = () => {
+    if (!selectedCountry) {
+      showError("Please select your country to continue.");
+      return;
+    }
+
+    setCountryStepVisible(false);
+  };
+
+  const showOrganiserSuccess = async () => {
+    await refreshUser?.();
+    setProcessingOpen(false);
+    setVerificationSuccessOpen(true);
   };
 
   const handleSaveBankAndContinue = async () => {
@@ -437,20 +481,21 @@ const BecomeOrganiser = () => {
         }
       );
 
-      await showPromise(promise, {
+      const response = await showPromise(promise, {
         loading: "Submitting BVN...",
-        success: "BVN submitted, we're processing your verification",
+        success: "BVN submitted",
         error: "Failed to submit BVN",
       });
 
       await refreshUser?.();
-      setProcessingOpen(true);
+      const kycStatus = response?.data?.data?.kyc_status;
 
-      window.setTimeout(() => {
-        setProcessingOpen(false);
-        showSuccess("We're reviewing your details");
-        navigate(`/profile/${user?.id}`);
-      }, 2500);
+      if (kycStatus === "verified") {
+        await showOrganiserSuccess();
+        return;
+      }
+
+      await showOrganiserSuccess();
     } catch (error) {
       const message =
         error?.response?.data?.message ||
@@ -506,15 +551,23 @@ const BecomeOrganiser = () => {
                 });
 
                 if (refreshed?.local_kyc_status === "verified") {
-                  navigate(`/profile/${user?.id}`);
+                  await showOrganiserSuccess();
                   return;
                 }
 
-                if (refreshed?.status) {
-                  showSuccess(
-                    `Verification submitted. Current status: ${refreshed.status}.`
-                  );
+                if (refreshed?.local_kyc_status === "failed") {
+                  const message =
+                    refreshed?.failure_reason ||
+                    "DIDIT verification was not approved. Please start a new verification session and try again.";
+                  setDiditSessionError(message);
+                  showError(message);
+                  return;
                 }
+
+                const message =
+                  "Verification did not activate your organiser account yet. Please try refreshing or start a new verification session.";
+                setDiditSessionError(message);
+                showError(message);
               } catch (refreshError) {
                 const message =
                   refreshError?.response?.data?.message ||
@@ -626,18 +679,20 @@ const BecomeOrganiser = () => {
             )}
 
             <div className="tw:mt-2">
-              {!selectedCountry && (
+              {countryStepVisible && (
                 <OrganiserCountryStep
                   countries={countries}
                   countriesLoading={countriesLoading}
                   countriesError={countriesError}
                   selectedCountry={selectedCountry}
+                  detectedCountry={detectedCountry}
                   countryAutoDetected={countryAutoDetected}
                   onCountryChange={handleCountryChange}
+                  onContinue={handleCountryContinue}
                 />
               )}
 
-              {selectedCountry && !verificationMethod && (
+              {!countryStepVisible && selectedCountry && !verificationMethod && (
                 <OrganiserMethodChoiceStep
                   selectedCountry={selectedCountry}
                   countryAutoDetected={countryAutoDetected}
@@ -678,7 +733,9 @@ const BecomeOrganiser = () => {
                   bvn={bvn}
                   bvnError={bvnError}
                   bvnLoading={bvnLoading}
-                  onBvnChange={(e) => setBvn(e.target.value.replace(/\D/g, ""))}
+                  onBvnChange={(e) =>
+                    setBvn(e.target.value.replace(/\D/g, "").slice(0, 11))
+                  }
                   onBack={() => setBankStep(0)}
                   onSubmit={handleSubmitBvn}
                 />
@@ -705,6 +762,12 @@ const BecomeOrganiser = () => {
       </div>
 
       <OrganiserProcessingDialog open={processingOpen} />
+
+      <OrganiserVerificationSuccessDialog
+        open={verificationSuccessOpen}
+        onCreateEvent={() => navigate("/event/select-event-type")}
+        onViewProfile={() => navigate(`/profile/${user?.id}`)}
+      />
 
       <OrganiserDiditInfoDialog
         open={diditInfoOpen}

@@ -201,7 +201,7 @@ function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) 
             }
             label="Set as default account"
           />
-          <div className="tw:min-h-20 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:p-4 tw:text-xs tw:text-gray-600">
+          <div className="tw:min-h-20 tw:rounded-3xl tw:border tw:border-neon/15 tw:bg-[#fbfbfd] tw:p-4 tw:text-xs tw:text-gray-600 tw:shadow-[0_0_16px_rgba(0,245,255,0.05)]">
             {isVerifying ? (
               <div className="tw:flex tw:items-center tw:gap-3">
                 <CircularProgress size={18} />
@@ -240,7 +240,7 @@ function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) 
             onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })
           }
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
         >
           {isAdding ? "Saving..." : "Add account"}
         </button>
@@ -280,7 +280,7 @@ const ListSkeleton = ({ rows = 4 }) => (
 );
 
 const StatCard = ({ icon: Icon, label, value, hint }) => (
-  <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+  <div className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]">
     <div className="tw:flex tw:items-center tw:justify-between">
       <span className="tw:text-sm tw:text-gray-500">{label}</span>
       {Icon ? <Icon className="tw:h-4 tw:w-4 tw:text-gray-400" /> : null}
@@ -356,7 +356,7 @@ function WithdrawDialog({
                   Choose where to receive your available balance.
                 </p>
 
-                <div className="tw:mt-5 tw:rounded-2xl tw:bg-[#faf8ff] tw:p-4">
+                <div className="tw:mt-5 tw:rounded-2xl tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-4 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
                   <div className="tw:text-xs tw:text-gray-500">
                     Amount to be withdrawn
                   </div>
@@ -567,7 +567,7 @@ function WithdrawDialog({
                     onClick={onClose}
                     disabled={submitting}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition hover:tw:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition tw:hover:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     Cancel
                   </button>
@@ -576,7 +576,7 @@ function WithdrawDialog({
                     onClick={onSubmit}
                     disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                   >
                     {submitting ? "Submitting..." : "Submit withdrawal"}
                   </button>
@@ -965,7 +965,7 @@ export default function AccountPayouts() {
           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
             <Link
               to="/account/payouts/history"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <History className="tw:h-4 tw:w-4" />
               Withdrawal history
@@ -974,14 +974,14 @@ export default function AccountPayouts() {
               type="button"
               onClick={() => setWithdrawOpen(true)}
               style={{ borderRadius: 12 }}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm hover:tw:bg-primarySecond"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:hover:bg-primarySecond"
             >
               <Landmark className="tw:h-4 tw:w-4" />
               Withdraw
             </button>
             <Link
               to="/account/crypto-wallet"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <Coins className="tw:h-4 tw:w-4" />
               Crypto wallets
@@ -989,7 +989,7 @@ export default function AccountPayouts() {
             <button
               type="button"
               onClick={loadPage}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
             >
               <RefreshCw className="tw:h-4 tw:w-4" />
               Refresh
@@ -1030,7 +1030,7 @@ export default function AccountPayouts() {
           )}
         </section>
 
-        <section className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-sm">
+        <section className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)]">
           <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
             <div>
               <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
@@ -1041,7 +1041,7 @@ export default function AccountPayouts() {
               </div>
             </div>
             <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-              <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:md:min-w-[280px]">
+              <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:transition focus-within:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)] tw:md:min-w-[280px]">
                 <Search className="tw:h-4 tw:w-4 tw:text-gray-400" />
                 <input
                   value={searchQuery}
@@ -1053,7 +1053,7 @@ export default function AccountPayouts() {
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
-                className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none"
+                className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
               >
                 <option value="all">All statuses</option>
                 <option value="draft">Draft</option>
@@ -1076,7 +1076,7 @@ export default function AccountPayouts() {
                 {filteredTicketSales.map((item, index) => (
                   <div
                     key={item?.id || item?.event_id || `${getTicketSaleTitle(item)}-${index}`}
-                    className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fcfcfe] tw:p-4"
+                    className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fcfcfe] tw:p-4 tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]"
                   >
                     <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-start tw:lg:justify-between">
                       <div className="tw:min-w-0">

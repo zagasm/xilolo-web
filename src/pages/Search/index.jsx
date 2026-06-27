@@ -133,7 +133,7 @@ function CompactEventRow({ event, index = null, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:transition hover:tw:border-slate-300 hover:tw:bg-slate-50"
+      className="tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
     >
       
 
@@ -197,9 +197,9 @@ function PersonRow({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:hover:bg-zinc-50 tw:transition-colors"
+      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:transition tw:hover:bg-zinc-50 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.06)]"
     >
-      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold">
+      <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold tw:border tw:border-neon">
         {avatarUrl && !avatarFailed ? (
           <img
             src={avatarUrl}
@@ -243,7 +243,7 @@ function PersonSliderCard({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:transition hover:tw:border-slate-300 hover:tw:bg-slate-50"
+      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
     >
       <div className="tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
         {avatarUrl && !avatarFailed ? (
@@ -466,7 +466,7 @@ export default function SearchPage() {
             onSubmit={handleSubmit}
             className="tw:flex-1 tw:relative tw:flex tw:items-center"
           >
-            <div className="tw:flex tw:items-center tw:bg-[#f5f7fa] tw:border tw:border-slate-200 tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-4 tw:w-full">
+            <div className="tw:flex tw:items-center tw:bg-[#f5f7fa] tw:border tw:border-slate-200 tw:rounded-full tw:px-3 tw:sm:px-4 tw:py-4 tw:w-full tw:transition focus-within:tw:border-neon/50 focus-within:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08),0_12px_30px_rgba(15,23,42,0.06)]">
               <Search className="tw:w-5 tw:h-5 tw:text-zinc-500 tw:mr-2" />
               <input
                 type="text"

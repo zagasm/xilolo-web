@@ -56,3 +56,13 @@ export async function purchaseTicketWithWallet(payload, token) {
 
   return unwrap(response);
 }
+
+export async function claimSponsoredTicket(eventId, token) {
+  const response = await api.post(
+    `/api/v1/events/${eventId}/sponsored-tickets/claim`,
+    {},
+    authHeaders(token)
+  );
+
+  return unwrap(response);
+}

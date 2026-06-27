@@ -111,7 +111,7 @@ export function CodeVerification({ email='tomilayoyusluv@gmail.com' }) {
     <>
       {!isVerified ? (
         <AuthContainer title="Verification code" description="We've sent a 6-digit code to">
-          <p className="text-center" style={{ color: "#111111", fontSize: "15px", marginTop: "-20px", fontFamily: "Inter" }}>
+          <p className="text-center" style={{ color: "#050505", fontSize: "15px", marginTop: "-20px", fontFamily: "Inter" }}>
             {maskEmail(email)}
           </p>
 

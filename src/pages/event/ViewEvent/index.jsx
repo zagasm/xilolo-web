@@ -4,8 +4,7 @@ import { useDispatch } from "react-redux";
 import SEO from "../../../component/SEO";
 import { Helmet } from "react-helmet-async";
 import { api, authHeaders } from "../../../lib/apiClient";
-import { showSuccess, showError } from "../../../component/ui/toast";
-import YouMayAlsoLike from "../../../component/Events/YouMayAlsoLike";
+import { showSuccess, showError, showPromise } from "../../../component/ui/toast";
 import EventReviewsSection from "../../../component/Events/EventReviewsSection.jsx";
 import ReportModal from "../../../component/Events/ReportModal";
 import LiveAppDownloadModal from "../../../component/Events/LiveAppDownloadModal";
@@ -37,7 +36,10 @@ import TicketPurchaseSuccessModal from "../../../features/wallet/components/Tick
 import WalletFundingRequiredModal from "../../../features/wallet/components/WalletFundingRequiredModal";
 import { useEventShareFlow } from "../../../features/eventShare/hooks/useEventShareFlow";
 import { normalizeEventRecord } from "../../../features/eventShare/shareUtils";
-import { usePurchaseTicketWithWallet } from "../../../features/wallet/hooks/usePurchaseTicketWithWallet";
+import {
+  useClaimSponsoredTicket,
+  usePurchaseTicketWithWallet,
+} from "../../../features/wallet/hooks/usePurchaseTicketWithWallet";
 import {
   clearPendingPurchaseIntent,
   setPendingPurchaseIntent,
@@ -76,6 +78,30 @@ export function CountdownPill({ target }) {
   );
 }
 
+function sponsorDisplayName(sponsor) {
+  return sponsor?.username || sponsor?.user_name || sponsor?.name || "Someone";
+}
+
+function sponsorProfilePath(sponsor) {
+  const id = sponsor?.user_id || sponsor?.id || sponsor?.sponsor_user_id;
+  return id ? `/profile/${id}` : null;
+}
+
+function SponsorProfileLink({ sponsor, className = "" }) {
+  const name = sponsorDisplayName(sponsor);
+  const path = sponsorProfilePath(sponsor);
+
+  if (!path) {
+    return <span className={className}>{name}</span>;
+  }
+
+  return (
+    <Link to={path} className={className}>
+      {name}
+    </Link>
+  );
+}
+
 function isUuid(value = "") {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     String(value)
@@ -84,6 +110,17 @@ function isUuid(value = "") {
 
 function getTicketPromptStorageKey(eventIdentifier) {
   return `xilolo:event-ticket-prompt-seen:${eventIdentifier}`;
+}
+
+function getViewerId(user = {}) {
+  return (
+    user?.id ||
+    user?.user_id ||
+    user?.userId ||
+    user?.uuid ||
+    user?.data?.id ||
+    ""
+  );
 }
 
 function resolveManualDownloadUrl(manual = {}) {
@@ -158,7 +195,7 @@ function EventDetailShimmer() {
   return (
     <div className="tw:min-h-screen tw:w-full tw:pb-12 tw:pt-20">
       <div className="tw:mx-auto tw:max-w-7xl tw:px-2 tw:md:px-6 tw:lg:px-8">
-        <div className="tw:mb-4 tw:mt-10 tw:h-[64px] tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
+        <div className="tw:mb-4 tw:mt-10 tw:h-16 tw:animate-pulse tw:md:rounded-[28px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/55 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.15)] tw:md:backdrop-blur-2xl" />
 
         <div className="tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#ffffff]/70 tw:md:bg-[#ffffff]/50 tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.09)] tw:md:backdrop-blur-2xl">
           <div className="tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
@@ -201,7 +238,6 @@ export default function ViewEvent() {
   const location = useLocation();
   const dispatch = useDispatch();
   const [event, setEvent] = useState(null);
-  const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
@@ -213,6 +249,7 @@ export default function ViewEvent() {
   const [modalAutoTrigger, setModalAutoTrigger] = useState(true);
   const [purchaseSummary, setPurchaseSummary] = useState(null);
   const [replayUploadOpen, setReplayUploadOpen] = useState(false);
+  const [preferredPurchaseType, setPreferredPurchaseType] = useState(null);
   const navigate = useNavigate();
   const { token, user } = useAuth();
   const shareFlow = useEventShareFlow();
@@ -220,6 +257,7 @@ export default function ViewEvent() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [startingStream, setStartingStream] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -239,7 +277,14 @@ export default function ViewEvent() {
         previous
           ? {
             ...previous,
-            hasPaid: purchaseType === "manual_only" ? !!previous?.hasPaid : true,
+            hasPaid:
+              purchaseType === "manual_only" || purchaseType === "sponsored_only"
+                ? !!previous?.hasPaid
+                : true,
+            user_has_sponsored_tickets:
+              purchaseType === "sponsored_only"
+                ? true
+                : previous?.user_has_sponsored_tickets,
             manual: previous?.manual
               ? {
                 ...previous.manual,
@@ -247,7 +292,10 @@ export default function ViewEvent() {
                   includesManual || previous.manual.viewer_has_access,
                 viewer_has_purchased:
                   includesManual || previous.manual.viewer_has_purchased,
-                viewer_has_ticket: true,
+                viewer_has_ticket:
+                  purchaseType === "sponsored_only"
+                    ? previous.manual.viewer_has_ticket
+                    : true,
               }
               : previous?.manual,
           }
@@ -262,10 +310,39 @@ export default function ViewEvent() {
       showSuccess(
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
-          : includesManual
-            ? "Ticket and manual purchased successfully."
-            : "Ticket purchased successfully."
+          : purchaseType === "sponsored_only"
+            ? "Tickets bought for others successfully."
+            : includesManual
+              ? "Ticket and manual purchased successfully."
+              : "Ticket purchased successfully."
       );
+    },
+  });
+
+  const claimSponsoredTicketMutation = useClaimSponsoredTicket({
+    onSuccess: () => {
+      setEvent((previous) =>
+        previous
+          ? {
+            ...previous,
+            hasPaid: true,
+            user_has_ticket: true,
+            can_claim_sponsored_ticket: false,
+            sponsored_tickets_available_count: Math.max(
+              0,
+              Number(previous.sponsored_tickets_available_count || 0) - 1
+            ),
+            manual: previous?.manual
+              ? {
+                ...previous.manual,
+                viewer_has_ticket: true,
+              }
+              : previous?.manual,
+          }
+          : previous
+      );
+      refreshEventDetailSilently();
+      showSuccess("Paid ticket claimed successfully.");
     },
   });
 
@@ -283,15 +360,8 @@ export default function ViewEvent() {
   function syncEventPayload(data = {}) {
     const ev =
       data?.currentEvent || data?.event || data?.data?.event || null;
-    const recommendations =
-      data?.recommendations ||
-      data?.recommended?.data ||
-      data?.recs ||
-      data?.data?.recommendations ||
-      [];
 
     setEvent(normalizeEventRecord(ev));
-    setRecs(recommendations);
     setIsSaved(!!ev?.is_saved);
     setIsFollowing(!!(ev?.is_following_organizer || ev?.is_following));
   }
@@ -365,7 +435,12 @@ export default function ViewEvent() {
       typeof window !== "undefined" &&
       window.localStorage.getItem(promptKey) === "1";
 
-    if (!event?.hasPaid && hasPurchaseOptions && !hasSeenPrompt) {
+    if (
+      !event?.hasPaid &&
+      !event?.can_claim_sponsored_ticket &&
+      hasPurchaseOptions &&
+      !hasSeenPrompt
+    ) {
       if (typeof window !== "undefined") {
         window.localStorage.setItem(promptKey, "1");
       }
@@ -385,13 +460,18 @@ export default function ViewEvent() {
   const posterUrl = useMemo(() => event?.poster?.[0]?.url, [event]);
   const manual = event?.manual || {};
   const purchaseOptions = event?.purchase_options || {};
+  const hasPaid = !!event?.hasPaid || !!event?.user_has_ticket;
   const manualAvailable = !!manual?.available;
   const manualHasAccess = !!manual?.viewer_has_access;
   const ticketOnlyAvailable =
     !event?.is_sold_out &&
-    (!!purchaseOptions.ticket_only || (!event?.hasPaid && Number(event?.price ?? 0) > 0));
+    !hasPaid &&
+    (!!purchaseOptions.ticket_only || Number(event?.price ?? 0) > 0);
   const ticketAndManualAvailable =
-    manualAvailable && !!purchaseOptions.ticket_and_manual && !manualHasAccess;
+    !hasPaid &&
+    manualAvailable &&
+    !!purchaseOptions.ticket_and_manual &&
+    !manualHasAccess;
   const manualOnlyAvailable =
     manualAvailable && !!purchaseOptions.manual_only && !manualHasAccess;
   const purchaseChoiceCount = [
@@ -424,7 +504,7 @@ export default function ViewEvent() {
     window.open(manualDownloadUrl, "_blank", "noopener,noreferrer");
   };
 
-  const handleGetTicket = async (purchaseType = "ticket_only") => {
+  const handleGetTicket = async (purchaseType = "ticket_only", quantity = 1) => {
     if (event?.is_sold_out || purchaseTicketMutation.isPending) return;
 
     if (!token) {
@@ -436,7 +516,7 @@ export default function ViewEvent() {
     try {
       await purchaseTicketMutation.mutateAsync({
         event_id: event.id,
-        quantity: 1,
+        quantity,
         purchase_type: purchaseType,
       });
     } catch (paymentError) {
@@ -455,7 +535,7 @@ export default function ViewEvent() {
           setPendingPurchaseIntent({
             eventId: event.id,
             eventTitle: event.title,
-            quantity: 1,
+            quantity,
             purchaseType,
             sourcePage: "event_detail",
             eventPath: location.pathname,
@@ -492,6 +572,23 @@ export default function ViewEvent() {
 
       showError(errorMessage);
       console.error("Wallet purchase error:", paymentError);
+    }
+  };
+
+  const handleClaimSponsoredTicket = async () => {
+    if (!event?.id || claimSponsoredTicketMutation.isPending) return;
+
+    if (!token) {
+      showError("Please log in to claim a paid ticket.");
+      navigate("/auth/signin");
+      return;
+    }
+
+    try {
+      await claimSponsoredTicketMutation.mutateAsync(event.id);
+    } catch (claimError) {
+      showError(getApiErrorMessage(claimError, "Unable to claim paid ticket."));
+      refreshEventDetailSilently();
     }
   };
 
@@ -536,7 +633,6 @@ export default function ViewEvent() {
   const isPaused = event?.status === "paused";
   const isEnded = event?.status === "ended";
   const isSoldOut = !!event?.is_sold_out;
-  const hasPaid = !!event?.hasPaid;
   const isOwnerEvent = !!(
     event?.isOwner ||
     event?.is_owner ||
@@ -546,7 +642,38 @@ export default function ViewEvent() {
   );
   const canBuyManualOnly = hasPaid && manualOnlyAvailable;
   const canDownloadManual = manualAvailable && manualHasAccess;
+  const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
+  const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
+  const sponsoredTicketSponsors = Array.isArray(event?.sponsored_ticket_sponsors)
+    ? event.sponsored_ticket_sponsors
+    : [];
+  const viewerId = String(getViewerId(user));
+  const viewerHasSponsoredTickets =
+    !!event?.user_has_sponsored_tickets ||
+    (!!viewerId &&
+      sponsoredTicketSponsors.some(
+        (sponsor) => String(sponsor?.id || sponsor?.user_id || "") === viewerId
+      ));
+  const firstSponsor = sponsoredTicketSponsors[0];
+  const sponsorHeadlineSuffix =
+    sponsoredTicketSponsors.length > 1
+      ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
+      : " bought tickets for others for this event.";
+  const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
+  const canSponsorOwnEvent = !!(isOwnerEvent && event?.user_can_sponsor_tickets && !isSoldOut);
+  const canOpenPurchaseOptions =
+    (!isOwnerEvent || canSponsorOwnEvent) &&
+    !isSoldOut &&
+    (ticketOnlyAvailable ||
+      ticketAndManualAvailable ||
+      manualOnlyAvailable ||
+      !!event?.user_can_sponsor_tickets ||
+      viewerHasSponsoredTickets);
   const replay = event?.replay || {};
+  const vod = event?.vod || {};
+  const isVodEvent = event?.delivery_type === "vod";
+  const vodIsReady = !!vod?.is_ready;
+  const canWatchVod = !!vod?.can_watch || !!event?.hasPaid || !!event?.isOwner;
   const replayEnabled = !!event?.enable_replay;
   const hasReplay = !!event?.has_replay;
   const replayAvailableAt =
@@ -554,7 +681,7 @@ export default function ViewEvent() {
   const replayExpiresAt =
     event?.replay_expires_at || replay?.expires_at || "";
   const replayUrl = event?.replay_url || replay?.url || "";
-  const replayIsAvailable = !!(replay?.is_available && replayUrl);
+  const replayIsAvailable = !!((replay?.is_available && replayUrl) || (vod?.source_type === "live_replay" && vodIsReady));
   const replayExpired = !!(
     replayEnabled &&
     !replayUrl &&
@@ -568,8 +695,12 @@ export default function ViewEvent() {
     primaryCtaLabel = "Join Live Event";
   } else if (canBuyManualOnly) {
     primaryCtaLabel = "Buy Manual";
+  } else if (viewerHasSponsoredTickets) {
+    primaryCtaLabel = "Buy More for Others";
   } else if (hasPaid && !isLiveNow) {
-    primaryCtaLabel = "Ticket Purchased";
+    primaryCtaLabel = event?.user_can_sponsor_tickets ? "Buy for Others" : "Ticket Purchased";
+  } else if (canClaimSponsoredTicket) {
+    primaryCtaLabel = claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim Paid Ticket";
   } else if (isSoldOut) {
     primaryCtaLabel = "Sold Out";
   } else if (purchaseTicketMutation.isPending) {
@@ -581,9 +712,15 @@ export default function ViewEvent() {
   }
 
   const ctaDisabled =
-    (!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
-    (hasPaid && !isLiveNow && !canBuyManualOnly) ||
-    purchaseTicketMutation.isPending;
+    purchaseTicketMutation.isPending ||
+    claimSponsoredTicketMutation.isPending ||
+    (!canClaimSponsoredTicket &&
+      ((!hasPaid && isSoldOut && !ticketOnlyAvailable && !ticketAndManualAvailable) ||
+        (hasPaid &&
+          !isLiveNow &&
+          !canBuyManualOnly &&
+          !event?.user_can_sponsor_tickets &&
+          !viewerHasSponsoredTickets)));
 
   const handleEnterLive = () => {
     if (hasPaid && isLiveNow) {
@@ -599,13 +736,76 @@ export default function ViewEvent() {
       return;
     }
 
-    if (shouldChoosePurchaseType || canBuyManualOnly) {
+    if (canClaimSponsoredTicket) {
+      handleClaimSponsoredTicket();
+      return;
+    }
+
+    if (viewerHasSponsoredTickets) {
+      setPreferredPurchaseType("sponsored_only");
+      setPurchaseModalOpen(true);
+      setModalAutoTrigger(false);
+      return;
+    }
+
+    if (shouldChoosePurchaseType || canBuyManualOnly || (hasPaid && event?.user_can_sponsor_tickets)) {
+      setPreferredPurchaseType(
+        hasPaid && event?.user_can_sponsor_tickets ? "sponsored_only" : null
+      );
       setPurchaseModalOpen(true);
       setModalAutoTrigger(false);
       return;
     }
 
     handleGetTicket(ticketAndManualAvailable ? "ticket_and_manual" : "ticket_only");
+  };
+
+  const handleOpenPurchaseOptions = () => {
+    if (!canOpenPurchaseOptions || purchaseTicketMutation.isPending) return;
+
+    if (!token) {
+      showError("Please log in to buy tickets or buy for others.");
+      navigate("/auth/signin");
+      return;
+    }
+
+    setPurchaseModalOpen(true);
+    setPreferredPurchaseType(
+      viewerHasSponsoredTickets ? "sponsored_only" : null
+    );
+    setModalAutoTrigger(false);
+  };
+
+  const handleOwnerStreamAction = async () => {
+    if (!event?.id) return;
+
+    if (isVodEvent) {
+      navigate(`/event/view/${event.id}`);
+      return;
+    }
+
+    if (isEnded) {
+      navigate(`/event/stream/${event.id}`);
+      return;
+    }
+
+    setStartingStream(true);
+    try {
+      await showPromise(
+        api.post(`/api/v1/events/${event.id}/streams/start`, {}, authHeaders(token)),
+        {
+          loading: "Starting stream...",
+          success: "Stream ready",
+          error: (err) =>
+            err?.response?.data?.message ||
+            err?.message ||
+            "Unable to start stream.",
+        }
+      );
+      navigate(`/event/stream/${event.id}`);
+    } finally {
+      setStartingStream(false);
+    }
   };
 
   if (loading) {
@@ -713,7 +913,7 @@ export default function ViewEvent() {
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:md:size-11"
+                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:md:size-11"
                 style={{ borderRadius: "9999px" }}
               >
                 <ArrowLeft className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
@@ -732,7 +932,7 @@ export default function ViewEvent() {
               type="button"
               onClick={handleShareEvent}
               disabled={shareFlow.shareInProgress}
-              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
+              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
               aria-label="Share event"
               style={{ borderRadius: "9999px" }}
             >
@@ -745,8 +945,8 @@ export default function ViewEvent() {
           </div>
 
           <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
-            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-[#f7f2eb] tw:blur-3xl tw:md:block" />
-            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-[#f5efe6] tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
+            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
 
             <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
               <div className="tw:space-y-6">
@@ -791,7 +991,7 @@ export default function ViewEvent() {
                     </div>
 
                     <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:p-2.5 tw:md:p-6">
-                      <div className="tw:rounded-[24px] tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
                         <div className="tw:flex tw:flex-col tw:gap-3 tw:md:gap-5">
                           <div className="tw:space-y-2 tw:md:space-y-3">
                             <div className="tw:hidden tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-[#ffffff]/72 tw:md:block">
@@ -924,13 +1124,43 @@ export default function ViewEvent() {
                         }}
                         type="button"
                         onClick={() => setReportOpen(true)}
-                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm hover:tw:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
+                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm tw:hover:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
                       >
                         Report this event
                       </button>
                     </div>
                   </div>
                 </div>
+
+                {(isVodEvent || vodIsReady) && (
+                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
+                    <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
+                      <div>
+                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                          Event Video
+                        </div>
+                        <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
+                          {vodIsReady ? "Video is ready" : "Video will be available soon"}
+                        </div>
+                        <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                          {vodIsReady
+                            ? "Ticket holders can stream this event on now."
+                            : "We will make the video available here as soon as it is ready."}
+                        </div>
+                      </div>
+                      <button
+                        style={{ borderRadius: 24, fontSize: 12 }}
+                        type="button"
+                        onClick={() => navigate(`/event/vod/${event.id}`)}
+                        disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                      >
+                        <Video className="tw:h-4 tw:w-4" />
+                        <span>{vodIsReady ? "Watch video" : "Available soon"}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {replayEnabled && (
                   <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
@@ -953,18 +1183,18 @@ export default function ViewEvent() {
                                     : "Replay is ready to watch."}
                                 </div>
                               </div>
-                              <a
-                                href={replayUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-slate-800"
+                              <button
+                                style={{ borderRadius: 24, fontSize: 12 }}
+                                type="button"
+                                onClick={() => navigate(`/event/vod/${event.id}`)}
+                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800"
                               >
                                 <Video className="tw:h-4 tw:w-4" />
                                 <span>Watch replay</span>
-                              </a>
+                              </button>
                             </div>
 
-                            <div className="tw:overflow-hidden tw:rounded-[24px] tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
+                            <div className="tw:overflow-hidden tw:rounded-3xl tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
                               <div className="tw:aspect-video">
                                 <ReactPlayer
                                   url={replayUrl}
@@ -976,7 +1206,7 @@ export default function ViewEvent() {
                             </div>
                           </div>
                         ) : replayExpired ? (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay is no longer available.
                             </div>
@@ -985,7 +1215,7 @@ export default function ViewEvent() {
                             </div>
                           </div>
                         ) : hasReplay ? (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay will be available soon
                             </div>
@@ -999,7 +1229,7 @@ export default function ViewEvent() {
                             )}
                           </div>
                         ) : (
-                          <div className="tw:mt-4 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
+                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
                             <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
                               Replay not uploaded yet
                             </div>
@@ -1036,7 +1266,7 @@ export default function ViewEvent() {
                           <button
                             type="button"
                             onClick={() => setReplayUploadOpen(true)}
-                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                           >
                             <Upload className="tw:h-4 tw:w-4" />
                             <span>Upload replay video</span>
@@ -1050,7 +1280,7 @@ export default function ViewEvent() {
 
               <aside className="tw:flex tw:flex-col tw:gap-6">
                 <div className="tw:px-1 tw:py-2 tw:md:sticky tw:md:top-28">
-                  <div className="tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
+                  <div className="tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
                     <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
                       <div>
                         <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
@@ -1119,7 +1349,7 @@ export default function ViewEvent() {
                             }}
                             type="button"
                             onClick={handleDownloadManual}
-                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary hover:tw:bg-primary/10"
+                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
                           >
                             Download manual
                           </button>
@@ -1127,7 +1357,91 @@ export default function ViewEvent() {
                       </div>
                     )}
 
-                    {!isOwnerEvent && (
+                    {hasSponsoredTicketsAvailable && !hasPaid && (
+                      <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
+                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                          {sponsoredTicketSponsors.length ? (
+                            <>
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary tw:hover:underline" />
+                              {sponsorHeadlineSuffix}
+                            </>
+                          ) : (
+                            "A kind person has bought tickets for others for this event."
+                          )}
+                        </div>
+                        <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
+                          You can grab one of the free tickets, get your own ticket, or chip in to buy for others!
+                        </div>
+                        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                          <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
+                            {sponsoredTicketsAvailableCount} available
+                          </span>
+                          {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
+                            <SponsorProfileLink
+                              key={sponsor.id || sponsor.username}
+                              sponsor={sponsor}
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary tw:hover:bg-white tw:hover:underline"
+                            />
+                          ))}
+
+                        </div>
+                      </div>
+                    )}
+
+                    {isOwnerEvent ? (
+                      <>
+                        {!isVodEvent && (
+                          <>
+                            <button
+                              style={{
+                                borderRadius: 24
+                              }}
+                              type="button"
+                              disabled={startingStream}
+                              onClick={handleOwnerStreamAction}
+                              className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                            >
+                              {startingStream
+                                ? "Starting stream..."
+                                : isLiveNow || isPaused
+                                  ? "Manage stream"
+                                  : isEnded
+                                    ? "View stream"
+                                    : "Start stream"}
+                            </button>
+
+                            <span className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                              Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
+                            </span>
+                          </>
+                        )}
+
+                        {isVodEvent && (
+                          <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                            This is a VOD event. Stream controls are not needed.
+                          </span>
+                        )}
+
+                        {canSponsorOwnEvent && (
+                          <button
+                            style={{
+                              borderRadius: 24,
+                              marginTop: 12
+                            }}
+                            type="button"
+                            disabled={purchaseTicketMutation.isPending}
+                            onClick={() => {
+                              setPreferredPurchaseType("sponsored_only");
+                              setPurchaseModalOpen(true);
+                              setModalAutoTrigger(false);
+                            }}
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                          >
+                            {purchaseTicketMutation.isPending ? "Processing..." : "Buy Tickets for Others"}
+                          </button>
+                        )}
+                      </>
+                    ) : (
                       <>
                         <button
                           style={{
@@ -1138,35 +1452,54 @@ export default function ViewEvent() {
                           onClick={handlePrimaryAction}
                           className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
                             ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                            : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
+                            : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
                             }`}
                         >
                           {primaryCtaLabel}
-                          {!ctaDisabled && !hasPaid && !shouldChoosePurchaseType && (
+                          {!ctaDisabled && !hasPaid && !canClaimSponsoredTicket && !shouldChoosePurchaseType && (
                             <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
                               ({priceText(event)})
                             </span>
                           )}
                         </button>
 
-                        <p className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
+                        {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
+                          <button
+                            style={{
+                              borderRadius: 24,
+                              marginTop: 12
+                            }}
+                            type="button"
+                            disabled={purchaseTicketMutation.isPending}
+                            onClick={handleOpenPurchaseOptions}
+                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
+                          >
+                            {purchaseTicketMutation.isPending
+                              ? "Processing..."
+                              : "Buy Tickets or Buy for Others"}
+                          </button>
+                        ) : null}
+
+                        <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
                           {hasPaid
                             ? isLiveNow
                               ? "You already have access. Tap the button above to join the live experience."
                               : canBuyManualOnly
-                                ? "Your ticket is secured. You can still unlock the event manual."
+                                ? "Your ticket is secured. You can still buy the event manual."
                                 : "Your ticket is secured. We will notify you when the event starts."
-                            : shouldChoosePurchaseType
-                              ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
-                              : "Secure checkout and fast access to your purchased ticket."}
-                        </p>
+                            : canClaimSponsoredTicket
+                              ? "A free ticket is available for you to claim now. You can still buy a ticket or buy for others from the purchase options."
+                              : shouldChoosePurchaseType
+                                ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
+                                : "Secure checkout and fast access to your purchased ticket."}
+                        </span>
                       </>
                     )}
                   </div>
 
-                  <div className="tw:mt-4 tw:rounded-[24px] tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                  <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
                     <div className="tw:flex tw:items-start tw:gap-4">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-[#f7f2eb]">
+                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-white">
                         {hostHasImage ? (
                           <img
                             src={event.hostImage}
@@ -1215,7 +1548,7 @@ export default function ViewEvent() {
                         disabled={followLoading || !event.hostId}
                         className={`tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:px-3 tw:text-xs tw:font-medium tw:transition tw:md:h-11 tw:md:text-sm ${isFollowing
                           ? "tw:border-primary/25 tw:bg-[#ffffff] tw:text-primary"
-                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 hover:tw:bg-[#ebf1f8]"
+                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 tw:hover:bg-[#ebf1f8]"
                           } ${followLoading ? "tw:cursor-not-allowed tw:opacity-70" : ""
                           }`}
                       >
@@ -1235,7 +1568,7 @@ export default function ViewEvent() {
                             ? `/profile/${event.organiserUserId || event.organiserId}`
                             : "/organizers"
                         }
-                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] hover:tw:bg-primarySecond tw:md:h-11 tw:md:text-sm"
+                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] tw:hover:bg-primarySecond tw:md:h-11 tw:md:text-sm"
                       >
                         View Profile
                       </Link>
@@ -1253,10 +1586,6 @@ export default function ViewEvent() {
             currentUser={user}
             onReviewMutationSuccess={refreshEventDetailSilently}
           />
-
-          <div className="tw:mt-8">
-            <YouMayAlsoLike recs={recs} posterFallback={posterUrl} />
-          </div>
         </div>
       </div>
 
@@ -1272,19 +1601,42 @@ export default function ViewEvent() {
               </div>
             </div>
 
-            {!isOwnerEvent && (
+            {isOwnerEvent ? (
               <button
                 style={{ borderRadius: 18 }}
                 type="button"
-                disabled={ctaDisabled}
-                onClick={handlePrimaryAction}
-                className={`tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
-                  ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                  : "tw:bg-primary tw:text-[#ffffff] hover:tw:bg-primarySecond"
-                  }`}
+                disabled={startingStream}
+                onClick={handleOwnerStreamAction}
+                className="tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:bg-primary tw:px-3 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
               >
-                {primaryCtaLabel}
+                {startingStream ? "Starting..." : isLiveNow || isPaused ? "Manage stream" : "Start stream"}
               </button>
+            ) : (
+              <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2">
+                <button
+                  style={{ borderRadius: 18 }}
+                  type="button"
+                  disabled={ctaDisabled}
+                  onClick={handlePrimaryAction}
+                  className={`tw:flex tw:h-10 tw:min-w-[138px] tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
+                    ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
+                    : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
+                    }`}
+                >
+                  {primaryCtaLabel}
+                </button>
+                {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
+                  <button
+                    style={{ borderRadius: 18 }}
+                    type="button"
+                    disabled={purchaseTicketMutation.isPending}
+                    onClick={handleOpenPurchaseOptions}
+                    className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                  >
+                    Buy for others
+                  </button>
+                ) : null}
+              </div>
             )}
           </div>
         </div>
@@ -1318,9 +1670,10 @@ export default function ViewEvent() {
         open={purchaseModalOpen}
         onClose={closePurchaseModal}
         event={event}
-        onBuy={(purchaseType) => handleGetTicket(purchaseType)}
+        onBuy={(purchaseType, quantity) => handleGetTicket(purchaseType, quantity)}
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
+        preferredPurchaseType={preferredPurchaseType}
       />
       <WalletFundingRequiredModal
         open={fundingRequiredOpen}

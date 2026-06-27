@@ -10,14 +10,27 @@ import { ChevronLeft } from "lucide-react";
 import ProfileInfoCard from "./ProfileInfoCard";
 import ProfileImageCard from "./ProfileImageCard";
 import { api, authHeaders } from "../../../lib/apiClient"; // ✅ use axios instance
+import {
+  DEFAULT_PROFILE_COUNTRY_CODE,
+  normalizeDialCode,
+  normalizePhoneForSubmit,
+  parseProfilePhone,
+  validateProfilePhone,
+} from "./profilePhoneUtils";
 
 function EditProfile() {
   const { user, login, token, setAuth } = useAuth();
 
   // console.log(user);
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [recoveryPhoneNumber, setRecoveryPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState({
+    countryCode: DEFAULT_PROFILE_COUNTRY_CODE,
+    number: "",
+  });
+  const [recoveryPhoneNumber, setRecoveryPhoneNumber] = useState({
+    countryCode: DEFAULT_PROFILE_COUNTRY_CODE,
+    number: "",
+  });
   const [emailVerified, setEmailVerified] = useState(false);
   const [emailTwoVerified, setEmailTwoVerified] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
@@ -49,27 +62,6 @@ function EditProfile() {
     : default_profilePicture;
   const [profileImage, setProfileImage] = useState(Default_user_image);
 
-  // Helpers
-  const splitPhone = (raw) => {
-    if (!raw) return { countryCode: "", localNumber: "" };
-
-    const normalized = raw.toString().replace(/[^\d+]/g, "");
-
-    const match = normalized.match(/^\+?(\d{1,3})(\d+)$/);
-
-    if (!match) {
-      return {
-        countryCode: "",
-        localNumber: normalized.replace(/^\+/, ""),
-      };
-    }
-
-    return {
-      countryCode: `+${match[1]}`,
-      localNumber: match[2],
-    };
-  };
-
   const parseDOB = (dobStr) => {
     if (!dobStr) return null;
     const parts = dobStr.includes("/") ? dobStr.split("/") : null;
@@ -100,8 +92,19 @@ function EditProfile() {
         email_two: user.email2 || "",
         gender: user.gender || "",
       });
-      setPhoneNumber(user.phoneNumber || "");
-      setRecoveryPhoneNumber(user.phoneNumber2 || "");
+      const primaryCountryCode =
+        normalizeDialCode(user.country_code_one) ||
+        normalizeDialCode(user.countryCodeOne) ||
+        DEFAULT_PROFILE_COUNTRY_CODE;
+      const recoveryCountryCode =
+        normalizeDialCode(user.country_code_two) ||
+        normalizeDialCode(user.countryCodeTwo) ||
+        primaryCountryCode;
+
+      setPhoneNumber(parseProfilePhone(user.phoneNumber, primaryCountryCode));
+      setRecoveryPhoneNumber(
+        parseProfilePhone(user.phoneNumber2, recoveryCountryCode)
+      );
       setEmailVerified(!!user.email_verified);
       setEmailTwoVerified(!!user.email_two_verified);
       setPhoneVerified(!!user.phone_verified);
@@ -198,12 +201,21 @@ function EditProfile() {
     if (!formData.firstName.trim()) return showError("First name is required");
     if (!formData.lastName.trim()) return showError("Last name is required");
     if (!formData.email.trim()) return showError("Email is required");
-    if (!phoneNumber) return showError("Primary phone number is required");
+    const primaryPhoneError = validateProfilePhone(phoneNumber, "Primary phone", {
+      required: true,
+    });
+    if (primaryPhoneError) return showError(primaryPhoneError);
 
-    // ✅ split both phones into code + local
-    const { countryCode, localNumber } = splitPhone(phoneNumber);
-    const { countryCode: recCountryCode, localNumber: recLocalNumber } =
-      splitPhone(recoveryPhoneNumber);
+    const recoveryPhoneError = validateProfilePhone(
+      recoveryPhoneNumber,
+      "Recovery phone"
+    );
+    if (recoveryPhoneError) return showError(recoveryPhoneError);
+
+    const countryCode = normalizeDialCode(phoneNumber.countryCode);
+    const localNumber = normalizePhoneForSubmit(phoneNumber.number);
+    const recCountryCode = normalizeDialCode(recoveryPhoneNumber.countryCode);
+    const recLocalNumber = normalizePhoneForSubmit(recoveryPhoneNumber.number);
 
     try {
       setUpdating(true);
@@ -215,7 +227,6 @@ function EditProfile() {
 
       data.append("email", formData.email);
 
-      // primary phone (even though UI is disabled, we still send the same value)
       data.append("phone", localNumber);
       data.append("country_code_one", countryCode);
 
@@ -223,15 +234,7 @@ function EditProfile() {
         data.append("email_two", formData.email_two);
       }
 
-      // ✅ only send recovery phone if present, and always with country_code_two
-      if (recoveryPhoneNumber) {
-        if (!recCountryCode) {
-          setUpdating(false);
-          return showError(
-            "Please select a valid country code for recovery phone."
-          );
-        }
-
+      if (recLocalNumber) {
         data.append("phone_two", recLocalNumber);
         data.append("country_code_two", recCountryCode);
       }
@@ -348,7 +351,7 @@ function EditProfile() {
           width: 30px;
           height: 30px;
           border: 3px solid #e5e7eb;
-          border-top-color: #111111;
+          border-top-color: #050505;
           border-radius: 50%;
           animation: spin 0.9s linear infinite;
         }

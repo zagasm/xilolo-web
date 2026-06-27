@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError, showPromise } from "../../component/ui/toast";
+import { useAuth } from "../auth/AuthContext";
 import {
   addBankAccount,
   clearBankMutationState,
@@ -42,8 +43,6 @@ import {
   selectVerifiedBankAccount,
 } from "../../store/bankAccountsSelectors";
 
-const BANK_ACCOUNTS_QUERY_KEY = ["organiser-bank-accounts"];
-const PRIMARY_BANK_ACCOUNT_QUERY_KEY = ["organiser-primary-bank-account"];
 const BANKS_DIRECTORY_QUERY_KEY = ["banks-directory"];
 
 const maskAccountNumber = (value = "") => {
@@ -63,13 +62,13 @@ const formatDate = (value) => {
     });
 };
 
-const fetchPrimaryBankAccount = async () => {
-  const res = await api.get("/api/v1/organiser/kyc/bank", authHeaders());
+const fetchPrimaryBankAccount = async (token) => {
+  const res = await api.get("/api/v1/organiser/kyc/bank", authHeaders(token));
   return res?.data?.data || null;
 };
 
-const fetchBankAccounts = async () => {
-  const res = await api.get("/api/v1/organiser/kyc/bank-accounts", authHeaders());
+const fetchBankAccounts = async (token) => {
+  const res = await api.get("/api/v1/organiser/kyc/bank-accounts", authHeaders(token));
   return {
     accounts: res?.data?.data || [],
     totalAccounts: Number(res?.data?.total_accounts ?? 0),
@@ -147,7 +146,7 @@ function AddAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) {
             }
             label="Set as default account"
           />
-          <div className="tw:min-h-20 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fbfbfd] tw:p-4 tw:text-xs tw:text-gray-600">
+          <div className="tw:min-h-20 tw:rounded-3xl tw:border tw:border-neon/15 tw:bg-[#fbfbfd] tw:p-4 tw:text-xs tw:text-gray-600 tw:shadow-[0_0_16px_rgba(0,245,255,0.05)]">
             {isVerifying ? (
               <div className="tw:flex tw:items-center tw:gap-3">
                 <CircularProgress size={18} />
@@ -176,7 +175,7 @@ function AddAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) {
           disabled={!canSubmit}
           onClick={() => onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })}
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
         >
           {isAdding ? "Saving..." : "Add account"}
         </button>
@@ -212,20 +211,26 @@ function DeleteAccountDialog({ open, onClose, account, disableDelete, onConfirm 
 export default function BankAccountsPage() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const { token, user, isAuthenticated } = useAuth();
   const deletingAccountId = useSelector(selectDeletingBankAccountId);
   const defaultingAccountId = useSelector(selectDefaultingBankAccountId);
   const isSettingDefault = useSelector(selectIsSettingDefaultBankAccount);
   const [addOpen, setAddOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const accountScope = user?.id || user?.user_id || token || "anonymous";
+  const primaryBankAccountQueryKey = ["organiser-primary-bank-account", String(accountScope)];
+  const bankAccountsQueryKey = ["organiser-bank-accounts", String(accountScope)];
 
   const { data: primaryAccount, isLoading: primaryLoading, refetch: refetchPrimary } = useQuery({
-    queryKey: PRIMARY_BANK_ACCOUNT_QUERY_KEY,
-    queryFn: fetchPrimaryBankAccount,
+    queryKey: primaryBankAccountQueryKey,
+    queryFn: () => fetchPrimaryBankAccount(token),
+    enabled: isAuthenticated,
     retry: 1,
   });
   const { data: accountsPayload, isLoading: accountsLoading, refetch: refetchAccounts } = useQuery({
-    queryKey: BANK_ACCOUNTS_QUERY_KEY,
-    queryFn: fetchBankAccounts,
+    queryKey: bankAccountsQueryKey,
+    queryFn: () => fetchBankAccounts(token),
+    enabled: isAuthenticated,
     retry: 1,
   });
   const { data: banks = [], isLoading: banksLoading } = useQuery({
@@ -250,8 +255,8 @@ export default function BankAccountsPage() {
 
   const invalidateQueries = async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: BANK_ACCOUNTS_QUERY_KEY }),
-      queryClient.invalidateQueries({ queryKey: PRIMARY_BANK_ACCOUNT_QUERY_KEY }),
+      queryClient.invalidateQueries({ queryKey: bankAccountsQueryKey }),
+      queryClient.invalidateQueries({ queryKey: primaryBankAccountQueryKey }),
     ]);
   };
 
@@ -312,15 +317,15 @@ export default function BankAccountsPage() {
     <>
       <div className="tw:min-h-screen tw:bg-[#F6F7FB] tw:px-3 tw:pb-16 tw:pt-24 tw:md:px-6 tw:lg:px-8">
         <div className="tw:mx-auto tw:max-w-6xl">
-          <section className="tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+          <section className="tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08),0_0_20px_rgba(0,245,255,0.05)]">
             <div className="tw:flex tw:flex-col tw:gap-5 tw:md:flex-row tw:md:items-start tw:md:justify-between">
               <div>
-                <Link to="/account/payouts" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 hover:tw:text-gray-900">
+                <Link to="/account/payouts" className="tw:inline-flex tw:items-center tw:gap-2 tw:text-xs tw:font-medium tw:text-gray-500 tw:hover:text-gray-900">
                   <ArrowLeft className="tw:h-4 tw:w-4" />
                   <span>Back to payouts</span>
                 </Link>
                 <div className="tw:mt-4 tw:flex tw:items-center tw:gap-3">
-                  <span className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-[20px] tw:bg-[#f4efff] tw:text-primary">
+                  <span className="tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-[20px] tw:bg-neon/10 tw:text-primary tw:shadow-[0_0_18px_rgba(0,245,255,0.12)]">
                     <Landmark className="tw:h-6 tw:w-6" />
                   </span>
                   <div>
@@ -335,7 +340,7 @@ export default function BankAccountsPage() {
                   <RefreshCw className="tw:h-4 tw:w-4" />
                   Refresh
                 </button> */}
-                <button type="button" onClick={() => setAddOpen(true)} style={{ borderRadius: 20, fontSize: 12 }} className="tw:inline-flex tw:py-2 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white">
+                <button type="button" onClick={() => setAddOpen(true)} style={{ borderRadius: 20, fontSize: 12 }} className="tw:inline-flex tw:py-2 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]">
                   <Plus className="tw:h-4 tw:w-4" />
                   Add account
                 </button>
@@ -343,9 +348,9 @@ export default function BankAccountsPage() {
             </div>
 
             <div className="tw:mt-6 tw:grid tw:grid-cols-3 tw:gap-4 tw:sm:grid-cols-3">
-              <div className="tw:rounded-[28px] tw:bg-[#fbfbfd] tw:p-4"><div className="tw:text-xs tw:text-gray-500">Linked accounts</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.total}</div></div>
-              <div className="tw:rounded-[28px] tw:bg-[#fbfbfd] tw:p-4"><div className="tw:text-xs tw:text-gray-500">Verified accounts</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.verified}</div></div>
-              <div className="tw:rounded-[28px] tw:bg-[#fbfbfd] tw:p-4"><div className="tw:text-xs tw:text-gray-500">BVN verified</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.bvnVerified}</div></div>
+              <div className="tw:rounded-[28px] tw:border tw:border-neon/10 tw:bg-[#fbfbfd] tw:p-4 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]"><div className="tw:text-xs tw:text-gray-500">Linked accounts</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.total}</div></div>
+              <div className="tw:rounded-[28px] tw:border tw:border-neon/10 tw:bg-[#fbfbfd] tw:p-4 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]"><div className="tw:text-xs tw:text-gray-500">Verified accounts</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.verified}</div></div>
+              <div className="tw:rounded-[28px] tw:border tw:border-neon/10 tw:bg-[#fbfbfd] tw:p-4 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]"><div className="tw:text-xs tw:text-gray-500">BVN verified</div><div className="tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats.bvnVerified}</div></div>
             </div>
 
             {/* <div className="tw:mt-6 tw:rounded-[24px] tw:border tw:border-[#ece8ff] tw:bg-[linear-gradient(135deg,#fbf8ff,#ffffff)] tw:p-4 tw:md:rounded-[32px] tw:md:p-6">
@@ -377,7 +382,7 @@ export default function BankAccountsPage() {
             </div> */}
           </section>
 
-          <section className="tw:mt-5 tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+          <section className="tw:mt-5 tw:p-0 tw:md:rounded-[32px] tw:md:border tw:md:border-white/70 tw:md:bg-white tw:md:p-7 tw:md:shadow-[0_18px_50px_rgba(15,23,42,0.08),0_0_20px_rgba(0,245,255,0.05)]">
             <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-center tw:md:justify-between">
               <div className="tw:text-lg tw:font-semibold tw:text-gray-900 tw:md:text-xl">All bank accounts</div>
               <div className="tw:text-xs tw:text-gray-500 tw:md:text-sm">You must keep at least one account.</div>
@@ -393,7 +398,7 @@ export default function BankAccountsPage() {
                   const isDeleting = deletingAccountId === account.id;
                   const isDefaulting = isSettingDefault && defaultingAccountId === account.id;
                   return (
-                    <div key={account.id} className="tw:rounded-[22px] tw:border tw:border-gray-100 tw:bg-[#fcfcfe] tw:p-4 tw:md:rounded-[28px] tw:md:p-5">
+                    <div key={account.id} className="tw:rounded-[22px] tw:border tw:border-gray-100 tw:bg-[#fcfcfe] tw:p-4 tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)] tw:md:rounded-[28px] tw:md:p-5">
                       <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-center tw:lg:justify-between">
                         <div>
                           <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -410,7 +415,7 @@ export default function BankAccountsPage() {
                         </div>
                         <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           {!account.is_default && (
-                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm disabled:tw:cursor-not-allowed disabled:tw:opacity-60">
+                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60">
                               {isDefaulting ? <CircularProgress size={16} /> : <Star className="tw:h-4 tw:w-4" />}
                               Set default
                             </button>

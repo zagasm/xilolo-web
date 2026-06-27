@@ -1,3 +1,29 @@
+/* Prevent horizontal scroll at root level */
+html,
+body {
+  overflow-x: hidden;
+}
+
+.xilolo-landing-scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.xilolo-landing-scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Hide scrollbars on sections that need it */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Shine sweep on CTA */
 .shine {
   position: absolute;
@@ -49,6 +75,16 @@
   height: 460px;
   background: radial-gradient(circle at 50% 50%, rgba(17, 17, 17, 0.1), transparent 65%);
   animation-delay: 4s;
+}
+
+/* Subtle neon accent blob — #00F5FF at very low opacity */
+.blob-neon {
+  right: 25%;
+  top: 5%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle at 55% 45%, rgba(0, 245, 255, 0.055), transparent 65%);
+  animation-delay: 7s;
 }
 
 @keyframes floaty {

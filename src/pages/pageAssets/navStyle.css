@@ -43,7 +43,7 @@
 }
 
 .osahan-nav-top .navbar-search .btn {
-    background: #111111 !important;
+    background: #050505 !important;
     color: white;
 }
 
@@ -52,7 +52,7 @@
     padding: 10px 60px;
     transition: 0.3s ease-in-out;
     /* background: #b5a6c518; */
-    color: #111111;
+    color: #050505;
     font-weight: 100;
 }
 
@@ -90,7 +90,7 @@
 .side_bar_container .list-sidebar .list-group a li {
     background: none;
     border: none;
-    color: #111111;
+    color: #050505;
     width: 200px;
     border-radius: 20px;
     margin-left: 20px;
@@ -105,7 +105,7 @@
 
 .side_bar_container .list-sidebar .list-group a li.active {
     color: white;
-    background: linear-gradient(84.41deg, #111111 1.78%, #2b2b2b 69.04%);
+    background: linear-gradient(84.41deg, #050505 1.78%, #2b2b2b 69.04%);
 
 
 
@@ -144,7 +144,7 @@
 .osahan-nav-top .right-icon::before {
     padding: 6px;
     border-radius: 50%;
-    color: #111111;
+    color: #050505;
     font-size: 25px;
     transition: 0.3s ease-in-out;
 }
@@ -154,7 +154,7 @@
     border-radius: 30px;
     /* box-shadow: 1px 0px 1px 0px #808080D6; */
     color: white;
-    background: #111111;
+    background: #050505;
     height: 40px;
     padding: 0px 00px;
 }
@@ -385,13 +385,13 @@
 }
 
 .mobile_navbar_container .nav-link.active {
-    color: #111111;
+    color: #050505;
 }
 
 .mobile_navbar_container .nav-link.float-up .nav-content {
     padding: 4.5px 6px;
     border-radius: 50%;
-    background: linear-gradient(131.28deg, #111111 22.4%, #2b2b2b 66.23%);
+    background: linear-gradient(131.28deg, #050505 22.4%, #2b2b2b 66.23%);
     box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.25);
     color: white;
 }
@@ -467,7 +467,7 @@
 
 /* .mobile_navbar_container .nav-link.float-up .nav-content {
     border-radius: 35px;
-    background: linear-gradient(131.28deg, #111111 22.4%, #2b2b2b 66.23%);
+    background: linear-gradient(131.28deg, #050505 22.4%, #2b2b2b 66.23%);
     box-shadow: -1px 1px 6px rgba(0, 0, 0, 0.3);
     color: white;
     padding: 10px 14px;
@@ -478,7 +478,7 @@
     width: 80px; /* or any fixed width */
     height: 80px; /* or any fixed height */
     border-radius: 50%;
-    background: linear-gradient(131.28deg, #111111 22.4%, #2b2b2b 66.23%);
+    background: linear-gradient(131.28deg, #050505 22.4%, #2b2b2b 66.23%);
     box-shadow: -1px 1px 6px rgba(0, 0, 0, 0.3);
     color: white;
     padding: 10px 14px;

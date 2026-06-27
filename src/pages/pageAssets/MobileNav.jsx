@@ -1,11 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  Home,
   HomeIcon,
-  Heart,
-  HeartOff,
   PlusSquare,
+  Sparkles,
   Ticket,
   User,
   Star,
@@ -64,6 +62,19 @@ export default function MobileNav() {
       ),
     },
     {
+      name: "AI",
+      to: "/xilolo-ai",
+      icon: (active) => (
+        <Sparkles
+          className={`tw:size-4 ${
+            active ? "tw:text-white" : "tw:text-[#4A4A4A]"
+          }`}
+          fill={active ? "black" : "none"}
+        />
+      ),
+      animated: true,
+    },
+    {
       name: "Account",
       to: "/account",
       icon: (active) => (
@@ -87,7 +98,10 @@ export default function MobileNav() {
             <Link
               key={item.name}
               to={item.to}
-              className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 tw:text-xs tw:font-medium"
+              className={[
+                "tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-0.5 tw:text-xs tw:font-medium",
+                item.animated && !active ? "xilolo-ai-nav-button" : "",
+              ].join(" ")}
             >
               {item.icon(active)}
               <span

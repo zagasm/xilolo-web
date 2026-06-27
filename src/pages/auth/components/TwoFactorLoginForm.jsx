@@ -1,7 +1,8 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import AuthContainer from "../assets/auth_container";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { getWebDevicePayload } from "../../../lib/deviceName";
+import { getAuthLocationPayload } from "../../../lib/authLocation";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
 export default function TwoFactorLoginForm({
@@ -12,8 +13,11 @@ export default function TwoFactorLoginForm({
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEmailSending, setIsEmailSending] = useState(false);
+  const [emailCodeSent, setEmailCodeSent] = useState(false);
   const [error, setError] = useState("");
   const inputsRef = useRef([]);
+  const lastAutoSubmittedCodeRef = useRef("");
 
   const verificationCode = useMemo(() => code.join(""), [code]);
   const isComplete = /^\d{6}$/.test(verificationCode);
@@ -30,6 +34,15 @@ export default function TwoFactorLoginForm({
       inputsRef.current[index + 1]?.focus();
     }
   };
+
+  useEffect(() => {
+    if (!isComplete || isSubmitting) return;
+    if (lastAutoSubmittedCodeRef.current === verificationCode) return;
+
+    lastAutoSubmittedCodeRef.current = verificationCode;
+    submitCode(verificationCode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComplete, isSubmitting, verificationCode]);
 
   const handleKeyDown = (event, index) => {
     if (event.key === "Backspace" && !code[index] && index > 0) {
@@ -50,9 +63,8 @@ export default function TwoFactorLoginForm({
     inputsRef.current[Math.min(pasted.length, 6) - 1]?.focus();
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!isComplete || isSubmitting) return;
+  const submitCode = async (codeToVerify = verificationCode) => {
+    if (!/^\d{6}$/.test(codeToVerify) || isSubmitting) return;
 
     setIsSubmitting(true);
     setError("");
@@ -60,8 +72,9 @@ export default function TwoFactorLoginForm({
     try {
       const { data } = await api.post("/api/v1/2fa/login/verify", {
         challenge_id: challenge?.challenge_id,
-        code: verificationCode,
+        code: codeToVerify,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
         remember_device: rememberDevice,
       });
 
@@ -93,6 +106,7 @@ export default function TwoFactorLoginForm({
         "The authentication code could not be verified.";
       setError(message);
       showError(message);
+      lastAutoSubmittedCodeRef.current = "";
       setCode(["", "", "", "", "", ""]);
       inputsRef.current[0]?.focus();
     } finally {
@@ -100,10 +114,39 @@ export default function TwoFactorLoginForm({
     }
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await submitCode();
+  };
+
+  const requestEmailCode = async () => {
+    if (isEmailSending) return;
+
+    setIsEmailSending(true);
+    setError("");
+
+    try {
+      const { data } = await api.post("/api/v1/2fa/login/email-code", {
+        challenge_id: challenge?.challenge_id,
+      });
+
+      setEmailCodeSent(true);
+      showSuccess(data?.message || "A login code has been sent to your email.");
+    } catch (err) {
+      const message =
+        err?.response?.data?.message ||
+        "We could not send an email code right now.";
+      setError(message);
+      showError(message);
+    } finally {
+      setIsEmailSending(false);
+    }
+  };
+
   return (
     <AuthContainer
       title="Two-factor authentication"
-      description="Enter the 6-digit code from your authenticator app"
+      description={emailCodeSent ? "Enter the 6-digit code sent to your email" : "Enter the 6-digit code from your authenticator app"}
       footer={false}
       header={true}
       privacy={true}
@@ -143,6 +186,24 @@ export default function TwoFactorLoginForm({
           />
           Remember this browser
         </label>
+
+        <div className="tw:mb-4 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-3">
+          <p className="tw:mb-2 tw:text-xs tw:font-medium tw:text-gray-700">
+            No access to your authenticator app?
+          </p>
+          <button
+            type="button"
+            onClick={requestEmailCode}
+            disabled={isEmailSending}
+            className="tw:text-sm tw:font-semibold tw:text-gray-950 disabled:tw:cursor-not-allowed disabled:tw:text-gray-400"
+          >
+            {isEmailSending
+              ? "Sending email code..."
+              : emailCodeSent
+                ? "Send email code again"
+                : "Send code to my email"}
+          </button>
+        </div>
 
         <button
           style={{

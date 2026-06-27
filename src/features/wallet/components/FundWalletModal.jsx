@@ -254,6 +254,9 @@ export default function FundWalletModal({
     window.location.href = reviewData.authorization_url;
   };
 
+  const selectedMethod = selectableMethods.find((method) => method.value === provider);
+  const isCryptoFunding = String(provider).toLowerCase() === "cryptomus" || selectedMethod?.raw?.metadata?.category === "crypto";
+
   const handleClose = () => {
     if (previewLoading) return;
     onClose();
@@ -299,7 +302,7 @@ export default function FundWalletModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 hover:tw:bg-gray-200"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 tw:hover:bg-gray-200"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -337,7 +340,7 @@ export default function FundWalletModal({
                     />
 
                     {previewLoading && currentInputPreviewKey ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#f7f2eb,#ffffff)] tw:p-4">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#e5e4e2,#ffffff)] tw:p-4">
                         <div className="tw:space-y-3 tw:animate-pulse">
                           <div className="tw:h-4 tw:w-40 tw:rounded-full tw:bg-[#e9ddff]" />
                           <div className="tw:flex tw:items-center tw:justify-between">
@@ -357,7 +360,7 @@ export default function FundWalletModal({
                     ) : null}
 
                     {reviewData ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#f7f2eb,#ffffff)] tw:p-4">
+                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#e5e4e2,#ffffff)] tw:p-4">
                         <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
                           Review funding charge
                         </div>
@@ -388,6 +391,11 @@ export default function FundWalletModal({
                             </span>
                           </div>
                         </div>
+                        {isCryptoFunding ? (
+                          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-3 tw:text-xs tw:text-gray-600">
+                            Crypto funding is processed by {selectedMethod?.label || "Cryptomus"}. The gateway fee is added to your charge, so your wallet receives only the credit amount shown above.
+                          </div>
+                        ) : null}
                       </div>
                     ) : null}
 
@@ -422,7 +430,7 @@ export default function FundWalletModal({
                       <button
                         type="button"
                         onClick={handleClose}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                         style={{ borderRadius: 16 }}
                       >
                         Cancel

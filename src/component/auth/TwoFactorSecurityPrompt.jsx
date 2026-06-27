@@ -67,7 +67,7 @@ export default function TwoFactorSecurityPrompt() {
                     type="button"
                     aria-label="Dismiss security prompt"
                     onClick={dismiss}
-                    className="tw:rounded-full tw:p-1.5 tw:text-gray-500 hover:tw:bg-gray-100"
+                    className="tw:rounded-full tw:p-1.5 tw:text-gray-500 tw:hover:bg-gray-100"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>

@@ -1,41 +1,26 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, authHeaders } from "../../../lib/apiClient";
+import { initializeWalletFunding } from "../../../api/walletApi";
+import { useWalletPaymentMethods } from "../../../features/wallet/hooks/useWalletPaymentMethods";
+import { getDefaultWalletProvider } from "../../../features/wallet/walletUtils";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { useAuth } from "../../auth/AuthContext";
 import { ChevronLeft } from "lucide-react";
-
-const FUNDING_TYPES = [
-  {
-    id: "main",
-    title: "Main Wallet",
-    description: "General payments and ticket purchases open to everyone.",
-  },
-  {
-    id: "organiser",
-    title: "Organiser Wallet",
-    description:
-      "Keep payout-ready credit for your organiser-only tools and events.",
-  },
-  {
-    id: "reseller",
-    title: "Reseller Wallet",
-    description:
-      "Top up to distribute tickets on behalf of partners or sub-organisers.",
-  },
-];
 
 export default function FundWalletPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [amount, setAmount] = useState(1000);
-  const [fundingType, setFundingType] = useState("main");
+  const [provider, setProvider] = useState("");
   const [loading, setLoading] = useState(false);
+  const { data: methods = [], isLoading: methodsLoading } = useWalletPaymentMethods();
+  const selectableMethods = useMemo(() => methods.filter((method) => !method.disabled), [methods]);
 
-  const selected = useMemo(
-    () => FUNDING_TYPES.find((item) => item.id === fundingType),
-    [fundingType]
-  );
+  React.useEffect(() => {
+    if (!provider && selectableMethods.length) {
+      setProvider(getDefaultWalletProvider(selectableMethods));
+    }
+  }, [provider, selectableMethods]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -46,13 +31,10 @@ export default function FundWalletPage() {
 
     try {
       setLoading(true);
-      const res = await api.post(
-        `/api/v1/wallet/topup/${fundingType}`,
-        { amount: Number(amount) },
-        authHeaders(token)
+      const payload = await initializeWalletFunding(
+        { provider, amount: Number(amount) },
+        token
       );
-
-      const payload = res?.data?.data;
       if (payload?.authorization_url) {
         showSuccess("Opening checkout…");
         window.location.href = payload.authorization_url;
@@ -91,37 +73,37 @@ export default function FundWalletPage() {
             Fund your wallet in seconds
           </span>
           <span className="tw:text-sm tw:text-gray-500 tw:max-w-xl">
-            Select a wallet type, pick how much you want to add, then head
-            straight into the Paystack checkout. We keep you in context so your
+          Select a payment method, pick how much you want to add, then head
+            straight into the provider checkout. We keep you in context so your
             balance is updated as soon as you finish the payment.
           </span>
         </div>
 
         <div className="tw:grid tw:grid-cols-1 tw:gap-3">
-          {FUNDING_TYPES.map((item) => (
+          {selectableMethods.map((item) => (
             <button
               style={{
                 borderRadius: 16,
               }}
               key={item.id}
               type="button"
-              onClick={() => setFundingType(item.id)}
+              onClick={() => setProvider(item.value)}
               className={`tw:w-full tw:rounded-2xl tw:border tw:px-4 tw:py-3 tw:text-left tw:transition tw:duration-150 ${
-                fundingType === item.id
+                provider === item.value
                   ? "tw:border-primary tw:bg-primary/5"
                   : "tw:border-gray-200 tw:bg-gray-50"
               }`}
             >
               <div className="tw:flex tw:items-center tw:justify-between">
                 <span className="tw:text-base tw:font-semibold tw:text-gray-900">
-                  {item.title}
+                  {item.label}
                 </span>
-                {fundingType === item.id && (
+                {provider === item.value && (
                   <span className="tw:text-xs tw:text-primary">Selected</span>
                 )}
               </div>
               <span className="tw:text-xs tw:text-gray-500 tw:mt-1">
-                {item.description}
+                {item.raw?.metadata?.fee_note || (item.raw?.metadata?.category === "crypto" ? "Crypto checkout. Gateway fees are added to your charge." : "Wallet funding provider.")}
               </span>
             </button>
           ))}
@@ -148,11 +130,11 @@ export default function FundWalletPage() {
                 Funding target
               </span>
               <span className="tw:text-xs tw:text-gray-500">
-                {selected?.title}
+                {selectableMethods.find((item) => item.value === provider)?.label || "Select a method"}
               </span>
             </div>
             <span className="tw:text-[13px] tw:text-gray-500">
-              {selected?.description}
+              {provider === "cryptomus" ? "Cryptomus crypto payments include a 2% gateway fee paid by you." : "Provider fees are previewed before checkout."}
             </span>
           </div>
 
@@ -162,7 +144,7 @@ export default function FundWalletPage() {
               fontSize: 12,
             }}
             type="submit"
-            disabled={loading}
+            disabled={loading || methodsLoading || !provider}
             className="tw:w-full tw:rounded-[20px] tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:opacity-90 tw:disabled:opacity-60"
           >
             {loading ? "Processing…" : "Fund wallet"}

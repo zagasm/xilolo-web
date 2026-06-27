@@ -214,7 +214,7 @@ function OrganiserCard({
       role="button"
       tabIndex={0}
       onClick={onCardClick}
-      className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:hover:tw:shadow-[0_16px_40px_rgba(0,0,0,0.06)] tw:cursor-pointer"
+      className="tw:w-full tw:bg-white tw:rounded-3xl tw:p-3 tw:flex tw:flex-col tw:h-full tw:shadow-[0_8px_24px_rgba(0,0,0,0.04)] tw:border tw:border-[#EFEFEF] tw:transition-transform tw:hover:-tw:translate-y-1 tw:tw:hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] tw:cursor-pointer"
     >
       {/* Image / initials */}
       <div className="tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center">

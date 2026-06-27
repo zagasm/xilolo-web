@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Helmet } from "react-helmet-async";
 import {
@@ -22,7 +22,10 @@ import TicketPurchaseSuccessModal from "../../features/wallet/components/TicketP
 import WalletFundingRequiredModal from "../../features/wallet/components/WalletFundingRequiredModal";
 import { useSharedEventPage } from "../../features/eventShare/hooks/useSharedEventPage";
 import { useEventShareFlow } from "../../features/eventShare/hooks/useEventShareFlow";
-import { usePurchaseTicketWithWallet } from "../../features/wallet/hooks/usePurchaseTicketWithWallet";
+import {
+  useClaimSponsoredTicket,
+  usePurchaseTicketWithWallet,
+} from "../../features/wallet/hooks/usePurchaseTicketWithWallet";
 import { useAuth } from "../auth/AuthContext";
 import {
   getEventDescription,
@@ -71,6 +74,30 @@ function formatStartsInLabel(startDate) {
   }
 
   return `${minutes}m`;
+}
+
+function sponsorDisplayName(sponsor) {
+  return sponsor?.username || sponsor?.user_name || sponsor?.name || "Someone";
+}
+
+function sponsorProfilePath(sponsor) {
+  const id = sponsor?.user_id || sponsor?.id || sponsor?.sponsor_user_id;
+  return id ? `/profile/${id}` : null;
+}
+
+function SponsorProfileLink({ sponsor, className = "" }) {
+  const name = sponsorDisplayName(sponsor);
+  const path = sponsorProfilePath(sponsor);
+
+  if (!path) {
+    return <span className={className}>{name}</span>;
+  }
+
+  return (
+    <Link to={path} className={className}>
+      {name}
+    </Link>
+  );
 }
 
 function SharedEventShimmer() {
@@ -140,7 +167,10 @@ export default function SharedEventPage() {
         previous
           ? {
               ...previous,
-              hasPaid: purchaseType === "manual_only" ? !!previous?.hasPaid : true,
+              hasPaid:
+                purchaseType === "manual_only" || purchaseType === "sponsored_only"
+                  ? !!previous?.hasPaid
+                  : true,
               manual: previous?.manual
                 ? {
                     ...previous.manual,
@@ -148,7 +178,10 @@ export default function SharedEventPage() {
                       includesManual || previous.manual.viewer_has_access,
                     viewer_has_purchased:
                       includesManual || previous.manual.viewer_has_purchased,
-                    viewer_has_ticket: true,
+                    viewer_has_ticket:
+                      purchaseType === "sponsored_only"
+                        ? previous.manual.viewer_has_ticket
+                        : true,
                   }
                 : previous?.manual,
             }
@@ -162,10 +195,32 @@ export default function SharedEventPage() {
       showSuccess(
         purchaseType === "manual_only"
           ? "Manual purchased successfully."
+          : purchaseType === "sponsored_only"
+            ? "Tickets bought for others successfully."
           : includesManual
             ? "Ticket and manual purchased successfully."
             : "Ticket purchased successfully."
       );
+    },
+  });
+
+  const claimSponsoredTicketMutation = useClaimSponsoredTicket({
+    onSuccess: () => {
+      setLocalEvent((previous) =>
+        previous
+          ? {
+              ...previous,
+              hasPaid: true,
+              user_has_ticket: true,
+              can_claim_sponsored_ticket: false,
+              sponsored_tickets_available_count: Math.max(
+                0,
+                Number(previous.sponsored_tickets_available_count || 0) - 1
+              ),
+            }
+          : previous
+      );
+      showSuccess("Paid ticket claimed successfully.");
     },
   });
 
@@ -214,14 +269,19 @@ export default function SharedEventPage() {
 
   const manual = event?.manual || {};
   const purchaseOptions = event?.purchase_options || {};
+  const hasPaid = !!event?.hasPaid || !!event?.user_has_ticket;
   const manualAvailable = !!manual?.available;
   const manualHasAccess = !!manual?.viewer_has_access;
   const ticketOnlyAvailable =
     !event?.is_sold_out &&
+    !hasPaid &&
     (!!purchaseOptions.ticket_only ||
-      (!event?.hasPaid && Number(event?.price ?? 0) > 0));
+      Number(event?.price ?? 0) > 0);
   const ticketAndManualAvailable =
-    manualAvailable && !!purchaseOptions.ticket_and_manual && !manualHasAccess;
+    !hasPaid &&
+    manualAvailable &&
+    !!purchaseOptions.ticket_and_manual &&
+    !manualHasAccess;
   const manualOnlyAvailable =
     manualAvailable && !!purchaseOptions.manual_only && !manualHasAccess;
   const purchaseChoiceCount = [
@@ -235,7 +295,17 @@ export default function SharedEventPage() {
     event?.price_display ||
     `${event?.currency?.symbol || "₦"}${event?.price || "0"}`;
   const isSoldOut = !!event?.is_sold_out;
-  const hasPaid = !!event?.hasPaid;
+  const hasSponsoredTicketsAvailable = !!event?.has_sponsored_tickets_available;
+  const sponsoredTicketsAvailableCount = Number(event?.sponsored_tickets_available_count || 0);
+  const sponsoredTicketSponsors = Array.isArray(event?.sponsored_ticket_sponsors)
+    ? event.sponsored_ticket_sponsors
+    : [];
+  const firstSponsor = sponsoredTicketSponsors[0];
+  const sponsorHeadlineSuffix =
+    sponsoredTicketSponsors.length > 1
+      ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
+      : " bought tickets for others for this event.";
+  const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
 
   const handleDownloadManual = async () => {
     if (!event?.id) return;
@@ -279,7 +349,7 @@ export default function SharedEventPage() {
     }
   };
 
-  const handleGetTicket = async (purchaseType = "ticket_only") => {
+  const handleGetTicket = async (purchaseType = "ticket_only", quantity = 1) => {
     if (!event?.id || event?.is_sold_out || purchaseTicketMutation.isPending) {
       return;
     }
@@ -294,7 +364,7 @@ export default function SharedEventPage() {
     try {
       await purchaseTicketMutation.mutateAsync({
         event_id: event.id,
-        quantity: 1,
+        quantity,
         purchase_type: purchaseType,
       });
     } catch (paymentError) {
@@ -313,7 +383,7 @@ export default function SharedEventPage() {
           setPendingPurchaseIntent({
             eventId: event.id,
             eventTitle: event.title,
-            quantity: 1,
+            quantity,
             purchaseType,
             sourcePage: "shared_event",
             eventPath: location.pathname,
@@ -352,13 +422,37 @@ export default function SharedEventPage() {
     }
   };
 
+  const handleClaimSponsoredTicket = async () => {
+    if (!event?.id || claimSponsoredTicketMutation.isPending) return;
+
+    if (!token) {
+      navigate("/auth/signin", {
+        state: { from: location.pathname },
+      });
+      return;
+    }
+
+    try {
+      await claimSponsoredTicketMutation.mutateAsync(event.id);
+    } catch (claimError) {
+      showError(getApiErrorMessage(claimError, "Unable to claim paid ticket."));
+    }
+  };
+
   const handlePrimaryAction = () => {
     if (hasPaid) {
       navigate("/tickets");
       return;
     }
 
-    if (isSoldOut || purchaseTicketMutation.isPending) return;
+    if (purchaseTicketMutation.isPending || claimSponsoredTicketMutation.isPending) return;
+
+    if (canClaimSponsoredTicket) {
+      handleClaimSponsoredTicket();
+      return;
+    }
+
+    if (isSoldOut) return;
 
     if (shouldChoosePurchaseType) {
       setPurchaseModalOpen(true);
@@ -370,6 +464,10 @@ export default function SharedEventPage() {
 
   const primaryActionLabel = hasPaid
     ? "View my ticket"
+    : canClaimSponsoredTicket
+      ? claimSponsoredTicketMutation.isPending
+        ? "Claiming..."
+        : "Claim paid ticket"
     : isSoldOut
       ? "Sold out"
       : purchaseTicketMutation.isPending
@@ -399,7 +497,7 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:mt-6 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+              className="tw:mt-6 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
               Go back
@@ -444,7 +542,7 @@ export default function SharedEventPage() {
             }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:h-11 tw:w-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm hover:tw:bg-white"
+              className="tw:inline-flex tw:h-11 tw:w-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-white/80 tw:bg-white/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-white"
             >
               <ArrowLeft className="tw:h-4 tw:w-4" />
             </button>
@@ -465,7 +563,7 @@ export default function SharedEventPage() {
               type="button"
               onClick={handleShare}
               disabled={shareFlow.shareInProgress}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
+              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
             >
               {shareFlow.shareInProgress ? (
                 <span className="tw:h-4 tw:w-4 tw:animate-spin tw:rounded-full tw:border-2 tw:border-white/80 tw:border-t-transparent" />
@@ -562,6 +660,46 @@ export default function SharedEventPage() {
                   </p>
 
                   <div className="tw:mt-5 tw:grid tw:grid-cols-1 tw:gap-3">
+                    {hasSponsoredTicketsAvailable && !hasPaid && (
+                      <div className="tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
+                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                          {sponsoredTicketSponsors.length ? (
+                            <>
+                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary tw:hover:underline" />
+                              {sponsorHeadlineSuffix}
+                            </>
+                          ) : (
+                            "Someone has bought tickets for others for this event."
+                          )}
+                        </div>
+                        <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
+                          You can claim one free paid ticket, buy your own ticket, or buy tickets for others.
+                        </div>
+                        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                          <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
+                            {sponsoredTicketsAvailableCount} available
+                          </span>
+                          {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
+                            <SponsorProfileLink
+                              key={sponsor.id || sponsor.username}
+                              sponsor={sponsor}
+                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary tw:hover:bg-white tw:hover:underline"
+                            />
+                          ))}
+                          {canClaimSponsoredTicket && (
+                            <button
+                              type="button"
+                              onClick={handleClaimSponsoredTicket}
+                              disabled={claimSponsoredTicketMutation.isPending}
+                              className="tw:rounded-full tw:bg-primary tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                            >
+                              {claimSponsoredTicketMutation.isPending ? "Claiming..." : "Claim paid ticket"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {!canClaimSponsoredTicket && (
                     <button
                     style={{
 
@@ -569,11 +707,16 @@ export default function SharedEventPage() {
                     }}
                       type="button"
                       onClick={handlePrimaryAction}
-                      disabled={isSoldOut || purchaseTicketMutation.isPending}
-                      className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
+                      disabled={
+                        purchaseTicketMutation.isPending ||
+                        claimSponsoredTicketMutation.isPending ||
+                        (!canClaimSponsoredTicket && isSoldOut)
+                      }
+                      className="tw:flex tw:min-h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
                     >
                       {primaryActionLabel}
                     </button>
+                    )}
 
                     <button
                     style={{
@@ -583,7 +726,7 @@ export default function SharedEventPage() {
                       type="button"
                       onClick={handleShare}
                       disabled={shareFlow.shareInProgress}
-                      className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-slate-900 hover:tw:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
+                      className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-slate-900 tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-80"
                     >
                       {shareFlow.shareInProgress ? (
                         <span className="tw:h-4 tw:w-4 tw:animate-spin tw:rounded-full tw:border-2 tw:border-slate-500/70 tw:border-t-transparent" />
@@ -598,14 +741,6 @@ export default function SharedEventPage() {
             </aside>
           </section>
 
-          <div className="tw:mt-10">
-            <YouMayAlsoLike
-              recs={recommended}
-              posterFallback={coverUrl}
-              title="You may also like"
-            />
-          </div>
-
           <EventReviewsSection
             eventId={event?.id}
             eventSummary={event?.reviews}
@@ -615,6 +750,14 @@ export default function SharedEventPage() {
               await sharedEventQuery.refetch();
             }}
           />
+
+          <div className="tw:mt-10">
+            <YouMayAlsoLike
+              recs={recommended}
+              posterFallback={coverUrl}
+              title="You may also like"
+            />
+          </div>
         </div>
       </div>
 
@@ -630,17 +773,31 @@ export default function SharedEventPage() {
               </div>
             </div>
 
+            {!canClaimSponsoredTicket && (
             <button
             style={{
   borderRadius: 16
             }}
               type="button"
               onClick={handlePrimaryAction}
-              disabled={isSoldOut || purchaseTicketMutation.isPending}
+              disabled={
+                purchaseTicketMutation.isPending ||
+                claimSponsoredTicketMutation.isPending ||
+                (!canClaimSponsoredTicket && isSoldOut)
+              }
               className="tw:flex tw:min-w-[168px] tw:items-center tw:justify-center tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-slate-300 tw:disabled:text-slate-600"
             >
-              {hasPaid ? "View my ticket" : isSoldOut ? "Sold out" : "Buy ticket"}
+              {hasPaid
+                ? "View my ticket"
+                : canClaimSponsoredTicket
+                  ? claimSponsoredTicketMutation.isPending
+                    ? "Claiming..."
+                    : "Claim paid ticket"
+                  : isSoldOut
+                    ? "Sold out"
+                    : "Buy ticket"}
             </button>
+            )}
           </div>
         </div>
       </div>
@@ -661,7 +818,7 @@ export default function SharedEventPage() {
         open={purchaseModalOpen}
         onClose={() => setPurchaseModalOpen(false)}
         event={event}
-        onBuy={(purchaseType) => handleGetTicket(purchaseType)}
+        onBuy={(purchaseType, quantity) => handleGetTicket(purchaseType, quantity)}
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
       />

@@ -56,6 +56,8 @@ export default function BlurBackdrop() {
       <motion.div className="blob blob-1" style={{ x: blob1X, y: blob1Y }} />
       <motion.div className="blob blob-2" style={{ x: blob2X, y: blob2Y }} />
       <motion.div className="blob blob-3" style={{ x: blob3X, y: blob3Y }} />
+      {/* Subtle neon accent blob */}
+      <motion.div className="blob blob-neon" style={{ x: blob2X, y: blob1Y }} />
 
       {/* soft vignette / radial glow following cursor */}
       <motion.div

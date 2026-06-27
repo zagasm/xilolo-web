@@ -6,6 +6,7 @@ import { showError } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
 import { TicketIcon } from "lucide-react";
 import { normalizeTicketStatus } from "../../utils/ticketHelpers";
+import StatusFilter from "../../component/ui/StatusFilter";
 
 const CACHE_KEY = "Xilolo_tickets_cache_v1";
 
@@ -119,31 +120,14 @@ function TicketsPage() {
               </div>
 
               {/* Tabs */}
-              <div className="tw:w-full tw:mt-2 tw:mb-4 tw:overflow-x-auto">
-                <div className="tw:inline-flex tw:bg-[#ffffff] tw:rounded-lg tw:p-1 tw:gap-1">
-                  {TABS.map((tab) => {
-                    const active = activeTab === tab.key;
-                    const count = counts[tab.key] ?? 0;
-                    return (
-                      <button
-                        style={{
-                          borderRadius: 8,
-                        }}
-                        key={tab.key}
-                        type="button"
-                        onClick={() => setActiveTab(tab.key)}
-                        className={[
-                          "tw:px-3 tw:py-2 tw:rounded-full tw:text-xs tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150 tw:md:px-4 tw:md:text-sm",
-                          active
-                            ? "tw:bg-primary tw:text-white tw:shadow-sm"
-                            : "tw:text-gray-500 tw:hover:text-gray-900",
-                        ].join(" ")}
-                      >
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="tw:mt-2 tw:mb-4 tw:w-full">
+                <StatusFilter
+                  value={activeTab}
+                  onChange={setActiveTab}
+                  options={TABS}
+                  counts={counts}
+                  label="Filter tickets by event status"
+                />
               </div>
 
               {/* Error state */}
@@ -162,8 +146,8 @@ function TicketsPage() {
               {/* Loading state */}
               {loading && (
                 <div className="row">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="col-12 col-md-12 col-lg-6 mb-4">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div key={i} className="col-12 col-md-12 col-lg-4 mb-4">
                       <div className="tw:animate-pulse tw:h-40 tw:bg-[#ffffff] tw:rounded-3xl tw:shadow-sm tw:w-full" />
                     </div>
                   ))}

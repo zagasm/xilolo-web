@@ -2,7 +2,7 @@ import React from "react";
 
 export default function OrganiserSidebarCard() {
   return (
-    <div className="tw:rounded-3xl tw:px-4 tw:py-5 tw:md:px-6 tw:md:py-6 tw:text-white tw:bg-linear-to-br tw:from-[#111111] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:shadow-[0_18px_45px_rgba(15,23,42,0.5)] tw:relative tw:overflow-hidden">
+    <div className="tw:rounded-3xl tw:px-4 tw:py-5 tw:md:px-6 tw:md:py-6 tw:text-white tw:bg-linear-to-br tw:from-[#050505] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:shadow-[0_18px_45px_rgba(15,23,42,0.5)] tw:relative tw:overflow-hidden">
       <div className="tw:absolute tw:inset-0 tw:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14)_0,transparent_55%)] tw:pointer-events-none" />
       <div className="tw:relative tw:space-y-4">
         <span className="tw:block tw:text-[11px] tw:uppercase tw:text-gray-200 tw:font-medium tw:tracking-[0.16em]">

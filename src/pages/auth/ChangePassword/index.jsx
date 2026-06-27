@@ -47,6 +47,11 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
 
     const { password, confirmPassword } = formData;
 
+    if (!input || !reset_token) {
+      showError("Password reset session is missing. Please request a new reset code.");
+      return;
+    }
+
     // Validation checks
     if (!password || !confirmPassword) {
       showError("All fields are required.");
@@ -66,10 +71,10 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
     setLoading(true);
     try {
       const payload = {
-        input:input.trim(),
-        token:reset_token.trim(),
-        password:password.trim(),
-         password_confirmation:confirmPassword.trim(),
+        input: input.trim(),
+        token: reset_token.trim(),
+        password: password.trim(),
+        password_confirmation: confirmPassword.trim(),
         ...getWebDevicePayload(),
       };
 
@@ -133,7 +138,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       navigate("/auth/signin", { replace: true });
     } catch (err) {
       let errorMessage = "An error occurred. Please try again.";
-      
+
       if (err.response) {
         // Handle API error responses
         if (err.response.data?.message === "Invalid or expired reset token.") {
@@ -144,7 +149,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
       } else if (err.request) {
         errorMessage = "Network error. Please check your internet connection.";
       }
-      
+
       showError(errorMessage);
       setError(errorMessage);
     } finally {
@@ -153,105 +158,95 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
   };
 
   return (
-    <AuthContainer 
-      title="Create new password" 
-      description={`Set a new password for ${input}`}
+    <AuthContainer
+      title="Create new password"
+      description={input ? `Set a new password for ${input}` : "Set a new password"}
     >
-      <form autoComplete="off" className="pr-3 pl-3" onSubmit={handleSubmit}>
-        <div className='text-center' style={{ marginBottom: '30px' }}>
-          <motion.h5
-            initial={{ opacity: 0, x: -70 }}
+      <form autoComplete="off" className="tw:px-3 tw:pb-2" onSubmit={handleSubmit}>
+        <div className="tw:rounded-[28px] tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
+          <div className="tw:text-center">
+            <span className="tw:block tw:mt-5 tw:text-xl tw:font-bold tw:text-slate-950">
+              Set new password
+            </span>
+            <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-500">
+              Use at least 8 characters. Your new password must match in both fields.
+            </span>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-            className="font-weight-bold mt-3 container_heading_text"
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="tw:mt-5"
           >
-            Set New Password
-          </motion.h5>
-          <motion.p
-            initial={{ opacity: 0, x: 70 }}
+            <span className="tw:block tw:text-sm tw:font-semibold tw:text-slate-900">
+              Password
+            </span>
+            <div className="tw:relative tw:mt-2">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition placeholder:tw:text-slate-400 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+                placeholder="Enter New Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <button
+                style={{ borderRadius: 28, fontSize: 12 }}
+                type="button"
+                className="tw:absolute tw:right-4 tw:top-1/2 tw:-translate-y-1/2 tw:text-xs tw:font-semibold tw:text-primary"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            <span className="tw:block tw:mt-2 tw:text-xs tw:text-slate-500">Minimum 8 characters</span>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-            className="text-muted heading_content mb-2"
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
+            className="tw:mt-4"
           >
-            Set your new password to continue
-          </motion.p>
+            <span className="tw:block tw:text-sm tw:font-semibold tw:text-slate-900">
+              Confirm password
+            </span>
+            <div className="tw:relative tw:mt-2">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition placeholder:tw:text-slate-400 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              <button
+                style={{ borderRadius: 28, fontSize: 12 }}
+                type="button"
+                className="tw:absolute tw:right-4 tw:top-1/2 tw:-translate-y-1/2 tw:text-xs tw:font-semibold tw:text-primary"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </motion.div>
         </div>
 
-        {/* New Password */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className="form-group"
-        >
-          <label>Password</label>
-          <div className="position-relative">
-            <i className="feather-lock position-absolute input-icon"></i>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              className=" input tw:w-full"
-              placeholder="Enter New Password"
-              value={formData.password}
-              onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
-            />
-            <i
-              className={`position-absolute input-password-icon ${showPassword ? "feather-eye" : "feather-eye-off"}`}
-              onClick={() => setShowPassword(!showPassword)}
-              style={{ right: "15px", top: "50%", transform: "translateY(-50%)", cursor: "pointer" }}
-            ></i>
-          </div>
-          <small className="text-muted">Minimum 8 characters</small>
-        </motion.div>
-
-        {/* Confirm Password */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className="form-group"
-        >
-          <label>Confirm Password</label>
-          <div className="position-relative">
-            <i className="feather-lock position-absolute input-icon"></i>
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              className="input tw:w-full"
-              placeholder="Confirm Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              style={{ paddingLeft: "60px", fontSize: "16px", paddingRight: "40px", marginBottom: 0 }}
-            />
-            <i
-              className={`position-absolute input-password-icon ${showConfirmPassword ? "feather-eye" : "feather-eye-off"}`}
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              style={{ right: "15px", top: "50%", transform: "translateY(-50%)", cursor: "pointer" }}
-            ></i>
-          </div>
-        </motion.div>
-
         {error && (
-          <div className="alert alert-danger text-center mb-3">
+          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-red-200 tw:bg-red-50 tw:px-4 tw:py-3 tw:text-center tw:text-sm tw:text-red-700">
             {error}
           </div>
         )}
 
         <motion.button
+          style={{ borderRadius: 28, fontSize: 12 }}
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-          className={` btn-block ${isFormValid() ? 'active_submit_button' : 'inactive_submit_button'}`}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
           type="submit"
           disabled={loading || !isFormValid()}
-          style={{
-            height: "50px",
-            borderRadius: "8px",
-            fontWeight: "500",
-            fontSize: "16px",
-            marginTop: "20px"
-          }}
         >
           {loading ? (
             <>

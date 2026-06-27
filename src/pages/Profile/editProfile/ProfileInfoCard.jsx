@@ -1,19 +1,138 @@
 import {
+  Autocomplete,
   InputLabel,
+  InputAdornment,
   MenuItem,
   Select,
   TextField,
   FormControl,
 } from "@mui/material";
-import DatePicker from "react-datepicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { DatePicker as MuiDatePicker } from "@mui/x-date-pickers/DatePicker";
+import moment from "moment";
 import {
   FiAlertCircle,
   FiCheckCircle,
   FiLock,
   FiMail,
+  FiPhone,
   FiUser,
 } from "react-icons/fi";
-import PhoneInput from "react-phone-input-2";
+import {
+  findPhoneCountryByDialCode,
+  normalizeLocalPhoneNumber,
+  PROFILE_PHONE_COUNTRIES,
+} from "./profilePhoneUtils";
+
+function ProfilePhoneField({
+  label,
+  value,
+  onChange,
+  verified,
+  disabled = false,
+  helperText,
+}) {
+  const selectedCountry = findPhoneCountryByDialCode(value?.countryCode);
+
+  return (
+    <div className="tw:space-y-2">
+      <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+        <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700">
+          {label}
+        </label>
+        {/* {verified ? (
+          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-emerald-700 tw:bg-emerald-50 tw:px-2.5 tw:py-1 tw:rounded-full">
+            <FiCheckCircle /> Verified
+          </span>
+        ) : (
+          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-medium tw:text-amber-700 tw:bg-amber-50 tw:px-2.5 tw:py-1 tw:rounded-full">
+            <FiAlertCircle /> Unverified
+          </span>
+        )} */}
+      </div>
+
+      <div className="tw:grid tw:grid-cols-[minmax(118px,145px)_1fr] tw:gap-2">
+        <Autocomplete
+          value={selectedCountry}
+          options={PROFILE_PHONE_COUNTRIES}
+          disabled={disabled}
+          autoHighlight
+          clearOnEscape={false}
+          disableClearable
+          getOptionLabel={(option) =>
+            `${option.flag} ${option.dialCode} ${option.country}`
+          }
+          isOptionEqualToValue={(option, selected) =>
+            option.code === selected.code && option.dialCode === selected.dialCode
+          }
+          onChange={(_, country) => {
+            if (!country) return;
+            onChange({ ...value, countryCode: country.dialCode });
+          }}
+          renderOption={(props, option) => (
+            <li {...props} key={`${option.code}-${option.dialCode}`}>
+              <span className="tw:mr-2">{option.flag}</span>
+              <span className="tw:font-medium tw:mr-2">{option.dialCode}</span>
+              <span className="tw:text-gray-500">{option.country}</span>
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Code"
+              size="medium"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "12px",
+                  backgroundColor: disabled ? "#f3f4f6" : "white",
+                },
+              }}
+            />
+          )}
+        />
+
+        <TextField
+          label="Phone number"
+          value={value?.number || ""}
+          disabled={disabled}
+          onChange={(event) =>
+            onChange({
+              ...value,
+              number: normalizeLocalPhoneNumber(event.target.value),
+            })
+          }
+          fullWidth
+          size="medium"
+          variant="outlined"
+          placeholder="8012345678"
+          inputProps={{
+            inputMode: "numeric",
+            pattern: "[0-9]*",
+            maxLength: 25,
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <FiPhone className="tw:text-gray-400" />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              backgroundColor: disabled ? "#f3f4f6" : "white",
+            },
+          }}
+        />
+      </div>
+
+      <p className="tw:m-0 tw:text-[11px] tw:leading-4 tw:text-gray-500">
+        {helperText || "Select your country code, then enter the phone number without the country code."}
+      </p>
+    </div>
+  );
+}
 
 export default function ProfileInfoCard({
   formData,
@@ -123,83 +242,49 @@ export default function ProfileInfoCard({
       </div>
 
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-        <div>
-          <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
-            Primary Phone Number
-          </label>
-          <div className="tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 tw:bg-white tw:border tw:border-gray-200">
-            <PhoneInput
-              value={phoneNumber}
-              onChange={setPhoneNumber}
-              country={"ng"}
-              inputStyle={{
-                width: "100%",
-                border: "none",
-                background: "transparent",
-                paddingLeft: 75,
-              }}
-              buttonStyle={{
-                background: "transparent",
-                border: "none",
-                width: 44,
-              }}
-              containerStyle={{ width: "100%" }}
-            />
-          </div>
-        </div>
+        <ProfilePhoneField
+          label="Primary Phone Number"
+          value={phoneNumber}
+          onChange={setPhoneNumber}
+          verified={phoneVerified}
+          helperText="Example: choose Nigeria +234, then enter 8012345678."
+        />
 
-        <div>
-          <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
-            Recovery Phone
-          </label>
-          <div
-            className={`tw:w-full tw:rounded-2xl tw:px-3 tw:py-2 ${
-              recoveryPhoneLocked
-                ? "tw:bg-[#f3f4f6] tw:opacity-80"
-                : "tw:bg-white tw:border tw:border-gray-200"
-            }`}
-          >
-            <PhoneInput
-              value={recoveryPhoneNumber}
-              onChange={setRecoveryPhoneNumber}
-              country={"ng"}
-              disabled={recoveryPhoneLocked}
-              inputStyle={{
-                width: "100%",
-                border: "none",
-                background: "transparent",
-                paddingLeft: 75,
-              }}
-              buttonStyle={{
-                background: "transparent",
-                border: "none",
-                width: 44,
-              }}
-              containerStyle={{ width: "100%" }}
-            />
-          </div>
-        </div>
+        <ProfilePhoneField
+          label="Recovery Phone"
+          value={recoveryPhoneNumber}
+          onChange={setRecoveryPhoneNumber}
+          verified={phoneTwoVerified}
+          disabled={recoveryPhoneLocked}
+          helperText={
+            recoveryPhoneLocked
+              ? "This recovery phone is already saved. Contact support if you need to change it."
+              : "Optional. Use a second number that can receive verification messages."
+          }
+        />
       </div>
 
       <div className="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
-        <div>
-          <label className="tw:block tw:text-xs tw:font-medium tw:text-gray-700 tw:mb-1">
-            Date of Birth
-          </label>
-          <div className="tw:w-full tw:h-11 tw:rounded-2xl tw:border tw:border-gray-200 tw:flex tw:items-center tw:px-3 focus-within:tw:border-primary focus-within:tw:ring-2 focus-within:tw:ring-primary/20">
-            <DatePicker
-              selected={dobDate}
-              onChange={(d) => setDobDate(d)}
-              dateFormat="MM/dd/yyyy"
-              placeholderText="MM/DD/YYYY"
-              showMonthDropdown
-              showYearDropdown
-              dropdownMode="select"
-              maxDate={new Date()}
-              className="tw:w-full tw:outline-none tw:text-sm"
-            />
-          </div>
-        </div>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <MuiDatePicker
+            label="Date of Birth"
+            value={dobDate ? moment(dobDate) : null}
+            onChange={(value) =>
+              setDobDate(value?.isValid?.() ? value.toDate() : null)
+            }
+            disableFuture
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                size: "medium",
+                placeholder: "MM/DD/YYYY",
+                sx: {
+                  "& .MuiOutlinedInput-root": { borderRadius: "12px" },
+                },
+              },
+            }}
+          />
+        </LocalizationProvider>
 
         <FormControl
           fullWidth

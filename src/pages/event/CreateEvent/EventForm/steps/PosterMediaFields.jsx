@@ -28,8 +28,6 @@ function fullImageCrop() {
 export default function PosterMediaFields({
   posterImages,
   setPosterImages,
-  posterVideos,
-  setPosterVideos,
   existingPoster,
   setExistingPoster,
   error,
@@ -146,18 +144,8 @@ export default function PosterMediaFields({
       };
     }
 
-    if (posterVideos?.length) {
-      return {
-        source: "new",
-        type: "video",
-        url: getPosterPreviewUrl(posterVideos[0]),
-        label: "First uploaded video",
-        name: posterVideos[0].name,
-      };
-    }
-
     return null;
-  }, [existingPoster, posterImages, posterVideos, thumbnailIndex]);
+  }, [existingPoster, posterImages, thumbnailIndex]);
 
   const getCroppedBlob = (image, pixelCrop) =>
     new Promise((resolve, reject) => {
@@ -285,9 +273,6 @@ export default function PosterMediaFields({
       return next;
     });
 
-  const removePosterVideoAt = (index) =>
-    setPosterVideos((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
-
   const handleMixedFiles = (files) => {
     const incomingFiles = Array.from(files || []);
     if (!incomingFiles.length) return;
@@ -295,12 +280,10 @@ export default function PosterMediaFields({
     const images = incomingFiles.filter(
       (file) => /^image\//.test(file.type) && file.size <= 10 * 1024 * 1024
     );
-    const videos = incomingFiles.filter(
-      (file) => /^video\//.test(file.type) && file.size <= 200 * 1024 * 1024
-    );
+    const rejectedFiles = incomingFiles.length - images.length;
 
-    if (videos.length) {
-      setPosterVideos((prev) => [...prev, ...videos]);
+    if (rejectedFiles > 0) {
+      showError("Only image files under 10MB are supported for event posters.");
     }
 
     if (images.length) {
@@ -346,16 +329,15 @@ export default function PosterMediaFields({
           }`}
         >
           <div className="tw:text-sm tw:font-medium tw:text-primary">
-            Drag and drop photos or videos, or click to choose files
+            Drag and drop photos, or click to choose files
           </div>
           <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
-            Images up to 10MB. Videos up to 200MB. The thumbnail is picked from
-            your uploaded images.
+            Images up to 10MB. Videos are not supported for event posters.
           </div>
           <input
             ref={uploadInputRef}
             type="file"
-            accept="image/*,video/*"
+            accept="image/*"
             multiple
             className="tw:hidden"
             onChange={(event) => {
@@ -406,19 +388,11 @@ export default function PosterMediaFields({
               </div>
 
               <div className="tw:flex tw:min-h-[280px] tw:items-center tw:justify-center tw:bg-[#f4f4f8]">
-                {featuredMedia.type === "image" ? (
-                  <img
-                    src={featuredMedia.url}
-                    alt={featuredMedia.name || "Selected poster"}
-                    className="tw:h-[320px] tw:w-full tw:object-cover"
-                  />
-                ) : (
-                  <video
-                    src={featuredMedia.url}
-                    controls
-                    className="tw:h-[320px] tw:w-full tw:bg-black tw:object-contain"
-                  />
-                )}
+                <img
+                  src={featuredMedia.url}
+                  alt={featuredMedia.name || "Selected poster"}
+                  className="tw:h-[320px] tw:w-full tw:object-cover"
+                />
               </div>
             </div>
           )}
@@ -435,19 +409,11 @@ export default function PosterMediaFields({
                       key={media.id || index}
                       className="tw:relative tw:h-24 tw:w-24 tw:overflow-hidden tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-black/5"
                     >
-                      {media.type === "image" ? (
-                        <img
-                          src={media.url}
-                          alt="Existing poster"
-                          className="tw:h-full tw:w-full tw:object-cover"
-                        />
-                      ) : (
-                        <video
-                          src={media.url}
-                          className="tw:h-full tw:w-full tw:object-cover"
-                          muted
-                        />
-                      )}
+                      <img
+                        src={media.url}
+                        alt="Existing poster"
+                        className="tw:h-full tw:w-full tw:object-cover"
+                      />
 
                       <span className="tw:absolute tw:left-2 tw:top-2 tw:rounded-full tw:bg-black/60 tw:px-2 tw:py-0.5 tw:text-[10px] tw:uppercase tw:text-white">
                         {media.type}

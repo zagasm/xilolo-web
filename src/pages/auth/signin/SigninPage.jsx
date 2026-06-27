@@ -15,6 +15,7 @@ import defaultAvatar from "../../../assets/avater_pix.avif";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { isAppleAuthConfigured } from "../../../lib/appleAuth";
 import { getWebDevicePayload } from "../../../lib/deviceName";
+import { getAuthLocationPayload } from "../../../lib/authLocation";
 import GoogleAuthSection from "../components/GoogleAuthSection.jsx";
 import AppleAuthSection from "../components/AppleAuthSection.jsx";
 import TwoFactorLoginForm from "../components/TwoFactorLoginForm.jsx";
@@ -353,6 +354,7 @@ export function Signin() {
         input: formData.email,
         password: formData.password,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       };
 
       const response = await api.post("/api/v1/login", payload);
@@ -399,6 +401,7 @@ export function Signin() {
       const { data } = await api.post("/api/v1/google/login", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (data?.two_factor_required) {
@@ -439,6 +442,7 @@ export function Signin() {
       const { data } = await api.post("/api/v1/apple/login", {
         id_token: idToken,
         ...getWebDevicePayload(),
+        ...(await getAuthLocationPayload()),
       });
 
       if (data?.two_factor_required) {
@@ -524,21 +528,21 @@ export function Signin() {
     >
       <style>{`
         .continue-btn {
-          background-color: ${isCredentialFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isCredentialFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isCredentialFilled ? "pointer" : "not-allowed"};
         }
 
         .signin-btn {
-          background-color: ${isPasswordFilled ? "#111111" : "rgba(230, 230, 230, 1)"};
+          background-color: ${isPasswordFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
           color: white;
           cursor: ${isPasswordFilled ? "pointer" : "not-allowed"};
         }
 
         .verification-btn {
           background-color: transparent;
-          border: 1px solid #111111;
-          color: #111111;
+          border: 1px solid #050505;
+          color: #050505;
         }
       `}</style>
 
@@ -565,7 +569,7 @@ export function Signin() {
               {rememberedAccounts.map((account) => (
                 <div
                   key={account.id || account.userId || account.email}
-                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer hover:tw:bg-gray-50"
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer tw:hover:bg-gray-50"
                   onClick={() => handleSelectAccount(account)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -684,7 +688,7 @@ export function Signin() {
                     backgroundColor: "#fff",
                   },
                   "& .MuiFormHelperText-root": {
-                    color: showBlackEmailHint ? "#111111" : undefined,
+                    color: showBlackEmailHint ? "#050505" : undefined,
                     marginLeft: 0,
                     whiteSpace: "nowrap",
                   },
@@ -721,7 +725,7 @@ export function Signin() {
               </div>
               <button
                 style={{
-                  color: '#111111',
+                  color: '#050505',
                   fontSize: 11
                 }}
                 type="button"

@@ -6,6 +6,7 @@ import AutomationSection from "../../component/landing/AutomationSection";
 import ThreeStepSection from "../../component/landing/ThreeStepSection";
 import LiveHighlightsSection from "../../component/landing/LiveHighlightSection";
 import LivePipelineSection from "../../component/landing/LivePipelineSection";
+import XiloloAiSection from "../../component/landing/XiloloAiSection";
 
 export default function ZagasmLanding() {
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -31,6 +32,8 @@ export default function ZagasmLanding() {
 
       <div className="tw:relative tw:z-10 tw:pt-8 tw:md:pt-52">
         <Hero />
+
+        <XiloloAiSection />
 
         <AutomationSection
           title="Sell tickets. Stream. Get paid"

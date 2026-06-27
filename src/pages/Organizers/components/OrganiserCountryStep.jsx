@@ -6,9 +6,17 @@ export default function OrganiserCountryStep({
   countriesLoading,
   countriesError,
   selectedCountry,
+  detectedCountry,
   countryAutoDetected,
   onCountryChange,
+  onContinue,
 }) {
+  const helperText =
+    countriesError ||
+    (detectedCountry
+      ? `We detected that you are from ${detectedCountry.name}. You can change it if this is not right.`
+      : "Search and select the country you are streaming from");
+
   return (
     <div className="tw:w-full tw:min-h-[260px] tw:flex tw:flex-col tw:gap-6">
       <div>
@@ -52,12 +60,7 @@ export default function OrganiserCountryStep({
             <TextField
               {...params}
               label="Country"
-              helperText={
-                countriesError ||
-                (countryAutoDetected
-                  ? "We prefilled this from your connection. You can change it if it looks wrong."
-                  : "Search and select the country you are streaming from")
-              }
+              helperText={helperText}
               error={Boolean(countriesError)}
             />
           )}
@@ -75,6 +78,20 @@ export default function OrganiserCountryStep({
           )}
         </div>
       )}
+
+      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+        <button
+          style={{
+            borderRadius: 12,
+          }}
+          type="button"
+          onClick={onContinue}
+          disabled={!selectedCountry || countriesLoading}
+          className="tw:inline-flex tw:items-center tw:justify-center tw:px-5 tw:py-2.5 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:shadow-sm tw:transition tw:hover:bg-primary/90 tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
+        >
+          Continue
+        </button>
+      </div>
     </div>
   );
 }

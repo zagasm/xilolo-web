@@ -50,7 +50,7 @@ function ChannelButton({ channel, onClick }) {
     <button
       type="button"
       onClick={() => onClick?.(channel)}
-      className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:text-left tw:transition hover:tw:border-primary/30 hover:tw:bg-primary/5"
+      className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:text-left tw:transition tw:hover:border-primary/30 tw:hover:bg-primary/5"
     >
       <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:text-slate-700">
         <Icon className="tw:h-4 tw:w-4" />
@@ -157,7 +157,7 @@ export default function EventShareModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-600 transition hover:tw:bg-slate-200"
+                    className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-600 transition tw:hover:bg-slate-200"
                     aria-label="Close share dialog"
                   >
                     <X className="tw:h-4 tw:w-4" />
@@ -181,7 +181,7 @@ export default function EventShareModal({
                         <button
                           type="button"
                           onClick={onRetry}
-                          className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                          className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                         >
                           Retry
                         </button>
@@ -206,7 +206,7 @@ export default function EventShareModal({
                             }}
                             type="button"
                             onClick={handleCopyLink}
-                            className="tw:mt-4 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                            className="tw:mt-4 tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                           >
                             <Copy className="tw:h-4 tw:w-4" />
                             {copied ? "Copied" : "Copy link"}

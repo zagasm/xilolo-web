@@ -36,7 +36,7 @@ export default function EditEvent() {
 
   if (loading) {
     return (
-      <div className="tw:w-full tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-[#FFF8F0]">
+      <div className="tw:w-full tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-[#e5e4e2]">
         <span className="tw:block tw:text-sm">Loading event…</span>
       </div>
     );
@@ -44,7 +44,7 @@ export default function EditEvent() {
 
   if (error || !event) {
     return (
-      <div className="tw:w-full tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-[#FFF8F0]">
+      <div className="tw:w-full tw:min-h-screen tw:flex tw:items-center tw:justify-center tw:bg-[#e5e4e2]">
         <span className="tw:block tw:text-sm tw:text-red-500">
           {error || "Event not found"}
         </span>
@@ -56,7 +56,7 @@ export default function EditEvent() {
 
   return (
     <div className="">
-      <div className="tw:w-full tw:min-h-screen tw:bg-[#FFF8F0] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
+      <div className="tw:w-full tw:min-h-screen tw:bg-[#e5e4e2] tw:pt-2 tw:md:pt-24 tw:lg:px-4">
         <div className="row p-0 mt-5 ">
           <div className="col ">
             <EventCreationWizard

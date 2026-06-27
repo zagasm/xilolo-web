@@ -334,7 +334,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 hover:tw:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                       >
                         <X className="tw:h-4 tw:w-4" />
                       </button>
@@ -455,7 +455,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 hover:tw:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
                         style={{ borderRadius: 16 }}
                       >
                         Cancel
@@ -464,7 +464,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleSubmit}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                        className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
                         style={{ borderRadius: 16 }}
                       >
                         {submitting ? (

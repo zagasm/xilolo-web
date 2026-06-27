@@ -85,7 +85,7 @@ export default function ProfileHeader({
   const canShare = typeof onShare === "function";
 
   return (
-    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:py-6 tw:px-3 tw:shadow-sm">
+    <div className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:py-6 tw:px-3 tw:shadow-[0_10px_28px_rgba(15,23,42,0.04),0_0_18px_rgba(0,245,255,0.04)]">
       <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
         {/* avatar + edit / follow */}
         <div className="tw:relative">
@@ -163,7 +163,7 @@ export default function ProfileHeader({
                 type="button"
                 disabled={followLoading}
                 onClick={onToggleFollow}
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-white tw:hover:bg-primary/80 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.16),0_0_18px_rgba(0,245,255,0.14)] tw:hover:bg-primary/80 tw:transition tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
               >
                 {followLoading
                   ? "Please wait..."
@@ -226,7 +226,7 @@ export default function ProfileHeader({
         </div>
 
         {/* ranking bar */}
-        <div className="tw:flex tw:flex-col tw:justify-center tw:items-center tw:mt-5 tw:w-full tw:rounded-2xl tw:bg-black tw:px-5 tw:py-4 tw:text-white">
+        <div className="tw:flex tw:flex-col tw:justify-center tw:items-center tw:mt-5 tw:w-full tw:rounded-2xl tw:bg-black tw:px-5 tw:py-4 tw:text-white tw:shadow-[0_18px_42px_rgba(0,0,0,0.24),0_0_24px_rgba(0,245,255,0.10)]">
           <span className="tw:text-sm tw:font-medium tw:mb-2">
             {rankingLabel}
           </span>

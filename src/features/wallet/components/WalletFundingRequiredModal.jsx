@@ -63,7 +63,7 @@ export default function WalletFundingRequiredModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 hover:tw:bg-gray-200"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 tw:hover:bg-gray-200"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -94,7 +94,7 @@ export default function WalletFundingRequiredModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 hover:tw:bg-gray-200"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                     style={{ borderRadius: 16 }}
                   >
                     Close
@@ -102,7 +102,7 @@ export default function WalletFundingRequiredModal({
                   <button
                     type="button"
                     onClick={onFundWallet}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white hover:tw:bg-primarySecond"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                     style={{ borderRadius: 16 }}
                   >
                     {primaryActionLabel}

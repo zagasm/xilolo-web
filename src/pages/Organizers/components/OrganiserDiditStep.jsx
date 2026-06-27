@@ -11,6 +11,8 @@ export default function OrganiserDiditStep({
   onChangeMethod,
   onOpenDiditInfo,
 }) {
+  const organiserIsActive = localDiditStatus === "verified";
+
   return (
     <div className="tw:space-y-5">
       <div>
@@ -40,14 +42,14 @@ export default function OrganiserDiditStep({
               Current status
             </span>
             <span className="tw:inline-flex tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-xs tw:font-medium tw:text-slate-700 tw:border tw:border-slate-200">
-              {diditStatus || "No session yet"}
+              {organiserIsActive ? "Organiser active" : diditStatus || "Unverified"}
             </span>
           </div>
         </div>
 
         <p className="tw:text-sm tw:text-slate-600">{diditStatusCopy}</p>
 
-        {localDiditStatus && (
+        {localDiditStatus && !organiserIsActive && (
           <div className="tw:text-xs tw:text-slate-500">
             KYC state:{" "}
             <span className="tw:font-semibold tw:text-slate-700">
@@ -69,7 +71,7 @@ export default function OrganiserDiditStep({
         )} */}
       </div>
 
-      <div className="tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-[#f7f2eb] tw:px-4 tw:py-4 tw:space-y-2">
+      <div className="tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-4 tw:py-4 tw:space-y-2">
         <span className="tw:block tw:text-sm tw:font-semibold tw:text-slate-900">
           Before you continue
         </span>

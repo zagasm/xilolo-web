@@ -1,12 +1,13 @@
-import React, { useMemo } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import moment from "moment";
+import { Dialog, Transition } from "@headlessui/react";
 import {
   flattenLaravelErrors,
   prettifyPath,
 } from "../../../../../utils/helpers";
 import { currencySymbol, formatMoney } from "../../../../../utils/pricingHelpers";
 
-function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
+function PreviewMedia({ posterImages, existingPoster }) {
   const imagePreviewUrls = useMemo(
     () =>
       posterImages.map((file) => ({
@@ -16,24 +17,14 @@ function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
     [posterImages]
   );
 
-  const videoPreviewUrls = useMemo(
-    () =>
-      posterVideos.map((file) => ({
-        name: file.name,
-        url: URL.createObjectURL(file),
-      })),
-    [posterVideos]
-  );
-
   React.useEffect(() => {
     return () => {
       imagePreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
-      videoPreviewUrls.forEach((item) => URL.revokeObjectURL(item.url));
     };
-  }, [imagePreviewUrls, videoPreviewUrls]);
+  }, [imagePreviewUrls]);
 
   const mediaItems = [
-    ...(existingPoster || []).map((item) => ({
+    ...(existingPoster || []).filter((item) => item.type === "image").map((item) => ({
       type: item.type,
       url: item.url,
       name: item.type,
@@ -41,11 +32,6 @@ function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
     })),
     ...imagePreviewUrls.map((item) => ({
       type: "image",
-      ...item,
-      existing: false,
-    })),
-    ...videoPreviewUrls.map((item) => ({
-      type: "video",
       ...item,
       existing: false,
     })),
@@ -67,19 +53,11 @@ function PreviewMedia({ posterImages, posterVideos, existingPoster }) {
           className="tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-gray-100 tw:bg-white tw:shadow-sm"
         >
           <div className="tw:relative">
-            {item.type === "image" ? (
-              <img
-                src={item.url}
-                alt={item.name || `poster-${index}`}
-                className="tw:h-52 tw:w-full  tw:object-cover"
-              />
-            ) : (
-              <video
-                src={item.url}
-                controls
-                className="tw:h-52 tw:w-full tw:bg-black tw:object-cover"
-              />
-            )}
+            <img
+              src={item.url}
+              alt={item.name || `poster-${index}`}
+              className="tw:h-52 tw:w-full tw:object-cover"
+            />
 
             <span className="tw:absolute tw:left-3 tw:top-3 tw:rounded-full tw:bg-black/65 tw:px-2.5 tw:py-1 tw:text-[11px] tw:uppercase tw:text-white">
               {item.type}
@@ -113,6 +91,82 @@ function formatReplayMinutes(value) {
   return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 }
 
+function ErrorModal({ open, errors, onClose, onGoToStep }) {
+  return (
+    <Transition appear show={open} as={Fragment}>
+      <Dialog as="div" className="tw:relative tw:z-999" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="tw:ease-out tw:duration-200"
+          enterFrom="tw:opacity-0"
+          enterTo="tw:opacity-100"
+          leave="tw:ease-in tw:duration-150"
+          leaveFrom="tw:opacity-100"
+          leaveTo="tw:opacity-0"
+        >
+          <div className="tw:fixed tw:inset-0 tw:bg-black/45" />
+        </Transition.Child>
+
+        <div className="tw:fixed tw:inset-0 tw:overflow-y-auto">
+          <div className="tw:flex tw:min-h-full tw:items-center tw:justify-center tw:p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="tw:ease-out tw:duration-200"
+              enterFrom="tw:opacity-0 tw:scale-95"
+              enterTo="tw:opacity-100 tw:scale-100"
+              leave="tw:ease-in tw:duration-150"
+              leaveFrom="tw:opacity-100 tw:scale-100"
+              leaveTo="tw:opacity-0 tw:scale-95"
+            >
+              <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-2xl tw:bg-white tw:p-5 tw:shadow-xl">
+                <Dialog.Title className="tw:text-lg tw:font-semibold tw:text-gray-900">
+                  Event submission failed
+                </Dialog.Title>
+                <Dialog.Description className="tw:mt-2 tw:text-sm tw:text-gray-600">
+                  Please fix the errors below and submit again.
+                </Dialog.Description>
+
+                <ul className="tw:mt-4 tw:max-h-72 tw:space-y-2 tw:overflow-y-auto tw:pr-1 tw:text-sm tw:text-red-700">
+                  {errors.map(({ path, messages }) => (
+                    <li key={path} className="tw:rounded-xl tw:bg-red-50 tw:p-3">
+                      <button
+                        type="button"
+                        className="tw:font-medium tw:text-red-700 tw:underline tw:underline-offset-2"
+                        onClick={() => {
+                          const match = path.match(/^step_(\d+)/);
+                          if (match && onGoToStep) {
+                            const step = Math.min(3, Math.max(1, Number(match[1])));
+                            onGoToStep(step);
+                            onClose();
+                          }
+                        }}
+                      >
+                        {prettifyPath(path)}
+                      </button>
+                      <span>: {messages.join(", ")}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="tw:mt-5 tw:flex tw:justify-end">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white"
+                    style={{ borderRadius: 16 }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+}
+
 export default function ReviewStep({
   collected,
   formErrors,
@@ -121,7 +175,6 @@ export default function ReviewStep({
   onPublish,
   onGoToStep,
   posterImages = [],
-  posterVideos = [],
   existingPoster = [],
 }) {
   const {
@@ -132,6 +185,7 @@ export default function ReviewStep({
     description,
     price,
     currencyCode,
+    deliveryType,
     maxTickets,
     ticketLimit,
     visibility,
@@ -151,6 +205,13 @@ export default function ReviewStep({
     () => flattenLaravelErrors(formErrors),
     [formErrors]
   );
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (flat.length) {
+      setIsErrorModalOpen(true);
+    }
+  }, [flat]);
 
   const currencyMark = currencySymbol(currencyCode || "NGN");
   const dateLabel =
@@ -177,6 +238,13 @@ export default function ReviewStep({
 
   return (
     <div className="tw:rounded-[32px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7">
+      <ErrorModal
+        open={isErrorModalOpen}
+        errors={flat}
+        onClose={() => setIsErrorModalOpen(false)}
+        onGoToStep={onGoToStep}
+      />
+
       {!!flat.length && (
         <div className="tw:mb-5 tw:rounded-[24px] tw:border tw:border-red-200 tw:bg-red-50 tw:p-4">
           <div className="tw:text-sm tw:font-medium tw:text-red-700">
@@ -187,7 +255,7 @@ export default function ReviewStep({
               <li key={path}>
                 <button
                   type="button"
-                  className="tw:text-red-700 tw:underline tw:underline-offset-2 hover:tw:text-red-800"
+                  className="tw:text-red-700 tw:underline tw:underline-offset-2 tw:hover:text-red-800"
                   onClick={() => {
                     const match = path.match(/^step_(\d+)/);
                     if (!match || !onGoToStep) return;
@@ -242,7 +310,7 @@ export default function ReviewStep({
                 Poster media
               </div>
               <div className="tw:text-sm tw:text-slate-500">
-                Review the images and videos that will represent this event.
+                Review the images that will represent this event.
               </div>
             </div>
             <button
@@ -256,13 +324,12 @@ export default function ReviewStep({
 
           <PreviewMedia
             posterImages={posterImages}
-            posterVideos={posterVideos}
             existingPoster={existingPoster}
           />
         </section>
 
         <div className="tw:space-y-4">
-          <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#faf8ff] tw:p-5">
+          <section className="tw:rounded-[28px] tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-5 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
             <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
               <div>
                 <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
@@ -336,6 +403,12 @@ export default function ReviewStep({
                 <div className="tw:text-xs tw:text-slate-500">Visibility</div>
                 <div className="tw:mt-1 tw:text-base tw:font-semibold tw:capitalize tw:text-slate-900">
                   {visibility || "public"}
+                </div>
+              </div>
+              <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">
+                <div className="tw:text-xs tw:text-slate-500">Event format</div>
+                <div className="tw:mt-1 tw:text-base tw:font-semibold tw:text-slate-900">
+                  {deliveryType === "vod" ? "Video on demand" : "Live event"}
                 </div>
               </div>
               <div className="tw:rounded-2xl tw:bg-slate-50 tw:p-4">

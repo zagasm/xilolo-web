@@ -159,7 +159,7 @@ export function normalizePaymentMethods(payload) {
 
       return {
         value: String(value),
-        label: item?.label || item?.title || prettifyProviderLabel(value),
+        label: item?.label || item?.title || item?.name || prettifyProviderLabel(value),
         disabled: item?.enabled === false || item?.is_enabled === false,
         raw: item,
       };

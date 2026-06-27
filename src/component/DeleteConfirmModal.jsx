@@ -53,7 +53,7 @@ export default function DeleteConfirmModal({
                     type="button"
                     onClick={onClose}
                     disabled={loading}
-                    className="tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:bg-gray-100 tw:text-gray-800 hover:tw:bg-gray-200 disabled:tw:opacity-60"
+                    className="tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:bg-gray-100 tw:text-gray-800 tw:hover:bg-gray-200 disabled:tw:opacity-60"
                   >
                     {cancelText}
                   </button>
@@ -62,7 +62,7 @@ export default function DeleteConfirmModal({
                     type="button"
                     onClick={onConfirm}
                     disabled={loading}
-                    className="tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:bg-red-600 tw:text-white hover:tw:bg-red-700 disabled:tw:opacity-60"
+                    className="tw:rounded-xl tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:bg-red-600 tw:text-white tw:hover:bg-red-700 disabled:tw:opacity-60"
                   >
                     {loading ? "Deleting..." : confirmText}
                   </button>

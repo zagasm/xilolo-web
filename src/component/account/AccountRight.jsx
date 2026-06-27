@@ -39,7 +39,7 @@ const ItemCard = ({ icon: Icon, label, to, onClick, isRed }) => {
     <Wrapper
       to={to}
       onClick={onClick}
-      className="tw:bg-white tw:w-full tw:rounded-3xl tw:py-3 tw:px-4 tw:flex tw:items-center tw:justify-between tw:hover:shadow-md tw:transition-all tw:cursor-pointer tw:group"
+      className="tw:bg-white tw:w-full tw:rounded-3xl tw:py-3 tw:px-4 tw:flex tw:items-center tw:justify-between tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)] tw:transition-all tw:cursor-pointer tw:group"
     >
       <div className="tw:flex tw:items-center tw:gap-4">
         {Icon && (
@@ -202,7 +202,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
       {/* Preferences section with inline notification switches */}
       <MenuSection title="Preference">
         {/* Notifications card with Push / Email toggles */}
-        <div className="tw:bg-white tw:w-full tw:rounded-3xl tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-sm tw:hover:shadow-md tw:transition-all">
+        <div className="tw:bg-white tw:w-full tw:rounded-3xl tw:px-4 tw:py-3 tw:flex tw:flex-col tw:gap-3 tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_16px_rgba(0,245,255,0.04)] tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_20px_rgba(0,245,255,0.08)] tw:transition-all">
           <div className="tw:flex tw:items-center tw:justify-between">
             <div className="tw:flex tw:items-center tw:gap-3">
               <Bell className="tw:w-5 tw:h-5 tw:text-gray-700" />

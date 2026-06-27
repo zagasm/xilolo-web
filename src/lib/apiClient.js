@@ -6,6 +6,17 @@ export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
 });
 
+api.interceptors.request.use((config) => {
+  const baseURL = String(config.baseURL || "");
+  const url = String(config.url || "");
+
+  if (baseURL.replace(/\/+$/, "").endsWith("/api") && url.startsWith("/api/")) {
+    config.url = url.replace(/^\/api/, "");
+  }
+
+  return config;
+});
+
 export function authHeaders(token) {
   const brToken = localStorage.getItem("token");
   const finalToken = token || brToken;
@@ -63,6 +74,18 @@ api.interceptors.response.use(
 
     if (!import.meta.env.PROD) {
       console.log("[api] response status:", status, "url:", url);
+    }
+
+    if (status === 503 && payload?.code === "MAINTENANCE_MODE") {
+      if (typeof window !== "undefined" && window.location.pathname !== "/maintenance") {
+        window.sessionStorage.setItem(
+          "xilolo_maintenance_message",
+          payload?.message || "Xilolo is currently on maintenance please try again later."
+        );
+        window.sessionStorage.setItem("xilolo_maintenance_redirected_at", String(Date.now()));
+        window.location.assign("/maintenance");
+      }
+      return Promise.reject(error);
     }
 
     if (status === 403) {

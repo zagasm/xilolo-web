@@ -12,7 +12,7 @@ export function ToastHost() {
           borderRadius: "14px",
           boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
         },
-        success: { iconTheme: { primary: "#111111", secondary: "#fff" } },
+        success: { iconTheme: { primary: "#050505", secondary: "#fff" } },
       }}
     />
   );

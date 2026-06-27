@@ -506,6 +506,16 @@ export default function TermsOfServicePage() {
                       currency and jurisdiction.
                     </span>
                   </li>
+                  <li>
+                    <span>
+                      <strong>Ticket revenue share:</strong> For streamed event
+                      ticket sales, the event organiser receives 60% of eligible
+                      ticket revenue and Xilolo receives 40% as the platform
+                      service share, before any separate payment processor
+                      charges, taxes, chargebacks, refunds, or legally required
+                      deductions.
+                    </span>
+                  </li>
                 </ul>
 
                 {/* Fee table */}
@@ -526,10 +536,10 @@ export default function TermsOfServicePage() {
                     </thead>
                     <tbody className="tw:divide-y tw:divide-slate-200">
                       <tr>
-                        <td className="tw:px-4 tw:py-3">Service fee</td>
-                        <td className="tw:px-4 tw:py-3">Platform usage</td>
+                        <td className="tw:px-4 tw:py-3">Streamed ticket revenue share</td>
+                        <td className="tw:px-4 tw:py-3">Organiser payout and Xilolo platform share</td>
                         <td className="tw:px-4 tw:py-3">
-                          15% of gross revenue (illustrative)
+                          60% organiser / 40% Xilolo
                         </td>
                       </tr>
                       <tr>

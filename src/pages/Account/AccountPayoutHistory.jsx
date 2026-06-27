@@ -128,13 +128,13 @@ function PayoutDetailsDialog({ open, payout, onClose }) {
         {payout ? (
           <div className="tw:space-y-4">
             <div className="tw:grid tw:grid-cols-2 tw:gap-3">
-              <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+              <div className="tw:rounded-2xl tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-3 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
                 <div className="tw:text-xs tw:text-gray-500">Amount</div>
                 <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
                   {formatMoney(payout?.amount ?? 0, symbol)}
                 </div>
               </div>
-              <div className="tw:rounded-2xl tw:bg-[#faf8ff] tw:p-3">
+              <div className="tw:rounded-2xl tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-3 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
                 <div className="tw:text-xs tw:text-gray-500">Status</div>
                 <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900 tw:capitalize">
                   {payout?.status || "unknown"}
@@ -345,7 +345,7 @@ export default function AccountPayoutHistory() {
                   key={payout?.id}
                   type="button"
                   onClick={() => setSelectedPayout(payout)}
-                  className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition hover:tw:shadow-md"
+                  className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition tw:hover:shadow-md"
                 >
                   <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div className="tw:min-w-0">

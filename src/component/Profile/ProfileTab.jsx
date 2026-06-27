@@ -34,17 +34,18 @@ export default function ProfileTabs({ user, isOwnProfile }) {
       (Array.isArray(user?.upcomingEvents) ? user.upcomingEvents : []);
 
     const live = buckets?.live ?? [];
-
-    // IMPORTANT: many systems treat paused as "not live" / past-ish.
-    // If you want "Ended" to include paused too:
-    const endedStrict = buckets?.ended ?? [];
     const paused = buckets?.paused ?? [];
-    const ended = [...endedStrict, ...paused];
+    const ended = buckets?.ended ?? [];
+    const readyToGoLive = buckets?.ready_to_go_live ?? [];
+    const expired = buckets?.expired ?? [];
 
     if (statusTab === "all") return all;
     if (statusTab === "upcoming") return upcoming;
     if (statusTab === "live") return live;
+    if (statusTab === "paused") return paused;
     if (statusTab === "ended") return ended;
+    if (statusTab === "ready_to_go_live") return readyToGoLive;
+    if (statusTab === "expired") return expired;
 
     return all;
   }, [user, statusTab]);

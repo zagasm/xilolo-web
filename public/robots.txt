@@ -1,11 +1,33 @@
-# Xilolo - Robots.txt
 User-agent: *
 Allow: /
+
 Disallow: /auth/
 Disallow: /account/
+Disallow: /feed
+Disallow: /profile
+Disallow: /search
+Disallow: /payment/
+Disallow: /wallet/
+Disallow: /kyc/
+Disallow: /notifications
+Disallow: /mentions
+Disallow: /tickets
+Disallow: /organizers
+Disallow: /event/view/
+Disallow: /event/select-event-type
+Disallow: /event/create-event/
+Disallow: /event/edit/
+Disallow: /event/stream/
+Disallow: /event/saved-events
+Disallow: /creator/channel/new
+Disallow: /subscription
+Disallow: /support-chat
+Disallow: /me/
+Disallow: /xilolo-ai
+Disallow: /become-an-organiser
 
-# Sitemap
+Allow: /events/
+Allow: /users/
+Allow: /organisers/
+
 Sitemap: https://xilolo.com/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 1

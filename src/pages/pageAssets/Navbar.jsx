@@ -10,6 +10,7 @@ import {
   UserCircle2,
   LogOut,
   LayoutGrid,
+  Sparkles,
 } from "lucide-react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAuth } from "../auth/AuthContext";
@@ -147,6 +148,20 @@ export default function Navbar() {
         </div>
 
         <div className="tw:flex tw:items-center tw:gap-3 tw:md:gap-3.5">
+          <Link
+            to="/xilolo-ai"
+            className={[
+              "xilolo-ai-nav-button tw:hidden tw:lg:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3.5 tw:text-sm tw:font-extrabold tw:shadow-[0_10px_26px_rgba(17,17,17,0.18)] tw:transition tw:hover:-translate-y-0.5",
+              location.pathname === "/xilolo-ai"
+                ? "tw:border-primary tw:bg-primary text-white"
+                : "tw:border-gray-200 tw:bg-white tw:text-primary",
+            ].join(" ")}
+            aria-label="Open Xilolo AI"
+          >
+            <Sparkles className="tw:size-4" />
+            <span>Xilolo AI</span>
+          </Link>
+
           <form
             onSubmit={handleDesktopSearchSubmit}
             className="tw:hidden tw:lg:flex tw:h-10 tw:w-[220px] tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-3"
@@ -248,7 +263,7 @@ export default function Navbar() {
                           onClick={() =>
                             handleMenuNavigation(profilePath, "profile", close)
                           }
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition hover:tw:bg-slate-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:bg-slate-50"
                         >
                           <UserCircle2 className="tw:size-4" />
                           <span>View Profile</span>
@@ -260,7 +275,7 @@ export default function Navbar() {
                           onClick={() =>
                             handleMenuNavigation("/account", "account", close)
                           }
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition hover:tw:bg-slate-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:bg-slate-50"
                         >
                           <LayoutGrid className="tw:size-4" />
                           <span>Account Center</span>
@@ -274,7 +289,7 @@ export default function Navbar() {
                             logout?.();
                             navigate("/auth/signin");
                           }}
-                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-red-600 tw:transition hover:tw:bg-red-50"
+                          className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:font-medium tw:text-red-600 tw:transition tw:hover:bg-red-50"
                         >
                           <LogOut className="tw:size-4" />
                           <span>Logout</span>

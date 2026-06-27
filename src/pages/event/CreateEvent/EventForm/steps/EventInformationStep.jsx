@@ -64,8 +64,6 @@ export default function EventInformationStep({
   onNext,
   posterImages,
   setPosterImages,
-  posterVideos,
-  setPosterVideos,
   existingPoster,
   setExistingPoster,
 }) {
@@ -108,13 +106,12 @@ export default function EventInformationStep({
   useEffect(() => {
     const totalPosterCount =
       (posterImages?.length || 0) +
-      (posterVideos?.length || 0) +
       (existingPoster?.length || 0);
 
     if (totalPosterCount > 0 && mediaError) {
       setMediaError("");
     }
-  }, [existingPoster, mediaError, posterImages, posterVideos]);
+  }, [existingPoster, mediaError, posterImages]);
 
   useEffect(() => {
     let mounted = true;
@@ -162,11 +159,10 @@ export default function EventInformationStep({
   const onSubmit = (values) => {
     const totalPosterCount =
       (posterImages?.length || 0) +
-      (posterVideos?.length || 0) +
       (existingPoster?.length || 0);
 
     if (totalPosterCount === 0) {
-      setMediaError("Add at least one event poster image or promo video.");
+      setMediaError("Add at least one event poster image.");
       return;
     }
 
@@ -284,8 +280,6 @@ export default function EventInformationStep({
           <PosterMediaFields
             posterImages={posterImages}
             setPosterImages={setPosterImages}
-            posterVideos={posterVideos}
-            setPosterVideos={setPosterVideos}
             existingPoster={existingPoster}
             setExistingPoster={setExistingPoster}
             error={mediaError}
@@ -296,7 +290,7 @@ export default function EventInformationStep({
           <button
             type="submit"
             disabled={!isValid}
-            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white hover:tw:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
             style={{ borderRadius: 20 }}
           >
             Continue to ticketing

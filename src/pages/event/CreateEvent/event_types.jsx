@@ -108,7 +108,7 @@ function EventType() {
   if (shouldShowBecomeOrganiser) {
     return (
       <div className="tw:w-full tw:min-h-screen tw:pt-20 tw:md:pt-24 tw:px-4 tw:lg:px-4">
-        <div className="tw:relative tw:bg-[#ffffff] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
+        <div className="tw:relative tw:bg-[#ffffff] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:border tw:border-slate-100 tw:px-4 tw:py-3 tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)]">
           <button
             type="button"
             onClick={() => navigate("/profile/edit-profile")}
@@ -156,7 +156,7 @@ function EventType() {
         }
 
 
-        <div className="tw:bg-linear-to-r tw:from-[#111111] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
+        <div className="tw:bg-linear-to-r tw:from-[#050505] tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white tw:shadow-[0_18px_42px_rgba(0,0,0,0.16),0_0_22px_rgba(0,245,255,0.12)]">
           <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
             Do you have an event?
           </span>
@@ -167,7 +167,7 @@ function EventType() {
 
           <Link
             to="/become-an-organiser"
-            className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center"
+            className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center tw:shadow-[0_0_18px_rgba(0,245,255,0.12)]"
           >
             <span className="tw:block tw:font-semibold">
               Become an Organizer
@@ -178,69 +178,52 @@ function EventType() {
     );
   }
 
-  // 2) Organiser but KYC not verified → notice block
+  // 2) Organiser role exists locally but KYC is not verified → send them back to setup.
   if (isOrganiser && !isKycVerified) {
     return (
       <div className="tw:min-h-screen tw:bg-white tw:flex tw:items-center tw:justify-center tw:px-4 tw:py-10">
-        <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
-          {/* Top: icon + badge */}
+        <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18),0_0_22px_rgba(0,245,255,0.08)] tw:space-y-6">
           <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
             <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
-              <div className="tw:h-6 tw:w-6 tw:rounded-full tw:border-[3px] tw:border-primary tw:border-t-transparent tw:animate-spin" />
+              <Edit size={22} className="tw:text-primary" />
             </div>
 
             <div className="tw:flex-1 tw:text-center">
               <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1">
-                <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500 tw:animate-pulse" />
+                <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500" />
                 <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.16em] tw:uppercase tw:text-emerald-700">
-                  KYC in progress
+                  Setup required
                 </span>
               </div>
 
               <span className="tw:block tw:mt-3 tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-                Your organiser account is under review
+                Complete organiser verification
               </span>
 
               <p className="tw:mt-2 tw:text-sm tw:text-slate-600">
-                We&apos;re currently verifying the details you submitted. Once
-                your KYC is approved, you&apos;ll unlock organiser tools like
-                event creation, payouts and more.
+                Organiser access is activated instantly after a successful
+                verification. Finish setup to start creating events.
               </p>
             </div>
           </div>
 
-          {/* Progress bar + copy */}
           <div className="tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:space-y-3">
-            <div className="tw:flex tw:items-center tw:justify-between">
-              <span className="tw:text-xs tw:font-medium tw:text-slate-700">
-                Verification status
-              </span>
-              <span className="tw:text-[11px] tw:font-semibold tw:text-slate-500 tw:uppercase tw:tracking-[0.16em]">
-                Under review
-              </span>
-            </div>
-
-            <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-slate-200">
-              <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-primary tw:transition-all tw:duration-500" />
-            </div>
-
             <ul className="tw:mt-1 tw:space-y-1.5 tw:text-[12px] tw:text-slate-600">
               <li className="tw:flex tw:items-center tw:gap-2">
                 <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                ID & bank details submitted
+                Choose BVN or identity verification.
               </li>
               <li className="tw:flex tw:items-center tw:gap-2">
                 <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
-                Our compliance team is reviewing your information
+                Submit successfully and organiser tools unlock immediately.
               </li>
               <li className="tw:flex tw:items-center tw:gap-2">
-                <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-slate-300" />
-                You&apos;ll be notified once a decision is made
+                <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
+                Then you can create events as usual.
               </li>
             </ul>
           </div>
 
-          {/* Info + actions */}
           <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
             <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
               <button
@@ -248,10 +231,10 @@ function EventType() {
                   borderRadius: 12,
                 }}
                 type="button"
-                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
-              // onClick={() => navigate("/")} // if you have useNavigate
+                className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:hover:shadow-md tw:transition"
+                onClick={() => navigate("/become-an-organiser")}
               >
-                Go to home
+                Complete setup
               </button>
             </div>
           </div>
@@ -295,7 +278,7 @@ function EventType() {
                 key={event.id}
                 type="button"
                 onClick={() => navigate(`/event/create-event/${event.id}`)}
-                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-[#ffffff] tw:p-4 tw:text-left tw:shadow-sm tw:border tw:border-[#f0f0f3] tw:hover:border-primary tw:hover:shadow-md tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3 tw:text-primary"
+                className="tw:group tw:relative tw:w-full tw:rounded-2xl tw:bg-[#ffffff] tw:p-4 tw:text-left tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:border tw:border-[#f0f0f3] tw:hover:border-neon/40 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)] tw:transition tw:duration-200 tw:flex tw:flex-col tw:gap-3 tw:text-primary"
               >
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-left tw:md:items-center tw:gap-3">
