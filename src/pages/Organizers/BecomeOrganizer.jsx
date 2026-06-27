@@ -12,6 +12,7 @@ import OrganiserBankAccountStep from "./components/OrganiserBankAccountStep";
 import OrganiserBvnStep from "./components/OrganiserBvnStep";
 import OrganiserDiditStep from "./components/OrganiserDiditStep";
 import OrganiserSidebarCard from "./components/OrganiserSidebarCard";
+import { COUNTRY_FALLBACK_OPTIONS } from "../../data/countryFallbackOptions";
 import {
   OrganiserDiditInfoDialog,
   OrganiserNameMismatchDialog,
@@ -143,18 +144,26 @@ const BecomeOrganiser = () => {
           .map(normalizeCountry)
           .filter((item) => item.name && item.code)
           .sort((a, b) => a.name.localeCompare(b.name));
+        const availableCountries = normalized.length
+          ? normalized
+          : COUNTRY_FALLBACK_OPTIONS;
 
         if (active) {
-          if (!normalized.length) {
+          if (!availableCountries.length) {
             throw new Error("Unable to load countries right now.");
           }
-          setCountries(normalized);
+          setCountries(availableCountries);
         }
       } catch (error) {
         if (!active || error?.name === "AbortError") return;
-        setCountriesError(
-          error?.message || "Unable to load countries right now."
-        );
+
+        if (COUNTRY_FALLBACK_OPTIONS.length) {
+          setCountries(COUNTRY_FALLBACK_OPTIONS);
+          setCountriesError(null);
+          return;
+        }
+
+        setCountriesError(error?.message || "Unable to load countries right now.");
       } finally {
         if (active) setCountriesLoading(false);
       }
