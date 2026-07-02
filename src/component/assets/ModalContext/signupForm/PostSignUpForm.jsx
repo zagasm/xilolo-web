@@ -32,6 +32,7 @@ const PostSignupForm = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDobPickerOpen, setIsDobPickerOpen] = useState(false);
   const fifteenYearsAgo = useMemo(() => {
     const boundary = new Date();
     boundary.setFullYear(boundary.getFullYear() - 15);
@@ -159,8 +160,10 @@ const PostSignupForm = () => {
   }
 
   return (
-    <PostSignupFormModal>
-      <motion.div
+    <PostSignupFormModal
+      contentClassName={isDobPickerOpen ? "date-picker-open" : ""}
+    >
+        <motion.div
         className="container"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -187,11 +190,14 @@ const PostSignupForm = () => {
             <LocalizationProvider dateAdapter={AdapterMoment}>
               <MuiDatePicker
                 value={dob ? moment(dob) : null}
+                onOpen={() => setIsDobPickerOpen(true)}
+                onClose={() => setIsDobPickerOpen(false)}
                 onChange={(value) =>
                   setDob(value?.isValid?.() ? value.toDate() : null)
                 }
                 maxDate={moment(fifteenYearsAgo)}
                 minDate={moment(fiveYearsBefore)}
+                desktopModeMediaQuery="@media (min-width:1024px)"
                 openTo="year"
                 views={["year", "month", "day"]}
                 slotProps={{
@@ -218,12 +224,44 @@ const PostSignupForm = () => {
                     },
                   },
                   popper: {
+                    className: "post-signup-date-picker-popper",
                     sx: {
+                      zIndex: 1301,
                       "& .MuiPaper-root": {
                         borderRadius: "20px",
                         boxShadow:
                           "0 24px 70px rgba(15,23,42,0.18), 0 0 22px rgba(0,245,255,0.08)",
                       },
+                    },
+                  },
+                  dialog: {
+                    className: "post-signup-date-picker-dialog",
+                    sx: {
+                      zIndex: 1301,
+                      "& .MuiDialog-paper": {
+                        borderRadius: "20px",
+                        boxShadow:
+                          "0 24px 70px rgba(15,23,42,0.18), 0 0 22px rgba(0,245,255,0.08)",
+                      },
+                    },
+                    BackdropProps: {
+                      className: "post-signup-date-picker-dialog-backdrop",
+                      sx: {
+                        zIndex: 1300,
+                      },
+                    },
+                  },
+                  desktopPaper: {
+                    sx: {
+                      borderRadius: "20px",
+                      boxShadow:
+                        "0 24px 70px rgba(15,23,42,0.18), 0 0 22px rgba(0,245,255,0.08)",
+                    },
+                  },
+                  mobilePaper: {
+                    sx: {
+                      zIndex: 1301,
+                      borderRadius: "20px",
                     },
                   },
                   day: {

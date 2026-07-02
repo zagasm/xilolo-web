@@ -4,7 +4,7 @@ import { useModal } from "..";
 import { motion, AnimatePresence } from "framer-motion";
 import "./postSignupStyle.css";
 
-const PostSignupFormModal = ({ children }) => {
+const PostSignupFormModal = ({ children, contentClassName = "" }) => {
   const { showModal } = useModal();
   const location = useLocation();
 
@@ -21,7 +21,7 @@ const PostSignupFormModal = ({ children }) => {
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="global-modal-content"
+            className={`global-modal-content ${contentClassName}`.trim()}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
