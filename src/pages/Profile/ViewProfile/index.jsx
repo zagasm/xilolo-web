@@ -347,7 +347,7 @@ export default function ViewProfile() {
     >
       {/* top bar */}
       <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
-        <div className="tw:max-w-2xl tw:mx-auto tw:flex tw:items-center tw:justify-between tw:px-4">
+        <div className="tw:max-w-2xl tw:flex tw:items-center tw:px-4">
           <button
             style={{ borderRadius: 20 }}
             type="button"
@@ -375,7 +375,7 @@ export default function ViewProfile() {
           <p className="tw:text-gray-600 tw:mt-10">No profile data found.</p>
         ) : isOwnProfile && shouldShowBecomeOrganiser ? (
           // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
-          <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:lg:px-4">
+          <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:pt-5 tw:lg:px-4">
             <div className="tw:relative tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
               <button
                 type="button"

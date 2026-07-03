@@ -532,6 +532,12 @@ export default function EventTemplate({
   const isDone = useMemo(() => meta?.current_page >= meta?.last_page, [meta]);
 
   const variant = live ? "live" : upcoming ? "upcoming" : "all";
+  const emptyTitle =
+    variant === "live" ? "No live events right now" : "Fresh events are on the way";
+  const emptyMessage =
+    variant === "live"
+      ? "There’s nothing streaming at the moment. Check back shortly for live sessions."
+      : "We could not find anything for this feed yet. Try again later or switch filters.";
 
   const showShimmer = loading && visibleEvents.length === 0;
 
@@ -590,10 +596,17 @@ export default function EventTemplate({
       )}
 
       {!loading && visibleEvents.length === 0 && (
-        <div className="tw:mt-12 tw:flex tw:flex-col tw:items-center tw:justify-center tw:text-center tw:text-gray-500">
-          <Frown className="tw:mb-3 tw:h-10 tw:w-10" />
-          <span className="tw:font-medium">No events available</span>
-          <small>Check back later or try a different filter.</small>
+        <div className="events-empty-state">
+          <div className="events-empty-state__orb" aria-hidden="true">
+            <CalendarDays className="tw:h-9 tw:w-9" />
+          </div>
+          <div className="events-empty-state__content">
+            <span className="events-empty-state__eyebrow">
+              Discover something worth showing up for
+            </span>
+            <span className="events-empty-state__title">{emptyTitle}</span>
+            <small className="events-empty-state__message">{emptyMessage}</small>
+          </div>
         </div>
       )}
 

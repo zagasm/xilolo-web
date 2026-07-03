@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 
 export default function StatusFilter({
   value,
@@ -10,23 +10,46 @@ export default function StatusFilter({
 }) {
   return (
     <div className="tw:w-full">
-      <div className="tw:relative tw:block tw:w-full tw:sm:w-[220px]">
-        <span className="tw:sr-only">{label}</span>
-        <SlidersHorizontal className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:h-4 tw:w-4 tw:-translate-y-1/2 tw:text-slate-500" />
-        <select
-          aria-label={label}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="tw:h-11 tw:w-full tw:appearance-none tw:rounded-xl tw:border tw:border-slate-200 tw:bg-[#f6f7f1] tw:pl-10 tw:pr-10 tw:text-sm tw:font-medium tw:text-slate-700 tw:shadow-sm tw:outline-none focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/15"
-        >
-          {options.map((option) => (
-            <option key={option.key} value={option.key}>
-              {option.label}
-              {counts[option.key] !== undefined ? ` (${counts[option.key]})` : ""}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="tw:pointer-events-none tw:absolute tw:right-3 tw:top-1/2 tw:h-4 tw:w-4 tw:-translate-y-1/2 tw:text-slate-400" />
+      <span className="tw:sr-only">{label}</span>
+      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2.5">
+        <div className="tw:inline-flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-white/70 tw:bg-white/80 tw:px-4 tw:text-xs tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-slate-500 tw:shadow-[0_16px_34px_rgba(15,23,42,0.08)] tw:backdrop-blur">
+          <SlidersHorizontal className="tw:h-4 tw:w-4 tw:text-primary" />
+          <span>Filter</span>
+        </div>
+
+        <div className="tw-no-scrollbar tw:flex tw:min-w-0 tw:flex-1 tw:gap-2 tw:overflow-x-auto tw:pb-1">
+          {options.map((option) => {
+            const isActive = value === option.key;
+            const count = counts[option.key] ?? 0;
+
+            return (
+              <button
+                key={option.key}
+                type="button"
+                onClick={() => onChange(option.key)}
+                aria-pressed={isActive}
+                className={[
+                  "tw:inline-flex tw:h-11 tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-4 tw:text-sm tw:font-semibold tw:transition tw:duration-200",
+                  isActive
+                    ? "tw:border-primary tw:bg-primary tw:text-white tw:shadow-[0_18px_38px_rgba(5,5,5,0.18),0_0_18px_rgba(0,255,209,0.14)]"
+                    : "tw:border-white/70 tw:bg-white/85 tw:text-slate-700 tw:shadow-[0_12px_28px_rgba(15,23,42,0.06)] tw:hover:border-neon/30 tw:hover:text-primary tw:hover:shadow-[0_16px_34px_rgba(15,23,42,0.08),0_0_16px_rgba(0,255,209,0.08)]",
+                ].join(" ")}
+              >
+                <span>{option.label}</span>
+                <span
+                  className={[
+                    "tw:inline-flex tw:min-w-[28px] tw:items-center tw:justify-center tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-bold",
+                    isActive
+                      ? "tw:bg-white/14 tw:text-white"
+                      : "tw:bg-lightPurple tw:text-primary",
+                  ].join(" ")}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

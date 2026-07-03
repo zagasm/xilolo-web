@@ -220,6 +220,98 @@
   margin-bottom: 20px
 }
 
+.events-empty-state {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin: 56px auto 0;
+  padding: 42px 24px;
+  max-width: 520px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top, rgba(0, 245, 255, 0.14), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 250, 251, 0.96) 100%);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+  text-align: center;
+  overflow: hidden;
+}
+
+.events-empty-state::before,
+.events-empty-state::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.events-empty-state::before {
+  top: -36px;
+  left: -30px;
+  width: 130px;
+  height: 130px;
+  background: rgba(0, 245, 255, 0.08);
+}
+
+.events-empty-state::after {
+  right: -18px;
+  bottom: -26px;
+  width: 96px;
+  height: 96px;
+  background: rgba(17, 24, 39, 0.05);
+}
+
+.events-empty-state__orb {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 999px;
+  color: #111827;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(239, 246, 255, 0.96) 100%);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow:
+    0 16px 32px rgba(15, 23, 42, 0.1),
+    0 0 0 12px rgba(0, 245, 255, 0.08);
+}
+
+.events-empty-state__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.events-empty-state__eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #0891b2;
+}
+
+.events-empty-state__title {
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #111827;
+}
+
+.events-empty-state__message {
+  max-width: 360px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
 
 @keyframes fadeIn {
   from {
@@ -256,6 +348,20 @@
     font-size: 12px;
     gap: 5px;
     bottom: 90px
+  }
+
+  .events-empty-state {
+    margin-top: 36px;
+    padding: 34px 18px;
+    border-radius: 24px;
+  }
+
+  .events-empty-state__title {
+    font-size: 21px;
+  }
+
+  .events-empty-state__message {
+    font-size: 14px;
   }
 
   .viewers-overlay-icon .viewers_indicator {
