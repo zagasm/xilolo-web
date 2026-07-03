@@ -356,6 +356,7 @@ export default function ViewEvent() {
   const hostName = event?.hostName || "Organizer";
   const hostInitials = initialsFromName(hostName);
   const hostHasImage = !!event?.hostImage;
+  const hostAbout = String(event?.hostAbout || "").trim();
 
   function syncEventPayload(data = {}) {
     const ev =
@@ -1572,6 +1573,21 @@ export default function ViewEvent() {
                       >
                         View Profile
                       </Link>
+                    </div>
+                  </div>
+
+                  <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                    <div className="tw:rounded-[24px] tw:border tw:border-slate-100 tw:bg-[radial-gradient(circle_at_top,_rgba(0,245,255,0.10),_transparent_38%),linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)] tw:p-4">
+                      <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
+                        About Organizer
+                      </div>
+                      <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
+                        {hostName}
+                      </div>
+                      <p className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-slate-600">
+                        {hostAbout ||
+                          "This organizer has not added a public introduction yet. You can still explore their profile and other events."}
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -9,6 +9,7 @@ import {
 } from "../../utils/ticketHelpers";
 import {
   CalendarDays,
+  CircleDot,
   Receipt,
   Ticket as TicketIcon,
   Wallet,
@@ -42,6 +43,16 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
   const event = ticket.event || {};
   const payment = ticket.payment || {};
   const title = event.title || "Event";
+  const posterUrl = Array.isArray(event.poster)
+    ? event.poster.find((item) => item?.type === "image" && item?.url)?.url
+    : event.poster;
+  const organiserName =
+    event.hostName ||
+    event.organizerName ||
+    event.organiser ||
+    event.organiserName ||
+    ticket.organiser_name ||
+    "Xilolo Host";
 
   const dateLabel = formatTicketDate(event.event_date);
   const timeLabel = formatTicketTime(event.start_time);
@@ -61,21 +72,29 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
     <div className="ticket-wrapper">
       <div className="ticket-shell">
         <div className="ticket-hero">
-          <img
-            src={event.poster}
-            alt={title}
-            className="ticket-hero-image"
-            
-          />
+          {posterUrl ? (
+            <img src={posterUrl} alt={title} className="ticket-hero-image" />
+          ) : (
+            <div className="ticket-hero-fallback">
+              <TicketIcon className="tw:h-8 tw:w-8 tw:text-white/80" />
+            </div>
+          )}
           <div className="ticket-hero-overlay" />
 
           <div className="ticket-hero-content">
-            <span
-              className={`tw:inline-flex tw:w-fit tw:items-center tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[9px] tw:font-bold tw:uppercase tw:md:px-3 tw:md:text-[10px] ${phaseDef.classes}`}
-            >
-              {phaseDef.icon}
-              {phaseDef.label}
-            </span>
+            <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+              <span
+                className={`tw:inline-flex tw:w-fit tw:items-center tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[9px] tw:font-bold tw:uppercase tw:md:px-3 tw:md:text-[10px] ${phaseDef.classes}`}
+              >
+                {phaseDef.icon}
+                {phaseDef.label}
+              </span>
+
+              <span className="ticket-code-chip">
+                <TicketIcon className="tw:h-3.5 tw:w-3.5" />
+                {ticket?.code || "Code pending"}
+              </span>
+            </div>
 
             <div className="tw:flex tw:items-end tw:justify-between tw:gap-4">
               <div className="tw:min-w-0">
@@ -85,9 +104,11 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
                 <span className="tw:mt-1.5 tw:block tw:line-clamp-2 tw:text-base tw:font-semibold tw:leading-tight tw:text-white tw:md:mt-2 tw:md:text-lg">
                   {title}
                 </span>
+                <span className="tw:mt-2 tw:inline-flex tw:items-center tw:gap-1.5 tw:text-xs tw:text-white/75">
+                  <CircleDot className="tw:h-3.5 tw:w-3.5 tw:text-neon" />
+                  Hosted by {organiserName}
+                </span>
               </div>
-
-              
             </div>
           </div>
         </div>
@@ -111,8 +132,8 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
                   <span className="tw:block tw:font-medium tw:text-slate-900">
                     Payment Method: {paymentMethodLabel}
                   </span>
-                  <span className="tw:block tw:break-all tw:text-[11px] tw:text-slate-500 tw:md:text-xs">
-                    {ticket?.code || "Ticket code unavailable"}
+                  <span className="tw:block tw:text-[11px] tw:text-slate-500 tw:md:text-xs">
+                    Secure admission pass ready in your receipt.
                   </span>
                 </div>
               </div>
@@ -131,7 +152,7 @@ function Ticket({ ticket, phase: phaseProp, onViewReceipt }) {
           <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2 tw:text-[11px] tw:text-slate-500 tw:md:text-xs">
             <Receipt className="tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-slate-400 tw:md:h-4 tw:md:w-4" />
             <span className="tw:truncate">
-              Open your receipt for full payment and ticket details.
+              View your receipt for the QR, payment trail, and event entry details.
             </span>
           </div>
 

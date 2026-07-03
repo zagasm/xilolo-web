@@ -12,7 +12,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,6 +29,23 @@
   max-width: 600px;
   /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); */
   position: relative;
+  z-index: 1201;
+}
+
+.global-modal-content.date-picker-open {
+  z-index: 1;
+}
+
+.post-signup-date-picker-popper {
+  z-index: 1301 !important;
+}
+
+.post-signup-date-picker-dialog {
+  z-index: 1301 !important;
+}
+
+.post-signup-date-picker-dialog-backdrop {
+  z-index: 1300 !important;
 }
 
 /* Responsive Adjustments */
@@ -385,5 +402,3 @@ input:focus {
     /* text-align: center; */
   }
 }
-
-

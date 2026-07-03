@@ -1,7 +1,14 @@
 // src/pages/search/SearchPage.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CalendarDays, Clock3, Search, X } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Clock3,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react";
 
@@ -121,8 +128,16 @@ function getCompactEventMeta(event) {
   return { dateLabel, timeLabel };
 }
 
+function getEventPosterUrl(event) {
+  if (Array.isArray(event?.poster)) {
+    return event.poster.find((item) => item?.type === "image" && item?.url)?.url || null;
+  }
+
+  return typeof event?.poster === "string" ? event.poster : null;
+}
+
 function CompactEventRow({ event, index = null, onClick }) {
-  const poster = event?.poster?.find?.((item) => item?.type === "image" && item?.url)?.url;
+  const poster = getEventPosterUrl(event);
   const { dateLabel, timeLabel } = getCompactEventMeta(event);
   const organiser = hostName(event);
   const hasActiveSubscription = !!(
@@ -166,6 +181,57 @@ function CompactEventRow({ event, index = null, onClick }) {
       </div>
 
       <div className="tw:h-16 tw:w-16 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-slate-100">
+        {poster ? (
+          <img
+            src={poster}
+            alt={event?.title || "Event poster"}
+            className="tw:h-full tw:w-full tw:object-cover"
+          />
+        ) : null}
+      </div>
+    </button>
+  );
+}
+
+function SearchSuggestionEventRow({ event, onClick }) {
+  const poster = getEventPosterUrl(event);
+  const { dateLabel, timeLabel } = getCompactEventMeta(event);
+  const organiser = hostName(event);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="tw:flex tw:w-full tw:items-stretch tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_24px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)]"
+    >
+      <div className="tw:w-1 tw:shrink-0 tw:rounded-full tw:bg-[#00FFD1]" />
+
+      <div className="tw:min-w-0 tw:flex-1">
+        <div className="tw:line-clamp-2 tw:text-base tw:font-bold tw:leading-tight tw:text-primary">
+          {event?.title || "Untitled event"}
+        </div>
+
+        <div className="tw:mt-1 tw:truncate tw:text-sm tw:text-slate-500">
+          Organised by {organiser}
+        </div>
+
+        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:text-xs tw:text-slate-500">
+          <span className="tw:inline-flex tw:items-center tw:gap-1.5">
+            <CalendarDays className="tw:h-3.5 tw:w-3.5" />
+            {dateLabel}
+          </span>
+          <span className="tw:inline-flex tw:items-center tw:gap-1.5">
+            <Clock3 className="tw:h-3.5 tw:w-3.5" />
+            {timeLabel}
+          </span>
+        </div>
+
+        <div className="tw:mt-3 tw:text-lg tw:font-bold tw:text-[#058C78]">
+          {priceText(event)}
+        </div>
+      </div>
+
+      <div className="tw:h-24 tw:w-24 tw:shrink-0 tw:overflow-hidden tw:rounded-[20px] tw:bg-lightPurple tw:sm:h-28 tw:sm:w-28">
         {poster ? (
           <img
             src={poster}
@@ -243,7 +309,7 @@ function PersonSliderCard({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
+      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
     >
       <div className="tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
         {avatarUrl && !avatarFailed ? (
@@ -259,7 +325,7 @@ function PersonSliderCard({ item, onClick }) {
           </span>
         )}
       </div>
-      <span className="tw:line-clamp-2 tw:min-h-[40px] tw:text-sm tw:font-semibold tw:text-slate-900">
+      <span className="tw:line-clamp-2 tw:min-h-10 tw:text-sm tw:font-semibold tw:text-slate-900">
         {name}
       </span>
     </button>
@@ -270,6 +336,7 @@ export default function SearchPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { token } = useAuth() || {};
+  const searchShellRef = useRef(null);
 
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
@@ -277,6 +344,7 @@ export default function SearchPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 
   const [trendingEvents, setTrendingEvents] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(false);
@@ -323,6 +391,20 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (!searchShellRef.current?.contains(event.target)) {
+        setIsSuggestionsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
+
   // persistent recent people
   const [recentPeople, setRecentPeople] = useState([]);
 
@@ -368,6 +450,7 @@ export default function SearchPage() {
   }, [pendingQuery]);
 
   const handleBack = () => {
+    setIsSuggestionsOpen(false);
     navigate(-1);
   };
 
@@ -377,17 +460,20 @@ export default function SearchPage() {
     setPeople([]);
     setEvents([]);
     setHasSearched(false);
+    setIsSuggestionsOpen(true);
   };
 
   const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);
     setPendingQuery(value);
+    setIsSuggestionsOpen(true);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!query.trim()) return;
+    setIsSuggestionsOpen(false);
     doSearch(query.trim());
   };
 
@@ -445,6 +531,14 @@ export default function SearchPage() {
     () => people.length > 0 || events.length > 0,
     [people, events]
   );
+  const trimmedQuery = query.trim();
+  const isTypingQuery = trimmedQuery.length >= 2;
+  const showSuggestionPanel = isSuggestionsOpen;
+  const suggestionEvents = isTypingQuery ? events : trendingEvents;
+  const suggestionHeading = isTypingQuery ? "Suggested Events" : "Trending Events";
+  const suggestionSubtext = isTypingQuery
+    ? "Quick matches based on what you are typing."
+    : "Popular events people are checking out right now.";
 
   const peopleToShow = people.length > 0 ? people : recentPeople;
   const showPeopleSection = peopleToShow.length > 0;
@@ -453,7 +547,10 @@ export default function SearchPage() {
     <div className="tw:min-h-screen tw:bg-white tw:flex tw:justify-center tw:py-16 tw:md:py-20 tw:px-3 tw:sm:px-4">
       <div className="tw:w-full tw:max-w-4xl tw:pb-10 tw:pt-8">
         {/* Top search bar */}
-        <div className="tw:flex tw:items-center tw:gap-3 tw:mb-6 tw:sm:mb-8">
+        <div
+          ref={searchShellRef}
+          className="tw:relative tw:flex tw:items-center tw:gap-3 tw:mb-6 tw:sm:mb-8"
+        >
           <button
             type="button"
             onClick={handleBack}
@@ -471,10 +568,23 @@ export default function SearchPage() {
               <input
                 type="text"
                 value={query}
+                onFocus={() => setIsSuggestionsOpen(true)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setIsSuggestionsOpen(false);
+                  }
+                }}
                 onChange={handleChange}
                 placeholder="Search events, creators or genres..."
                 className="tw:flex-1 tw:bg-transparent tw:border-none tw:outline-none tw:text-sm tw:sm:text-base tw:text-black tw:placeholder:text-zinc-400"
               />
+              <button
+                type="button"
+                aria-label="Search filters"
+                className="tw:ml-2 tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:text-zinc-500 tw:transition-colors hover:tw:bg-white/60"
+              >
+                <SlidersHorizontal className="tw:h-4 tw:w-4" />
+              </button>
               {query && (
                 <button
                   type="button"
@@ -486,15 +596,88 @@ export default function SearchPage() {
               )}
             </div>
           </form>
+
+          {showSuggestionPanel && (
+            <div className="tw:absolute tw:left-0 tw:right-0 tw:top-[calc(100%+12px)] tw:z-30">
+              <div className="tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-slate-200 tw:bg-[#fbfbf9] tw:p-4 tw:shadow-[0_22px_60px_rgba(15,23,42,0.12)]">
+                <div className="tw:mb-4">
+                  <div className="tw:text-base tw:font-semibold tw:text-primary">
+                    {suggestionHeading}
+                  </div>
+                  <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
+                    {isTypingQuery
+                      ? loading
+                        ? "Searching for matching events..."
+                        : suggestionSubtext
+                      : suggestionSubtext}
+                  </div>
+                </div>
+
+                {!isTypingQuery && loadingTrending && suggestionEvents.length === 0 ? (
+                  <div className="tw:space-y-3">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="tw:h-32 tw:animate-pulse tw:rounded-3xl tw:bg-white"
+                      />
+                    ))}
+                  </div>
+                ) : null}
+
+                {isTypingQuery && loading ? (
+                  <div className="tw:space-y-3">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="tw:h-32 tw:animate-pulse tw:rounded-3xl tw:bg-white"
+                      />
+                    ))}
+                  </div>
+                ) : null}
+
+                {!loading &&
+                !loadingTrending &&
+                suggestionEvents.length > 0 ? (
+                  <div className="tw:flex tw:max-h-[460px] tw:flex-col tw:gap-3 tw:overflow-y-auto tw:pr-1">
+                    {suggestionEvents.slice(0, 6).map((event) => (
+                      <SearchSuggestionEventRow
+                        key={event.id}
+                        event={event}
+                        onClick={() => {
+                          setIsSuggestionsOpen(false);
+                          navigate(`/event/view/${event.id}`);
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+
+                {isTypingQuery &&
+                !loading &&
+                suggestionEvents.length === 0 ? (
+                  <div className="tw:rounded-[22px] tw:border tw:border-dashed tw:border-slate-200 tw:bg-white tw:px-4 tw:py-5 tw:text-sm tw:text-slate-500">
+                    No event suggestions yet. Press Enter to view broader search
+                    results.
+                  </div>
+                ) : null}
+
+                {!isTypingQuery &&
+                !loadingTrending &&
+                suggestionEvents.length === 0 ? (
+                  <div className="tw:rounded-[22px] tw:border tw:border-dashed tw:border-slate-200 tw:bg-white tw:px-4 tw:py-5 tw:text-sm tw:text-slate-500">
+                    Trending events are not available right now.
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Loading state text */}
-        {loading && (
+        {!showSuggestionPanel && loading && (
           <div className="tw:mb-4 tw:text-sm tw:text-zinc-500">Searching…</div>
         )}
 
-        {/* People / recent searches */}
-        {showPeopleSection && (
+        {!showSuggestionPanel && showPeopleSection && (
           <section className="tw:mb-8">
             <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               {people.length > 0 ? "Users" : "Recent Searches"}
@@ -520,8 +703,7 @@ export default function SearchPage() {
           </section>
         )}
 
-        {/* Trending events (initial load / when not searching) */}
-        {!hasSearched && trendingEvents.length > 0 && (
+        {!showSuggestionPanel && !hasSearched && trendingEvents.length > 0 && (
           <section className="tw:mb-6">
             <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               Trending Searches
@@ -543,8 +725,10 @@ export default function SearchPage() {
           </section>
         )}
 
-        {/* Trending shimmer */}
-        {!hasSearched && loadingTrending && trendingEvents.length === 0 && (
+        {!showSuggestionPanel &&
+        !hasSearched &&
+        loadingTrending &&
+        trendingEvents.length === 0 && (
           <div className="row tw:mx-0 tw:mt-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <EventShimmer key={i} />
@@ -552,8 +736,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Events */}
-        {events.length > 0 && (
+        {!showSuggestionPanel && events.length > 0 && (
           <section className="tw:mb-6">
             <div className="tw:mb-3 tw:text-lg tw:sm:text-xl tw:font-semibold tw:text-black">
               Events
@@ -571,8 +754,7 @@ export default function SearchPage() {
           </section>
         )}
 
-        {/* Events shimmer while loading and no current events yet */}
-        {loading && events.length === 0 && (
+        {!showSuggestionPanel && loading && events.length === 0 && (
           <div className="row tw:mx-0 tw:mt-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <EventShimmer key={i} />
@@ -580,8 +762,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Empty state */}
-        {!loading && hasSearched && !hasResults && (
+        {!showSuggestionPanel && !loading && hasSearched && !hasResults && (
           <div className="tw:mt-10 tw:text-center tw:text-zinc-500">
             <p className="tw:text-base tw:font-medium">
               No results found for “{query}”

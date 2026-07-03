@@ -120,6 +120,11 @@ img:hover { transform: scale(1.01); }
 .home_section { padding-left: 120px; transition: 0.2s ease-in-out; }
 .mobile_organizer { display: none; }
 
+.home-hero {
+  padding-top: 12px;
+  padding-bottom: 6px;
+}
+
 @media (max-width: 1700px) {
   .mobile_organizer { display: block; }
 }
@@ -129,4 +134,5 @@ img:hover { transform: scale(1.01); }
 @media (max-width: 959px) {
   .home_section { padding-left: 0px; }
   .posts-container { padding-left: 0px; }
+  .home-hero { padding-top: 6px; }
 }

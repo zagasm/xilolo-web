@@ -9,6 +9,58 @@ import { clearWalletFlowStorage } from "../../../features/wallet/walletFlowStora
 import { queryClient } from "../../../lib/queryClient";
 
 const AuthContext = createContext();
+const LOCAL_API_BASE =
+  import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "";
+
+function normalizeStoredMediaUrl(value) {
+  if (!value || typeof value !== "string" || !LOCAL_API_BASE) return value;
+
+  const apiBase = LOCAL_API_BASE.replace(/\/+$/, "");
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith("/storage/")) {
+    return `${apiBase}${trimmed}`;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+
+    if (import.meta.env.DEV && parsed.pathname.startsWith("/storage/") && parsed.origin !== apiBase) {
+      return `${apiBase}${parsed.pathname}`;
+    }
+  } catch {
+    return value;
+  }
+
+  return value;
+}
+
+function normalizeOrganiserPayload(organiser) {
+  if (!organiser || typeof organiser !== "object") return organiser;
+
+  return {
+    ...organiser,
+    profileImage: normalizeStoredMediaUrl(organiser.profileImage),
+    profileUrl: normalizeStoredMediaUrl(organiser.profileUrl),
+  };
+}
+
+function normalizeUserPayload(user) {
+  if (!user || typeof user !== "object") return user;
+
+  return {
+    ...user,
+    profileUrl: normalizeStoredMediaUrl(
+      user.profileUrl ||
+      user.profile_url ||
+      user.avatar_url ||
+      user.avatar ||
+      user.profile_image
+    ),
+    organiser: normalizeOrganiserPayload(user.organiser),
+    organizer: normalizeOrganiserPayload(user.organizer),
+  };
+}
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -19,8 +71,11 @@ export const AuthProvider = ({ children }) => {
 
   /** persist helpers */
   const persist = (u, t, o) => {
-    if (u) localStorage.setItem("userdata", JSON.stringify(u));
-    if (o) localStorage.setItem("organiserdata", JSON.stringify(o));
+    const normalizedUser = normalizeUserPayload(u);
+    const normalizedOrganiser = normalizeOrganiserPayload(o);
+
+    if (normalizedUser) localStorage.setItem("userdata", JSON.stringify(normalizedUser));
+    if (normalizedOrganiser) localStorage.setItem("organiserdata", JSON.stringify(normalizedOrganiser));
     if (t) localStorage.setItem("token", t);
   };
 
@@ -29,25 +84,29 @@ export const AuthProvider = ({ children }) => {
     const o = localStorage.getItem("organiserdata");
     const t = localStorage.getItem("token");
     if (u && t) {
-      setUser(JSON.parse(u));
+      setUser(normalizeUserPayload(JSON.parse(u)));
       setToken(t);
     }
     if (o) {
-      setOrganiser(JSON.parse(o));
+      setOrganiser(normalizeOrganiserPayload(JSON.parse(o)));
     }
     setIsLoading(false);
   }, []);
 
   /** Login (full replace) */
   const login = ({ user: u, token: t, organiser: o, security: s }) => {
+    const normalizedUser = normalizeUserPayload(u);
+    const normalizedOrganiser =
+      normalizeOrganiserPayload(o ?? normalizedUser?.organiser ?? normalizedUser?.organizer ?? null);
+
     queryClient.clear();
     clearWalletFlowStorage();
-    setUser(u);
-    setOrganiser(o ?? u?.organiser ?? u?.organizer ?? null);
+    setUser(normalizedUser);
+    setOrganiser(normalizedOrganiser);
     setToken(t);
     setSecurity(s ?? null);
-    persist(u, t, o ?? u?.organiser ?? u?.organizer ?? null);
-    if (u) rememberAccount(u, t);
+    persist(normalizedUser, t, normalizedOrganiser);
+    if (normalizedUser) rememberAccount(normalizedUser, t);
   };
 
   const refreshUser = async () => {
@@ -58,13 +117,15 @@ export const AuthProvider = ({ children }) => {
 
       // Adjust this depending on how your backend wraps it
       const payload = res?.data?.data || res?.data || {};
-      const freshUser = payload.user || payload;
+      const freshUser = normalizeUserPayload(payload.user || payload);
       const freshOrganiser =
-        payload.organiser ||
-        payload.organizer ||
-        freshUser?.organiser ||
-        freshUser?.organizer ||
-        null;
+        normalizeOrganiserPayload(
+          payload.organiser ||
+          payload.organizer ||
+          freshUser?.organiser ||
+          freshUser?.organizer ||
+          null
+        );
 
       setUser(freshUser);
       setOrganiser(freshOrganiser);
@@ -88,14 +149,16 @@ export const AuthProvider = ({ children }) => {
       else localStorage.removeItem("token");
     }
     if (typeof u !== "undefined") {
-      setUser(u);
-      if (u) localStorage.setItem("userdata", JSON.stringify(u));
+      const normalizedUser = normalizeUserPayload(u);
+      setUser(normalizedUser);
+      if (normalizedUser) localStorage.setItem("userdata", JSON.stringify(normalizedUser));
       else localStorage.removeItem("userdata");
-      if (u) rememberAccount(u, typeof t !== "undefined" ? t : token);
+      if (normalizedUser) rememberAccount(normalizedUser, typeof t !== "undefined" ? t : token);
     }
     if (typeof o !== "undefined") {
-      setOrganiser(o);
-      if (o) localStorage.setItem("organiserdata", JSON.stringify(o));
+      const normalizedOrganiser = normalizeOrganiserPayload(o);
+      setOrganiser(normalizedOrganiser);
+      if (normalizedOrganiser) localStorage.setItem("organiserdata", JSON.stringify(normalizedOrganiser));
       else localStorage.removeItem("organiserdata");
     }
     if (typeof s !== "undefined") {
