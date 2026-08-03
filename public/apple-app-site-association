@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "XXXXXXXXXX.com.zagasmstudio.app",
+        "paths": [
+          "/event/*"
+        ]
+      }
+    ]
+  }
+}
