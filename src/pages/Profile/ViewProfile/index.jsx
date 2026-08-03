@@ -178,12 +178,30 @@ export default function ViewProfile() {
       !hydratedSharedProfile,
     staleTime: 1000 * 60 * 2,
     queryFn: async () => {
-      const res = await api.get(
-        `/api/v1/organiser/${routeUserId}`,
-        authHeaders(token)
-      );
+      try {
+        const res = await api.get(
+          `/api/v1/organiser/${routeUserId}`,
+          authHeaders(token)
+        );
 
-      return normalizeViewedOrganiserProfile(res);
+        return normalizeViewedOrganiserProfile(res);
+      } catch (error) {
+        // Not an organiser (404) → fall back to the regular user profile so
+        // clicking a non-organiser opens their profile instead of erroring.
+        if (error?.response?.status === 404) {
+          const userRes = await getUserProfileShare(routeUserId, token);
+          const userData = userRes?.user || null;
+
+          if (userData) {
+            return {
+              __isRegularUserProfile: true,
+              ...normalizeSharedUserProfile(userData),
+            };
+          }
+        }
+
+        throw error;
+      }
     },
   });
 
