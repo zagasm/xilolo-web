@@ -81,6 +81,7 @@ import WalletPage from "./features/wallet/pages/WalletPage.jsx";
 import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
 import WalletFundingCancelPage from "./features/wallet/pages/WalletFundingCancelPage.jsx";
 import SharedEventPage from "./pages/event/SharedEventPage.jsx";
+import EventDeepLinkPage from "./pages/event/EventDeepLinkPage.jsx";
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
@@ -422,6 +423,7 @@ export function App() {
       {/* <DisableRightClick /> */}
       <Routes>
         <Route path="/maintenance" element={<MaintenancePage />} />
+        <Route path="/event/:id" element={<EventDeepLinkPage />} />
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
           <Route path="/" element={<ZagasmLanding />} />

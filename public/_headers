@@ -1,0 +1,7 @@
+# Force JSON content type for the extension-less Apple association files.
+# Apple's Universal Links validator requires a JSON response, not octet-stream.
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+
+/apple-app-site-association
+  Content-Type: application/json
