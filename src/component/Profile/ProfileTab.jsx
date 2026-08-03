@@ -23,6 +23,11 @@ export default function ProfileTabs({ user, isOwnProfile }) {
   const isOrganiserProfileData =
     !isOwnProfile && (!!user?.events || !!user?.allEvents);
 
+  // Viewing a regular (non-organiser) user → they have no event buckets.
+  // Show an empty grid instead of falling back to the viewer's own events.
+  const isOtherRegularUserProfile =
+    !isOwnProfile && !isOrganiserProfileData;
+
   const organiserEventsByTab = useMemo(() => {
     const buckets = user?.events || null;
 
@@ -51,11 +56,27 @@ export default function ProfileTabs({ user, isOwnProfile }) {
   }, [user, statusTab]);
 
   // ---------- choose source ----------
-  const events = isOrganiserProfileData ? organiserEventsByTab : myEvents;
-  const loading = isOrganiserProfileData ? false : myEventsLoading;
-  const loadingMore = isOrganiserProfileData ? false : myEventsLoadingMore;
-  const error = isOrganiserProfileData ? null : myEventsError;
-  const hasMore = isOrganiserProfileData ? false : myEventsHasMore;
+  const events = isOrganiserProfileData
+    ? organiserEventsByTab
+    : isOtherRegularUserProfile
+      ? []
+      : myEvents;
+  const loading =
+    isOrganiserProfileData || isOtherRegularUserProfile
+      ? false
+      : myEventsLoading;
+  const loadingMore =
+    isOrganiserProfileData || isOtherRegularUserProfile
+      ? false
+      : myEventsLoadingMore;
+  const error =
+    isOrganiserProfileData || isOtherRegularUserProfile
+      ? null
+      : myEventsError;
+  const hasMore =
+    isOrganiserProfileData || isOtherRegularUserProfile
+      ? false
+      : myEventsHasMore;
 
   const heading = isOwnProfile ? "My Events" : "Events";
 
