@@ -129,6 +129,71 @@ jobs:
 
           echo "Bunny SPA fallback configured."
 
+      - name: "Ensure AASA edge rules (Content-Type: application/json)"
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Apple's Universal Links validator requires the association file to
+          # be served as application/json. Bunny derives Content-Type from the
+          # file extension, so an extension-less AASA is served as octet-stream
+          # no matter what the upload sends. These edge rules override the
+          # header at the CDN edge. Idempotent: stale AASA rules are removed
+          # first, unrelated rules are left untouched.
+          PZ="https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}"
+          AUTH=(-H "AccessKey: ${BUNNY_API_KEY}" -H "Content-Type: application/json")
+
+          zone=$(curl --fail --silent --show-error "${AUTH[@]}" "$PZ" || echo "{}")
+          echo "$zone" | jq -r '.EdgeRules[]? | select(
+            (((.Triggers // []) | map(((.PatternMatches // []) + [.Parameter1]) | join(" ")) | join(" ")) | contains("apple-app-site"))) | .Guid' \
+            | while read -r guid; do
+                [ -n "$guid" ] || continue
+                curl --fail --silent --show-error -X DELETE "${AUTH[@]}" "$PZ/edgerules/$guid" >/dev/null 2>&1 \
+                  && echo "Removed stale AASA edge rule: $guid" || echo "WARN: could not delete stale rule $guid"
+              done
+
+          curl --fail --silent --show-error "${AUTH[@]}" \
+            --request POST --url "$PZ/edgerules/addOrUpdate" --data @- >/dev/null <<'EOF' \
+            && echo "AASA edge rule (.well-known) written." || echo "WARN: failed to write .well-known rule"
+          {
+            "ActionType": 5,
+            "ActionParameter1": "Content-Type",
+            "ActionParameter2": "application/json",
+            "TriggerMatchingType": 1,
+            "Enabled": true,
+            "Description": "AASA content-type (.well-known)",
+            "Triggers": [
+              {
+                "Type": 0,
+                "PatternMatchingType": 0,
+                "Parameter1": null,
+                "PatternMatches": ["pattern:%.well%-known/apple%-app%-site%-association"]
+              }
+            ]
+          }
+          EOF
+
+          curl --fail --silent --show-error "${AUTH[@]}" \
+            --request POST --url "$PZ/edgerules/addOrUpdate" --data @- >/dev/null <<'EOF' \
+            && echo "AASA edge rule (root) written." || echo "WARN: failed to write root rule"
+          {
+            "ActionType": 5,
+            "ActionParameter1": "Content-Type",
+            "ActionParameter2": "application/json",
+            "TriggerMatchingType": 1,
+            "Enabled": true,
+            "Description": "AASA content-type (root)",
+            "Triggers": [
+              {
+                "Type": 0,
+                "PatternMatchingType": 0,
+                "Parameter1": null,
+                "PatternMatches": ["pattern:/apple%-app%-site%-association"]
+              }
+            ]
+          }
+          EOF
+
       - name: Remove old files from Bunny Storage root
         shell: bash
         run: |
