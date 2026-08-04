@@ -184,7 +184,15 @@ jobs:
 
           find "$BUILD_DIR" -type f | while read -r file; do
             rel_path="${file#"$BUILD_DIR"/}"
-            content_type="$(file --brief --mime-type "$file")"
+            # Apple's Universal Links validator requires the association file
+            # to be served as application/json. The AASA has no file extension,
+            # so force the content type instead of relying on `file` detection
+            # (which varies by runner and previously shipped octet-stream).
+            if [[ "$rel_path" == ".well-known/apple-app-site-association" || "$rel_path" == "apple-app-site-association" ]]; then
+              content_type="application/json"
+            else
+              content_type="$(file --brief --mime-type "$file")"
+            fi
 
             echo "Uploading: $rel_path"
             curl --fail --silent --show-error \
