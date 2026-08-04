@@ -167,7 +167,7 @@ jobs:
                 "Type": 0,
                 "PatternMatchingType": 0,
                 "Parameter1": null,
-                "PatternMatches": ["pattern:%.well%-known/apple%-app%-site%-association"]
+                "PatternMatches": ["https://xilolo.com/.well-known/apple-app-site-association", "http://xilolo.com/.well-known/apple-app-site-association", "https://www.xilolo.com/.well-known/apple-app-site-association", "http://www.xilolo.com/.well-known/apple-app-site-association"]
               }
             ]
           }
@@ -188,7 +188,7 @@ jobs:
                 "Type": 0,
                 "PatternMatchingType": 0,
                 "Parameter1": null,
-                "PatternMatches": ["pattern:/apple%-app%-site%-association"]
+                "PatternMatches": ["https://xilolo.com/apple-app-site-association", "http://xilolo.com/apple-app-site-association", "https://www.xilolo.com/apple-app-site-association", "http://www.xilolo.com/apple-app-site-association"]
               }
             ]
           }
