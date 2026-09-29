@@ -14,20 +14,21 @@ body {
   margin-bottom: 0px;
 }
 .form_container {
-  /* box-shadow: 0 0 20px rgba(154, 114, 194, 0.15); */
+  /* Centred by width, not by flex alignment: the bootstrap column is col-xl-3
+     (25%), and `align-items: center` made the inner form shrink-wrap so the card's
+     width stopped matching the column and it sat off-centre. A fixed card width
+     with auto margins is stable at every viewport. */
+  width: 100%;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 25px;
-  justify-content: center;
-  align-items: center;
-  /* padding: 15px 20px; */
 }
 
+/* The fixed 20px gradient bars were template decoration: they added nothing on a
+   signup screen and read as an accidental artefact at the viewport edges. */
 .bar_section {
-  display: flex;
-  align-items: center;
-  height: 100vh;
-  position: absolute;
-  top: 0px;
-
+  display: none;
 }
 
 .bar_container {
@@ -448,4 +449,47 @@ form .code_container .code {
   object-fit: contain;
   margin-bottom: 0px;
 }
+}
+
+/* ── Mobile, forced sane ──────────────────────────────────────────────────────
+   The auth screens kept a desktop minimum width: bootstrap's `row` carries -15px
+   side margins and its columns carry 15px padding, so on a 390px phone the layout
+   rendered ~500px wide and everything past the right edge was clipped (fields,
+   Terms/Privacy). Bootstrap + the legacy stylesheet both outrank a utility class
+   here, so this block is deliberately !important — a clipped signup form is worse
+   than an ugly specificity fight. */
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  .auth_container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .inner_form_con {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Name fields side by side get cramped and overflow — stack the columns. */
+  .inner_form_con > [class*="col"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  form .input,
+  form .form-control,
+  .phone-input {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }

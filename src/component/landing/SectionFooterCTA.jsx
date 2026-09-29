@@ -73,19 +73,11 @@ const COLUMNS = [
   },
 ];
 
-const COMPACT_LINKS = [
-  { to: "/feed", label: "Discover" },
-  { to: "/become-an-organiser", label: "Host your first event" },
-  { to: "/support", label: "Support" },
-  { to: "/terms-of-service", label: "Terms" },
-  { to: "/privacy-policy", label: "Privacy" },
-];
-
 const item = "tw:text-[13px] tw:transition-colors tw:hover:text-paper-raised";
 
 function SocialRow({ size = 8, icon = 3.5 }) {
   return (
-    <ul className="tw:flex tw:items-center tw:gap-0.5">
+    <ul className="tw:flex tw:items-center tw:gap-0.5" style={{ margin: 0, padding: 0, listStyle: "none" }}>
       {SOCIALS.map(({ name, Icon, href }) => (
         <li key={name}>
           <a
@@ -109,22 +101,48 @@ export default function SectionFooterCTA({ showCta = true, compact = false }) {
   if (compact) {
     return (
       <footer className="tw:bg-ink" style={{ color: FOOTER_TEXT }}>
-        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw:flex-col tw:items-center tw:gap-3 tw:px-4 tw:py-4 tw:md:flex-row tw:md:justify-between tw:md:px-8">
-          <img
-            src="/logo.png"
-            alt="Xilolo"
-            className="tw:h-5 tw:w-[76px] tw:shrink-0 tw:object-contain tw:brightness-0 tw:invert"
-          />
-          <nav className="tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-x-5 tw:gap-y-1">
-            {COMPACT_LINKS.map(({ to, label }) => (
-              <Link key={to} to={to} className={item}>
-                {label}
-              </Link>
+        <div className="tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:py-6 tw:md:px-8">
+          {/* Row 1 — brand + the four link groups, as in the full footer but tight.
+              The strip version alone read as too thin for a front page. */}
+          <div className="tw:grid tw:gap-6 tw:md:grid-cols-[1.4fr_repeat(4,1fr)]">
+            <div className="tw:flex tw:flex-col tw:gap-2">
+              <img
+                src="/logo.png"
+                alt="Xilolo"
+                className="tw:h-6 tw:w-[92px] tw:shrink-0 tw:object-contain tw:brightness-0 tw:invert"
+              />
+              <a href="mailto:support@xilolo.com" className="tw:text-xs">
+                support@xilolo.com
+              </a>
+            </div>
+
+            {COLUMNS.map(({ heading, links }) => (
+              <div
+                key={heading}
+                className="tw:hidden tw:flex-col tw:gap-2 tw:md:flex"
+              >
+                <p className="tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:opacity-70">
+                  {heading}
+                </p>
+                <ul className="tw:flex tw:flex-col tw:gap-1" style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                  {links.map(({ to, label }) => (
+                    <li key={to}>
+                      <Link to={to} className={`${item} tw:text-xs`}>
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </nav>
-          <div className="tw:flex tw:items-center tw:gap-4">
+          </div>
+
+          {/* Row 2 — one quiet line: socials and copyright. */}
+          <div className="tw:mt-5 tw:flex tw:flex-col tw:items-center tw:gap-2 tw:border-t tw:border-hairline-dark tw:pt-3 tw:md:flex-row tw:md:justify-between">
+            <span className="tw:text-[11px]">
+              © {new Date().getFullYear()} Xilolo Technologies
+            </span>
             <SocialRow />
-            <span className="tw:text-[11px]">© {new Date().getFullYear()} Xilolo</span>
           </div>
         </div>
       </footer>
@@ -171,7 +189,7 @@ export default function SectionFooterCTA({ showCta = true, compact = false }) {
               <p className="tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:opacity-70">
                 {heading}
               </p>
-              <ul className="tw:flex tw:flex-col tw:gap-1.5">
+              <ul className="tw:flex tw:flex-col tw:gap-1.5" style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 {links.map(({ to, label }) => (
                   <li key={to}>
                     <Link to={to} className={item}>

@@ -46,7 +46,7 @@ function AuthLayout() {
           without creating a scrollbar, because the auth screens no longer force
           90vh and the footer is a single strip. Together they fill exactly one
           screen — which is the requirement for these pages. */}
-      <div className="tw:flex-1">
+      <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center">
         <Outlet />
       </div>
       {showFooter ? <SectionFooterCTA compact /> : null}
