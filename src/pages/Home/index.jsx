@@ -8,19 +8,34 @@
  *     _HomeHeaderSection      -> <HomeHeader>        (greeting + wallet strip + tab pills)
  *     _HomeWalletStrip        -> <WalletStrip>
  *     _CompactHomeTabPills    -> <TabPill> pair      (All / Live + live count)
- *     _buildAllSliverList     -> <HeroFeedCard> list (All tab, single column)
+ *     _buildAllSliverList     -> <HeroFeedCard> list (All tab)
  *     _HomeHeroCard           -> <HeroFeedCard>
- *     _buildLiveSliverList    -> <LiveFeedCard> list (Live tab, single column)
+ *     _buildLiveSliverList    -> <LiveFeedCard> list (Live tab)
  *     LiveEventCard           -> <LiveFeedCard>      (home/widgets/live_event_card.dart)
  *     _buildShimmerLoader     -> <HeroSkeleton>
  *     empty + error states    -> <EmptyState> / <InlineErrorCard>
  *   xilolo-app/lib/core/widget/bottom_nav.dart -> the web Navbar (global shell)
  *
+ * App section order is preserved exactly: greeting -> wallet strip -> All/Live
+ * pills -> feed, and the card anatomy stays poster -> title -> host + price ->
+ * CTA. The ONLY structural change is the desktop layout: the feed is a real grid
+ * (1 column mobile / 2 at md / 3 at xl) instead of one narrow column.
+ *
  * Tokens: DESIGN.md + src/styles/tailwind.css. Primitives: src/component/ui.
- * Tailwind here is `tw:`-prefixed with the variant AFTER the prefix.
+ * Tailwind here is `tw:`-prefixed with the variant AFTER the prefix
+ * (`tw:md:grid-cols-2`), never before (`md:tw:grid-cols-2` is silently dead).
+ *
+ * Legacy-cascade notes for whoever touches this next:
+ *   - `header { display:flex; height:40px; padding:30px }` and
+ *     `h1..h6 { font-weight:500 }` ship UNLAYERED in src/style.css /
+ *     main.min.css, so they beat layered Tailwind utilities whatever the class
+ *     list says. The header wrapper is therefore a <div> (not a <header>), and
+ *     heading weight carries the `!` important modifier.
+ *   - `#root p { color: inherit }` (id-scoped) kills every `tw:text-*` on a <p>,
+ *     so coloured copy is rendered as <span className="tw:block …">.
  *
  * Data is untouched: the feed still reads the same endpoints through the same
- * `usePaginatedEvents` hook the previous EventTemplate used.
+ * `usePaginatedEvents` hook the previous implementation used.
  */
 import React, { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -66,6 +81,26 @@ import "./Homestyle.css";
 /* ── Endpoints — unchanged from the previous implementation ──────────────── */
 const ALL_ENDPOINT = "/api/v1/events/all/get";
 const LIVE_ENDPOINT = "/api/v1/events/view/live";
+
+/* ── Layout tokens ───────────────────────────────────────────────────────── */
+
+/** One container for the header AND the feed so the grid lines up with it. */
+export const HOME_CONTAINER = "tw:mx-auto tw:w-full tw:max-w-7xl tw:px-4 tw:md:px-6";
+
+/**
+ * Responsive feed grid — 1 column on phones, 2 at md, 3 at xl (founder brief).
+ * `items-stretch` + `h-full` on every card keeps each row equal-height and the
+ * gap (16px / 24px on md+) is the only spacing between cards.
+ */
+export function FeedGrid({ className = "", children }) {
+  return (
+    <div
+      className={`tw:grid tw:grid-cols-1 tw:items-stretch tw:gap-4 tw:md:grid-cols-2 tw:md:gap-5 tw:xl:grid-cols-3 ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 /* ── Presentation helpers (mirror the app's private helpers) ─────────────── */
 
@@ -198,7 +233,13 @@ function GlassChip({ children, className = "" }) {
 }
 
 /* ── Header tab pill — app `_CompactHomeTabPill` (38px, pill) ────────────── */
-function TabPill({ label, selected, onClick, showLiveDot = false, count = 0 }) {
+/**
+ * Hover audit (defect 6): unselected = ink text on paper-raised, hover raises
+ * the fill to chip (#EFEFF2) — 16.6:1. The count badge was `muted` on that
+ * hover fill, 3.84:1 and failing AA, so it is `muted-strong` (5.9:1) now.
+ * Selected = paper on ink (17.4:1 base, 16.7:1 on the ink-raised hover).
+ */
+export function TabPill({ label, selected, onClick, showLiveDot = false, count = 0 }) {
   return (
     <button
       type="button"
@@ -206,8 +247,8 @@ function TabPill({ label, selected, onClick, showLiveDot = false, count = 0 }) {
       aria-pressed={selected}
       className={`tw:inline-flex tw:h-[38px] tw:items-center tw:gap-1.5 tw:rounded-pill tw:px-[18px] tw:text-sm tw:font-semibold tw:transition-colors ${
         selected
-          ? "tw:bg-ink tw:text-paper"
-          : "tw:border tw:border-hairline tw:bg-paper-raised tw:text-body tw:hover:bg-chip"
+          ? "tw:bg-ink tw:text-paper tw:hover:bg-ink-raised"
+          : "tw:border tw:border-hairline tw:bg-paper-raised tw:text-body tw:hover:bg-chip tw:hover:text-body"
       }`}
     >
       {showLiveDot ? (
@@ -217,7 +258,7 @@ function TabPill({ label, selected, onClick, showLiveDot = false, count = 0 }) {
       {count > 0 ? (
         <span
           className={`tw:text-xs tw:font-bold ${
-            selected ? "tw:text-paper/70" : "tw:text-muted"
+            selected ? "tw:text-paper/70" : "tw:text-muted-strong"
           }`}
         >
           {count}
@@ -228,7 +269,15 @@ function TabPill({ label, selected, onClick, showLiveDot = false, count = 0 }) {
 }
 
 /* ── Wallet strip — app `_HomeWalletStrip` ──────────────────────────────── */
-function WalletStrip() {
+/**
+ * The ONE balance on this screen (the shell's Navbar chip is hidden here by
+ * `.home-wallet-strip`'s sibling rule in Homestyle.css — defect 4).
+ * Surface matches the app: flat fill + accent hairline + radius 18, no shadow
+ * (DESIGN.md forbids shadows outside overlays). The old inline
+ * `linear-gradient(var(--color-accent-soft) …)` never rendered at all: the tw
+ * prefix renames @theme vars to `--tw-color-*`, so the var resolved to nothing.
+ */
+export function WalletStrip() {
   const { data, isLoading } = useWalletSummary();
   const balance = formatWalletMoney(
     getWalletBalanceAmount(data),
@@ -238,11 +287,7 @@ function WalletStrip() {
   return (
     <Link
       to="/account/wallet"
-      className="tw:mt-2.5 tw:flex tw:items-center tw:gap-3 tw:rounded-[18px] tw:border tw:border-accent/25 tw:px-3 tw:py-2.5"
-      style={{
-        backgroundImage:
-          "linear-gradient(135deg, var(--color-accent-soft), var(--color-paper-raised))",
-      }}
+      className="home-wallet-strip tw:mt-2.5 tw:flex tw:w-full tw:max-w-[420px] tw:items-center tw:gap-3 tw:rounded-[18px] tw:border tw:border-accent/40 tw:bg-paper-raised tw:px-3 tw:py-2.5 tw:transition-colors tw:hover:border-accent/70"
     >
       <span className="tw:flex tw:size-[38px] tw:shrink-0 tw:items-center tw:justify-center tw:rounded-[13px] tw:bg-accent tw:text-ink">
         <Wallet className="tw:size-[19px]" aria-hidden="true" />
@@ -263,8 +308,22 @@ function WalletStrip() {
   );
 }
 
+/* ── Card frame — shared by both card types so the grid stays equal-height ── */
+export function FeedCard({ rounded = 12, padded = false, className = "", children }) {
+  const radius = rounded >= 24 ? "tw:rounded-[24px]" : "tw:rounded-[16px]";
+  return (
+    <article
+      className={`tw:flex tw:h-full tw:flex-col tw:overflow-hidden tw:border tw:border-hairline tw:bg-paper-raised ${radius} ${
+        padded ? "tw:p-2.5" : ""
+      } ${className}`}
+    >
+      {children}
+    </article>
+  );
+}
+
 /* ── Hero card — app `_HomeHeroCard` (the All tab) ──────────────────────── */
-function HeroFeedCard({ event }) {
+export function HeroFeedCard({ event }) {
   const live = normalizeEventStatus(event?.status) === "live";
   const target = eventStartDate(event);
   const hasFutureCountdown =
@@ -282,7 +341,7 @@ function HeroFeedCard({ event }) {
   const href = eventHref(event);
 
   return (
-    <article className="tw:mb-4 tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-hairline tw:bg-paper-raised">
+    <FeedCard rounded={24}>
       {href ? (
         <Link to={href} className="home-hero-media tw:block" aria-label={title}>
           <PosterMedia
@@ -325,23 +384,25 @@ function HeroFeedCard({ event }) {
         />
       )}
 
-      <div className="tw:p-4">
-        {href ? (
-          <Link to={href} className="tw:block">
-            <h3 className="tw:line-clamp-2 tw:font-display tw:text-base tw:font-extrabold tw:leading-[1.2] tw:text-body">
+      <div className="tw:flex tw:flex-1 tw:flex-col tw:p-4">
+        <h3 className="tw:mb-0! tw:text-base! tw:font-extrabold! tw:leading-[1.2]!">
+          {href ? (
+            <Link to={href} className="tw:block">
+              <span className="tw:line-clamp-2 tw:block tw:font-display tw:text-base tw:font-extrabold tw:leading-[1.2] tw:text-body tw:transition-colors tw:hover:text-accent-deep">
+                {title}
+              </span>
+            </Link>
+          ) : (
+            <span className="tw:line-clamp-2 tw:block tw:font-display tw:text-base tw:font-extrabold tw:leading-[1.2] tw:text-body">
               {title}
-            </h3>
-          </Link>
-        ) : (
-          <h3 className="tw:line-clamp-2 tw:font-display tw:text-base tw:font-extrabold tw:leading-[1.2] tw:text-body">
-            {title}
-          </h3>
-        )}
+            </span>
+          )}
+        </h3>
 
         <div className="tw:mt-3 tw:flex tw:items-start tw:gap-2.5">
           <HostAvatar event={event} name={host} />
           <div className="tw:min-w-0 tw:flex-1">
-            <p className="tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:font-bold tw:text-body">
+            <span className="tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:font-bold tw:text-body">
               <span className="tw:truncate">{host}</span>
               {verified ? (
                 <BadgeCheck
@@ -349,21 +410,21 @@ function HeroFeedCard({ event }) {
                   aria-label="Verified organiser"
                 />
               ) : null}
-            </p>
+            </span>
             {dateLine ? (
-              <p className="tw:mt-0.5 tw:truncate tw:text-[11px] tw:text-muted">
+              <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-muted">
                 {dateLine}
-              </p>
+              </span>
             ) : null}
           </div>
-          <div className="tw:shrink-0 tw:text-right">
-            <p className="tw:text-[9.5px] tw:font-bold tw:leading-none tw:text-muted">
+          <span className="tw:shrink-0 tw:text-right">
+            <span className="tw:block tw:text-[9.5px] tw:font-bold tw:leading-none tw:text-muted">
               From
-            </p>
-            <p className="tw:mt-1 tw:font-display tw:text-[16.5px] tw:font-extrabold tw:leading-none tw:text-body">
+            </span>
+            <span className="tw:mt-1 tw:block tw:font-display tw:text-[16.5px] tw:font-extrabold tw:leading-none tw:text-body">
               {eventPrice(event)}
-            </p>
-          </div>
+            </span>
+          </span>
         </div>
 
         <CtaButton href={href}>
@@ -371,7 +432,7 @@ function HeroFeedCard({ event }) {
           {ctaLabel}
         </CtaButton>
       </div>
-    </article>
+    </FeedCard>
   );
 }
 
@@ -404,30 +465,40 @@ function PosterMedia({ poster, title, overlay }) {
 
 /**
  * Full-width pill CTA — app hero card (`_HomeHeroCard`) and live card
- * (`LiveEventCard`) share this shape. Only the live card turns red, and only
- * once the viewer has paid ("Join Live Stream").
+ * (`LiveEventCard`) share this shape.
+ *
+ * Colours come from the app, not from taste (`live_event_card.dart:664-700`):
+ * light mode buy button = `AppColors.primary` fill (= AppDesignTokens.ink) with
+ * a WHITE label, i.e. ink fill + white text, 18.7:1. The paid state keeps the
+ * red "Join Live Stream" fill + white (4.83:1). Both hover to ink-raised/white
+ * (16.7:1). `Button`'s `primary` variant is the accent fill (ink label) meant
+ * for accent actions, so a card CTA overrides it with the `!` suffix form —
+ * needed twice over: the base rule so it beats the variant, and the hover rule
+ * so the important base doesn't pin the hover state.
  */
-function CtaButton({ href, hasPaid = false, children }) {
+export function CtaButton({ href, hasPaid = false, children }) {
   const variant = hasPaid ? "danger" : "primary";
-  const className = "tw:mt-3.5 tw:w-full";
+  const className = hasPaid
+    ? "tw:w-full"
+    : "tw:w-full tw:bg-ink! tw:text-paper-raised! tw:hover:bg-ink-raised! tw:hover:text-paper-raised! tw:disabled:bg-ink/45! tw:disabled:text-paper-raised!";
 
-  if (!href) {
-    return (
-      <Button variant={variant} size="lg" className={className} disabled>
-        {children}
-      </Button>
-    );
-  }
-
-  return (
+  const button = href ? (
     <Button as={Link} to={href} variant={variant} size="lg" className={className}>
       {children}
     </Button>
+  ) : (
+    <Button variant={variant} size="lg" className={className} disabled>
+      {children}
+    </Button>
   );
+
+  // mt-auto + pt-3.5 pins the CTA to the bottom of an equal-height grid card
+  // (padding, not margin, so no two margin utilities have to fight).
+  return <div className="tw:mt-auto tw:pt-3.5">{button}</div>;
 }
 
 /* ── Live card — app LiveEventCard (home/widgets/live_event_card.dart) ──── */
-function LiveFeedCard({ event, onMore }) {
+export function LiveFeedCard({ event, onMore }) {
   const poster = posterUrl(event);
   const title = eventTitle(event);
   const host = hostName(event);
@@ -437,7 +508,7 @@ function LiveFeedCard({ event, onMore }) {
   const href = eventHref(event);
 
   return (
-    <article className="tw:mb-5 tw:rounded-[16px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-2.5">
+    <FeedCard padded>
       <div className="tw:relative tw:min-h-[170px] tw:overflow-hidden tw:rounded-[12px] tw:bg-inner">
         {poster ? (
           <img
@@ -458,7 +529,7 @@ function LiveFeedCard({ event, onMore }) {
           type="button"
           onClick={onMore}
           aria-label="Event options"
-          className="tw:absolute tw:right-2.5 tw:top-2.5 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill tw:bg-black/45 tw:text-paper-raised"
+          className="tw:absolute tw:right-2.5 tw:top-2.5 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill tw:bg-black/50 tw:text-paper-raised tw:transition-colors tw:hover:bg-black/75"
         >
           <MoreHorizontal className="tw:size-5" aria-hidden="true" />
         </button>
@@ -466,7 +537,7 @@ function LiveFeedCard({ event, onMore }) {
         <div className="tw:absolute tw:inset-x-3 tw:bottom-3 tw:flex tw:items-center tw:gap-2.5">
           <HostAvatar event={event} name={host} size={40} />
           <div className="tw:min-w-0 tw:flex-1">
-            <p className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:font-bold tw:text-paper-raised">
+            <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:font-bold tw:text-paper-raised">
               <span className="tw:truncate">{host}</span>
               {verified ? (
                 <BadgeCheck
@@ -474,19 +545,21 @@ function LiveFeedCard({ event, onMore }) {
                   aria-label="Verified organiser"
                 />
               ) : null}
-            </p>
+            </span>
             {dateLine ? (
-              <p className="tw:mt-0.5 tw:truncate tw:text-[11px] tw:text-paper-raised/90">
+              <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-paper-raised/90">
                 {dateLine}
-              </p>
+              </span>
             ) : null}
           </div>
         </div>
       </div>
 
       <div className="tw:mt-3 tw:flex tw:items-start tw:justify-between tw:gap-3">
-        <h3 className="tw:line-clamp-2 tw:text-[15px] tw:font-bold tw:leading-snug tw:text-body">
-          {title}
+        <h3 className="tw:mb-0! tw:text-[15px]! tw:font-bold! tw:leading-snug!">
+          <span className="tw:line-clamp-2 tw:block tw:text-[15px] tw:font-bold tw:leading-snug tw:text-body">
+            {title}
+          </span>
         </h3>
         <span className="tw:shrink-0 tw:font-display tw:text-xl tw:font-bold tw:leading-none tw:text-body">
           {eventPrice(event)}
@@ -510,16 +583,16 @@ function LiveFeedCard({ event, onMore }) {
         )}
         {hasPaid ? "Join Live Stream" : "Buy Ticket"}
       </CtaButton>
-    </article>
+    </FeedCard>
   );
 }
 
 /* ── Loading / error / empty — app shimmer, inline error card, empty state ─ */
-function HeroSkeleton() {
+export function HeroSkeleton() {
   return (
-    <div className="tw:mb-4 tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-hairline tw:bg-paper-raised">
+    <FeedCard rounded={24}>
       <Skeleton className="tw:h-[200px] tw:w-full tw:rounded-none" />
-      <div className="tw:p-4">
+      <div className="tw:flex tw:flex-1 tw:flex-col tw:p-4">
         <Skeleton className="tw:h-4 tw:w-3/4 tw:rounded-control" />
         <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2.5">
           <Skeleton className="tw:size-[34px] tw:rounded-pill" />
@@ -528,21 +601,23 @@ function HeroSkeleton() {
             <Skeleton className="tw:mt-2 tw:h-3 tw:w-1/2 tw:rounded-control" />
           </div>
         </div>
-        <Skeleton className="tw:mt-3.5 tw:h-[50px] tw:w-full tw:rounded-pill" />
+        <div className="tw:mt-auto tw:pt-3.5">
+          <Skeleton className="tw:h-[50px] tw:w-full tw:rounded-pill" />
+        </div>
       </div>
-    </div>
+    </FeedCard>
   );
 }
 
-function InlineErrorCard({ message, onRetry }) {
+export function InlineErrorCard({ message, onRetry }) {
   return (
-    <div className="tw:mb-4 tw:flex tw:items-center tw:gap-3 tw:rounded-card tw:border tw:border-danger/30 tw:bg-danger/10 tw:px-3.5 tw:py-3">
+    <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-card tw:border tw:border-danger/30 tw:bg-danger/10 tw:px-3.5 tw:py-3">
       <span className="tw:flex tw:size-[38px] tw:shrink-0 tw:items-center tw:justify-center tw:rounded-pill tw:bg-paper-raised tw:text-danger">
         <CalendarX2 className="tw:size-5" aria-hidden="true" />
       </span>
-      <p className="tw:min-w-0 tw:flex-1 tw:text-sm tw:font-semibold tw:text-body">
+      <span className="tw:min-w-0 tw:flex-1 tw:text-sm tw:font-semibold tw:text-body">
         {message}
-      </p>
+      </span>
       <Button variant="ghost" size="sm" onClick={onRetry}>
         Retry
       </Button>
@@ -551,14 +626,23 @@ function InlineErrorCard({ message, onRetry }) {
 }
 
 /* ── Header — app `_HomeHeaderSection` ──────────────────────────────────── */
-function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
+/**
+ * Order is the app's and must not change: greeting -> wallet strip -> pills.
+ * The wrapper is a <div>, NOT a <header>: `src/style.css` ships a global
+ * `header { display:flex; align-items:center; height:40px; padding:30px }`
+ * which squashed this block into a 40px flex box, overflowed ~70px upwards and
+ * pushed the greeting under the fixed 74px Navbar (that was the "Hi <name> is
+ * missing" defect) while the overflowing wallet strip landed on top of the tab
+ * pills (the overlap defect). A <div> is immune to that element rule.
+ */
+export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
   return (
-    <header className="tw:shrink-0 tw:border-b tw:border-hairline tw:bg-paper">
-      <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-3.5 tw:pt-3.5 tw:pb-3">
+    <div className="home-header tw:shrink-0 tw:border-b tw:border-hairline tw:bg-paper">
+      <div className={`${HOME_CONTAINER} tw:pt-4 tw:pb-3`}>
         <div className="tw:flex tw:items-center tw:gap-1.5">
-          <p className="tw:min-w-0 tw:truncate tw:text-[18.5px] tw:font-extrabold tw:leading-[1.08] tw:tracking-[-0.01em] tw:text-body">
+          <span className="tw:block tw:min-w-0 tw:truncate tw:text-[18.5px] tw:font-extrabold tw:leading-[1.08] tw:tracking-[-0.01em] tw:text-body">
             Hi <span className="tw:text-accent-deep">{firstName || "there"}</span>
-          </p>
+          </span>
           <span aria-hidden="true" className="tw:text-base tw:leading-none">
             👋
           </span>
@@ -581,7 +665,7 @@ function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
           />
         </div>
       </div>
-    </header>
+    </div>
   );
 }
 
@@ -638,8 +722,12 @@ export default function Home() {
     setShowOrganizers(false);
   };
 
+  // The API ships the name camel-cased (`UserResource`: 'firstName' => …), but
+  // the older snake_case payloads still float around in localStorage, so both
+  // spellings are read. `username` is the last resort before the "there" copy.
   const firstName =
     (typeof user?.firstName === "string" && user.firstName.trim()) ||
+    (typeof user?.first_name === "string" && user.first_name.trim()) ||
     (typeof user?.username === "string" && user.username.trim()) ||
     "";
 
@@ -676,58 +764,66 @@ export default function Home() {
           />
 
           <div ref={eventsScrollRef} className="home-feed tw-no-scrollbar">
-            <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:pt-3 tw:pb-7">
+            <div className={`${HOME_CONTAINER} tw:pt-3 tw:pb-7`}>
               {feed.error && list.length > 0 ? (
-                <InlineErrorCard message={errorMessage} onRetry={feed.refresh} />
+                <div className="tw:mb-4">
+                  <InlineErrorCard message={errorMessage} onRetry={feed.refresh} />
+                </div>
               ) : null}
 
-              {showSkeletons ? (
-                <>
-                  <HeroSkeleton />
-                  <HeroSkeleton />
-                  <HeroSkeleton />
-                </>
-              ) : null}
+              <FeedGrid>
+                {showSkeletons ? (
+                  <>
+                    <HeroSkeleton />
+                    <HeroSkeleton />
+                    <HeroSkeleton />
+                  </>
+                ) : null}
 
-              {!feed.loading && feed.error && list.length === 0 ? (
-                <EmptyState
-                  icon={CalendarX2}
-                  title="Can't load events right now"
-                  body={errorMessage}
-                  action={
-                    <Button variant="primary" size="md" onClick={feed.refresh}>
-                      Retry
-                    </Button>
-                  }
-                />
-              ) : null}
+                {!feed.loading && feed.error && list.length === 0 ? (
+                  <div className="tw:col-span-full">
+                    <EmptyState
+                      icon={CalendarX2}
+                      title="Can't load events right now"
+                      body={errorMessage}
+                      action={
+                        <Button variant="primary" size="md" onClick={feed.refresh}>
+                          Retry
+                        </Button>
+                      }
+                    />
+                  </div>
+                ) : null}
 
-              {!feed.loading && !feed.error && list.length === 0 ? (
-                <EmptyState
-                  icon={emptyState.Icon}
-                  title={emptyState.title}
-                  body={emptyState.body}
-                />
-              ) : null}
+                {!feed.loading && !feed.error && list.length === 0 ? (
+                  <div className="tw:col-span-full">
+                    <EmptyState
+                      icon={emptyState.Icon}
+                      title={emptyState.title}
+                      body={emptyState.body}
+                    />
+                  </div>
+                ) : null}
 
-              {list.map((event) =>
-                isLive ? (
-                  <LiveFeedCard
-                    key={event.id}
-                    event={event}
-                    onMore={() => setSelectedEvent(event)}
-                  />
-                ) : (
-                  <HeroFeedCard key={event.id} event={event} />
-                ),
-              )}
+                {list.map((event) =>
+                  isLive ? (
+                    <LiveFeedCard
+                      key={event.id}
+                      event={event}
+                      onMore={() => setSelectedEvent(event)}
+                    />
+                  ) : (
+                    <HeroFeedCard key={event.id} event={event} />
+                  ),
+                )}
 
-              {feed.loadingMore && list.length > 0 ? (
-                <>
-                  <HeroSkeleton />
-                  <HeroSkeleton />
-                </>
-              ) : null}
+                {feed.loadingMore && list.length > 0 ? (
+                  <>
+                    <HeroSkeleton />
+                    <HeroSkeleton />
+                  </>
+                ) : null}
+              </FeedGrid>
 
               {!showSkeletons && !isDone && list.length > 0 ? (
                 <div ref={loadMoreRef} className="tw:h-10 tw:w-full" aria-hidden="true" />
@@ -736,12 +832,12 @@ export default function Home() {
               {showOrganizers && !showSkeletons ? (
                 <div className="tw:mt-12">
                   <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:pb-3">
-                    <p className="tw:text-sm tw:font-semibold tw:text-body">
+                    <span className="tw:text-sm tw:font-semibold tw:text-body">
                       Organizers you may know
-                    </p>
+                    </span>
                     <Link
                       to="/organizers"
-                      className="tw:text-xs tw:font-semibold tw:text-accent-deep"
+                      className="tw:text-xs tw:font-semibold tw:text-accent-deep tw:hover:underline!"
                     >
                       View all
                     </Link>
