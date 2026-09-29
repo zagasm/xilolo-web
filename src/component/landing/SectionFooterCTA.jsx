@@ -1,29 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  SiFacebook,
-  SiInstagram,
-  SiTiktok,
-  SiX,
-  SiYoutube,
-} from "react-icons/si";
-import { ArrowRight, Mail, MapPin } from "lucide-react";
+import { SiFacebook, SiInstagram, SiTiktok, SiX, SiYoutube } from "react-icons/si";
+import { ArrowRight } from "lucide-react";
 import { Button } from "../ui";
 
 /**
- * Site footer.
+ * Site footer — sleek pass.
  *
- * Was: a "social link" placeholder row rendered from PNG icons under
- * public/images/icons/ (facebook.png, x.png, …) — brand marks as bitmaps, which
- * is the single clearest "not a real product" tell in a footer — plus bootstrap
- * grid classes and hardcoded greys.
+ * Previous version was a heavy slab: py-14/py-12/py-6 padding, an h-8 logo, an
+ * h-11 app-button row and 40px social targets, which made the footer shout
+ * louder than the page above it. This keeps the same content and the same dark
+ * ink surface (the design system's one deliberate break) but tightens the
+ * rhythm so it reads as a quiet close rather than a second page.
  *
- * Now: real SVG brand marks, the same link groups as the nav (no invented
- * destinations), a dark ink surface as the one deliberate break in the page, and
- * the contact details that were already in the old footer.
+ * All social URLs, the support email and the address are carried over verbatim
+ * from the original footer — do not replace them with guesses.
  *
- * All five social URLs, the email and the address are carried over verbatim from
- * the previous footer — do not replace them with guesses.
+ * showCta={false} drops the closing CTA band; the auth pages use that, since
+ * "Ready to host your first event? Get started" is pointless on a signup page.
  */
 const APP_STORE_URL = "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
 const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
@@ -64,140 +58,122 @@ const COLUMNS = [
   {
     heading: "Legal",
     links: [
-      { to: "/privacy-policy", label: "Privacy policy" },
-      { to: "/terms-of-service", label: "Terms of service" },
-      { to: "/community-guidelines", label: "Community guidelines" },
+      { to: "/privacy-policy", label: "Privacy" },
+      { to: "/terms-of-service", label: "Terms" },
+      { to: "/community-guidelines", label: "Guidelines" },
       { to: "/data-protection", label: "Data protection" },
     ],
   },
 ];
 
-export default function SectionFooterCTA() {
+const linkClass =
+  "tw:text-[13px] tw:text-muted-dark tw:transition-colors tw:hover:text-paper-raised";
+
+export default function SectionFooterCTA({ showCta = true }) {
   return (
     <footer className="tw:bg-ink tw:text-body-dark">
-      {/* Closing CTA — one primary action, as everywhere else. */}
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw:flex-col tw:items-start tw:justify-between tw:gap-6 tw:px-4 tw:py-14 tw:md:flex-row tw:md:items-center tw:md:px-8">
-        <div>
-          <p className="tw:font-display tw:text-[clamp(1.5rem,3vw,2rem)] tw:font-extrabold tw:leading-tight tw:tracking-[-0.01em] tw:text-paper-raised">
-            Ready to host your first event?
-          </p>
-          <p className="tw:mt-2 tw:max-w-[52ch] tw:text-sm tw:text-muted-dark">
-            Create an account, set up your event, and go live — ticketing, streaming and payouts in
-            one place.
-          </p>
+      {showCta ? (
+        <div className="tw:border-b tw:border-hairline-dark">
+          <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw-flex-col tw:items-start tw:justify-between tw:gap-4 tw:px-4 tw:py-8 tw:md:flex-row tw:md:items-center tw:md:px-8">
+            <p className="tw:font-display tw:text-lg tw:font-bold tw:tracking-[-0.01em] tw:text-paper-raised">
+              Ready to host your first event?
+            </p>
+            <Button as={Link} to="/auth/signup" size="md" className="tw:shrink-0">
+              Get started
+              <ArrowRight className="tw:size-4" />
+            </Button>
+          </div>
         </div>
-        <Button as={Link} to="/auth/signup" size="lg" className="tw:shrink-0">
-          Get started
-          <ArrowRight className="tw:size-4" />
-        </Button>
-      </div>
+      ) : null}
 
-      <div className="tw:border-t tw:border-hairline-dark">
-        <div className="tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:py-12 tw:md:px-8">
-          <div className="tw:grid tw:gap-10 tw:md:grid-cols-[1.4fr_repeat(4,1fr)]">
-            {/* Brand */}
-            <div className="tw:flex tw:flex-col tw:gap-4">
-              <img src="/logo.png" alt="Xilolo" className="tw:h-8 tw:w-auto tw:brightness-0 tw:invert" />
-              <p className="tw:max-w-[34ch] tw:text-sm tw:text-muted-dark">
-                Live events, ticketed shows and payouts for creators and brands.
+      <div className="tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:py-9 tw:md:px-8">
+        <div className="tw:grid tw:gap-8 tw:md:grid-cols-[1.5fr_repeat(4,1fr)]">
+          {/* Brand */}
+          <div className="tw:flex tw:flex-col tw:gap-3">
+            <img
+              src="/logo.png"
+              alt="Xilolo"
+              className="tw:h-6 tw:w-auto tw:brightness-0 tw:invert"
+            />
+            <a href="mailto:support@xilolo.com" className={linkClass}>
+              support@xilolo.com
+            </a>
+            <p className="tw:text-xs tw:leading-relaxed tw:text-muted-dark">
+              16192 Coastal Highway, Lewes
+              <br />
+              Delaware 19958
+            </p>
+          </div>
+
+          {/* Links — compact columns, same destinations as the nav */}
+          {COLUMNS.map(({ heading, links }) => (
+            <div key={heading} className="tw:flex tw:flex-col tw:gap-2.5">
+              <p className="tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-faint-dark">
+                {heading}
               </p>
-              <div className="tw:flex tw:flex-col tw:gap-2 tw:text-sm">
+              <ul className="tw:flex tw:flex-col tw:gap-1.5">
+                {links.map(({ to, label }) => (
+                  <li key={to}>
+                    <Link to={to} className={linkClass}>
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* One quiet utility row: apps left, socials right */}
+        <div className="tw:mt-9 tw:flex tw:flex-col tw:gap-4 tw:border-t tw:border-hairline-dark tw:pt-5 tw:md:flex-row tw:md:items-center tw:md:justify-between">
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-5 tw:gap-y-2">
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              iOS app
+            </a>
+            <a
+              href={PLAY_STORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={linkClass}
+            >
+              Android app
+            </a>
+          </div>
+
+          <ul className="tw:flex tw:items-center tw:gap-1">
+            {SOCIALS.map(({ name, Icon, href }) => (
+              <li key={name}>
                 <a
-                  href="mailto:support@xilolo.com"
-                  className="tw:inline-flex tw:items-center tw:gap-2 tw:text-muted-dark tw:transition-colors tw:hover:text-paper-raised"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Xilolo on ${name}`}
+                  className="tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-pill tw:text-muted-dark tw:transition-colors tw:hover:bg-ink-raised tw:hover:text-paper-raised"
                 >
-                  <Mail className="tw:size-4" aria-hidden="true" />
-                  support@xilolo.com
+                  <Icon className="tw:size-3.5" aria-hidden="true" />
                 </a>
-                <span className="tw:inline-flex tw:items-start tw:gap-2 tw:text-muted-dark">
-                  <MapPin className="tw:mt-0.5 tw:size-4 tw:shrink-0" aria-hidden="true" />
-                  <span>
-                    16192 Coastal Highway
-                    <br />
-                    Lewes, Delaware 19958
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            {/* Link groups — same destinations as the nav */}
-            {COLUMNS.map(({ heading, links }) => (
-              <div key={heading} className="tw:flex tw:flex-col tw:gap-3">
-                <p className="tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-muted-dark">
-                  {heading}
-                </p>
-                <ul className="tw:flex tw:flex-col tw:gap-2.5">
-                  {links.map(({ to, label }) => (
-                    <li key={to}>
-                      <Link
-                        to={to}
-                        className="tw:text-sm tw:text-body-dark tw:transition-colors tw:hover:text-accent"
-                      >
-                        {label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </li>
             ))}
-          </div>
-
-          {/* App + social row */}
-          <div className="tw:mt-12 tw:flex tw:flex-col tw:gap-6 tw:border-t tw:border-hairline-dark tw:pt-8 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-              <a
-                href={APP_STORE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tw:inline-flex tw:h-11 tw:items-center tw:rounded-pill tw:border tw:border-hairline-dark tw:px-4 tw:text-sm tw:font-medium tw:text-body-dark tw:transition-colors tw:hover:border-accent/40"
-              >
-                Download for iOS
-              </a>
-              <a
-                href={PLAY_STORE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tw:inline-flex tw:h-11 tw:items-center tw:rounded-pill tw:border tw:border-hairline-dark tw:px-4 tw:text-sm tw:font-medium tw:text-body-dark tw:transition-colors tw:hover:border-accent/40"
-              >
-                Get it on Google Play
-              </a>
-            </div>
-
-            <ul className="tw:flex tw:items-center tw:gap-2">
-              {SOCIALS.map(({ name, Icon, href }) => (
-                <li key={name}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Xilolo on ${name}`}
-                    className="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-pill tw:border tw:border-hairline-dark tw:text-body-dark tw:transition-colors tw:hover:border-accent/40 tw:hover:text-accent"
-                  >
-                    <Icon className="tw:size-4" aria-hidden="true" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          </ul>
         </div>
       </div>
 
       <div className="tw:border-t tw:border-hairline-dark">
-        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw:flex-col tw:gap-3 tw:px-4 tw:py-6 text-sm tw:md:flex-row tw:md:items-center tw:md:justify-between tw:md:px-8">
-          <p className="tw:text-xs tw:text-muted-dark">
-            © {new Date().getFullYear()} Xilolo Technologies. All rights reserved.
-          </p>
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-5">
-            <Link to="/terms-of-service" className="tw:text-xs tw:text-muted-dark tw:hover:text-accent">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw-flex-col tw:gap-2 tw:px-4 tw:py-4 tw:text-xs tw:text-faint-dark tw:md:flex-row tw:md:items-center tw:md:justify-between tw:md:px-8">
+          <p>© {new Date().getFullYear()} Xilolo Technologies</p>
+          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-4">
+            <Link to="/terms-of-service" className="tw:hover:text-paper-raised">
               Terms
             </Link>
-            <Link to="/privacy-policy" className="tw:text-xs tw:text-muted-dark tw:hover:text-accent">
+            <Link to="/privacy-policy" className="tw:hover:text-paper-raised">
               Privacy
             </Link>
-            <Link
-              to="/community-guidelines"
-              className="tw:text-xs tw:text-muted-dark tw:hover:text-accent"
-            >
+            <Link to="/community-guidelines" className="tw:hover:text-paper-raised">
               Guidelines
             </Link>
           </div>
