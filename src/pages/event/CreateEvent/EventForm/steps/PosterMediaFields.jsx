@@ -303,10 +303,10 @@ export default function PosterMediaFields({
 
   return (
     <>
-      <section className="tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-4 tw:sm:p-5">
+      <section className="tw:mb-1">
         <div className="tw:mb-4 tw:flex tw:flex-col tw:gap-1">
-          <span className="tw:text-base tw:font-semibold tw:text-slate-900">
-            Upload a thumbnail 
+          <span className="tw:block tw:text-[14px] tw:font-bold tw:text-body">
+            Add a poster or cover image for your event
           </span>
         </div>
 
@@ -322,16 +322,14 @@ export default function PosterMediaFields({
             handleMixedFiles(event.dataTransfer.files);
           }}
           onClick={() => uploadInputRef.current?.click()}
-          className={`tw:cursor-pointer tw:rounded-3xl tw:border tw:border-dashed tw:p-5 tw:text-center tw:transition ${
-            isDraggingUpload
-              ? "tw:border-primary tw:bg-[#ffffff]"
-              : "tw:border-gray-300 tw:bg-[#ffffff] tw:hover:border-primary"
+          className={`tw:mt-3 tw:cursor-pointer tw:rounded-[12px] tw:border tw:border-dashed tw:bg-inner tw:p-5 tw:text-center tw:transition ${
+            isDraggingUpload ? "tw:border-accent" : "tw:border-hairline tw:hover:border-accent"
           }`}
         >
-          <div className="tw:text-sm tw:font-medium tw:text-primary">
+          <div className="tw:text-[14px] tw:font-semibold tw:text-accent-deep">
             Drag and drop photos, or click to choose files
           </div>
-          <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
+          <div className="tw:mt-1 tw:text-[12px] tw:font-medium tw:text-muted">
             Images up to 10MB. Videos are not supported for event posters.
           </div>
           <input
@@ -349,13 +347,13 @@ export default function PosterMediaFields({
 
         <div className="tw:mt-5 tw:space-y-5">
           {featuredMedia && (
-            <div className="tw:overflow-hidden tw:rounded-[24px] tw:border tw:border-gray-100 tw:bg-white">
-              <div className="tw:flex tw:items-center tw:justify-between tw:border-b tw:border-gray-100 tw:px-4 tw:py-3">
+            <div className="tw:overflow-hidden tw:rounded-[12px] tw:border tw:border-hairline">
+              <div className="tw:flex tw:items-center tw:justify-between tw:border-b tw:border-hairline tw:px-4 tw:py-3">
                 <div>
-                  <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-900">
+                  <span className="tw:block tw:text-[13px] tw:font-bold tw:text-body">
                     Preview
                   </span>
-                  <span className="tw:text-xs tw:text-slate-500">
+                  <span className="tw:text-[12px] tw:font-medium tw:text-muted">
                     {featuredMedia.label}
                   </span>
                 </div>
@@ -370,7 +368,7 @@ export default function PosterMediaFields({
                           thumbnailIndex
                         )
                       }
-                      className="tw:rounded-full tw:border tw:border-gray-200 tw:px-3 tw:py-1.5 tw:text-xs tw:hover:bg-gray-50"
+                      className="tw:rounded-full tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-body tw:hover:border-accent"
                       style={{ borderRadius: 16 }}
                     >
                       Recrop
@@ -378,7 +376,7 @@ export default function PosterMediaFields({
                     <button
                       type="button"
                       onClick={() => removePosterImageAt(thumbnailIndex)}
-                      className="tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:text-red-600 tw:hover:bg-red-50"
+                      className="tw:rounded-full tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
                       style={{ borderRadius: 16 }}
                     >
                       Remove
@@ -387,11 +385,11 @@ export default function PosterMediaFields({
                 )}
               </div>
 
-              <div className="tw:flex tw:min-h-[280px] tw:items-center tw:justify-center tw:bg-[#f4f4f8]">
+              <div className="tw:flex tw:min-h-[220px] tw:items-center tw:justify-center tw:bg-inner">
                 <img
                   src={featuredMedia.url}
                   alt={featuredMedia.name || "Selected poster"}
-                  className="tw:h-[320px] tw:w-full tw:object-cover"
+                  className="tw:h-[240px] tw:w-full tw:object-cover"
                 />
               </div>
             </div>
@@ -399,15 +397,15 @@ export default function PosterMediaFields({
 
           <div className="tw:space-y-3">
             {existingPoster?.length > 0 && (
-              <div className="tw:rounded-[24px] tw:border tw:border-gray-100 tw:bg-white tw:p-4">
-                <span className="tw:mb-3 tw:block tw:text-sm tw:font-medium tw:text-slate-900">
+              <div className="tw:rounded-[12px] tw:border tw:border-hairline tw:p-4">
+                <span className="tw:mb-3 tw:block tw:text-[13px] tw:font-bold tw:text-body">
                   Existing media
                 </span>
                 <div className="tw:flex tw:flex-wrap tw:gap-3">
                   {existingPoster.map((media, index) => (
                     <div
                       key={media.id || index}
-                      className="tw:relative tw:h-24 tw:w-24 tw:overflow-hidden tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-black/5"
+                      className="tw:relative tw:h-24 tw:w-24 tw:overflow-hidden tw:rounded-[12px] tw:border tw:border-hairline tw:bg-inner"
                     >
                       <img
                         src={media.url}
@@ -438,25 +436,25 @@ export default function PosterMediaFields({
           </div>
         </div>
 
-        {error ? <p className="tw:mt-3 tw:text-xs tw:text-red-500">{error}</p> : null}
+        {error ? <p className="tw:mt-3 tw:text-[12px] tw:font-semibold tw:text-danger">{error}</p> : null}
       </section>
 
       {cropDialog.open && (
-        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:bg-black/60 tw:p-4 tw:backdrop-blur-sm">
-          <div className="tw:flex tw:max-h-[80vh] tw:w-full tw:max-w-3xl tw:flex-col tw:gap-4 tw:overflow-hidden tw:rounded-[34px] tw:border tw:border-gray-100 tw:bg-white tw:p-6 tw:shadow-2xl">
+        <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-center tw:justify-center tw:bg-black/60 tw:p-4">
+          <div className="tw:flex tw:max-h-[80vh] tw:w-full tw:max-w-3xl tw:flex-col tw:gap-4 tw:overflow-hidden tw:rounded-[16px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-6">
             <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
               <div>
-                <span className="tw:block tw:text-xl tw:font-bold tw:text-gray-900">
+                <span className="tw:block tw:font-display tw:text-[17px] tw:font-bold tw:text-body">
                   Crop poster
                 </span>
-                <span className="tw:text-sm tw:text-gray-500">
+                <span className="tw:text-[12px] tw:font-medium tw:text-muted">
                   The crop starts at the full image size. Adjust only if you want
                   a tighter frame.
                 </span>
               </div>
               <button
                 type="button"
-                className="tw:text-gray-400 tw:hover:text-gray-600"
+                className="tw:text-[12px] tw:font-semibold tw:text-muted tw:hover:text-body"
                 onClick={closeCropDialog}
               >
                 Cancel
@@ -464,7 +462,7 @@ export default function PosterMediaFields({
             </div>
 
             <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:overflow-y-auto tw:pr-1 tw:lg:grid-cols-[1.2fr_0.8fr]">
-              <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-gray-200 tw:bg-gray-50 tw:p-3">
+              <div className="tw:rounded-[12px] tw:border tw:border-dashed tw:border-hairline tw:bg-inner tw:p-3">
                 <ReactCrop
                   crop={crop}
                   onChange={(_, percentCrop) => {
@@ -498,30 +496,30 @@ export default function PosterMediaFields({
                 </ReactCrop>
               </div>
 
-              <div className="tw:hidden tw:flex-col tw:gap-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:p-4 tw:lg:flex">
+              <div className="tw:hidden tw:flex-col tw:gap-3 tw:rounded-[12px] tw:border tw:border-hairline tw:p-4 tw:lg:flex">
                 <div className="tw:flex tw:items-center tw:gap-2">
-                  <div className="tw:h-2 tw:w-8 tw:rounded-full tw:bg-linear-to-r tw:from-primary tw:to-primarySecond" />
-                  <span className="tw:text-sm tw:text-gray-500">Preview</span>
+                  <div className="tw:h-2 tw:w-8 tw:rounded-full tw:bg-accent" />
+                  <span className="tw:text-[12px] tw:font-semibold tw:text-muted">Preview</span>
                 </div>
-                <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-100 tw:p-4">
+                <div className="tw:flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-[12px] tw:border tw:border-hairline tw:bg-inner tw:p-4">
                   <canvas
                     ref={previewCanvasRef}
                     className="tw:max-h-[260px] tw:w-full"
                   />
                 </div>
-                <span className="tw:block tw:text-xs tw:text-gray-500">
+                <span className="tw:block tw:text-[12px] tw:font-medium tw:text-muted">
                   Save to replace the current image. You can reopen the crop tool
                   whenever you want.
                 </span>
               </div>
             </div>
 
-            <div className="tw:sticky tw:bottom-0 tw:flex tw:items-center tw:justify-end tw:gap-3 tw:border-t tw:border-gray-100 tw:bg-white tw:pt-3">
+            <div className="tw:sticky tw:bottom-0 tw:flex tw:items-center tw:justify-end tw:gap-3 tw:border-t tw:border-hairline tw:bg-paper-raised tw:pt-3">
               <button
                 type="button"
                 onClick={closeCropDialog}
-                className="tw:rounded-xl tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
-                style={{ borderRadius: 16, fontSize: 12 }}
+                className="tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:py-2 tw:text-[12px] tw:font-semibold tw:text-body"
+                style={{ fontSize: 12 }}
               >
                 Cancel
               </button>
@@ -529,8 +527,8 @@ export default function PosterMediaFields({
                 type="button"
                 onClick={commitCrop}
                 disabled={!completedCrop?.width || !completedCrop?.height}
-                className="tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
-                style={{ borderRadius: 16, fontSize: 12 }}
+                className="tw:rounded-full tw:bg-accent tw:px-4 tw:py-2 tw:text-[12px] tw:font-bold tw:text-white tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                style={{ fontSize: 12 }}
               >
                 Save poster
               </button>

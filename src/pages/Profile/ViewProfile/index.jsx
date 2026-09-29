@@ -1,21 +1,56 @@
+// src/pages/Profile/ViewProfile/index.jsx
+//
+// /profile/:profileId — the web user profile page.
+//
+// DESIGN SOURCE OF TRUTH (read-only): xilolo-app
+//   Own profile  lib/features/presentation/screens/profile/screens/
+//                user_and_organizer_profile_screen/user_main_profile_screen_revamp.dart
+//                  app bar (back 42 circle card fill + hairline, title "Profile"
+//                  21/w700, "Edit" pill r16)                     :259-326
+//                  stack order: header card -> followers/following -> about ->
+//                  ranking, gutters 14                     :163-193, :332-346
+//   Other user   lib/.../profile/screens/organizer_profile.dart
+//                  app bar (back 40 circle chip, "Profile" 20/w600, share 40
+//                  circle chip)                                   :186-265
+//                  stack order: header -> followers -> about (only if a bio) ->
+//                  ranking, gutters 16                      :132-163, :271-296
+//                  error/loading shimmer               :97-130, organizer_profile_shimmer
+//   Plain user   lib/.../profile/screens/user_profile_screen.dart
+//                  error state: error_outline 64 faint, message 16 muted, Go Back
+//                  button                                        :110-136
+//   L10n         lib/l10n/app_en.arb — "Profile", "More From Organizer",
+//                "Organizer's Ranking", "View Top Organizers", "No events found"
+//
+// RESPONSIVENESS: the app is a single column at every width (horizontal padding
+// only), so this page is too — one column capped at 560px and centred, the same
+// convention the rebuilt /tickets screen uses (TicketsPage.jsx:261-262). The
+// previous two-column 35%/flex layout was a web-only arrangement the app does
+// not have.
+//
+// Data is untouched: same useProfile() hook, same GET /api/v1/organiser/:id +
+// 404 fallback to the shared-user profile, same GET /api/v1/follow/:id, same
+// share helpers, same KYC / become-an-organiser branches.
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft, Pencil, Share2, TriangleAlert } from "lucide-react";
+
 import useProfile from "../../../hooks/useProfile";
-import ProfileHeader from "../../../component/Profile/ProfileHeader";
+import ProfileHeader, {
+  ProfileRanking,
+  profileHasSubscription,
+  profileIsOrganiser,
+} from "../../../component/Profile/ProfileHeader";
 import AboutPanel from "../../../component/Profile/AboutPanel";
 import ProfileTabs from "../../../component/Profile/ProfileTab";
-import "./profile.css";
-import { ChevronLeft } from "lucide-react";
-
 import { useAuth } from "../../auth/AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
 import { showError, showSuccess } from "../../../component/ui/toast";
-import { Edit } from "react-feather";
 import {
   getOrganiserProfileShare,
   getUserProfileShare,
 } from "../../../api/profileShareApi";
+import "./profile.css";
 
 const pickIsFollowing = (data) => {
   if (!data) return false;
@@ -66,65 +101,297 @@ const normalizeSharedUserProfile = (payload) => {
   };
 };
 
+/** app: organizer_profile.dart:97-130 shells the pending organiser profile with
+ *  OrganizerProfileShimmer; this is the same skeleton in web tokens. */
 const ProfileSkeleton = () => (
-  <div className="tw:animate-pulse tw:flex tw:flex-col tw:lg:flex-row tw:gap-6 tw:h-full">
-    <div className="tw:w-full tw:lg:w-[35%] tw:space-y-4">
-      <div className="tw:bg-white tw:rounded-3xl tw:p-6 tw:border tw:border-gray-100 tw:space-y-4 tw:shadow-sm">
-        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
-          <div className="tw:h-24 tw:w-24 tw:rounded-full tw:bg-gray-200" />
-          <div className="tw:h-6 tw:w-1/2 tw:rounded-full tw:bg-gray-200" />
-          <div className="tw:h-4 tw:w-1/3 tw:rounded-full tw:bg-gray-200" />
-          <div className="tw:flex tw:items-center tw:gap-2 tw:mt-2">
-            <span className="tw:h-4 tw:w-20 tw:rounded-full tw:bg-gray-100" />
-            <span className="tw:h-4 tw:w-24 tw:rounded-full tw:bg-gray-100" />
-          </div>
-        </div>
-
-        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} className="tw:space-y-2">
-              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
-              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
-        <div className="tw:h-5 tw:w-40 tw:rounded-full tw:bg-gray-100" />
-        <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mt-4">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="tw:space-y-2">
-              <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-gray-100" />
-              <div className="tw:h-4 tw:w-full tw:rounded-full tw:bg-gray-200" />
-            </div>
-          ))}
+  <div className="tw:animate-pulse tw:flex tw:flex-col tw:gap-[10px]">
+    <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-[24px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-[14px] tw:md:p-[18px]">
+      <div className="tw:size-[84px] tw:shrink-0 tw:rounded-full tw:bg-inner" />
+      <div className="tw:min-w-0 tw:flex-1 tw:space-y-3">
+        <div className="tw:h-5 tw:w-1/2 tw:rounded-full tw:bg-inner" />
+        <div className="tw:h-5 tw:w-24 tw:rounded-full tw:bg-chip" />
+        <div className="tw:h-px tw:w-full tw:bg-hairline" />
+        <div className="tw:flex tw:gap-4">
+          <div className="tw:h-9 tw:w-28 tw:rounded-lg tw:bg-chip" />
+          <div className="tw:h-9 tw:w-28 tw:rounded-lg tw:bg-chip" />
         </div>
       </div>
     </div>
-
-    <div className="tw:flex-1 tw:space-y-4">
-      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm tw:space-y-4">
-        <div className="tw:flex tw:gap-3">
-          {["tab-1", "tab-2", "tab-3"].map((tab) => (
-            <span
-              key={tab}
-              className="tw:h-10 tw:w-24 tw:rounded-full tw:bg-gray-100"
-            />
-          ))}
-        </div>
-        <div className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
-      </div>
-      <div className="tw:bg-white tw:rounded-3xl tw:p-5 tw:border tw:border-gray-100 tw:shadow-sm">
-        <div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:md:grid-cols-3">
-          {Array.from({ length: 4 }).map((_, idx) => (
-            <div key={idx} className="tw:h-52 tw:rounded-2xl tw:bg-gray-100" />
-          ))}
-        </div>
-      </div>
+    <div className="tw:grid tw:grid-cols-2 tw:gap-[10px]">
+      {["f1", "f2"].map((k) => (
+        <div
+          key={k}
+          className="tw:h-[90px] tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised"
+        />
+      ))}
     </div>
+    <div className="tw:h-[120px] tw:rounded-[22px] tw:border tw:border-hairline tw:bg-paper-raised" />
   </div>
 );
+
+/** app: user_profile_screen.dart:110-136 / organizer_profile.dart:97-130. */
+function ProfileErrorState({ message, onBack }) {
+  return (
+    <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:px-8 tw:py-16 tw:text-center">
+      <TriangleAlert className="tw:size-16 tw:text-faint" strokeWidth={1.5} />
+      <div className="tw:mt-4 tw:text-[16px] tw:text-muted">{message}</div>
+      <button
+        type="button"
+        onClick={onBack}
+        className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-accent tw:px-6 tw:text-[14px] tw:font-semibold tw:text-white"
+      >
+        Go Back
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Presentation only. Exported so /dev/profile-preview can render the REAL page
+ * markup at any width without a session — the preview must not be able to drift
+ * from production.
+ */
+export function ProfileScreenView({
+  profile = null,
+  kycStatus = null,
+  isOwnProfile = true,
+  isLoading = false,
+  error = null,
+  isFollowing = false,
+  followLoading = false,
+  shareLoading = false,
+  onToggleFollow,
+  onShare,
+  onBack,
+  previewEvents = null,
+}) {
+  const navigate = useNavigate();
+  const goBack = onBack || (() => navigate(-1));
+
+  const isOrganiser = isOwnProfile && profileIsOrganiser(profile);
+  const isKycVerified = kycStatus === "verified";
+  const shouldShowBecomeOrganiser =
+    isOwnProfile && !isOrganiser && !isKycVerified;
+  const isSharedOrganiserProfile =
+    !!profile?.organiser ||
+    (!!profile?.userId && (!!profile?.events || !!profile?.allEvents));
+
+  const appBarAction = isOwnProfile ? (
+    /* app: own profile app bar "Edit" pill, r16 (revamp:300-320) */
+    <Link
+      to="/profile/edit-profile"
+      className="tw:ml-auto tw:inline-flex tw:h-[38px] tw:items-center tw:gap-2 tw:rounded-[16px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:text-[13px] tw:font-semibold tw:text-body"
+    >
+      <Pencil className="tw:size-[18px]" />
+      Edit
+    </Link>
+  ) : (
+    /* app: public profile app bar share chip 40x40 (organizer_profile.dart:234-260) */
+    <button
+      type="button"
+      onClick={onShare}
+      disabled={shareLoading}
+      aria-label="Share profile"
+      className="tw:ml-auto tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-chip tw:text-body tw:disabled:opacity-60"
+    >
+      <Share2 className="tw:size-5" />
+    </button>
+  );
+
+  return (
+    <div className="tw:min-h-screen tw:bg-paper tw:pt-24 tw:pb-8 tw:font-sans">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
+        {/* app bar — organizer_profile.dart:186-265 / revamp:259-326 */}
+        <div className="tw:flex tw:h-14 tw:items-center tw:gap-3">
+          <button
+            type="button"
+            onClick={goBack}
+            aria-label="Go back"
+            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-hairline tw:bg-chip tw:text-body"
+          >
+            <ChevronLeft className="tw:size-5" />
+          </button>
+          <h1 className="tw:m-0! tw:text-[20px]! tw:font-bold! tw:leading-none tw:text-body">
+            Profile
+          </h1>
+          {appBarAction}
+        </div>
+
+        <div className="tw:mt-3">
+          {isLoading ? (
+            <ProfileSkeleton />
+          ) : error ? (
+            <ProfileErrorState
+              message={`Failed to load profile: ${error}`}
+              onBack={goBack}
+            />
+          ) : !profile ? (
+            <ProfileErrorState message="No profile data found." onBack={goBack} />
+          ) : shouldShowBecomeOrganiser ? (
+            // 1) Your own profile + NOT organiser + KYC not verified
+            <div className="tw:space-y-[10px]">
+              <div className="tw:flex flex-col items-center tw:rounded-[22px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-[18px]">
+                <div className="tw:size-[114px] tw:overflow-hidden tw:rounded-full">
+                  <img
+                    src={profile?.profileUrl || "/images/avater_pix.avif"}
+                    alt=""
+                    className="tw:h-full tw:w-full tw:object-cover"
+                  />
+                </div>
+                <div className="tw:mt-3 tw:text-center">
+                  <span className="tw:block tw:text-[16px] tw:font-semibold tw:text-body">
+                    {profile?.name}
+                  </span>
+                  <span className="tw:block tw:text-[12px] tw:text-muted">
+                    {profile?.email}
+                  </span>
+                </div>
+                <div className="tw:mt-6 tw:w-full tw:rounded-[16px] tw:bg-chip tw:px-4 tw:py-3">
+                  <span className="tw:block tw:text-[12px] tw:text-muted">
+                    Following
+                  </span>
+                  <span className="tw:block tw:text-[20px] tw:font-semibold tw:text-body">
+                    {profile?.followings_count ?? 0}
+                  </span>
+                </div>
+              </div>
+
+              <div className="tw:rounded-[16px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-4 tw:py-3">
+                <span className="tw:block tw:text-[14px] tw:font-semibold tw:text-body">
+                  About Me
+                </span>
+                <span className="tw:block tw:text-[12px] tw:text-muted">
+                  {profile?.about}
+                </span>
+              </div>
+
+              <div className="tw:rounded-[22px] tw:bg-ink tw:px-4 tw:py-4 tw:text-center">
+                <span className="tw:block tw:text-[20px] tw:font-semibold tw:uppercase tw:text-white">
+                  Do you have an event?
+                </span>
+                <span className="tw:block tw:text-[12px] tw:text-ink-muted">
+                  You can be an organizer and drive more audience to your event.
+                  People all over the world can’t wait to attend!!
+                </span>
+                <Link
+                  to="/become-an-organiser"
+                  className="tw:mt-5 tw:block tw:rounded-[12px] tw:bg-white tw:p-3 tw:text-center tw:text-[15px] tw:font-semibold tw:text-body"
+                >
+                  Become an Organizer
+                </Link>
+              </div>
+            </div>
+          ) : isOwnProfile && isOrganiser && !isKycVerified ? (
+            // 2) Your own profile + organiser but KYC not verified
+            <div className="tw:flex tw:justify-center tw:py-6">
+              <div className="tw:w-full tw:rounded-[22px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:md:p-8">
+                <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
+                  <div className="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-[16px] tw:bg-accent-soft">
+                    <span className="tw:size-6 tw:animate-spin tw:rounded-full tw:border-[3px] tw:border-accent tw:border-t-transparent" />
+                  </div>
+
+                  <div className="tw:min-w-0 tw:text-center">
+                    <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-success/10 tw:px-3 tw:py-1">
+                      <span className="tw:size-2 tw:animate-pulse tw:rounded-full tw:bg-success" />
+                      <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-success">
+                        KYC in progress
+                      </span>
+                    </span>
+
+                    <span className="tw:mt-3 tw:block tw:text-[20px] tw:font-semibold tw:text-body tw:md:text-2xl">
+                      Your organiser account is under review
+                    </span>
+
+                    <div className="tw:mt-2 tw:text-[14px] tw:text-muted">
+                      We&apos;re currently verifying the details you submitted.
+                      Once your KYC is approved, you&apos;ll unlock organiser
+                      tools like event creation, payouts and more.
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tw:mt-6 tw:space-y-3 tw:rounded-[16px] tw:bg-chip tw:px-4 tw:py-4">
+                  <div className="tw:flex tw:items-center tw:justify-between">
+                    <span className="tw:text-[12px] tw:font-medium tw:text-body">
+                      Verification status
+                    </span>
+                    <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-muted">
+                      Under review
+                    </span>
+                  </div>
+
+                  <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-inner">
+                    <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-accent tw:transition-all tw:duration-500" />
+                  </div>
+
+                  <div className="tw:space-y-1.5 tw:text-[12px] tw:text-muted">
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <span className="tw:size-1.5 tw:rounded-full tw:bg-accent" />
+                      ID &amp; bank details submitted
+                    </div>
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <span className="tw:size-1.5 tw:rounded-full tw:bg-success" />
+                      Our compliance team is reviewing your information
+                    </div>
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <span className="tw:size-1.5 tw:rounded-full tw:bg-faint" />
+                      You&apos;ll be notified once a decision is made
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tw:mt-6">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/")}
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:text-[12px] tw:font-medium tw:text-body"
+                  >
+                    Go to home
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // 3) Normal profile layout — app section order, one column
+            <div className="tw:space-y-[10px]">
+              <ProfileHeader
+                user={profile}
+                isOwnProfile={isOwnProfile}
+                isFollowing={isFollowing}
+                followLoading={followLoading}
+                onToggleFollow={onToggleFollow}
+              />
+
+              <AboutPanel user={profile} isOwnProfile={isOwnProfile} />
+
+              {/* app: ranking follows the about block
+                  (revamp:343, organizer_profile.dart:287-292) */}
+              {profileHasSubscription(profile) || profile?.rank ? null : null}
+              <ProfileRanking user={profile} isOwnProfile={isOwnProfile} />
+            </div>
+          )}
+
+          {/* events block — hidden while the profile is still loading / broken /
+              while the KYC gates are showing, exactly as the app splits the
+              profile screen from the events list */}
+          {!isLoading &&
+            !error &&
+            profile &&
+            !shouldShowBecomeOrganiser &&
+            !(isOwnProfile && isOrganiser && !isKycVerified) && (
+              <div className="tw:mt-4">
+                <ProfileTabs
+                  user={profile}
+                  isOwnProfile={isOwnProfile}
+                  previewEvents={previewEvents}
+                />
+              </div>
+            )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ViewProfile() {
   const navigate = useNavigate();
@@ -133,7 +400,7 @@ export default function ViewProfile() {
   const { profileId: routeUserId } = useParams();
 
   // logged-in user (you)
-  const { user: me, token, organiser } = useAuth() || {};
+  const { user: me, token } = useAuth() || {};
 
   // existing hook for "my profile"
   const {
@@ -222,34 +489,21 @@ export default function ViewProfile() {
     : viewedOrganiserProfileQuery.error?.message || null;
 
   /* ------------------ organiser / KYC logic (only for own profile) ------------------ */
-  const isOrganiser =
-    isOwnProfile &&
-    (finalProfileUser?.is_organiser_verified ||
-      finalProfileUser?.roles?.includes("organiser") ||
-      finalProfileUser?.roles?.includes("organizer") ||
-      finalProfileUser?.organiser?.is_organiser_verified || // optional
-      finalProfileUser?.organiser?.roles?.includes?.("organiser")); // optional
   const isSharedOrganiserProfile =
     sharedProfileType === "organiser" ||
     !!finalProfileUser?.organiser ||
-    (!!finalProfileUser?.userId && (!!finalProfileUser?.events || !!finalProfileUser?.allEvents));
+    (!!finalProfileUser?.userId &&
+      (!!finalProfileUser?.events || !!finalProfileUser?.allEvents));
   const shareTargetId = isSharedOrganiserProfile
     ? finalProfileUser?.organiser?.id ||
       finalProfileUser?.organiser?.user_id ||
       finalProfileUser?.userId ||
       finalProfileUser?.id
-    : finalProfileUser?.id || finalProfileUser?.user_id || finalProfileUser?.userId;
-  const profileHeading = isOwnProfile
-    ? "Profile"
-    : isSharedOrganiserProfile
-      ? "Organizer Profile"
-      : "Profile";
+    : finalProfileUser?.id ||
+      finalProfileUser?.user_id ||
+      finalProfileUser?.userId;
 
   const kycStatus = isOwnProfile ? finalProfileUser?.kyc?.status || null : null;
-  const isKycVerified = kycStatus === "verified";
-
-  const shouldShowBecomeOrganiser =
-    isOwnProfile && !isOrganiser && !isKycVerified;
 
   /* ------------------ follow / unfollow organiser ------------------ */
   const handleToggleFollow = async () => {
@@ -294,10 +548,10 @@ export default function ViewProfile() {
         (current) =>
           current
             ? {
-              ...current,
-              isFollowing: isNowFollowing,
-              following: isNowFollowing,
-            }
+                ...current,
+                isFollowing: isNowFollowing,
+                following: isNowFollowing,
+              }
             : current
       );
 
@@ -359,217 +613,19 @@ export default function ViewProfile() {
   };
 
   return (
-    <div
-      data-bounce-page="profile"
-      className="tw:font-sans tw:bg-white tw:min-h-screen tw:py-4 tw:lg:h-[calc(100vh-80px)] tw:lg:overflow-hidden"
-    >
-      {/* top bar */}
-      <div className="tw:bg-white tw:w-full tw:pt-20 tw:lg:pt-24 tw:pb-4 tw:border-b tw:border-gray-100">
-        <div className="tw:max-w-2xl tw:flex tw:items-center tw:px-4">
-          <button
-            style={{ borderRadius: 20 }}
-            type="button"
-            className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:bg-white tw:border tw:border-gray-200 tw:hover:bg-gray-50 tw:transition"
-            onClick={() => navigate(-1)}
-          >
-            <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-700" />
-          </button>
-          <span className="tw:text-lg tw:md:text-xl tw:font-semibold tw:text-gray-900">
-            {profileHeading}
-          </span>
-          <div className="tw:size-10" />
-        </div>
-      </div>
-
-      {/* content */}
-      <div className="tw:mt-4 tw:px-2 tw:md:px-6 tw:h-auto tw:lg:h-[calc(100vh-140px)]">
-        {isLoading ? (
-          <ProfileSkeleton />
-        ) : profileError ? (
-          <p className="tw:text-red-600 tw:mt-10">
-            Failed to load profile: {profileError}
-          </p>
-        ) : !finalProfileUser ? (
-          <p className="tw:text-gray-600 tw:mt-10">No profile data found.</p>
-        ) : isOwnProfile && shouldShowBecomeOrganiser ? (
-          // 1) Your own profile + NOT organiser + KYC not verified → "Become an Organiser"
-          <div className="tw:w-full tw:min-h-screen tw:bg-[#F5F5F7] tw:px-4 tw:pt-5 tw:lg:px-4">
-            <div className="tw:relative tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-10 tw:rounded-3xl tw:px-4 tw:py-3">
-              <button
-                type="button"
-                onClick={() => navigate("/profile/edit-profile")}
-                aria-label="Edit profile"
-                className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-700 tw:shadow-md tw:hover:bg-slate-50 tw:transition"
-              >
-                <Edit size={18} />
-              </button>
-              <div className="tw:flex tw:flex-col tw:items-center tw:justify-center">
-                <div className="tw:size-[114px] tw:rounded-full tw:overflow-hidden">
-                  <img
-                    src={
-                      finalProfileUser?.profileUrl || "/images/avater_pix.avif"
-                    }
-                    alt=""
-                    className="tw:w-full tw:h-full tw:object-cover"
-                  />
-                </div>
-                <div className="tw:mt-1 tw:text-center">
-                  <span className="tw:block tw:font-semibold tw:text-[16px]">
-                    {finalProfileUser?.name}
-                  </span>
-                  <span className="tw:block tw:text-xs">
-                    {finalProfileUser?.email}
-                  </span>
-                </div>
-                <div className="tw:bg-[#f5f5f5] tw:relative tw:px-4 tw:py-3 tw:rounded-2xl tw:mt-6 tw:w-full">
-                  <div>
-                    <span className="tw:block tw:text-xs">Following</span>
-                    <span className="tw:block tw:font-semibold tw:text-[20px]">
-                      {finalProfileUser?.followings_count ?? 0}
-                    </span>
-                  </div>
-                  <img
-                    className="tw:size-3 tw:absolute tw:top-4 tw:right-4"
-                    src="/images/arrowrightbend.png"
-                    alt=""
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="tw:bg-white tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-2 tw:rounded-2xl tw:px-4 tw:py-3">
-              <span className="tw:block tw:font-semibold">About Me</span>
-              <span className="tw:block tw:text-xs">
-                {finalProfileUser?.about}
-              </span>
-            </div>
-
-            <div className="tw:bg-linear-to-r tw:from-primary tw:via-[#1d1d1d] tw:to-[#2b2b2b] tw:w-full tw:md:max-w-xl tw:mx-auto tw:mt-4 tw:rounded-2xl tw:px-4 tw:py-4 tw:text-center tw:text-white">
-              <span className="tw:block tw:font-semibold tw:uppercase tw:text-xl">
-                Do you have an event?
-              </span>
-              <span className="tw:block tw:text-xs">
-                You can be an organizer and drive more audience to your event.
-                People all over the world can’t wait to attend!!
-              </span>
-
-              <Link
-                to="/become-an-organiser"
-                className="tw:p-3 tw:block tw:bg-white tw:text-black tw:mt-5 tw:rounded-lg tw:text-center"
-              >
-                <span className="tw:block tw:font-semibold">
-                  Become an Organizer
-                </span>
-              </Link>
-            </div>
-          </div>
-        ) : isOwnProfile && isOrganiser && !isKycVerified ? (
-          // 2) Your own profile + organiser but KYC not verified → notice block
-          <div className="tw:h-full tw:flex tw:items-start tw:lg:items-center tw:justify-center tw:py-6">
-            <div className="tw:w-full tw:max-w-xl tw:bg-white tw:rounded-3xl tw:p-6 tw:md:p-8 tw:shadow-[0_18px_60px_rgba(15,23,42,0.18)] tw:space-y-6">
-              {/* Top: icon + badge */}
-              <div className="tw:flex tw:items-center tw:flex-col tw:gap-4">
-                <div className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary/5">
-                  <div className="tw:h-6 tw:w-6 tw:rounded-full tw:border-[3px] tw:border-primary tw:border-t-transparent tw:animate-spin" />
-                </div>
-
-                <div className="tw:flex-1 tw:text-center">
-                  <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1">
-                    <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500 tw:animate-pulse" />
-                    <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.16em] tw:uppercase tw:text-emerald-700">
-                      KYC in progress
-                    </span>
-                  </div>
-
-                  <span className="tw:block tw:mt-3 tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
-                    Your organiser account is under review
-                  </span>
-
-                  <p className="tw:mt-2 tw:text-sm tw:text-slate-600">
-                    We&apos;re currently verifying the details you submitted.
-                    Once your KYC is approved, you&apos;ll unlock organiser
-                    tools like event creation, payouts and more.
-                  </p>
-                </div>
-              </div>
-
-              {/* Progress bar + copy */}
-              <div className="tw:rounded-2xl tw:bg-slate-50 tw:px-4 tw:py-4 tw:space-y-3">
-                <div className="tw:flex tw:items-center tw:justify-between">
-                  <span className="tw:text-xs tw:font-medium tw:text-slate-700">
-                    Verification status
-                  </span>
-                  <span className="tw:text-[11px] tw:font-semibold tw:text-slate-500 tw:uppercase tw:tracking-[0.16em]">
-                    Under review
-                  </span>
-                </div>
-
-                <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-slate-200">
-                  <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-primary tw:transition-all tw:duration-500" />
-                </div>
-
-                <ul className="tw:mt-1 tw:space-y-1.5 tw:text-[12px] tw:text-slate-600">
-                  <li className="tw:flex tw:items-center tw:gap-2">
-                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
-                    ID & bank details submitted
-                  </li>
-                  <li className="tw:flex tw:items-center tw:gap-2">
-                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-400" />
-                    Our compliance team is reviewing your information
-                  </li>
-                  <li className="tw:flex tw:items-center tw:gap-2">
-                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-slate-300" />
-                    You&apos;ll be notified once a decision is made
-                  </li>
-                </ul>
-              </div>
-
-              {/* Info + actions */}
-              <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:justify-between tw:gap-4">
-                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                  <button
-                    style={{ borderRadius: 12 }}
-                    type="button"
-                    className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:px-4 tw:py-2 tw:text-xs tw:font-medium tw:text-slate-700 tw:hover:bg-slate-50 tw:transition"
-                    onClick={() => navigate("/")}
-                  >
-                    Go to home
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          // 3) Normal profile layout
-          // (own profile with KYC verified OR viewing another organiser)
-          <div className="tw:flex tw:flex-col tw:lg:flex-row tw:lg:gap-6 tw:lg:h-full">
-            {/* LEFT: profile card + about */}
-            <div className="tw:w-full tw:lg:w-[35%] tw-no-scrollbar tw:lg:pb-10 tw:shrink-0 tw:lg:h-full tw:lg:overflow-y-auto tw:lg:pr-2">
-              <div className="tw:space-y-4 tw:lg:pb-6">
-                <ProfileHeader
-                  user={finalProfileUser}
-                  organiser={organiser}
-                  isOwnProfile={isOwnProfile}
-                  isFollowing={isFollowing}
-                  followLoading={followLoading}
-                  onToggleFollow={handleToggleFollow}
-                  onShare={handleShareProfile}
-                  shareLoading={shareLoading}
-                />
-                <AboutPanel user={finalProfileUser} />
-              </div>
-            </div>
-
-            {/* RIGHT: events */}
-            <div className="tw:flex-1 tw:h-auto tw:lg:h-full tw:pb-20 tw:pr-1 tw:lg:overflow-y-auto">
-              <ProfileTabs
-                user={finalProfileUser}
-                isOwnProfile={isOwnProfile}
-              />
-            </div>
-          </div>
-        )}
-      </div>
+    <div data-bounce-page="profile">
+      <ProfileScreenView
+        profile={finalProfileUser}
+        kycStatus={kycStatus}
+        isOwnProfile={isOwnProfile}
+        isLoading={isLoading}
+        error={profileError}
+        isFollowing={isFollowing}
+        followLoading={followLoading}
+        shareLoading={shareLoading}
+        onToggleFollow={handleToggleFollow}
+        onShare={handleShareProfile}
+      />
     </div>
   );
 }

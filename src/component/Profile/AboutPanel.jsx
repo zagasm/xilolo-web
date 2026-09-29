@@ -1,3 +1,30 @@
+// src/component/Profile/AboutPanel.jsx
+//
+// Web mirror of the app's profile "about" block.
+//
+// DESIGN SOURCE OF TRUTH (read-only): xilolo-app
+//   Own profile   lib/.../user_and_organizer_profile_screen/
+//                 user_main_profile_screen_revamp.dart
+//                   About Me card (40 circle chip + user icon, title 17/w700,
+//                   body 13/1.35, empty -> full-width 46 outlined pill with a
+//                   dotted-plus and "Add About Me")           :777-898
+//                   copy: l10n aboutMe / aboutMeHint / addAboutMe
+//   Other user    lib/.../profile/screens/organizer_profile.dart
+//                   About card — title 16/w600, body 14/1.5 muted, and the card
+//                   is NOT rendered at all when the bio is empty  :583-614
+//   Info cards    lib/.../profile/screens/user_profile_screen.dart
+//                   card: card fill, r12, hairline border, p16, title 16/w600
+//                   row: 100px label column (14, textSecondary) + value (14,
+//                   textPrimary)                              :284-339
+//                   card titles "Personal Information" / "Account Status" /
+//                   "Social"                                  :213-241
+//
+// Rows are the SAME fields the panel already read (nothing new is fetched or
+// invented); only the card anatomy and the section titles moved to the app's.
+import React from "react";
+import { Link } from "react-router-dom";
+import { Pencil, PlusCircle, User as UserIcon } from "lucide-react";
+
 import { truncate } from "../../utils/helpers";
 
 function safeValue(v) {
@@ -11,89 +38,163 @@ function safeValue(v) {
   return String(v);
 }
 
-export default function AboutPanel({ user }) {
+function InfoCard({ title, rows }) {
+  const visible = rows.filter(([, value]) => value !== undefined);
+  if (!visible.length) return null;
+
+  return (
+    <div className="tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+      <div className="tw:text-[16px] tw:font-semibold tw:text-body">{title}</div>
+      <div className="tw:mt-3 tw:space-y-2">
+        {visible.map(([label, value]) => (
+          <div key={label} className="tw:flex tw:items-start">
+            <span className="tw:w-[100px] tw:shrink-0 tw:text-[14px] tw:text-muted">
+              {label}
+            </span>
+            <span className="tw:min-w-0 tw:flex-1 tw:text-[14px] tw:text-body">
+              {safeValue(value)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function AboutPanel({ user, isOwnProfile = false }) {
   if (!user) return null;
 
   const isOrganiserProfileData =
     !!user?.organiser || (!!user?.userId && !!user?.allEvents);
 
-  const displayName =
-    user?.name ||
-    (typeof user?.organiser === "string" ? user.organiser : user?.organiser?.organiser) ||
-    user?.userName ||
-    "This profile";
-
   const aboutText = String(
-    user?.about ||
-      user?.organiser?.about ||
-      ""
+    user?.about || user?.organiser?.about || "",
   ).trim();
 
   const organiserName =
     typeof user?.organiser === "string"
       ? user.organiser
-      : user?.organiser?.organiser ||
-        user?.organiser?.name ||
-        user?.name ||
-        "—";
-
-  const rows = isOrganiserProfileData
-    ? [
-        ["Organizer Name", organiserName],
-        ["Email", truncate(user?.email, 22)],
-        ["KYC Status", user?.kyc_status ?? user?.kyc?.status],
-        ["Followers", user?.numberOfFollowers ?? user?.followers_count],
-        ["Tickets Sold", user?.tickets_total ?? user?.successfulPayments],
-        ["Ranking", user?.rank],
-      ]
-    : [
-        ["Username", user?.userName],
-        ["Email", truncate(user?.email, 22)],
-        ["Phone", user?.phoneNumber],
-        ["Gender", user?.gender],
-        ["DOB", user?.dob],
-        ["Age", user?.age],
-      ];
+      : user?.organiser?.organiser || user?.organiser?.name || user?.name || "—";
 
   return (
-    <div className="tw:mt-3 tw:rounded-[28px] tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_14px_34px_rgba(15,23,42,0.05)] tw:md:p-6">
-      <div className="tw:flex tw:flex-col tw:gap-5">
-        <div className="tw:overflow-hidden tw:rounded-3xl tw:border tw:border-slate-100 tw:bg-[radial-gradient(circle_at_top,rgba(0,245,255,0.10),transparent_40%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] tw:p-5">
-          <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.22em] tw:text-slate-500">
-            About
-          </div>
-          <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
-            {isOrganiserProfileData ? `Meet ${displayName}` : `More about ${displayName}`}
-          </div>
-          <p className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-slate-600 tw:md:text-[15px]">
-            {aboutText ||
-              (isOrganiserProfileData
-                ? "This organizer has not added a public introduction yet, but you can still explore their events and profile activity."
-                : "This member has not added a public introduction yet. Profile details will appear here once updated.")}
-          </p>
-        </div>
-
-        <div>
-          <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-            Profile Snapshot
-          </div>
-          <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
-            {rows.map(([label, value]) => (
-              <div
-                key={label}
-                className="tw:rounded-2xl tw:border tw:border-slate-100 tw:bg-slate-50/70 tw:p-4"
-              >
-                <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-slate-500">
-                  {label}
-                </div>
-                <div className="tw:mt-2 tw:text-sm tw:font-medium tw:leading-6 tw:text-slate-900">
-                  {safeValue(value)}
-                </div>
+    <div className="tw:space-y-[10px]">
+      {/* ── biography ─────────────────────────────────────────────────────── */}
+      {isOwnProfile ? (
+        <div className="tw:rounded-[22px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-[18px]">
+          <div className="tw:flex tw:items-start tw:gap-3">
+            <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-hairline tw:bg-chip tw:text-body">
+              <UserIcon className="tw:size-[21px]" />
+            </span>
+            <div className="tw:min-w-0 tw:flex-1">
+              <div className="tw:flex tw:items-center tw:gap-2">
+                <span className="tw:text-[17px] tw:font-bold! tw:text-body">
+                  About Me
+                </span>
+                {aboutText && (
+                  <Link
+                    to="/profile/edit-profile"
+                    aria-label="Edit About Me"
+                    className="tw:ml-auto tw:text-muted tw:hover:text-body"
+                  >
+                    <Pencil className="tw:size-[18px]" />
+                  </Link>
+                )}
               </div>
-            ))}
+              <div
+                className={`tw:mt-2 tw:text-[13px] tw:leading-[1.35] ${
+                  aboutText ? "tw:text-body" : "tw:text-muted"
+                }`}
+              >
+                {aboutText ||
+                  "Tell others a little about yourself, your events, or brand."}
+              </div>
+            </div>
           </div>
+
+          {!aboutText && (
+            <Link
+              to="/profile/edit-profile"
+              className="tw:mt-[18px] tw:flex tw:h-[46px] tw:w-full tw:items-center tw:justify-center tw:gap-3 tw:rounded-full tw:border tw:border-hairline tw:text-[13px] tw:font-semibold tw:text-body"
+            >
+              <PlusCircle className="tw:size-[18px]" />
+              Add About Me
+            </Link>
+          )}
         </div>
-      </div>
+      ) : (
+        aboutText && (
+          <div className="tw:rounded-[24px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-5 tw:py-4">
+            <div className="tw:text-[16px] tw:font-semibold tw:text-body">
+              About
+            </div>
+            <div className="tw:mt-2 tw:text-[14px] tw:leading-[1.5] tw:text-muted">
+              {aboutText}
+            </div>
+          </div>
+        )
+      )}
+
+      {/* ── snapshot rows (app card + 100px label column anatomy) ─────────── */}
+      {isOrganiserProfileData ? (
+        <>
+          <InfoCard
+            title="Personal Information"
+            rows={[
+              ["Organizer Name", organiserName],
+              ["Email", truncate(user?.email, 22)],
+            ]}
+          />
+          <InfoCard
+            title="Account Status"
+            rows={[["KYC Status", user?.kyc_status ?? user?.kyc?.status]]}
+          />
+          <InfoCard
+            title="Social"
+            rows={[
+              ["Followers", user?.numberOfFollowers ?? user?.followers_count],
+              [
+                "Tickets Sold",
+                user?.tickets_total ?? user?.successfulPayments,
+              ],
+              ["Ranking", user?.rank],
+            ]}
+          />
+        </>
+      ) : (
+        <>
+          <InfoCard
+            title="Personal Information"
+            rows={[
+              ["Username", user?.userName],
+              ["Email", truncate(user?.email, 22)],
+              ["Phone", user?.phoneNumber],
+              ["Gender", user?.gender],
+              ["DOB", user?.dob],
+              ["Age", user?.age],
+            ]}
+          />
+          <InfoCard
+            title="Account Status"
+            rows={[
+              ["Email Verified", user?.email_verified ?? user?.emailVerified],
+              ["Phone Verified", user?.phone_verified ?? user?.phoneVerified],
+            ]}
+          />
+          <InfoCard
+            title="Social"
+            rows={[
+              [
+                "Followers",
+                user?.followers_count ?? user?.followersCount ?? user?.numberOfFollowers,
+              ],
+              [
+                "Following",
+                user?.followings_count ?? user?.followingsCount,
+              ],
+            ]}
+          />
+        </>
+      )}
     </div>
   );
 }
