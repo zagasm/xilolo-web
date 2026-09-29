@@ -46,6 +46,7 @@ import {
   BadgeCheck,
   CalendarDays,
   CalendarX2,
+  ChevronRight,
   Info,
   MoreHorizontal,
   Play,
@@ -672,10 +673,36 @@ export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
   );
 }
 
+/**
+ * Heading for the "Organizers you may know" rail. Exported so the DEV preview in
+ * ./HomePreview.jsx renders this exact node instead of a copy that can drift.
+ * App parity: suggested_organisers_section.dart:52-76 — title 16/w700 in
+ * textPrimary on the left, its action on the right, then a 12px gap to the rail.
+ */
+export function OrganizersRailHeading() {
+  return (
+    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:pb-3">
+      <span className="tw:text-base tw:font-bold tw:text-body">
+        Organizers you may know
+      </span>
+      <Link
+        to="/organizers"
+        className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-semibold tw:text-accent-deep tw:hover:underline!"
+      >
+        View all
+        <ChevronRight className="tw:size-[15px] tw:shrink-0" aria-hidden />
+      </Link>
+    </div>
+  );
+}
+
 /* ── Page ────────────────────────────────────────────────────────────────── */
 export default function Home() {
   const [activeTab, setActiveTab] = useState("all");
   const [showOrganizers, setShowOrganizers] = useState(false);
+  // Whether the organisers rail has anything to show (loading or loaded). The
+  // rail reports it so its heading disappears when the app's section would.
+  const [organisersAvailable, setOrganisersAvailable] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const eventsScrollRef = useRef(null);
   const { user } = useAuth();
@@ -834,18 +861,14 @@ export default function Home() {
 
               {showOrganizers && !showSkeletons ? (
                 <div className="tw:mt-12">
-                  <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:pb-3">
-                    <span className="tw:text-sm tw:font-semibold tw:text-body">
-                      Organizers you may know
-                    </span>
-                    <Link
-                      to="/organizers"
-                      className="tw:text-xs tw:font-semibold tw:text-accent-deep tw:hover:underline!"
-                    >
-                      View all
-                    </Link>
-                  </div>
-                  <MobileSingleOrganizers />
+                  {/* App parity: suggested_organisers_section.dart:52-76 — title
+                      16/w700 in textPrimary, action on the right. The heading is
+                      hidden when the app would render nothing at all (:40-46), so
+                      it waits for the rail to report whether it has content. */}
+                  {organisersAvailable ? <OrganizersRailHeading /> : null}
+                  <MobileSingleOrganizers
+                    onAvailabilityChange={setOrganisersAvailable}
+                  />
                 </div>
               ) : null}
             </div>

@@ -1,0 +1,67 @@
+/* src/pages/tickets/tickets.css
+ *
+ * Only what Tailwind utilities cannot express, for the /tickets screen:
+ *   1. the shimmer sweep the app gets from `Shimmer.fromColors`
+ *      (event_ticket_card.dart:400-466 — base context.pal.inner, highlight
+ *      white in light mode),
+ *   2. the 60-segment dashed rule the card draws by hand
+ *      (event_ticket_card.dart:240-257),
+ *   3. the magenta empty-state glyph tinted with the accent, which is what
+ *      ImageView.asset(color:) does in Flutter via
+ *      ColorFilter.mode(color, BlendMode.srcIn) (lib/components/image_view.dart:96)
+ *      — the CSS equivalent is a mask over a flat accent fill.
+ *
+ * Class names are namespaced `xt-` so nothing here can collide with the legacy
+ * template stylesheet, and every colour comes from the tokens in
+ * src/styles/tailwind.css (no new hexes).
+ */
+
+.xt-shimmer {
+  background-color: var(--color-inner);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0.95) 37%,
+    rgba(255, 255, 255, 0) 63%
+  );
+  background-size: 300% 100%;
+  animation: xt-shimmer-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes xt-shimmer-sweep {
+  0% {
+    background-position: 130% 0;
+  }
+  100% {
+    background-position: -30% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xt-shimmer {
+    animation: none;
+  }
+}
+
+/* Dashed hairline — app: 60 alternating segments of textSecondary @ 25%. */
+.xt-dash-rule {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-muted) 25%, transparent) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+/* 48x48 box painted in the accent through the app's own ticket glyph.
+   The mask URL is supplied inline by the component (see TicketsPage.jsx) so no
+   bundler has to resolve a root-absolute public asset out of CSS. */
+.xt-ticket-glyph {
+  background-color: var(--color-accent);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
