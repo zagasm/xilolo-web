@@ -83,7 +83,7 @@ export default function ReportModal({ open, onClose, onSubmit }) {
 
               {selected === "Other" && (
                 <input
-                  className="tw:w-full tw:border tw:border-gray-200 tw:rounded-xl tw:px-3 tw:py-2 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary tw:mb-3"
+                  className="tw:w-full tw:border tw:border-gray-200 tw:rounded-xl tw:px-3 tw:py-2 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary tw:mb-3"
                   placeholder="Tell us more…"
                   value={other}
                   onChange={(e) => setOther(e.target.value)}

@@ -581,7 +581,7 @@ export default function SearchPage() {
               <button
                 type="button"
                 aria-label="Search filters"
-                className="tw:ml-2 tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:text-zinc-500 tw:transition-colors hover:tw:bg-white/60"
+                className="tw:ml-2 tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:text-zinc-500 tw:transition-colors tw:hover:bg-white/60"
               >
                 <SlidersHorizontal className="tw:h-4 tw:w-4" />
               </button>

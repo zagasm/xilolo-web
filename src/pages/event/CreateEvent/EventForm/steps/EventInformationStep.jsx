@@ -221,7 +221,7 @@ export default function EventInformationStep({
               <input
                 {...register("title")}
                 placeholder="Enter event title"
-                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
               />
               {errors.title && (
                 <span className="tw:mt-1 tw:block tw:text-xs tw:text-red-500">
@@ -236,7 +236,7 @@ export default function EventInformationStep({
                 {...register("description")}
                 rows={7}
                 placeholder="Describe your event in detail"
-                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
               />
               {errors.description && (
                 <span className="tw:mt-1 tw:block tw:text-xs tw:text-red-500">
@@ -290,7 +290,7 @@ export default function EventInformationStep({
           <button
             type="submit"
             disabled={!isValid}
-            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             style={{ borderRadius: 20 }}
           >
             Continue to ticketing

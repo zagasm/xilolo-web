@@ -334,7 +334,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 tw:hover:bg-slate-200 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                       >
                         <X className="tw:h-4 tw:w-4" />
                       </button>
@@ -438,7 +438,7 @@ export default function RescheduleEventModal({
                           onChange={(event) => setReason(event.target.value)}
                           rows={4}
                           placeholder="Tell attendees why the schedule changed."
-                          className="tw:min-h-[120px] tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:text-slate-900 focus:tw:border-primary focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/15"
+                          className="tw:min-h-[120px] tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:text-slate-900 tw:focus:border-primary tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary/15"
                         />
                       </div>
                     </div>
@@ -455,7 +455,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:bg-slate-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-slate-700 tw:hover:bg-slate-200 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                         style={{ borderRadius: 16 }}
                       >
                         Cancel
@@ -464,7 +464,7 @@ export default function RescheduleEventModal({
                         type="button"
                         onClick={handleSubmit}
                         disabled={submitting}
-                        className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+                        className="tw:inline-flex tw:h-11 tw:min-w-[170px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
                         style={{ borderRadius: 16 }}
                       >
                         {submitting ? (

@@ -479,7 +479,7 @@ export default function ReviewStep({
           type="button"
           onClick={onPublish}
           disabled={isSubmitting}
-          className="tw:rounded-full tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-white disabled:tw:opacity-70"
+          className="tw:rounded-full tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-5 tw:py-2.5 tw:text-white tw:disabled:opacity-70"
           style={{ borderRadius: 20 }}
         >
           {isSubmitting ? "Submitting..." : "Submit event"}

@@ -240,7 +240,7 @@ function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) 
             onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })
           }
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
         >
           {isAdding ? "Saving..." : "Add account"}
         </button>
@@ -567,7 +567,7 @@ function WithdrawDialog({
                     onClick={onClose}
                     disabled={submitting}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition tw:hover:bg-gray-200 disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition tw:hover:bg-gray-200 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     Cancel
                   </button>
@@ -576,7 +576,7 @@ function WithdrawDialog({
                     onClick={onSubmit}
                     disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     {submitting ? "Submitting..." : "Submit withdrawal"}
                   </button>
@@ -1053,7 +1053,7 @@ export default function AccountPayouts() {
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
-                className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
+                className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none tw:focus:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
               >
                 <option value="all">All statuses</option>
                 <option value="draft">Draft</option>

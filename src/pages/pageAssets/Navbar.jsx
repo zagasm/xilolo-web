@@ -505,7 +505,7 @@ export default function Navbar() {
                   }
                 }}
                 placeholder="Search events or profiles"
-                className="tw:w-full tw:bg-transparent tw:text-sm tw:text-gray-800 tw:outline-none placeholder:tw:text-gray-400"
+                className="tw:w-full tw:bg-transparent tw:text-sm tw:text-gray-800 tw:outline-none tw:placeholder:text-gray-400"
                 readOnly
               />
             </form>

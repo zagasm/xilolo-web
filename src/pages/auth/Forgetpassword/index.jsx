@@ -83,7 +83,7 @@ export function ForgetPassword() {
           </span>
           <input
             type="email"
-            className="tw:mt-2 tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition placeholder:tw:text-slate-400 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+            className="tw:mt-2 tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition tw:placeholder:text-slate-400 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/10"
             placeholder="you@example.com"
             autoComplete="email"
             value={input}
@@ -96,7 +96,7 @@ export function ForgetPassword() {
 
         <button
           style={{ borderRadius: 28, fontSize: 12}}
-          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
           type="submit"
           disabled={isButtonDisabled}
         >

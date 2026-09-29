@@ -241,7 +241,7 @@ export default function VerificationModal({
                           key={index}
                           type="text"
                           maxLength="1"
-                          className="tw:w-12 tw:h-12 tw:rounded-xl tw:border tw:border-gray-300 tw:text-center tw:text-lg tw:font-bold tw:text-gray-900 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20 tw:outline-none"
+                          className="tw:w-12 tw:h-12 tw:rounded-xl tw:border tw:border-gray-300 tw:text-center tw:text-lg tw:font-bold tw:text-gray-900 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/20 tw:outline-none"
                           value={data}
                           ref={(el) => (inputRefs.current[index] = el)}
                           onChange={(e) => handleOtpChange(e.target, index)}

@@ -185,7 +185,7 @@ export default function SetPasswordModal({ open, onClose }) {
                           value={formData.currentPassword}
                           onChange={handleChange}
                           placeholder="Enter current password"
-                          className="tw:w-full tw:h-11 tw:rounded-xl tw:border tw:border-gray-200 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20 tw:outline-none tw:px-3 tw:pr-10"
+                          className="tw:w-full tw:h-11 tw:rounded-xl tw:border tw:border-gray-200 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/20 tw:outline-none tw:px-3 tw:pr-10"
                           required
                         />
                         <button
@@ -216,8 +216,8 @@ export default function SetPasswordModal({ open, onClose }) {
                           minLength={8}
                           className={`tw:w-full tw:h-11 tw:rounded-xl tw:border tw:outline-none tw:px-3 tw:pr-10 ${
                             errors.newPassword
-                              ? "tw:border-red-300 focus:tw:border-red-400 focus:tw:ring-red-100"
-                              : "tw:border-gray-200 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
+                              ? "tw:border-red-300 tw:focus:border-red-400 tw:focus:ring-red-100"
+                              : "tw:border-gray-200 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/20"
                           }`}
                           required
                         />
@@ -254,8 +254,8 @@ export default function SetPasswordModal({ open, onClose }) {
                           minLength={8}
                           className={`tw:w-full tw:h-11 tw:rounded-xl tw:border tw:outline-none tw:px-3 tw:pr-10 ${
                             errors.confirmPassword
-                              ? "tw:border-red-300 focus:tw:border-red-400 focus:tw:ring-red-100"
-                              : "tw:border-gray-200 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20"
+                              ? "tw:border-red-300 tw:focus:border-red-400 tw:focus:ring-red-100"
+                              : "tw:border-gray-200 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/20"
                           }`}
                           required
                         />

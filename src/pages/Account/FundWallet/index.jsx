@@ -119,7 +119,7 @@ export default function FundWalletPage() {
               min={1}
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+              className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white tw:px-4 tw:py-3 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
               placeholder="Enter amount"
             />
           </div>

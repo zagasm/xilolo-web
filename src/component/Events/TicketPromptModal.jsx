@@ -314,7 +314,7 @@ export default function TicketPromptModal({
                           value={quantity}
                           onChange={(event) => setQuantity(event.target.value)}
                           onBlur={() => setQuantity(normalizedQuantity)}
-                          className="tw:h-10 tw:w-20 tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:text-right tw:text-sm tw:font-semibold tw:outline-none focus:tw:border-primary"
+                          className="tw:h-10 tw:w-20 tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:text-right tw:text-sm tw:font-semibold tw:outline-none tw:focus:border-primary"
                         />
                       </div>
                       <div className="tw:mt-2 tw:grid tw:grid-cols-1 tw:gap-2 tw:text-xs">

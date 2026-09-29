@@ -186,7 +186,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition placeholder:tw:text-slate-400 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition tw:placeholder:text-slate-400 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/10"
                 placeholder="Enter New Password"
                 value={formData.password}
                 onChange={handleChange}
@@ -216,7 +216,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
-                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition placeholder:tw:text-slate-400 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+                className="tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:pr-14 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition tw:placeholder:text-slate-400 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/10"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -244,7 +244,7 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
           type="submit"
           disabled={loading || !isFormValid()}
         >

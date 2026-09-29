@@ -228,7 +228,7 @@ export default function Ads() {
                   }}
                   type="button"
                   onClick={() => setSelectedPackage(plan)}
-                  className="tw:relative tw:w-full tw:rounded-2xl tw:bg-primary tw:px-6 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:transition tw:hover:brightness-95 active:tw:scale-[0.99]"
+                  className="tw:relative tw:w-full tw:rounded-2xl tw:bg-primary tw:px-6 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:transition tw:hover:brightness-95 tw:active:scale-[0.99]"
                 >
                   Choose plan
                 </button>

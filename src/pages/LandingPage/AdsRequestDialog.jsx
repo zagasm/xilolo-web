@@ -488,7 +488,7 @@ export default function AdsRequestDialog({ open, onClose, selectedPackage }) {
             fontSize: 12
           }}
             type="submit"
-            className="tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-white tw:font-semibold tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:hover:brightness-95 active:tw:scale-[0.99]"
+            className="tw:rounded-2xl tw:bg-primary tw:px-5 tw:py-3 tw:text-white tw:font-semibold tw:shadow-[0_16px_40px_rgba(99,102,241,0.20)] tw:hover:brightness-95 tw:active:scale-[0.99]"
             disabled={submitting}
           >
             {submitting ? "Sending..." : "Send request"}

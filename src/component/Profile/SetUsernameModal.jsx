@@ -257,7 +257,7 @@ export default function SetUsernameModal({
                       }}
                       placeholder="e.g. alice_stone"
                       disabled={!canChange || saving}
-                      className="tw:w-full tw:h-11 tw:rounded-xl tw:border tw:border-gray-200 focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/20 tw:outline-none tw:px-3"
+                      className="tw:w-full tw:h-11 tw:rounded-xl tw:border tw:border-gray-200 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/20 tw:outline-none tw:px-3"
                     />
                     {!!currentUsername && (
                       <span className="tw:block tw:mt-1 tw:text-xs tw:text-gray-500">

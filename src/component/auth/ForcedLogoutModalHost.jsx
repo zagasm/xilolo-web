@@ -136,7 +136,7 @@ export default function ForcedLogoutModalHost() {
           <div className="tw:fixed tw:inset-0 tw:bg-slate-950/55 tw:backdrop-blur-sm" />
         </Transition.Child>
 
-        <div className="tw:fixed tw:inset-0 tw:flex tw:items-center tw:justify-center tw:p-4 sm:tw:p-6">
+        <div className="tw:fixed tw:inset-0 tw:flex tw:items-center tw:justify-center tw:p-4 tw:sm:p-6">
           <Transition.Child
             as={Fragment}
             enter="tw:transition tw:duration-300"
@@ -149,7 +149,7 @@ export default function ForcedLogoutModalHost() {
             <Dialog.Panel className="tw:relative tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-[28px] tw:border tw:border-white/60 tw:bg-white/95 tw:shadow-[0_20px_70px_rgba(15,23,42,0.25)] tw:ring-1 tw:ring-slate-200/60">
               <div className="tw:absolute tw:inset-x-0 tw:top-0 tw:h-24 tw:bg-gradient-to-b tw:from-rose-50 tw:to-transparent" />
 
-              <div className="tw:relative tw:p-6 sm:tw:p-7">
+              <div className="tw:relative tw:p-6 tw:sm:p-7">
                 <div className="tw:mx-auto tw:flex tw:h-14 tw:w-14 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-rose-100 tw:ring-8 tw:ring-rose-50">
                   <svg
                     viewBox="0 0 24 24"
@@ -192,7 +192,7 @@ export default function ForcedLogoutModalHost() {
                       setOpen(false);
                       navigate("/auth/signin", { replace: true });
                     }}
-                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-lg tw:shadow-slate-900/15 tw:transition tw:hover:bg-slate-800 active:tw:scale-[0.99]"
+                    className="tw:inline-flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-slate-950 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-lg tw:shadow-slate-900/15 tw:transition tw:hover:bg-slate-800 tw:active:scale-[0.99]"
                   >
                     Continue to sign in
                   </button>

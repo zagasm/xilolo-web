@@ -173,7 +173,7 @@ export default function TwoFactorLoginForm({
               inputMode="numeric"
               autoComplete={index === 0 ? "one-time-code" : "off"}
               maxLength={1}
-              className="tw:h-12 tw:w-10 tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white tw:text-center tw:text-lg tw:font-semibold tw:text-gray-900 focus:tw:border-black focus:tw:outline-none"
+              className="tw:h-12 tw:w-10 tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white tw:text-center tw:text-lg tw:font-semibold tw:text-gray-900 tw:focus:border-black tw:focus:outline-none"
             />
           ))}
         </div>
@@ -195,7 +195,7 @@ export default function TwoFactorLoginForm({
             type="button"
             onClick={requestEmailCode}
             disabled={isEmailSending}
-            className="tw:text-sm tw:font-semibold tw:text-gray-950 disabled:tw:cursor-not-allowed disabled:tw:text-gray-400"
+            className="tw:text-sm tw:font-semibold tw:text-gray-950 tw:disabled:cursor-not-allowed tw:disabled:text-gray-400"
           >
             {isEmailSending
               ? "Sending email code..."
@@ -212,7 +212,7 @@ export default function TwoFactorLoginForm({
           }}
           type="submit"
           disabled={!isComplete || isSubmitting}
-          className="tw:w-full tw:rounded-lg tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:bg-gray-300"
+          className="tw:w-full tw:rounded-lg tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-gray-300"
         >
           {isSubmitting ? "Verifying..." : "Verify and sign in"}
         </button>

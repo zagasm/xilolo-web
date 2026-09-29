@@ -134,8 +134,8 @@ export default function ProfileHeader({
                     className="tw:h-full tw:w-full tw:rounded-full tw:object-cover"
                     loading="lazy"
                   />
-                  <span className="tw:pointer-events-none tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:bg-black/0 tw:transition group-hover:tw:bg-black/20">
-                    <span className="tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white/90 tw:text-primary tw:opacity-0 tw:shadow-md tw:transition group-hover:tw:opacity-100">
+                  <span className="tw:pointer-events-none tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:bg-black/0 tw:transition tw:group-hover:bg-black/20">
+                    <span className="tw:flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-white/90 tw:text-primary tw:opacity-0 tw:shadow-md tw:transition tw:group-hover:opacity-100">
                       <ZoomIn className="tw:h-4 tw:w-4" />
                     </span>
                   </span>
@@ -236,7 +236,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={handleFollowersClick}
-              className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 disabled:tw:cursor-default disabled:tw:hover:bg-gray-50"
+              className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 tw:disabled:cursor-default tw:disabled:hover:bg-gray-50"
               disabled={!isOwnProfile}
             >
               <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">
@@ -253,7 +253,7 @@ export default function ProfileHeader({
             <button
               type="button"
               onClick={handleFollowingClick}
-              className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 disabled:tw:cursor-default disabled:tw:hover:bg-gray-50"
+              className="tw:flex tw:flex-col tw:justify-between tw:rounded-2xl tw:bg-gray-50 tw:px-4 tw:py-3 tw:text-left tw:hover:bg-gray-100 tw:disabled:cursor-default tw:disabled:hover:bg-gray-50"
               disabled={!isOwnProfile}
             >
               <div className="tw:flex tw:items-center tw:justify-between tw:text-xs tw:text-gray-500">

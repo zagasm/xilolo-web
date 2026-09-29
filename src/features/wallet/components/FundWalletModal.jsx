@@ -444,7 +444,7 @@ export default function FundWalletModal({
                           !selectableMethods.length ||
                           !reviewData?.authorization_url
                         }
-                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                         style={{ borderRadius: 16 }}
                       >
                         Proceed to payment

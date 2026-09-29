@@ -263,7 +263,7 @@ export default function AddWalletModal({
                         rows={2}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:px-4 tw:py-3 tw:text-xs tw:text-[#050505] placeholder:tw:text-[#a89f95] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary/25 focus:tw:border-transparent tw:resize-none"
+                        className="tw:block tw:w-full tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:px-4 tw:py-3 tw:text-xs tw:text-[#050505] tw:placeholder:text-[#a89f95] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary/25 tw:focus:border-transparent tw:resize-none"
                         placeholder="Paste the exact address from your wallet app…"
                       />
                     </div>
@@ -355,7 +355,7 @@ export default function AddWalletModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:h-10 tw:px-4 tw:rounded-2xl tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition disabled:tw:opacity-50"
+                        className="tw:h-10 tw:px-4 tw:rounded-2xl tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition tw:disabled:opacity-50"
                       >
                         <span>Cancel</span>
                       </button>
@@ -365,7 +365,7 @@ export default function AddWalletModal({
                         }}
                         type="submit"
                         disabled={submitting}
-                        className="tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 disabled:tw:opacity-60 disabled:tw:hover:scale-100"
+                        className="tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 tw:disabled:opacity-60 tw:disabled:hover:scale-100"
                       >
                         {submitting && (
                           <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />
