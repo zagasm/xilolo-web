@@ -34,7 +34,7 @@ export default function EventsFilterTabs({ value, onChange }) {
             type="button"
             onClick={() => onChange(option.key)}
             aria-pressed={isActive}
-            className={`tw:mx-0.5 tw:flex tw:h-[38px] tw:min-w-0 tw:flex-1 tw:items-center tw:justify-center tw:truncate tw:rounded-full tw:px-2 tw:text-[11px] tw:font-black tw:leading-none tw:transition-colors ${
+            className={`tw:flex tw:h-[38px] tw:min-w-0 tw:flex-1 tw:items-center tw:justify-center tw:truncate tw:rounded-full tw:px-2 tw:text-[11px] tw:font-black tw:leading-none tw:transition-colors ${
               isActive
                 ? "tw:bg-accent tw:text-white"
                 : "tw:text-muted tw:hover:text-body"

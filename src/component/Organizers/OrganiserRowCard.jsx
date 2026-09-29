@@ -1,92 +1,94 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+/**
+ * Leaderboard row (rank 4 and below) — the app's `_OrganizerRankRow`
+ * (top_organizers_screen.dart:468-570).
+ *
+ *   :484-490  surface: card fill, radius 18, hairline border, 12px padding
+ *   :493-504  rank cell: a 22px-wide gutter, centred, 14px w800, textSecondary
+ *             — a plain NUMBER, not the "#N" chip the old web page drew
+ *   :506-512  avatar: 46px, `ringWidth: 0` (NO ring), gradient initials fallback
+ *   :520-535  name: capitalizeUsername(userName) 14.5 w700 + 4px + a 13px tick
+ *   :539-559  followers: 13px people icon + 4px + "N followers" at 12 muted
+ *   :564      follow pill, inline width (px 18 / py 9 / 13px)
+ * The app's 10px inter-row gap lives in the parent list (:125-126), so the page
+ * supplies it instead of this card.
+ */
+import { Users } from "lucide-react";
+
+import TopOrganizerAvatar, { VerifiedTick } from "./TopOrganizerAvatar";
+import TopOrganizerFollowPill from "./TopOrganizerFollowPill";
 import {
-  getFollowState,
-  getInitials,
-  hasProfileImage,
-} from "./organiser.utils";
-import { Ticket } from "lucide-react";
-import { useAuth } from "../../pages/auth/AuthContext";
-import SubscriptionBadge from "../ui/SubscriptionBadge.jsx";
+  capitalizeUsername,
+  compactNumber,
+  hasActiveSubscription,
+  rankOf,
+} from "./topOrganizers.utils";
 
-export default function OrganizerRowCard({ org, onToggleFollow }) {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+export default function OrganizerRowCard({
+  org,
+  onToggleFollow,
+  onOpenProfile,
+  isOwnProfile,
+  isLoading,
+}) {
+  const name = capitalizeUsername(org?.userName);
+  const verified = hasActiveSubscription(org);
+  const followers = compactNumber(org?.numberOfFollowers);
 
-  const displayName = org?.userName || org?.organiser || "Organizer";
-  const initials = getInitials(displayName);
-  const showImage = hasProfileImage(org?.profileImage);
-  const followersCount = org?.numberOfFollowers ?? 0;
-  const { buttonClass, label: followLabel } = getFollowState(org);
+  const open = () => {
+    if (org?.id) onOpenProfile?.(org.id);
+  };
 
   return (
     <div
-      onClick={() => navigate(`/profile/${org.id}`)}
-      className="tw:flex tw:w-full tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-3 tw:shadow-sm tw:sm:gap-4 tw:sm:p-4"
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          open();
+        }
+      }}
+      className="tw:flex tw:cursor-pointer tw:items-center tw:rounded-[18px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-3"
     >
-      <div className="tw:relative tw:size-20 tw:shrink-0 tw:overflow-hidden tw:rounded-2xl tw:bg-[#d8d6d2] tw:sm:h-[110px] tw:sm:w-[110px]">
-        {showImage ? (
-          <img
-            src={org.profileImage}
-            alt={displayName}
-            className="tw:h-full tw:w-full tw:object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="tw:flex tw:h-full tw:w-full tw:items-center tw:justify-center">
-            <span className="tw:text-xl tw:font-semibold tw:text-primary tw:sm:text-2xl">
-              {initials}
-            </span>
-          </div>
-        )}
+      <span className="tw:w-[22px] tw:shrink-0 tw:text-center tw:text-sm tw:font-extrabold tw:text-muted">
+        {rankOf(org)}
+      </span>
 
-        {Number.isFinite(Number(org?.rank)) && (
-          <div className="tw:absolute tw:left-2 tw:top-2 tw:rounded-xl tw:border tw:border-gray-100 tw:bg-white/90 tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-gray-900 tw:backdrop-blur tw:sm:text-xs">
-            #{org.rank}
-          </div>
-        )}
-      </div>
+      <span className="tw:ml-3 tw:shrink-0">
+        <TopOrganizerAvatar
+          name={org?.organiser ?? org?.userName}
+          imageUrl={org?.profileImage}
+          size={46}
+          ringWidth={0}
+        />
+      </span>
 
-      <div className="tw:min-w-0 tw:flex-1">
-        <div className="tw:flex tw:items-center">
-          <span className="tw:block tw:truncate tw:first-letter:uppercase tw:text-[13px] tw:font-semibold tw:text-gray-900 tw:sm:text-lg">
-            {displayName}
+      <div className="tw:ml-3 tw:min-w-0 tw:flex-1">
+        <span className="tw:flex tw:min-w-0 tw:items-center tw:gap-1">
+          <span
+            className="tw:truncate tw:font-bold tw:text-body"
+            style={{ fontSize: 14.5 }}
+          >
+            {name}
           </span>
-          {org.has_active_subscription && (
-            <SubscriptionBadge className="tw:size-2 tw:md:size-3" />
-          )}
-        </div>
-
-        <span className="tw:mt-1 tw:block tw:text-[10px] tw:text-gray-600 tw:sm:text-xs">
-          {followersCount} <span className="tw:text-gray-500">followers</span>
+          {verified ? <VerifiedTick size={13} /> : null}
         </span>
 
-        <div className="tw:mt-1.5 tw:flex tw:flex-wrap tw:items-center tw:gap-1 tw:md:gap-2">
-          <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-[9px] tw:sm:text-xs">
-            <Ticket className="tw:size-3 tw:text-emerald-600 tw:sm:size-4" />
-            <span className="tw:text-emerald-600">
-              {org?.tickets_total ?? 0}
-            </span>
-            Tickets Sold
-          </span>
-        </div>
+        <span className="tw:mt-0.5 tw:flex tw:min-w-0 tw:items-center tw:gap-1 tw:text-xs tw:text-muted">
+          <Users aria-hidden="true" className="tw:size-[13px] tw:shrink-0" />
+          <span className="tw:truncate">{followers} followers</span>
+        </span>
       </div>
 
-      {user.id !== org?.userId && (
-        <div className="tw:w-24 tw:shrink-0 tw:sm:w-[120px]">
-          <button
-            style={{ borderRadius: 16, fontSize: 11 }}
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFollow(org.userId);
-            }}
-            className={`tw:w-full tw:rounded-2xl tw:px-2.5 tw:py-1.5 tw:text-[11px] tw:font-medium tw:leading-tight tw:ring-1 tw:transition tw:sm:px-3 tw:sm:py-2 tw:sm:text-sm ${buttonClass}`}
-          >
-            {followLabel}
-          </button>
-        </div>
-      )}
+      <span className="tw:ml-2.5 tw:shrink-0">
+        <TopOrganizerFollowPill
+          isOwnProfile={isOwnProfile}
+          isFollowing={org?.isFollowing === true}
+          isLoading={isLoading}
+          onToggle={() => onToggleFollow?.(org)}
+        />
+      </span>
     </div>
   );
 }

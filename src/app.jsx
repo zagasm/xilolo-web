@@ -75,6 +75,10 @@ import HomePreview from "./pages/Home/HomePreview.jsx";
 // be screenshotted and measured without an account. DEV-gated below; never shipped.
 import TicketsPreview from "./pages/tickets/TicketsPreview.jsx";
 import CreateEventPreview from "./pages/event/CreateEvent/CreateEventPreview.jsx";
+// Dev-only preview of the AUTH-GATED profile page (/profile/:profileId), so its
+// layout can be screenshotted and measured without an account. DEV-gated below;
+// never shipped.
+import ProfilePreview from "./pages/Profile/ProfilePreview.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
@@ -624,6 +628,15 @@ export function App() {
         <Route
           path="/dev/create-event-preview"
           element={import.meta.env.DEV ? <CreateEventPreview /> : <Error404 />}
+        />
+
+        {/* Dev-only preview of the profile page (/profile/:profileId). Auth-gated,
+            so this renders the REAL presentation component (ProfileScreenView)
+            with fixtures — own / organiser / plain-user variants, at any width,
+            without an account. 404s in production. */}
+        <Route
+          path="/dev/profile-preview"
+          element={import.meta.env.DEV ? <ProfilePreview /> : <Error404 />}
         />
 
         <Route path="/page-not-found" element={<Error404 />} />

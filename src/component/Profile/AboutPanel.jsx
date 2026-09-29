@@ -61,7 +61,20 @@ function InfoCard({ title, rows }) {
   );
 }
 
-export default function AboutPanel({ user, isOwnProfile = false }) {
+/**
+ * @param showInfoCards  the "Personal Information" / "Account Status" /
+ *   "Social" cards come from ONE app screen — user_profile_screen.dart's About
+ *   TAB (:205-241) — which the web has no tab for. The own profile
+ *   (revamp:332-346) and the organiser profile (organizer_profile.dart:271-296)
+ *   have no such cards at all, so they are suppressed there; a plain user
+ *   reached by a share link still shows them, which is the only place the app
+ *   does.
+ */
+export default function AboutPanel({
+  user,
+  isOwnProfile = false,
+  showInfoCards = false,
+}) {
   if (!user) return null;
 
   const isOrganiserProfileData =
@@ -134,8 +147,10 @@ export default function AboutPanel({ user, isOwnProfile = false }) {
         )
       )}
 
-      {/* ── snapshot rows (app card + 100px label column anatomy) ─────────── */}
-      {isOrganiserProfileData ? (
+      {/* ── snapshot rows (app card + 100px label column anatomy) ───────────
+          plain-user profile only; see showInfoCards above ──────────────── */}
+      {showInfoCards &&
+        (isOrganiserProfileData ? (
         <>
           <InfoCard
             title="Personal Information"
@@ -194,7 +209,7 @@ export default function AboutPanel({ user, isOwnProfile = false }) {
             ]}
           />
         </>
-      )}
+        ))}
     </div>
   );
 }

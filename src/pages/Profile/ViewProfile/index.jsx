@@ -38,7 +38,6 @@ import { ChevronLeft, Pencil, Share2, TriangleAlert } from "lucide-react";
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader, {
   ProfileRanking,
-  profileHasSubscription,
   profileIsOrganiser,
 } from "../../../component/Profile/ProfileHeader";
 import AboutPanel from "../../../component/Profile/AboutPanel";
@@ -173,8 +172,19 @@ export function ProfileScreenView({
   const shouldShowBecomeOrganiser =
     isOwnProfile && !isOrganiser && !isKycVerified;
   const isSharedOrganiserProfile =
-    !!profile?.organiser ||
-    (!!profile?.userId && (!!profile?.events || !!profile?.allEvents));
+    !profile?.__isRegularUserProfile &&
+    (!!profile?.organiser ||
+      (!!profile?.userId && (!!profile?.events || !!profile?.allEvents)));
+
+  /* Which of the app's three profile designs this payload is:
+   *   own       revamp:163-193        (header + stat cards + about + ranking)
+   *   organiser organizer_profile.dart (header + followers + about + ranking)
+   *   user      user_profile_screen.dart (share-link plain user)          */
+  const variant = isOwnProfile
+    ? "own"
+    : isSharedOrganiserProfile
+      ? "organiser"
+      : "user";
 
   const appBarAction = isOwnProfile ? (
     /* app: own profile app bar "Edit" pill, r16 (revamp:300-320) */
@@ -201,17 +211,36 @@ export function ProfileScreenView({
   return (
     <div className="tw:min-h-screen tw:bg-paper tw:pt-24 tw:pb-8 tw:font-sans">
       <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
-        {/* app bar — organizer_profile.dart:186-265 / revamp:259-326 */}
-        <div className="tw:flex tw:h-14 tw:items-center tw:gap-3">
+        {/* app bar — own: revamp:259-326 (back 42 circle, card fill + hairline,
+            title "Profile" 21/w700, "Edit" pill r16) · other:
+            organizer_profile.dart:186-265 (back 40 chip circle, title "Profile"
+            20/w600, share chip 40) */}
+        <div
+          className={`tw:flex tw:items-center tw:gap-3 ${
+            isOwnProfile ? "tw:h-[66px]" : "tw:h-16"
+          }`}
+        >
           <button
             type="button"
             onClick={goBack}
             aria-label="Go back"
-            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-hairline tw:bg-chip tw:text-body"
+            className={`tw:flex tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-body ${
+              isOwnProfile
+                ? "tw:size-[42px] tw:border tw:border-hairline tw:bg-paper-raised"
+                : "tw:size-10 tw:bg-chip"
+            }`}
           >
-            <ChevronLeft className="tw:size-5" />
+            <ChevronLeft
+              className={isOwnProfile ? "tw:size-[18px]" : "tw:size-5"}
+            />
           </button>
-          <h1 className="tw:m-0! tw:text-[20px]! tw:font-bold! tw:leading-none tw:text-body">
+          <h1
+            className={`tw:m-0! tw:leading-none tw:text-body ${
+              isOwnProfile
+                ? "tw:text-[21px]! tw:font-bold!"
+                : "tw:text-[20px]! tw:font-semibold!"
+            }`}
+          >
             Profile
           </h1>
           {appBarAction}
@@ -352,22 +381,29 @@ export function ProfileScreenView({
               </div>
             </div>
           ) : (
-            // 3) Normal profile layout — app section order, one column
+            // 3) Normal profile layout — app section order, one column:
+            //    header -> followers -> about -> ranking (revamp:332-346),
+            //    then the separate My Events list (my_events_screen.dart)
             <div className="tw:space-y-[10px]">
               <ProfileHeader
                 user={profile}
                 isOwnProfile={isOwnProfile}
+                variant={variant}
                 isFollowing={isFollowing}
                 followLoading={followLoading}
                 onToggleFollow={onToggleFollow}
               />
 
-              <AboutPanel user={profile} isOwnProfile={isOwnProfile} />
+              <AboutPanel
+                user={profile}
+                isOwnProfile={isOwnProfile}
+                showInfoCards={variant === "user"}
+              />
 
-              {/* app: ranking follows the about block
-                  (revamp:343, organizer_profile.dart:287-292) */}
-              {profileHasSubscription(profile) || profile?.rank ? null : null}
-              <ProfileRanking user={profile} isOwnProfile={isOwnProfile} />
+              {/* app: ranking is the last block of the stack — own profile only
+                  with an organiser object (revamp:343), organiser profile
+                  always (organizer_profile.dart:292) */}
+              <ProfileRanking user={profile} variant={variant} />
             </div>
           )}
 
@@ -422,8 +458,13 @@ export default function ViewProfile() {
   const sharedProfileType = location.state?.sharedProfileType || null;
   const hydratedSharedProfile = useMemo(() => {
     if (isOwnProfile || !sharedProfileData) return null;
-    return normalizeSharedUserProfile(sharedProfileData);
-  }, [isOwnProfile, sharedProfileData]);
+    const normalized = normalizeSharedUserProfile(sharedProfileData);
+    // the share redirect tells us which shape this is; carry it through so the
+    // view can pick the app's organiser vs plain-user presentation
+    return sharedProfileType === "user"
+      ? { ...normalized, __isRegularUserProfile: true }
+      : normalized;
+  }, [isOwnProfile, sharedProfileData, sharedProfileType]);
 
   const mergedOwnProfile = useMemo(() => {
     if (!isOwnProfile) return null;

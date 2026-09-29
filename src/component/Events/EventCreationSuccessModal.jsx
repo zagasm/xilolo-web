@@ -52,7 +52,7 @@ export default function EventCreationSuccessModal({
           leaveFrom="tw:opacity-100"
           leaveTo="tw:opacity-0"
         >
-          <DialogBackdrop className="tw:fixed tw:inset-0 tw:bg-black/60 tw:z-40" />
+          <DialogBackdrop className="tw:fixed tw:inset-0 tw:z-40 tw:bg-black/45" />
         </Transition.Child>
 
         {/* Wrapper */}
@@ -66,45 +66,39 @@ export default function EventCreationSuccessModal({
             leaveFrom="tw:opacity-100 tw:scale-100"
             leaveTo="tw:opacity-0 tw:scale-95"
           >
-            <DialogPanel className="tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-4xl tw:border tw:border-gray-200 tw:bg-white tw:p-6 tw:text-left tw:shadow-[0_30px_80px_rgba(15,23,42,0.25)] tw:text-black">
+            <DialogPanel className="tw:w-full tw:max-w-md tw:overflow-hidden tw:rounded-[16px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:text-left tw:text-body">
               <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
-                <div className="tw:grid tw:place-items-center tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:rounded-full tw:bg-linear-to-br tw:from-primary tw:to-primarySecond tw:text-white">
+                <div className="tw:grid tw:size-16 tw:place-items-center tw:rounded-full tw:bg-accent tw:text-white">
                   <VerifiedIcon className="tw:size-9" />
                 </div>
 
-                <h3 className="tw:text-2xl tw:font-bold tw:text-gray-900 tw:text-center">
+                <h3 className="tw:block tw:font-display tw:text-[16px] tw:font-bold tw:text-body tw:text-center">
                   {copy.title}
                 </h3>
 
-                <p className="tw:text-center tw:text-sm tw:text-gray-500">
+                <p className="tw:text-center tw:text-[13px] tw:font-medium tw:text-muted">
                   {copy.subtitle}
                 </p>
 
-                <p className="tw:text-center tw:text-xs tw:text-gray-400 tw:px-3">
+                <p className="tw:text-center tw:text-[12px] tw:text-ink-muted tw:px-3">
                   {copy.description}
                 </p>
 
                 <div className="tw:w-full tw:flex tw:flex-col tw:gap-3">
                   <button
-                    style={{
-                      borderRadius: 16,
-                      fontSize: 12,
-                    }}
+                    style={{ fontSize: 13 }}
                     type="button"
                     onClick={handleView}
-                    className="tw:w-full tw:rounded-[18px] tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:brightness-105"
+                    className="tw:w-full tw:rounded-full tw:bg-accent tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-white tw:transition tw:duration-150 tw:hover:brightness-95"
                   >
                     {copy.cta}
                   </button>
 
                   <button
-                   style={{
-                      borderRadius: 16,
-                      fontSize: 12,
-                    }}
+                    style={{ fontSize: 13 }}
                     type="button"
                     onClick={onClose}
-                    className="tw:w-full tw:rounded-[18px] tw:border tw:border-gray-200 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"
+                    className="tw:w-full tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-body tw:transition tw:duration-150 tw:hover:border-accent"
                   >
                     Later
                   </button>

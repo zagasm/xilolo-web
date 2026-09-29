@@ -1,53 +1,105 @@
-import React from "react";
+/**
+ * Loading states for the Top Organizers screen — the app's `_TopOrganizersShimmer`
+ * (top_organizers_screen.dart:856-898), `_PodiumShimmer` (:900-919),
+ * `_ListShimmer` (:921-937) and `_RankRowShimmer` (:939-972).
+ *
+ * Every block is the app's `_ShimmerPill` / `_ShimmerCircle`: `pal.inner`
+ * (#E9E9EC -> `tw:bg-inner`), the pills fully rounded (999), the podium panel
+ * radius 24 with a hairline border, the row cards radius 18 with 12px padding.
+ * The app animates these with the `shimmer` package; `animate-pulse` is the web
+ * equivalent of the same base/highlight cycle.
+ */
 
-const ShimmerBlock = ({ className = "" }) => (
-  <div className={`tw:relative tw:overflow-hidden tw:bg-gray-100 ${className}`}>
-    <div className="tw:absolute tw:inset-0 tw:animate-pulse tw:bg-gray-200" />
-    <div className="tw:absolute tw:inset-0 tw:bg-linear-to-r tw:from-transparent tw:via-white/60 tw:to-transparent tw:-translate-x-full tw:animate-[shimmer_1.2s_infinite]" />
-  </div>
-);
-
-// NOTE: add this keyframe once in your global css (below)
-export function PodiumShimmer() {
+function Pill({ width, height }) {
   return (
-    <div className="tw:grid tw:grid-cols-3 tw:items-end tw:gap-4 tw:md:gap-6 tw:py-2">
-      <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
-        <ShimmerBlock className="tw:rounded-full tw:size-16 tw:sm:size-20 tw:md:size-24" />
-        <ShimmerBlock className="tw:h-3 tw:w-20 tw:rounded-full" />
-        <ShimmerBlock className="tw:h-2.5 tw:w-16 tw:rounded-full" />
-      </div>
+    <span
+      aria-hidden="true"
+      className="tw:block tw:animate-pulse tw:rounded-full tw:bg-inner"
+      style={{ width, height }}
+    />
+  );
+}
 
-      <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
-        <ShimmerBlock className="tw:rounded-full tw:size-20 tw:sm:size-24 tw:md:size-28" />
-        <ShimmerBlock className="tw:h-3 tw:w-24 tw:rounded-full" />
-        <ShimmerBlock className="tw:h-2.5 tw:w-18 tw:rounded-full" />
-      </div>
+function Circle({ diameter }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="tw:block tw:animate-pulse tw:rounded-full tw:bg-inner"
+      style={{ width: diameter, height: diameter }}
+    />
+  );
+}
 
-      <div className="tw:flex tw:flex-col tw:items-center tw:gap-3">
-        <ShimmerBlock className="tw:rounded-full tw:size-16 tw:sm:size-20 tw:md:size-24" />
-        <ShimmerBlock className="tw:h-3 tw:w-20 tw:rounded-full" />
-        <ShimmerBlock className="tw:h-2.5 tw:w-16 tw:rounded-full" />
-      </div>
+/** :900-919 — one podium column skeleton (avatar 64 / 86). */
+export function PodiumShimmer({ size }) {
+  return (
+    <div className="tw:flex tw:flex-1 tw:flex-col tw:items-center">
+      <Circle diameter={size} />
+      <span className="tw:mt-3.5">
+        <Pill width={70} height={13} />
+      </span>
+      <span className="tw:mt-1.5">
+        <Pill width={54} height={11} />
+      </span>
+      <span className="tw:mt-2.5 tw:block tw:w-full">
+        <Pill width="100%" height={28} />
+      </span>
     </div>
   );
 }
 
-export function RowShimmer() {
+/** :939-972 — one leaderboard row skeleton. */
+export function RankRowShimmer() {
   return (
-    <div className="tw:w-full tw:border tw:border-gray-100 tw:rounded-3xl tw:p-3 tw:sm:p-4 tw:flex tw:items-center tw:gap-3 tw:sm:gap-4">
-      <ShimmerBlock className="tw:rounded-2xl tw:size-4 tw:sm:w-[110px] tw:sm:h-[110px]" />
+    <div className="tw:flex tw:items-center tw:rounded-[18px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-3">
+      <Circle diameter={46} />
+      <span className="tw:ml-3 tw:flex tw:flex-1 tw:flex-col tw:gap-2">
+        <Pill width={130} height={13} />
+        <Pill width={90} height={11} />
+      </span>
+      <span className="tw:ml-3">
+        <Pill width={74} height={30} />
+      </span>
+    </div>
+  );
+}
 
-      <div className="tw:flex-1 tw:space-y-2">
-        <ShimmerBlock className="tw:h-3 tw:w-40 tw:rounded-full" />
-        <ShimmerBlock className="tw:h-2.5 tw:w-24 tw:rounded-full" />
-        <ShimmerBlock className="tw:h-2.5 tw:w-28 tw:rounded-full" />
-        <div className="tw:flex tw:gap-3 tw:pt-1">
-          <ShimmerBlock className="tw:h-8 tw:w-32 tw:rounded-2xl" />
-          <ShimmerBlock className="tw:h-8 tw:w-32 tw:rounded-2xl" />
-        </div>
-      </div>
+/** :921-937 — `count` rows, each 10px above the next. */
+export function ListShimmer({ count = 4 }) {
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-2.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <RankRowShimmer key={i} />
+      ))}
+    </div>
+  );
+}
 
-      <ShimmerBlock className="tw:rounded-2xl tw:w-24 tw:sm:w-[120px] tw:h-10" />
+/**
+ * :856-898 — the whole screen while the first page loads: the header stand-ins,
+ * then the podium panel skeleton and 4 rows. The page renders the real back
+ * arrow above this (the app's shimmer keeps its arrow real too, :866-870), so
+ * only the title/subtitle are stand-ins here.
+ */
+export default function TopOrganizersShimmer() {
+  return (
+    <div className="tw:pt-2">
+      <Pill width={200} height={30} />
+      <span className="tw:mt-2.5 tw:block">
+        <Pill width={150} height={13} />
+      </span>
+      <span className="tw:mt-[22px] tw:block">
+        <span className="tw:block tw:rounded-[24px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:pt-5 tw:pb-[18px]">
+          <span className="tw:flex tw:items-end tw:gap-2.5">
+            <PodiumShimmer size={64} />
+            <PodiumShimmer size={86} />
+            <PodiumShimmer size={64} />
+          </span>
+        </span>
+      </span>
+      <span className="tw:mt-5 tw:block">
+        <ListShimmer count={4} />
+      </span>
     </div>
   );
 }
