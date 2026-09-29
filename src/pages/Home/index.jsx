@@ -23,7 +23,8 @@
  *
  * Tokens: DESIGN.md + src/styles/tailwind.css. Primitives: src/component/ui.
  * Tailwind here is `tw:`-prefixed with the variant AFTER the prefix
- * (`tw:md:grid-cols-2`), never before (`md:tw:grid-cols-2` is silently dead).
+ * (`tw:md:grid-cols-2`), never the other way round (`<variant>:tw:grid-cols-2`
+ * is silently dead).
  *
  * Legacy-cascade notes for whoever touches this next:
  *   - `header { display:flex; height:40px; padding:30px }` and
@@ -289,7 +290,7 @@ export function WalletStrip() {
       to="/account/wallet"
       className="home-wallet-strip tw:mt-2.5 tw:flex tw:w-full tw:max-w-[420px] tw:items-center tw:gap-3 tw:rounded-[18px] tw:border tw:border-accent/40 tw:bg-paper-raised tw:px-3 tw:py-2.5 tw:transition-colors tw:hover:border-accent/70"
     >
-      <span className="tw:flex tw:size-[38px] tw:shrink-0 tw:items-center tw:justify-center tw:rounded-[13px] tw:bg-accent tw:text-ink">
+      <span className="tw:flex tw:size-[38px] tw:shrink-0 tw:items-center tw:justify-center tw:rounded-[13px] tw:bg-[#16909C] tw:text-paper-raised">
         <Wallet className="tw:size-[19px]" aria-hidden="true" />
       </span>
       <span className="tw:min-w-0 tw:flex-1">
@@ -300,7 +301,7 @@ export function WalletStrip() {
           {isLoading && !data ? "—" : balance}
         </span>
       </span>
-      <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-pill tw:bg-accent tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-ink">
+      <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-pill tw:bg-[#16909C] tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-paper-raised">
         <Plus className="tw:size-[15px]" aria-hidden="true" />
         Top up
       </span>
@@ -406,7 +407,7 @@ export function HeroFeedCard({ event }) {
               <span className="tw:truncate">{host}</span>
               {verified ? (
                 <BadgeCheck
-                  className="tw:size-[13px] tw:shrink-0 tw:text-accent-deep"
+                  className="tw:size-[13px] tw:shrink-0 tw:text-[#16909C]"
                   aria-label="Verified organiser"
                 />
               ) : null}
@@ -467,20 +468,22 @@ function PosterMedia({ poster, title, overlay }) {
  * Full-width pill CTA — app hero card (`_HomeHeroCard`) and live card
  * (`LiveEventCard`) share this shape.
  *
- * Colours come from the app, not from taste (`live_event_card.dart:664-700`):
- * light mode buy button = `AppColors.primary` fill (= AppDesignTokens.ink) with
- * a WHITE label, i.e. ink fill + white text, 18.7:1. The paid state keeps the
- * red "Join Live Stream" fill + white (4.83:1). Both hover to ink-raised/white
- * (16.7:1). `Button`'s `primary` variant is the accent fill (ink label) meant
- * for accent actions, so a card CTA overrides it with the `!` suffix form —
- * needed twice over: the base rule so it beats the variant, and the hover rule
- * so the important base doesn't pin the hover state.
+ * Colours come from the app, not from taste. The app's card CTA is the accent
+ * fill with a white label: `home_revamp_screen.dart:2580-2582` sets
+ * `backgroundColor: pal.accent, foregroundColor: pal.onAccent`, where
+ * `pal.accent` is the light-mode brand (`app_palette.dart:57-58` ->
+ * `app_design_system.dart:26-40`, seed `#0EA5B4` -> `#16909C`) and
+ * `pal.onAccent` resolves to `Colors.white` for that luminance
+ * (`app_palette.dart:64-67`). `Button`'s `primary` variant points the other way
+ * (accent fill + ink label), so the card CTA overrides it with the `!` suffix
+ * form — needed twice over: the base rule so it beats the variant, and the
+ * hover rule so the important base doesn't pin the hover state.
  */
 export function CtaButton({ href, hasPaid = false, children }) {
   const variant = hasPaid ? "danger" : "primary";
   const className = hasPaid
     ? "tw:w-full"
-    : "tw:w-full tw:bg-ink! tw:text-paper-raised! tw:hover:bg-ink-raised! tw:hover:text-paper-raised! tw:disabled:bg-ink/45! tw:disabled:text-paper-raised!";
+    : "tw:w-full tw:bg-[#16909C]! tw:text-paper-raised! tw:hover:bg-accent-deep! tw:hover:text-paper-raised! tw:disabled:bg-[#16909C]/45! tw:disabled:text-paper-raised!";
 
   const button = href ? (
     <Button as={Link} to={href} variant={variant} size="lg" className={className}>
@@ -541,7 +544,7 @@ export function LiveFeedCard({ event, onMore }) {
               <span className="tw:truncate">{host}</span>
               {verified ? (
                 <BadgeCheck
-                  className="tw:size-4 tw:shrink-0 tw:text-accent-deep"
+                  className="tw:size-4 tw:shrink-0 tw:text-[#16909C]"
                   aria-label="Verified organiser"
                 />
               ) : null}
