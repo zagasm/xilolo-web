@@ -245,8 +245,13 @@ export default function EventCard({
     await refreshEvents?.();
   };
 
+  /* Card shell — app: _glassCardDecoration(radius: 16/20) =
+     paper-raised fill + hairline 1px border + r16-20, flat
+     (my_events_screen.dart:429, organizer_profile.dart:39-53). The app's
+     4%-black card shadow is dropped per DESIGN.md (flat + hairline outside
+     real overlays). */
   return (
-    <div className="col-12 col-md-6 col-lg-6 col-xl-6 tw:relative tw:overflow-hidden tw:rounded-3xl tw:border tw:border-slate-100 tw:bg-[#ffffff] tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)] tw:transition-shadow tw:hover:shadow-[0_18px_46px_rgba(15,23,42,0.08),0_0_24px_rgba(0,245,255,0.08)]">
+    <div className="tw:relative tw:overflow-hidden tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised">
       {/* Top-right actions (only for owner) */}
       {isOwnerEvent && (
         <div className="tw:absolute tw:right-4 tw:top-4 tw:z-20">
@@ -389,29 +394,33 @@ export default function EventCard({
         </div>
       )}
 
-      {/* Clickable media/title section navigates to event page */}
-      <div className="tw:cursor-pointer" onClick={goToEvent}>
+      {/* Clickable media/title section navigates to event page.
+          app: poster 200 tall with a 20px top radius and the status pill
+          overlaid at left 12 / top 12 (organizer_profile.dart:963-995,
+          my_events_screen.dart:553-600). */}
+      <div
+        className="tw:relative tw:h-[200px] tw:overflow-hidden tw:cursor-pointer"
+        onClick={goToEvent}
+      >
         <MediaCarousel items={media} alt={event.title} />
+        {statusChip && (
+          <span className="tw:absolute tw:left-3 tw:top-3 tw:z-10">
+            {statusChip}
+          </span>
+        )}
       </div>
 
-      <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5">
-        <div className="tw:text-xs tw:text-zinc-600">
-          <div className="tw:flex tw:flex-col tw:gap-3">
-            {statusChip && (
-              <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-                <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                  {statusChip}
-                  {normalizedStatus === "upcoming" && <CountdownPill target={startDate} />}
-                </div>
-              </div>
-            )}
+      <div className="tw:flex tw:flex-col tw:gap-3 tw:p-[14px]">
+        {normalizedStatus === "upcoming" && (
+          <div className="tw:flex">
+            <CountdownPill target={startDate} />
           </div>
-        </div>
+        )}
 
         <div className="tw:flex tw:items-start tw:gap-2">
           <div
             onClick={goToEvent}
-            className="tw:uppercase tw:text-left tw:block tw:text-[16px] tw:text-black tw:font-semibold tw:flex-1"
+            className="tw:block tw:flex-1 tw:text-left tw:text-[18px] tw:font-bold tw:leading-[1.25] tw:text-body"
           >
             {event.title}
           </div>
@@ -422,8 +431,9 @@ export default function EventCard({
                 e.stopPropagation();
                 toggleSave();
               }}
-              className={`tw:rounded-xl tw:p-2 tw:transition ${isSaved ? "tw:text-primary" : "tw:text-gray-600 "
-                }`}
+              className={`tw:shrink-0 tw:rounded-xl tw:p-2 tw:transition ${
+                isSaved ? "tw:text-accent-deep" : "tw:text-muted"
+              }`}
               aria-label="Save"
               title={isSaved ? "Unsave" : "Save"}
             >
@@ -434,12 +444,28 @@ export default function EventCard({
           )}
         </div>
 
-        <div className="tw:flex tw:items-center tw:justify-between tw:pt-1">
-          <div className="tw:text-xs tw:inline-flex tw:items-center tw:gap-2 tw:text-gray-600">
-            <Clock size={14} />
-            <span>{scheduleLabel}</span>
+        {/* app: host name row only when the payload carries one
+            (my_events_screen.dart:465-476). useMyEvents falls back to "Xilolo"
+            for events with no organiser, so the fallback is suppressed rather
+            than printed under every card. */}
+        {isOwnerEvent &&
+          event.hostName &&
+          event.hostName !== "Xilolo" && (
+            <div className="tw:text-[14px] tw:text-muted">{event.hostName}</div>
+          )}
+
+        <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+          <div className="tw:inline-flex tw:min-w-0 tw:items-center tw:gap-1 tw:text-[12px] tw:text-muted">
+            <Clock size={16} />
+            <span className="tw:truncate">{scheduleLabel}</span>
           </div>
-          <div className="tw:text-primary tw:text-lg tw:font-semibold">
+          {/* app: own list price is accent (my_events_screen.dart:499), another
+              organiser's list price is textPrimary (organizer_profile.dart:858). */}
+          <div
+            className={`tw:shrink-0 tw:text-[16px] tw:font-bold ${
+              isOwnerEvent ? "tw:text-accent-deep" : "tw:text-body"
+            }`}
+          >
             {event.price_display}
           </div>
         </div>
@@ -470,21 +496,22 @@ export default function EventCard({
           </div>
         </div> */}
 
-        {/* CTA */}
+        {/* CTA
+            owner  — app: AppButton height 40, radius 10, accent fill, onAccent
+                     (WHITE) label (my_events_screen.dart:519-537)
+            other  — app: ElevatedButton radius 12, py 10, accent fill + white
+                     label, red when this is a Join-Live CTA
+                     (organizer_profile.dart:866-887) */}
         {isOwnerEvent ? (
           <button
-            style={{
-              fontSize: 12,
-              borderRadius: 20,
-            }}
             onClick={(e) => {
               e.stopPropagation();
               goToStreamControl();
             }}
             disabled={startingStream}
-            className="tw:mt-auto tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.14),0_0_16px_rgba(0,245,255,0.12)] tw:hover:bg-primary/90"
+            className="tw:mt-auto tw:inline-flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[10px] tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:disabled:opacity-60"
           >
-            <span className="tw:mr-2">
+            <span>
               {startingStream
                 ? "Starting stream..."
                 : isVodEvent
@@ -506,9 +533,11 @@ export default function EventCard({
               e.stopPropagation();
               goToEvent();
             }}
-            className="tw:mt-4 tw:inline-flex tw:gap-2 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:font-medium tw:text-white tw:shadow-[0_12px_28px_rgba(0,0,0,0.14),0_0_16px_rgba(0,245,255,0.12)] tw:hover:bg-primary/90"
+            className={`tw:mt-4 tw:inline-flex tw:h-[42px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[12px] tw:px-4 tw:text-[14px] tw:font-semibold tw:text-white ${
+              normalizedStatus === "live" ? "tw:bg-danger" : "tw:bg-accent"
+            }`}
           >
-            <span className="tw:mr-2">
+            <span>
               {isOrganiserProfile ? "Buy Ticket" : "View event"}
             </span>
           </button>

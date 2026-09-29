@@ -7,7 +7,23 @@ import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { showError } from "../../../../../component/ui/toast";
-import SelectField from "../../../../../component/form/SelectField";
+import { ArrowRight, PlayCircle, Radio } from "lucide-react";
+import {
+  APP_INPUT,
+  APP_INPUT_ERROR,
+  Chip,
+  ChipGroup,
+  EventSelect,
+  EventSurface,
+  Field,
+  FieldError,
+  FieldHint,
+  OptionCard,
+  StepCtaBar,
+  StepCtaButton,
+  SurfaceTitle,
+  SwitchRow,
+} from "./EventUI";
 
 const DISPLAY_CURRENCIES = [
   {
@@ -38,6 +54,9 @@ const VISIBILITY_OPTIONS = [
 ];
 
 const REPLAY_MINUTE_PRESETS = [30, 60, 120, 180, 720, 1440];
+// create_event_three.dart:847-849 — app splits the presets into two groups.
+const REPLAY_AFTER_PRESETS = [30, 60, 120, 180];
+const REPLAY_FOR_PRESETS = [720, 1440];
 
 const VOD_UPLOAD_PHRASES = [
   "Rolling out the red carpet for your video...",
@@ -358,6 +377,46 @@ const schema = z
     }
   });
 
+// create_event_three.dart:1783-1858 — _ManualPickerTile
+function ManualTile({ title, subtitle, actionLabel, onPick, onClear, accept }) {
+  const inputRef = useRef(null);
+  return (
+    <div className="tw:flex tw:items-start tw:justify-between tw:gap-3 tw:rounded-[12px] tw:border tw:border-hairline tw:bg-inner tw:p-3.5">
+      <div className="tw:min-w-0">
+        <span className="tw:block tw:text-[14px] tw:font-bold tw:text-body">{title}</span>
+        <span className="tw:mt-1 tw:block tw:text-[12px] tw:font-medium tw:text-muted">
+          {subtitle}
+        </span>
+      </div>
+      <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="tw:rounded-full tw:border tw:border-accent tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-bold tw:text-accent-deep"
+        >
+          {actionLabel}
+        </button>
+        {onClear ? (
+          <button
+            type="button"
+            onClick={onClear}
+            className="tw:rounded-full tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-muted"
+          >
+            Clear
+          </button>
+        ) : null}
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          className="tw:hidden"
+          onChange={(event) => onPick?.(event.target.files?.[0] || null)}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function TicketingStep({
   defaultValues = {},
   onBack,
@@ -501,7 +560,7 @@ export default function TicketingStep({
     (async () => {
       try {
         const res = await api.get("/api/v1/currency", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers: token ? { Authorization: *** ${token}` } : {},
         });
         const list = res?.data?.currencies || res?.data?.data || [];
         if (!mounted) return;
@@ -652,60 +711,44 @@ export default function TicketingStep({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="tw:rounded-4xl tw:border tw:border-gray-100 tw:bg-[#ffffff] tw:p-5 tw:shadow-[0_20px_60px_rgba(15,23,42,0.05)] tw:sm:p-7"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="tw:pb-0">
       <VideoUploadSuccessModal
         open={showVodSuccessModal}
         fileName={vodFile?.name}
         onClose={() => setShowVodSuccessModal(false)}
       />
 
-      <div className="tw:mb-6 tw:flex tw:flex-col tw:gap-2">
-        <span className="tw:text-lg tw:font-semibold tw:text-slate-900 tw:lg:text-2xl">
-          Ticketing
-        </span>
-        <span className="tw:text-sm tw:text-slate-500">
-          Set pricing, ticket availability, and optional material access.
-        </span>
-      </div>
+      {/* create_event_three.dart:133-184 — "Event format" surface */}
+      <EventSurface title="Event format" className="tw:p-3">
+        <div className="tw:grid tw:grid-cols-2 tw:gap-2.5">
+          <OptionCard
+            selected={deliveryType === "live"}
+            title="Live Event"
+            subtitle="Realtime stream setup"
+            icon={Radio}
+            onClick={() => setValue("deliveryType", "live", { shouldValidate: true })}
+          />
+          <OptionCard
+            selected={deliveryType === "vod"}
+            title="Video On Demand"
+            subtitle="Upload before review"
+            icon={PlayCircle}
+            onClick={() => setValue("deliveryType", "vod", { shouldValidate: true })}
+          />
+        </div>
 
-      <div className="tw:space-y-5">
-        <SelectField
-          label="Event format"
-          value={deliveryType}
-          onChange={(value) => {
-            setValue("deliveryType", value, { shouldValidate: true });
-            if (value !== "vod") {
-              setVodError("");
-            }
-          }}
-          options={[
-            { value: "live", label: "Live event" },
-            { value: "vod", label: "Video on demand" },
-          ]}
-          error={errors?.deliveryType?.message}
-        />
-
-        {deliveryType === "vod" && (
-          <div className="tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4">
-            <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
-              Upload Video
-            </div>
-            {/* <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
-              The video uploads directly to Bunny Stream after the event is created.
-            </div> */}
+        {deliveryType === "vod" ? (
+          <div className="tw:mt-3.5">
+            <SurfaceTitle>Upload Video</SurfaceTitle>
             <button
-              style={{ borderRadius: 36 }}
               type="button"
               onClick={() => vodInputRef.current?.click()}
-              className="tw:mt-4 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-left tw:hover:border-primary/40"
+              className="tw:mt-3 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-[12px] tw:border tw:border-dashed tw:border-hairline tw:px-4 tw:py-3 tw:text-left tw:transition tw:hover:border-accent"
             >
-              <span className="tw:block tw:text-sm tw:font-medium tw:text-slate-700">
+              <span className="tw:block tw:text-[14px] tw:font-semibold tw:text-body">
                 {vodFile?.name || "Choose VOD video"}
               </span>
-              <span className="tw:mt-1 tw:block tw:text-xs tw:text-slate-500">
+              <span className="tw:mt-1 tw:block tw:text-[12px] tw:font-medium tw:text-muted">
                 Bunny Stream supports up to 72 hours and 2160p source videos.
               </span>
             </button>
@@ -713,223 +756,260 @@ export default function TicketingStep({
               ref={vodInputRef}
               type="file"
               accept="video/*"
-              className="tw:sr-only"
-                onChange={(event) => {
-                  const file = event.target.files?.[0] || null;
-                  setVodFile(file);
-                  setVodError("");
-                  onVodFileChanged?.(file);
-                }}
+              className="tw:hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setVodFile(file);
+                setVodError("");
+                onVodFileChanged?.(file);
+              }}
             />
-            {vodError ? (
-              <span className="tw:mt-2 tw:text-xs tw:text-red-500">{vodError}</span>
-            ) : null}
+            <FieldError>{vodError}</FieldError>
             {vodUploadState?.status && vodUploadState.status !== "idle" ? (
-              <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-4">
+              <div className="tw:mt-3.5 tw:rounded-[12px] tw:border tw:border-hairline tw:p-3.5">
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <div className="tw:min-w-0">
-                    <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
+                    <div className="tw:text-[14px] tw:font-bold tw:text-body">
                       {vodUploadState.message || "Preparing upload..."}
                     </div>
-                    <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
+                    <div className="tw:mt-1 tw:text-[12px] tw:font-medium tw:text-muted">
                       {vodUploadState.status === "complete"
                         ? "You can continue to the review step."
                         : uploadPhrase}
                     </div>
-                    <div className="tw:mt-2 tw:text-xs tw:font-medium tw:text-slate-700">
+                    <div className="tw:mt-2 tw:text-[12px] tw:font-semibold tw:text-body">
                       {formatBytes(vodUploadState.loaded)} / {formatBytes(vodUploadState.total || vodFile?.size)}
-                      <span className="tw:ml-2 tw:text-slate-500">
-                        {uploadProgress}%
-                      </span>
+                      <span className="tw:ml-2 tw:text-muted">{uploadProgress}%</span>
                     </div>
                   </div>
-                  {isUploadingVod && (
+                  {isUploadingVod ? (
                     <button
-                      style={{ borderRadius: 36, fontSize: 12 }}
                       type="button"
                       onClick={onCancelVodUpload}
-                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 tw:hover:bg-red-50"
+                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
                     >
                       Cancel
                     </button>
-                  )}
+                  ) : null}
                 </div>
-                <div className="tw:mt-3 tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-slate-100">
+                <div className="tw:mt-3 tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-inner">
                   <div
-                    className="tw:h-full tw:rounded-full tw:bg-primary tw:bg-[linear-gradient(45deg,rgba(255,255,255,.22)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.22)_50%,rgba(255,255,255,.22)_75%,transparent_75%,transparent)] tw:bg-[length:22px_22px] tw:transition-all tw:duration-300 tw:ease-out tw:animate-[upload-stripes_0.8s_linear_infinite]"
+                    className="tw:h-full tw:rounded-full tw:bg-accent tw:transition-all tw:duration-300 tw:ease-out"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
               </div>
             ) : null}
           </div>
+        ) : (
+          <p className="tw:mt-3 tw:text-[12px] tw:font-semibold tw:text-muted">
+            Live events continue through the standard publishing flow.
+          </p>
         )}
+      </EventSurface>
 
-        <SelectField
-          label="Event location"
-          value={attendanceType}
-          onChange={(value) => setValue("attendanceType", value, { shouldValidate: true })}
-          options={[
-            { value: "online", label: "Online" },
-            { value: "physical", label: "Physical" },
-            { value: "both", label: "Both online and physical" },
-          ]}
-          error={errors?.attendanceType?.message}
-        />
+      {/* create_event_three.dart:186-300 — price + maximum tickets row */}
+      <EventSurface>
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3.5">
+          <Field label="Ticket Price" error={errors.priceInput?.message}>
+            <div className="tw:relative">
+              <span className="tw:pointer-events-none tw:absolute tw:left-3.5 tw:top-1/2 tw:-translate-y-1/2 tw:text-[15px] tw:text-muted">
+                {selectedCurrency.symbol}
+              </span>
+              <Controller
+                name="priceInput"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={field.value}
+                    onChange={(event) => {
+                      const normalized = normalizeAmountInput(event.target.value);
+                      field.onChange(normalized ? formatAmountDisplay(normalized) : "");
+                    }}
+                    className={`${errors.priceInput ? APP_INPUT_ERROR : APP_INPUT} tw:pl-9`}
+                    placeholder="0"
+                  />
+                )}
+              />
+            </div>
+          </Field>
 
-        <SelectField
+          <EventSelect
+            label="Maximum Tickets"
+            value={maxTickets === "limited" ? "Limited" : "Unlimited"}
+            onChange={(value) =>
+              setValue("maxTickets", value === "Limited" ? "limited" : "unlimited", {
+                shouldValidate: true,
+              })
+            }
+            options={[
+              { value: "Unlimited", label: "Unlimited" },
+              { value: "Limited", label: "Limited" },
+            ]}
+            placeholder="Select Limit"
+          />
+        </div>
+
+        {maxTickets === "limited" ? (
+          <div className="tw:mt-3">
+            <Field
+              label="Ticket Limit"
+              error={errors.ticketLimit?.message}
+            >
+              <input
+                type="number"
+                min="1"
+                {...register("ticketLimit")}
+                placeholder="Enter number of tickets available"
+                className={errors.ticketLimit ? APP_INPUT_ERROR : APP_INPUT}
+              />
+            </Field>
+          </div>
+        ) : null}
+      </EventSurface>
+
+      {/* create_event_three.dart:301-332 — currency */}
+      <EventSurface>
+        <EventSelect
           label="Currency"
           value={selectedCurrencyCode}
           onChange={(value) => setValue("currencyCode", value, { shouldValidate: true })}
           options={DISPLAY_CURRENCIES}
           error={errors?.currencyCode?.message}
         />
+        <FieldHint>
+          Currency locks your payouts and ticket display. Choose what your audience expects.
+        </FieldHint>
+      </EventSurface>
 
-        <div>
-          <label className="tw:mb-1 tw:block tw:text-[15px]">Ticket price</label>
-          <Controller
-            name="priceInput"
-            control={control}
-            render={({ field }) => (
-              <div className="tw:relative">
-                <span className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-sm tw:text-slate-500">
-                  {selectedCurrency.symbol}
-                </span>
+      {/* create_event_three.dart:333-359 — replay */}
+      <EventSurface>
+        <SwitchRow
+          title="Make Replay Available"
+          checked={enableReplay}
+          onChange={(next) => setValue("enableReplay", next, { shouldValidate: true })}
+        />
+        {enableReplay ? (
+          <div className="tw:mt-3">
+            <ChipGroup title="Available after" subtitle="Unlocks after the event ends.">
+              {REPLAY_AFTER_PRESETS.map((minutes) => (
+                <Chip
+                  key={`after-${minutes}`}
+                  label={formatReplayMinutes(minutes)}
+                  selected={String(watch("replayAvailableAfterMinutes")) === String(minutes)}
+                  onClick={() =>
+                    setValue("replayAvailableAfterMinutes", String(minutes), {
+                      shouldValidate: true,
+                    })
+                  }
+                />
+              ))}
+            </ChipGroup>
+            <ChipGroup title="Available for" subtitle="Stays online before deletion.">
+              {REPLAY_FOR_PRESETS.map((minutes) => (
+                <Chip
+                  key={`for-${minutes}`}
+                  label={formatReplayMinutes(minutes)}
+                  selected={String(watch("replayAvailableForMinutes")) === String(minutes)}
+                  onClick={() =>
+                    setValue("replayAvailableForMinutes", String(minutes), {
+                      shouldValidate: true,
+                    })
+                  }
+                />
+              ))}
+            </ChipGroup>
+            <div className="tw:mt-3 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
+              <Field label="Available after (minutes)" error={errors.replayAvailableAfterMinutes?.message}>
                 <input
-                  type="text"
-                  inputMode="decimal"
-                  value={field.value}
-                  onChange={(event) => {
-                    const normalized = normalizeAmountInput(event.target.value);
-                    field.onChange(normalized ? formatAmountDisplay(normalized) : "");
-                  }}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
-                  placeholder={`Enter ticket price in ${selectedCurrency.label}`}
+                  type="number"
+                  min="1"
+                  {...register("replayAvailableAfterMinutes")}
+                  className={errors.replayAvailableAfterMinutes ? APP_INPUT_ERROR : APP_INPUT}
+                />
+              </Field>
+              <Field label="Available for (minutes)" error={errors.replayAvailableForMinutes?.message}>
+                <input
+                  type="number"
+                  min="1"
+                  {...register("replayAvailableForMinutes")}
+                  className={errors.replayAvailableForMinutes ? APP_INPUT_ERROR : APP_INPUT}
+                />
+              </Field>
+            </div>
+          </div>
+        ) : null}
+      </EventSurface>
+
+      {/* create_event_three.dart:360-476 — paid soft-copy manual */}
+      <EventSurface>
+        <SwitchRow
+          title="Attach a paid soft-copy manual to this event."
+          checked={hasMaterials}
+          onChange={(next) => setValue("hasMaterials", next, { shouldValidate: true })}
+        />
+
+        {hasMaterials ? (
+          <div className="tw:mt-3">
+            <ManualTile
+              title="Manual File"
+              subtitle={
+                fileLabel(manualFile) ||
+                existingManual?.fileName ||
+                "PDF, DOC, XLS, CSV, TXT, PPT and similar formats"
+              }
+              actionLabel={manualFile ? "Change" : "Select file"}
+              onClear={manualFile ? () => setManualFile(null) : null}
+              accept={MANUAL_FILE_ACCEPT}
+              onPick={(file) => {
+                setManualFile(file);
+                clearManualError("manualFile");
+              }}
+            />
+            <FieldError>{manualErrors.manualFile}</FieldError>
+
+            <div className="tw:mt-3">
+              <ManualTile
+                title="Manual Cover"
+                subtitle={
+                  fileLabel(manualCover) ||
+                  existingManualCover?.fileName ||
+                  "Optional cover image for the manual"
+                }
+                actionLabel={manualCover ? "Change" : "Select image"}
+                onClear={manualCover ? () => setManualCover(null) : null}
+                accept={MANUAL_COVER_ACCEPT}
+                onPick={(file) => {
+                  setManualCover(file);
+                  clearManualError("manualCover");
+                }}
+              />
+              <FieldError>{manualErrors.manualCover}</FieldError>
+            </div>
+
+            {manualCoverPreview || existingManualCover?.url ? (
+              <div className="tw:mt-3 tw:overflow-hidden tw:rounded-[12px] tw:border tw:border-hairline">
+                <img
+                  src={manualCoverPreview || existingManualCover?.url}
+                  alt="Material cover preview"
+                  className="tw:h-full tw:max-h-40 tw:w-full tw:object-cover"
                 />
               </div>
-            )}
-          />
-          {errors.priceInput && (
-            <p className="tw:mt-1 tw:text-xs tw:text-red-500">{errors.priceInput.message}</p>
-          )}
-        </div>
+            ) : null}
 
-        <SelectField
-          label="Ticket availability"
-          value={maxTickets}
-          onChange={(value) => setValue("maxTickets", value, { shouldValidate: true })}
-          options={[
-            { value: "unlimited", label: "Unlimited tickets" },
-            { value: "limited", label: "Limited tickets" },
-          ]}
-          error={errors?.maxTickets?.message}
-        />
-
-        {maxTickets === "limited" && (
-          <div>
-            <label className="tw:mb-1 tw:block tw:text-[15px]">Total number of tickets</label>
-            <input
-              type="number"
-              min="1"
-              {...register("ticketLimit")}
-              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
-            />
-            {errors.ticketLimit && (
-              <p className="tw:mt-1 tw:text-xs tw:text-red-500">{errors.ticketLimit.message}</p>
-            )}
-          </div>
-        )}
-
-        <SelectField
-          label="Event visibility"
-          value={visibility}
-          onChange={(value) => setValue("visibility", value, { shouldValidate: true })}
-          options={VISIBILITY_OPTIONS}
-          error={errors?.visibility?.message}
-        />
-
-        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
-          <label className="tw:text-[15px]">This event has materials</label>
-          <input
-            type="checkbox"
-            {...register("hasMaterials")}
-            className="tw:h-4 tw:w-4 tw:accent-primary"
-          />
-        </div>
-
-        {hasMaterials && (
-          <div className=" ">
-            <div className="tw:flex tw:flex-col tw:gap-1">
-              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
-                Event material
-              </div>
-              <div className="tw:text-sm tw:text-slate-500">
-                Attach an optional paid soft-copy material buyers can purchase with or after the
-                ticket.
-              </div>
-            </div>
-
-            <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-2">
-              <div>
-                <label className="tw:mb-1 tw:block tw:text-[15px]">Material file</label>
-                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:hover:border-primary/40">
-                  <span className="tw:text-sm tw:font-medium tw:text-slate-700">
-                    {fileLabel(manualFile) || existingManual?.fileName || "Choose document"}
-                  </span>
-                  <span className="tw:block tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-500">
-                    Accepted: {MANUAL_FILE_EXTENSIONS.join(", ")}
-                  </span>
-                  <input
-                    type="file"
-                    accept={MANUAL_FILE_ACCEPT}
-                    className="tw:hidden"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0] || null;
-                      setManualFile(file);
-                      clearManualError("manualFile");
-                    }}
-                  />
-                </label>
-                {manualErrors.manualFile && (
-                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">{manualErrors.manualFile}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="tw:mb-1 tw:block tw:text-[15px]">Material cover</label>
-                <label className="tw:flex tw:min-h-[104px] tw:cursor-pointer tw:flex-col tw:justify-center tw:rounded-2xl tw:border tw:border-dashed tw:border-gray-300 tw:bg-[#ffffff] tw:px-4 tw:py-3 tw:hover:border-primary/40">
-                  <span className="tw:text-sm tw:font-medium tw:text-slate-700">
-                    {fileLabel(manualCover) || existingManualCover?.fileName || "Choose cover image"}
-                  </span>
-                  <span className="tw:block tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-500">
-                    Optional image shown before purchase and download.
-                  </span>
-                  <input
-                    type="file"
-                    accept={MANUAL_COVER_ACCEPT}
-                    className="tw:hidden"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0] || null;
-                      setManualCover(file);
-                      clearManualError("manualCover");
-                    }}
-                  />
-                </label>
-                {manualErrors.manualCover && (
-                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">{manualErrors.manualCover}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="tw:mt-4 tw:grid tw:grid-cols-1 tw:gap-4 tw:lg:grid-cols-[minmax(0,1fr)_180px]">
-              <div>
-                <label className="tw:mb-1 tw:block tw:text-[15px]">Material price</label>
+            <div className="tw:mt-3">
+              <Field
+                label="Manual Price"
+                error={manualErrors.manualPrice || errors.manualPriceInput?.message}
+              >
                 <Controller
                   name="manualPriceInput"
                   control={control}
                   render={({ field }) => (
                     <div className="tw:relative">
-                      <span className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-sm tw:text-slate-500">
+                      <span className="tw:pointer-events-none tw:absolute tw:left-3.5 tw:top-1/2 tw:-translate-y-1/2 tw:text-[15px] tw:text-muted">
                         {selectedCurrency.symbol}
                       </span>
                       <input
@@ -941,159 +1021,38 @@ export default function TicketingStep({
                           field.onChange(normalized ? formatAmountDisplay(normalized) : "");
                           clearManualError("manualPrice");
                         }}
-                        className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
-                        placeholder="Set material price"
+                        className={`${
+                          manualErrors.manualPrice || errors.manualPriceInput
+                            ? APP_INPUT_ERROR
+                            : APP_INPUT
+                        } tw:pl-9`}
+                        placeholder="0"
                       />
                     </div>
                   )}
                 />
-                {(manualErrors.manualPrice || errors.manualPriceInput?.message) && (
-                  <p className="tw:mt-1 tw:text-xs tw:text-red-500">
-                    {manualErrors.manualPrice || errors.manualPriceInput?.message}
-                  </p>
-                )}
-              </div>
-
-              {(manualCoverPreview || existingManualCover?.url) && (
-                <div className="tw:overflow-hidden tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-white">
-                  <img
-                    src={manualCoverPreview || existingManualCover?.url}
-                    alt="Material cover preview"
-                    className="tw:h-full tw:max-h-40 tw:w-full tw:object-cover"
-                  />
-                </div>
-              )}
+              </Field>
             </div>
           </div>
-        )}
+        ) : null}
+      </EventSurface>
 
-        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
-          <label className="tw:text-[15px]">Enable event replay</label>
-          <input
-            type="checkbox"
-            {...register("enableReplay")}
-            className="tw:h-4 tw:w-4 tw:accent-primary"
-          />
-        </div>
+      {/*
+        Visibility + content safety now live on the Review & Publish screen
+        (preview_screen.dart:367-424 and :426-488). These hidden fields keep the
+        step_2 payload keys (visibility / matureContent / attendanceType, the last
+        one owned by step 1) flowing exactly as before.
+      */}
+      <input type="hidden" {...register("attendanceType")} />
+      <input type="hidden" {...register("visibility")} />
+      <input type="hidden" {...register("matureContent")} />
 
-        {enableReplay && (
-          <div className="tw:space-y-5 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50/80 tw:p-4">
-            <div>
-              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
-                Replay becomes available after
-              </div>
-              <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
-                Choose when the replay should unlock after the event ends.
-              </div>
-              <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
-                {REPLAY_MINUTE_PRESETS.map((minutes) => (
-                  <button
-                    style={{ borderRadius: 36, fontSize: 12 }}
-                    key={`after-${minutes}`}
-                    type="button"
-                    onClick={() =>
-                      setValue("replayAvailableAfterMinutes", String(minutes), {
-                        shouldValidate: true,
-                      })
-                    }
-                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableAfterMinutes")) === String(minutes)
-                        ? "tw:bg-slate-900 tw:text-white"
-                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 tw:hover:bg-slate-100"
-                      }`}
-                  >
-                    {formatReplayMinutes(minutes)}
-                  </button>
-                ))}
-              </div>
-              <div className="tw:mt-3">
-                <input
-                  type="number"
-                  min="1"
-                  {...register("replayAvailableAfterMinutes")}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
-                  placeholder="Minutes after the event ends"
-                />
-                {errors.replayAvailableAfterMinutes && (
-                  <span className="tw:mt-1 tw:text-xs tw:text-red-500">
-                    {errors.replayAvailableAfterMinutes.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className="tw:text-[15px] tw:font-medium tw:text-slate-900">
-                Replay stays available for
-              </div>
-              <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
-                Choose how long the replay should stay online before automatic deletion.
-              </div>
-              <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-2">
-                {REPLAY_MINUTE_PRESETS.map((minutes) => (
-                  <button
-                    style={{ borderRadius: 36, fontSize: 12 }}
-                    key={`for-${minutes}`}
-                    type="button"
-                    onClick={() =>
-                      setValue("replayAvailableForMinutes", String(minutes), {
-                        shouldValidate: true,
-                      })
-                    }
-                    className={`tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition ${String(watch("replayAvailableForMinutes")) === String(minutes)
-                        ? "tw:bg-slate-900 tw:text-white"
-                        : "tw:bg-white tw:text-slate-700 tw:ring-1 tw:ring-slate-200 tw:hover:bg-slate-100"
-                      }`}
-                  >
-                    {formatReplayMinutes(minutes)}
-                  </button>
-                ))}
-              </div>
-              <div className="tw:mt-3">
-                <input
-                  type="number"
-                  min="1"
-                  {...register("replayAvailableForMinutes")}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
-                  placeholder="Minutes replay stays online"
-                />
-                {errors.replayAvailableForMinutes && (
-                  <span className="tw:mt-1 tw:text-xs tw:text-red-500">
-                    {errors.replayAvailableForMinutes.message}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="tw:flex tw:items-center tw:justify-between tw:py-3">
-          <label className="tw:text-[15px]">This event contains mature content</label>
-          <input
-            type="checkbox"
-            {...register("matureContent")}
-            className="tw:h-4 tw:w-4 tw:accent-primary"
-          />
-        </div>
-      </div>
-
-      <div className="tw:mt-6 tw:flex tw:justify-between">
-        <button
-          type="button"
-          onClick={onBack}
-          className="tw:rounded-full tw:border tw:border-gray-200 tw:px-4 tw:py-2.5 tw:hover:bg-gray-50"
-          style={{ borderRadius: 20, fontSize: 12 }}
-        >
-          Back
-        </button>
-        <button
-          type="submit"
-          disabled={isUploadingVod || vodUploadMustFinish}
-          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
-          style={{ borderRadius: 20, fontSize: 12 }}
-        >
-          {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Continue to preview"}
-        </button>
-      </div>
+      <StepCtaBar>
+        <StepCtaButton disabled={isUploadingVod || vodUploadMustFinish}>
+          {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Review & Publish"}
+          <ArrowRight className="tw:size-[18px]" aria-hidden="true" />
+        </StepCtaButton>
+      </StepCtaBar>
     </form>
   );
 }

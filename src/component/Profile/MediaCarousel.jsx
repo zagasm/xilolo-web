@@ -18,12 +18,12 @@ export default function MediaCarousel({ items = [], alt = "" }) {
 
   if (!items.length) {
     return (
-      <div className="tw:relative tw:aspect-video tw:bg-gray-100 tw:rounded-2xl" />
+      <div className="tw:h-full tw:w-full tw:bg-inner" />
     );
   }
 
   return (
-    <div className="tw:relative tw:aspect-video">
+    <div className="tw:relative tw:h-full tw:min-h-[200px]">
       <Swiper
         modules={[Pagination, A11y, Autoplay]}
         // pagination={{ clickable: true }}

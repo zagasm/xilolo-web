@@ -161,6 +161,12 @@ export default function EventCreationWizard({
   mode = "create",
   eventId,
   initialEvent,
+  /* Preview-only (import.meta.env.DEV): forces a step so each step of the flow
+     can be screenshotted without completing the previous one. Never passed in
+     the production routes in src/app.jsx. */
+  previewStep = null,
+  previewCollected = null,
+  previewTimeZones = null,
 }) {
   const isEdit = mode === "edit" && !!eventId;
   const { token } = useAuth();
@@ -171,9 +177,11 @@ export default function EventCreationWizard({
     [initialEvent]
   );
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState([]);
-  const [collected, setCollected] = useState({});
+  const [currentStep, setCurrentStep] = useState(previewStep || 1);
+  const [completedSteps, setCompletedSteps] = useState(
+    previewStep ? [1, 2].filter((step) => step < previewStep) : []
+  );
+  const [collected, setCollected] = useState(previewCollected || {});
   const [posterImages, setPosterImages] = useState(
     mapped.media.posterImages || []
   );
@@ -444,6 +452,11 @@ export default function EventCreationWizard({
     setCurrentStep(step);
   };
 
+  // preview_screen.dart:407-420 / :476-484 — the review screen owns these two.
+  const handleUpdateAccess = (patch) => {
+    mergeCollected("step_2", patch);
+  };
+
   const handlePublish = async () => {
     try {
       setIsSubmitting(true);
@@ -528,9 +541,14 @@ export default function EventCreationWizard({
   );
 
   const infoStepDefaults = collected.step_1 || mapped.info;
-  const ticketStepDefaults = collected.step_2 || {
+  const ticketStepDefaults = {
     ...mapped.ticketing,
     ...mapped.access,
+    ...(collected.step_2 || {}),
+    // create_event_one.dart:452-471 — the app asks for attendance in step 1, so
+    // step 2 only carries the value through into the payload.
+    attendanceType:
+      collected.step_1?.attendanceType || mapped.ticketing.attendanceType,
   };
 
   if (isEdit && !initialEvent) {
@@ -538,21 +556,28 @@ export default function EventCreationWizard({
   }
 
   return (
-    <div className="tw:mx-auto tw:max-w-5xl tw:px-1 tw:pb-20 tw:pt-10 tw:md:pt-0">
-      <ProgressSteps
-        currentStep={currentStep}
-        completedSteps={completedSteps}
-        onBack={() => {
-          if (currentStep === 1) {
-            navigate(-1);
-          } else {
-            setCurrentStep((step) => Math.max(1, step - 1));
-          }
-        }}
-      />
+    <div className="tw:mx-auto tw:max-w-3xl tw:px-0 tw:pb-24 tw:pt-4 tw:md:pt-0">
+      {/* The app shows the step rail on its two wizard steps only
+          (event_step_shell.dart:104-292) and switches to an AppBar on the
+          Review & Publish screen (preview_screen.dart:577-599). */}
+      {currentStep < 3 && (
+        <ProgressSteps
+          currentStep={currentStep}
+          completedSteps={completedSteps}
+          onBack={() => {
+            if (currentStep === 1) {
+              navigate(-1);
+            } else {
+              setCurrentStep((step) => Math.max(1, step - 1));
+            }
+          }}
+        />
+      )}
 
+      <div className="tw:px-4 tw:pt-1.5">
       {currentStep === 1 && (
         <EventInformationStep
+          previewTimeZones={previewTimeZones}
           defaultValues={infoStepDefaults}
           onNext={handleInfoNext}
           posterImages={posterImages}
@@ -579,13 +604,16 @@ export default function EventCreationWizard({
           collected={mergedForReview}
           formErrors={formErrors}
           isSubmitting={isSubmitting}
+          isEdit={isEdit}
           onBack={() => setCurrentStep(2)}
           onPublish={handlePublish}
           onGoToStep={goToStep}
+          onUpdateAccess={handleUpdateAccess}
           posterImages={posterImages}
           existingPoster={existingPoster}
         />
       )}
+      </div>
 
       <EventCreationSuccessModal
         open={successModal.open}

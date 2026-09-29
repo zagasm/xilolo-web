@@ -74,6 +74,7 @@ import HomePreview from "./pages/Home/HomePreview.jsx";
 // Dev-only preview of the AUTH-GATED tickets screen (/tickets), so its layout can
 // be screenshotted and measured without an account. DEV-gated below; never shipped.
 import TicketsPreview from "./pages/tickets/TicketsPreview.jsx";
+import CreateEventPreview from "./pages/event/CreateEvent/CreateEventPreview.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
@@ -614,6 +615,15 @@ export function App() {
         <Route
           path="/dev/tickets-preview"
           element={import.meta.env.DEV ? <TicketsPreview /> : <Error404 />}
+        />
+
+        {/* Dev-only preview of the create-event flow. /event/create-event/:eventTypeId
+            is auth-gated, so this renders the REAL wizard with a fixture event and a
+            forced step (?step=1|2|3) so each step can be measured + screenshotted at
+            any width without an account. 404s in production. */}
+        <Route
+          path="/dev/create-event-preview"
+          element={import.meta.env.DEV ? <CreateEventPreview /> : <Error404 />}
         />
 
         <Route path="/page-not-found" element={<Error404 />} />
