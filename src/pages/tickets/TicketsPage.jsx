@@ -31,9 +31,9 @@
 //   - `header{ display:flex; height:40px; padding:30px }` ships unlayered in
 //     src/style.css, so the app bar is a <div>, never a <header>.
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Inbox } from "lucide-react";
 
-import TicketReceiptModal from "../../component/Ticket/TicketViewModal";
 import { api, authHeaders } from "../../lib/apiClient";
 import { showError } from "../../component/ui/toast";
 import { useAuth } from "../auth/AuthContext";
@@ -49,7 +49,9 @@ import EventTicketCard, {
 } from "./EventTicketCard";
 import "./tickets.css";
 
-const CACHE_KEY = "Xilolo_tickets_cache_v1";
+// Exported so the detail route (/tickets/:ticketId) can warm-start from the
+// same cache and re-use the same payload shape.
+export const CACHE_KEY = "Xilolo_tickets_cache_v1";
 
 /** app: l10n all / upcoming / live / ended (ticket_screen.dart:68-73). */
 export const TABS = [
@@ -186,13 +188,11 @@ export function TicketRow({ ticket, onViewReceipt }) {
 
 function TicketsPage() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [error, setError] = useState(null);
-
-  const [selectedTicket, setSelectedTicket] = useState(null);
-  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState("all");
 
@@ -228,14 +228,16 @@ function TicketsPage() {
     }
   };
 
+  /**
+   * A tap on a card opens the ticket's detail screen, exactly like the app
+   * (ticket_screen.dart:226-230 -> pushRight(ReceiptScreen(ticket))).
+   * The ticket travels in router state so the detail paints immediately; the
+   * route re-resolves it from the same list payload on a hard refresh.
+   */
   const handleViewReceipt = (ticket) => {
-    setSelectedTicket(ticket);
-    setReceiptOpen(true);
-  };
-
-  const closeReceipt = () => {
-    setReceiptOpen(false);
-    setSelectedTicket(null);
+    const id = ticket?.ticket_id || ticket?.code;
+    if (!id) return;
+    navigate(`/tickets/${encodeURIComponent(id)}`, { state: { ticket } });
   };
 
   // Attach phase (upcoming/live/ended) to each ticket for filtering
@@ -294,12 +296,6 @@ function TicketsPage() {
         <div className="tw:h-4" />
       </div>
 
-      {/* View Ticket / Receipt modal (unchanged) */}
-      <TicketReceiptModal
-        open={receiptOpen}
-        onClose={closeReceipt}
-        ticket={selectedTicket}
-      />
     </div>
   );
 }
