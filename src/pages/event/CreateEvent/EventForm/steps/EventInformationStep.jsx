@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { ArrowRight, Calendar, Globe, MapPin, MonitorSmartphone, Tag, TextAlignLeft } from "lucide-react";
+import { ArrowRight, Calendar, Globe, MapPin, MonitorSmartphone, Tag, AlignLeft } from "lucide-react";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { showError } from "../../../../../component/ui/toast";
@@ -313,7 +313,7 @@ export default function EventInformationStep({
 
           <Field label="Description" className="tw:mb-5">
             <div className="tw:relative">
-              <TextAlignLeft
+              <AlignLeft
                 className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-3.5 tw:size-[18px] tw:text-muted"
                 aria-hidden="true"
               />
