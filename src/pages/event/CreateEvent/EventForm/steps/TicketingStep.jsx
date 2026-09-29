@@ -560,7 +560,7 @@ export default function TicketingStep({
     (async () => {
       try {
         const res = await api.get("/api/v1/currency", {
-          headers: token ? { Authorization: *** ${token}` } : {},
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const list = res?.data?.currencies || res?.data?.data || [];
         if (!mounted) return;
