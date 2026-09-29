@@ -30,7 +30,62 @@ import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDo
 import { formatEventDateTime } from "../../utils/ui";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
-const RTMP_SERVER_URL = "rtmp://173.199.93.204/live";
+
+// The RTMP ingest endpoint is owned by the backend, not by this file. It comes
+// back on the stream/credentials payloads as `credentials.rtmp.server` /
+// `credentials.rtmp.url` and `stream.rtmp_server` / `stream.rtmp_link` /
+// `stream.rtmp_url` (backend: config('streaming.ingest.rtmp'), which resolves
+// to the ingest HOSTNAME plus the `live` SRS app — e.g.
+// rtmp://ingest.xilolo.com:1935/live). Creators must publish into the `live`
+// app or the stream lands in `__defaultApp__` and plays nowhere.
+//
+// This file previously hardcoded `rtmp://173.199.93.204/live`: a retired raw
+// node address, plain rtmp with no TLS, and not the ingest endpoint at all.
+// Never reintroduce a literal here — read it from the API response.
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function resolveStreamKey(event) {
+  return firstNonEmptyString(
+    event?.credentials?.rtmp?.stream_key,
+    event?.stream?.streaming_api?.rtmp_key,
+    event?.stream?.streaming_api?.streamKey,
+    event?.stream?.rtmp_key,
+    event?.stream?.stream_key,
+  );
+}
+
+// A "server" field must carry only host + app; if a payload ever returns a URL
+// that already has the stream key appended, strip it so the key does not end up
+// in the OBS Server field as well as the Stream Key field.
+function resolveRtmpServer(event) {
+  const stream = event?.stream || {};
+  const streamingApi = stream?.streaming_api || {};
+
+  const server = firstNonEmptyString(
+    event?.credentials?.rtmp?.server,
+    stream.rtmp_server,
+    streamingApi.rtmp_server,
+    stream.rtmp_url,
+    stream.rtmp_link,
+    event?.credentials?.rtmp?.url,
+  ).replace(/\/+$/, "");
+
+  const streamKey = resolveStreamKey(event);
+
+  if (streamKey && server.endsWith(`/${streamKey}`)) {
+    return server.slice(0, -(streamKey.length + 1));
+  }
+
+  return server;
+}
 
 function getErrorMessage(error, fallback = "Something went wrong.") {
   const code = getErrorCode(error);
@@ -115,9 +170,15 @@ function hasStreamAccessDetails(event) {
   const stream = event?.stream;
   const streamingApi = stream?.streaming_api;
 
+  // Mirror the fields resolveRtmpServer() reads, so a stream the API describes
+  // with `rtmp_link` only (GET /streams) still counts as having credentials.
+  // `streaming_api` is a legacy field the backend no longer returns.
   return Boolean(
+    event?.credentials?.rtmp?.server ||
+    stream?.rtmp_server ||
     streamingApi?.rtmp_server ||
-    stream?.rtmp_url,
+    stream?.rtmp_url ||
+    stream?.rtmp_link,
   );
 }
 
@@ -610,15 +671,12 @@ export default function EventStreamControlPage() {
   );
 
   const shouldShowObsDetails = hasStartedStream && !isEnded;
-  const rtmpServer = shouldShowObsDetails ? RTMP_SERVER_URL : "";
-  const rtmpKey =
-    shouldShowObsDetails
-      ? rtmpCredentials?.stream_key ||
-        streamingApi?.rtmp_key ||
-        streamingApi?.streamKey ||
-        stream?.stream_key ||
-        ""
-      : "";
+  // Server AND key are read from the API response (see resolveRtmpServer /
+  // resolveStreamKey above). There is deliberately no hardcoded fallback host:
+  // a wrong server is worse than none, because creators publish into it and it
+  // silently fails.
+  const rtmpServer = shouldShowObsDetails ? resolveRtmpServer(eventData) : "";
+  const rtmpKey = shouldShowObsDetails ? resolveStreamKey(eventData) : "";
   const isPreLiveStage =
     hasStartedStream && !isEnded && stageOverride === "started";
   const showGoLive =
