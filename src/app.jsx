@@ -49,6 +49,7 @@ import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
 import TicketsPage from "./pages/tickets/TicketsPage.jsx";
+import TicketReceiptScreen from "./pages/tickets/TicketReceiptScreen.jsx";
 import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
 import SearchPage from "./pages/Search/index.jsx";
 import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
@@ -488,12 +489,12 @@ export function App() {
           path="/organisers/:shareKey"
           element={<SharedProfileRedirectPage type="organiser" />}
         />
-        {/* No landing page: the root goes straight to signup. Deliberately the
-            same <SignUp /> inside the same <AuthLayout /> as /auth/signup, so
+        {/* No landing page: the root goes straight to SIGN IN. Deliberately the
+            same <Signin /> inside the same <AuthLayout /> as /auth/signin, so
             the two entry points can never diverge. Deep links that must survive
             (/event/:id, /events/:shareKey, legal, /about, /contact) are untouched. */}
         <Route element={<AuthLayout />}>
-          <Route path="/" element={<SignUp />} />
+          <Route path="/" element={<Signin />} />
         </Route>
 
         <Route path="/auth" element={<AuthLayout />}>
@@ -525,6 +526,10 @@ export function App() {
               <Route path="edit-password" element={<EditPassword />} />
             </Route>
             <Route path="/tickets" element={<TicketsPage />} />
+            {/* Ticket detail — the app pushes a full screen for a tap on a
+                ticket (ticket_screen.dart:226-230 -> ReceiptScreen), so this is
+                a route, not the modal it replaced. */}
+            <Route path="/tickets/:ticketId" element={<TicketReceiptScreen />} />
             <Route path="/payment/callback" element={<PaymentCallback />} />
             <Route
               path="/wallet/funding/callback"

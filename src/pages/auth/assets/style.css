@@ -226,10 +226,18 @@ form .inactive_submit_button {
 }
 
 
+/* Brand teal, not near-black: #050505 on this page's grey wash was what made
+   the "Sign up" / "Sign In" cross-links read as invisible (founder report).
+   #16909C is the web accent token (src/styles/tailwind.css `--color-accent`).
+   Both cross-links also carry this colour inline, so neither can drift.
+   `!important` on the underline is required: the legacy bundle ships
+   `src/assets/css/style.css:409  a { text-decoration: none !important }`,
+   which strips the underline from EVERY anchor on the site. A !important here
+   wins on specificity (0,1,1 > 0,0,1), which is the only way to beat it. */
 .footer_text a {
-  color: #050505;
+  color: #16909C;
   font-weight: 700;
-  text-decoration: underline;
+  text-decoration: underline !important;
 }
 
 form .code_container {

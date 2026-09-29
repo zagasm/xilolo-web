@@ -223,6 +223,48 @@ function HostAvatar({ event, name, size = 34, className = "" }) {
   );
 }
 
+/* ── Organiser tap target — avatar + name open the organiser's profile ───── */
+/**
+ * The feed payload exposes NO share key: `app/Http/Resources/EventResource.php`
+ * ships `hostId` / `organiser_id` (both the host user id) plus `hostName` /
+ * `hostImage`, and `/organisers/:shareKey` can only resolve from a share key.
+ * So the honest link from feed data is `/profile/:profileId`, which exists
+ * today (src/app.jsx:523-524) and needs no backend change. A richer
+ * `/organisers/:shareKey` link needs a share-key field added to EventResource.
+ */
+function hostProfileHref(event) {
+  const candidates = [
+    event?.hostId,
+    event?.host_id,
+    event?.organiser_id,
+    event?.organiserId,
+  ];
+  for (const candidate of candidates) {
+    const value = candidate === 0 || candidate ? String(candidate).trim() : "";
+    if (value) return `/profile/${value}`;
+  }
+  return "";
+}
+
+/**
+ * Renders the avatar + organiser name as ONE tap target. Falls back to a plain
+ * (non-interactive) fragment when the payload carries no host id, so a card can
+ * never link to a broken URL.
+ */
+function HostTapTarget({ event, className = "", children }) {
+  const href = hostProfileHref(event);
+  if (!href) return <>{children}</>;
+  return (
+    <Link
+      to={href}
+      title="View organiser profile"
+      className={`tw:transition-opacity tw:hover:opacity-90 ${className}`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 /* ── Glass chip — app `_glassChip()` ─────────────────────────────────────── */
 function GlassChip({ children, className = "" }) {
   return (
@@ -402,23 +444,28 @@ export function HeroFeedCard({ event }) {
         </h3>
 
         <div className="tw:mt-3 tw:flex tw:items-start tw:gap-2.5">
-          <HostAvatar event={event} name={host} />
-          <div className="tw:min-w-0 tw:flex-1">
-            <span className="tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:font-bold tw:text-body">
-              <span className="tw:truncate">{host}</span>
-              {verified ? (
-                <BadgeCheck
-                  className="tw:size-[13px] tw:shrink-0 tw:text-[#16909C]"
-                  aria-label="Verified organiser"
-                />
-              ) : null}
-            </span>
-            {dateLine ? (
-              <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-muted">
-                {dateLine}
+          <HostTapTarget
+            event={event}
+            className="tw:flex tw:min-w-0 tw:flex-1 tw:items-start tw:gap-2.5"
+          >
+            <HostAvatar event={event} name={host} />
+            <div className="tw:min-w-0 tw:flex-1">
+              <span className="tw:flex tw:items-center tw:gap-1 tw:text-[13px] tw:font-bold tw:text-body">
+                <span className="tw:truncate">{host}</span>
+                {verified ? (
+                  <BadgeCheck
+                    className="tw:size-[13px] tw:shrink-0 tw:text-[#16909C]"
+                    aria-label="Verified organiser"
+                  />
+                ) : null}
               </span>
-            ) : null}
-          </div>
+              {dateLine ? (
+                <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-muted">
+                  {dateLine}
+                </span>
+              ) : null}
+            </div>
+          </HostTapTarget>
           <span className="tw:shrink-0 tw:text-right">
             <span className="tw:block tw:text-[9.5px] tw:font-bold tw:leading-none tw:text-muted">
               From
@@ -539,23 +586,28 @@ export function LiveFeedCard({ event, onMore }) {
         </button>
 
         <div className="tw:absolute tw:inset-x-3 tw:bottom-3 tw:flex tw:items-center tw:gap-2.5">
-          <HostAvatar event={event} name={host} size={40} />
-          <div className="tw:min-w-0 tw:flex-1">
-            <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:font-bold tw:text-paper-raised">
-              <span className="tw:truncate">{host}</span>
-              {verified ? (
-                <BadgeCheck
-                  className="tw:size-4 tw:shrink-0 tw:text-[#16909C]"
-                  aria-label="Verified organiser"
-                />
-              ) : null}
-            </span>
-            {dateLine ? (
-              <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-paper-raised/90">
-                {dateLine}
+          <HostTapTarget
+            event={event}
+            className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2.5"
+          >
+            <HostAvatar event={event} name={host} size={40} />
+            <div className="tw:min-w-0 tw:flex-1">
+              <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[13px] tw:font-bold tw:text-paper-raised">
+                <span className="tw:truncate">{host}</span>
+                {verified ? (
+                  <BadgeCheck
+                    className="tw:size-4 tw:shrink-0 tw:text-[#16909C]"
+                    aria-label="Verified organiser"
+                  />
+                ) : null}
               </span>
-            ) : null}
-          </div>
+              {dateLine ? (
+                <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[11px] tw:text-paper-raised/90">
+                  {dateLine}
+                </span>
+              ) : null}
+            </div>
+          </HostTapTarget>
         </div>
       </div>
 
@@ -638,10 +690,24 @@ export function InlineErrorCard({ message, onRetry }) {
  * pushed the greeting under the fixed 74px Navbar (that was the "Hi <name> is
  * missing" defect) while the overflowing wallet strip landed on top of the tab
  * pills (the overlap defect). A <div> is immune to that element rule.
+ *
+ * SMART HEADER (founder brief, 2026-09-29 — this deliberately diverges from the
+ * app, whose `Column[header, Expanded(feed)]` keeps the whole header fixed):
+ * the greeting + wallet strip SCROLL AWAY with the feed, and only the All/Live
+ * tab row stays pinned so the tabs remain reachable from the bottom of the
+ * list. Two consequences for anyone editing this:
+ *   1. Both blocks are rendered from this one component as a FRAGMENT (no
+ *      wrapper box), so in the DOM they are direct children of `.home-feed` —
+ *      the scroll container.
+ *   2. That is required, not cosmetic: a sticky element is clamped to its
+ *      parent's box, so a sticky tab row nested inside a header wrapper would
+ *      unstick the moment the header scrolled past. As a direct child of
+ *      `.home-feed` it pins for the whole scroll range.
  */
 export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
   return (
-    <div className="home-header tw:shrink-0 tw:border-b tw:border-hairline tw:bg-paper">
+    <>
+      {/* Scrolls away: greeting -> wallet strip. */}
       <div className={`${HOME_CONTAINER} tw:pt-4 tw:pb-3`}>
         <div className="tw:flex tw:items-center tw:gap-1.5">
           <span className="tw:block tw:min-w-0 tw:truncate tw:text-[18.5px] tw:font-extrabold tw:leading-[1.08] tw:tracking-[-0.01em] tw:text-body">
@@ -653,23 +719,29 @@ export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
         </div>
 
         <WalletStrip />
+      </div>
 
-        <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2">
-          <TabPill
-            label="All"
-            selected={activeTab === "all"}
-            onClick={() => onTabChange("all")}
-          />
-          <TabPill
-            label="Live"
-            showLiveDot
-            count={liveCount}
-            selected={activeTab === "live"}
-            onClick={() => onTabChange("live")}
-          />
+      {/* Pinned: All / Live. `top-0` of the scrollport is below the fixed 74px
+          Navbar, because `.home-feed` itself starts under the page's pt-24. */}
+      <div className="home-tabbar tw:sticky tw:top-0 tw:z-20 tw:border-b tw:border-hairline tw:bg-paper">
+        <div className={`${HOME_CONTAINER} tw:py-2.5`}>
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <TabPill
+              label="All"
+              selected={activeTab === "all"}
+              onClick={() => onTabChange("all")}
+            />
+            <TabPill
+              label="Live"
+              showLiveDot
+              count={liveCount}
+              selected={activeTab === "live"}
+              onClick={() => onTabChange("live")}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -786,14 +858,17 @@ export default function Home() {
 
       <div className="tw:w-full tw:bg-paper tw:pt-24 tw:font-sans">
         <div className="home-feed-shell">
-          <HomeHeader
-            firstName={firstName}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-            liveCount={liveEvents.length}
-          />
-
+          {/* The header lives INSIDE the scroll container so the greeting and
+              the wallet card scroll away with the feed; only its tab row is
+              sticky (see <HomeHeader>). */}
           <div ref={eventsScrollRef} className="home-feed tw-no-scrollbar">
+            <HomeHeader
+              firstName={firstName}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              liveCount={liveEvents.length}
+            />
+
             <div className={`${HOME_CONTAINER} tw:pt-3 tw:pb-7`}>
               {feed.error && list.length > 0 ? (
                 <div className="tw:mb-4">
