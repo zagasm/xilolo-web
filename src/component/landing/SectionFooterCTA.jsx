@@ -105,7 +105,9 @@ export default function SectionFooterCTA({ showCta = true, compact = false }) {
           {/* Row 1 — brand + the four link groups, as in the full footer but tight.
               The strip version alone read as too thin for a front page. */}
           <div className="tw:grid tw:gap-6 tw:md:grid-cols-[1.4fr_repeat(4,1fr)]">
-            <div className="tw:flex tw:flex-col tw:gap-2">
+            {/* Brand block (mark + support email) is desktop-only on the compact
+                footer: on a phone the founder wants just the copyright and socials. */}
+            <div className="tw:hidden tw:flex-col tw:gap-2 tw:md:flex">
               <img
                 src="/logo.png"
                 alt="Xilolo"

@@ -493,3 +493,26 @@ form .code_container .code {
     box-sizing: border-box !important;
   }
 }
+
+/* Everything inside the card must fit the card. The clipping persisted with the
+   card itself capped, so the overflow is coming from a child (bootstrap columns
+   inside the form carry their own gutters) rather than the card. */
+@media (max-width: 767px) {
+  .form_container,
+  .form_container * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .form_container .row,
+  .form_container [class*="col-"],
+  .form_container [class="col"] {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
