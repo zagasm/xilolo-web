@@ -153,7 +153,7 @@ const PhoneEmailPostSignup = ({ type, userupdate, token }) => {
                 <FaEnvelope className="tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400" />
                 <input
                   type="email"
-                  className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-12 tw:py-3 tw:text-sm tw:text-gray-900 focus:tw:border-black focus:tw:outline-none"
+                  className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:px-12 tw:py-3 tw:text-sm tw:text-gray-900 tw:focus:border-black tw:focus:outline-none"
                   value={email}
                   readOnly
                 />

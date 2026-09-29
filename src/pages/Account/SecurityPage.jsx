@@ -187,7 +187,7 @@ export default function SecurityPage() {
                 type="button"
                 onClick={startSetup}
                 disabled={working}
-                className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:opacity-60"
+                className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:opacity-60"
               >
                 {working ? "Starting..." : "Enable 2FA"}
               </button>
@@ -233,7 +233,7 @@ export default function SecurityPage() {
                   }
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-neon focus:tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
+                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm tw:focus:border-neon tw:focus:outline-none tw:focus:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
                   placeholder="123456"
                 />
               </label>
@@ -245,7 +245,7 @@ export default function SecurityPage() {
                   }}
                   type="submit"
                   disabled={!/^\d{6}$/.test(confirmCode) || working}
-                  className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] disabled:tw:bg-gray-300"
+                  className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:bg-gray-300"
                 >
                   {working ? "Confirming..." : "Confirm setup"}
                 </button>
@@ -279,13 +279,13 @@ export default function SecurityPage() {
                   }
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="tw:min-w-0 tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm focus:tw:border-neon focus:tw:outline-none focus:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
+                  className="tw:min-w-0 tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm tw:focus:border-neon tw:focus:outline-none tw:focus:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
                   placeholder="Authenticator 6-digit code"
                 />
                 <button
                   type="submit"
                   disabled={working || (disableCode && !/^\d{6}$/.test(disableCode))}
-                  className="tw:rounded-xl tw:bg-red-600 tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white disabled:tw:opacity-60"
+                  className="tw:rounded-xl tw:bg-red-600 tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
                 >
                   {working ? "Disabling..." : "Disable"}
                 </button>

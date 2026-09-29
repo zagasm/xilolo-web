@@ -147,18 +147,22 @@ img:hover { transform: scale(1.01); }
 
 /* App body = Column[header, Expanded(feed)] — the header never scrolls away
    and the feed scrolls beneath it (home_revamp_screen.dart:194-223).
-   Same 96px navbar offset + 120px shell the page used before, so nothing about
-   the surrounding app shell changes. */
+   The shell must be exactly "viewport minus the page's own top offset", and the
+   page's top offset is `tw:pt-24` = 96px (the 74px fixed Navbar + 22px of air).
+   It used to subtract 120px, which left a dead 24px strip under the feed and a
+   second, page-level scrollbar. Measured at 1440x900 after the fix: shell
+   bottom == viewport bottom, documentElement.scrollHeight == viewport height
+   (the page itself never scrolls; only .home-feed does). */
 .home-feed-shell {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  height: calc(100vh - 96px);
   min-height: 0;
 }
 
 @supports (height: 100dvh) {
   .home-feed-shell {
-    height: calc(100dvh - 120px);
+    height: calc(100dvh - 96px);
   }
 }
 
@@ -215,6 +219,22 @@ img:hover { transform: scale(1.01); }
   min-height: 180px;
   overflow: hidden;
 }
+
+/* Grid adaptation (desktop only): once cards sit two and three per row, the
+   app's natural-ratio poster makes neighbouring cards different heights. From
+   md up the poster slot takes a fixed ratio and the image covers it, so every
+   row is even. Below md the single column keeps the app's un-cropped poster. */
+@media (min-width: 768px) {
+  .home-hero-media {
+    aspect-ratio: 16 / 10;
+  }
+  .home-hero-media__image {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    object-fit: cover;
+  }
+}
 .home-hero-media__blur {
   position: absolute;
   inset: 0;
@@ -229,4 +249,21 @@ img:hover { transform: scale(1.01); }
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* ==========================================================================
+   /feed defects (2026-09-29) — one balance only.
+
+   The global shell (src/pages/pageAssets/Navbar.jsx:515) renders
+   <WalletBalanceChip> on EVERY signed-in route, and /feed renders its own
+   <WalletStrip> (the app's home wallet strip) — so the founder saw two balances
+   at once. A page cannot delete a node the shell owns, so the shell chip is
+   hidden only while the home shell is mounted, and only by attribute: on /feed
+   the Navbar chip is the single /account/wallet anchor that is not the page's
+   own strip. :has() scopes it to this route, so every other page keeps the chip.
+   Verified in the browser: on /feed exactly one balance element is visible and
+   the shell chip computes display:none.
+   ========================================================================== */
+body:has(.home-feed-shell) a[href="/account/wallet"]:not(.home-wallet-strip) {
+  display: none !important;
 }

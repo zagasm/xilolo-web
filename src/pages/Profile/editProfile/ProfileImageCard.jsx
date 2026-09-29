@@ -371,7 +371,7 @@ export default function ProfileImageCard({
                   type="button"
                   onClick={saveCropped}
                   disabled={!completedCrop?.width || !completedCrop?.height}
-                  className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-black tw:text-white tw:text-sm tw:font-semibold disabled:tw:opacity-50 disabled:tw:cursor-not-allowed"
+                  className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-black tw:text-white tw:text-sm tw:font-semibold tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
                 >
                   Save photo
                 </button>

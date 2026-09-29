@@ -286,7 +286,7 @@ function ActionButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={cx(
-        "tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:transition disabled:tw:cursor-not-allowed disabled:tw:opacity-60",
+        "tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:disabled:cursor-not-allowed tw:disabled:opacity-60",
         className,
       )}
     >
@@ -454,7 +454,7 @@ function CheckinAccessPanel({
                 type="button"
                 onClick={() => onRevoke(activeAccess)}
                 disabled={pendingAction === "checkin-revoke"}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 disabled:tw:opacity-60"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 tw:disabled:opacity-60"
               >
                 {pendingAction === "checkin-revoke" ? (
                   <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />

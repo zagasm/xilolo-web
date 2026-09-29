@@ -396,7 +396,7 @@ export default function AccountPayoutHistory() {
               type="button"
               disabled={meta.current_page <= 1 || loading}
               onClick={() => fetchHistory(meta.current_page - 1)}
-              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             >
               Previous
             </button>
@@ -407,7 +407,7 @@ export default function AccountPayoutHistory() {
               type="button"
               disabled={meta.current_page >= meta.last_page || loading}
               onClick={() => fetchHistory(meta.current_page + 1)}
-              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             >
               Next
             </button>

@@ -263,7 +263,7 @@ export function CodeVerification({ verificationData }) {
                 onKeyDown={(e) => handleKeyDown(e, index)} 
                 onPaste={handlePaste} 
                 ref={(el) => (inputsRef.current[index] = el)} 
-                className="tw:h-14 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:text-center tw:text-xl tw:font-bold tw:text-slate-950 tw:outline-none tw:transition focus:tw:border-primary focus:tw:ring-2 focus:tw:ring-primary/10"
+                className="tw:h-14 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:text-center tw:text-xl tw:font-bold tw:text-slate-950 tw:outline-none tw:transition tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/10"
                 inputMode="numeric" 
                 pattern="[0-9]*" 
               />
@@ -306,7 +306,7 @@ export function CodeVerification({ verificationData }) {
         <motion.div variants={inputVariants} className="tw:mt-5">
           <motion.button 
             style={{ borderRadius: 28, fontSize: 12}}
-            className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+            className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             type="submit" 
             disabled={!isCodeComplete || isLoading} 
             variants={buttonVariants} 

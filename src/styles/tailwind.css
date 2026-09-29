@@ -15,9 +15,9 @@
 @theme {
   /* Accent: FILLS only. For accent-coloured text/icons on light surfaces use
      accent-deep (primary is 2.97:1 on white; accent-deep is 5.8:1). */
-  --color-accent: #0EA5B4;
+  --color-accent: #16909C;
   --color-accent-deep: #06707D;
-  --color-accent-soft: rgba(14, 165, 180, 0.11);
+  --color-accent-soft: rgba(22, 144, 156, 0.11);
 
   /* Surfaces */
   --color-paper: #F3F2F0;
@@ -33,7 +33,7 @@
   --color-muted-dark: #7C7C82;
   /* Secondary text ON the ink surface. muted-dark only reaches 4.4:1 on ink
      and faint-dark just 2.0:1 — both fail WCAG AA. This is 6.1:1. */
-  --color-ink-muted: #9A9AA2;
+  --color-ink-muted: #9AA0AA;
   --color-faint: #C4C4CC;
   --color-faint-dark: #444444;
 
@@ -108,6 +108,21 @@
 footer a {
   color: inherit;
   text-decoration: none;
+}
+
+/* ── Legacy overflow mask, neutralised on the auth screens ───────────────────
+   layer1.css and zagasm-landing.css both ship `overflow-x: hidden` on html/body.
+   On the auth screens that is what clipped the form and the Terms/Privacy line
+   at the right edge instead of the layout fitting the viewport — and being on
+   the root elements it applied to every route. Those screens now measure exactly
+   viewport-wide (assertions and numbers: src/pages/auth/assets/style.css), so the
+   mask is redundant there and only hides the next regression.
+   :has() keeps the removal scoped to screens carrying .auth-background, and
+   (0,1,1) outranks the legacy `html, body` (0,0,1) regardless of import order.
+   html matters as much as body: the viewport takes its overflow from html. */
+html:has(.auth-background),
+body:has(.auth-background) {
+  overflow-x: visible;
 }
 
 html{

@@ -159,7 +159,7 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
           type="button"
           disabled={loading || (meta?.current_page || 1) <= 1}
           onClick={() => onPage((meta?.current_page || 1) - 1)}
-          className="tw:rounded-xl tw:border tw:border-slate-200 tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-slate-700 disabled:tw:opacity-50"
+          className="tw:rounded-xl tw:border tw:border-slate-200 tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-slate-700 tw:disabled:opacity-50"
         >
           Previous
         </button>
@@ -167,7 +167,7 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
           type="button"
           disabled={loading || (meta?.current_page || 1) >= (meta?.last_page || 1)}
           onClick={() => onPage((meta?.current_page || 1) + 1)}
-          className="tw:rounded-xl tw:border tw:border-slate-200 tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-slate-700 disabled:tw:opacity-50"
+          className="tw:rounded-xl tw:border tw:border-slate-200 tw:px-3 tw:py-2 tw:text-sm tw:font-semibold tw:text-slate-700 tw:disabled:opacity-50"
         >
           Next
         </button>
@@ -315,7 +315,7 @@ export default function EventStreamAnalyticsPage() {
               type="button"
               onClick={() => loadDashboard({ background: true })}
               disabled={refreshing}
-              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white disabled:tw:opacity-60"
+              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
             >
               {refreshing ? <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" /> : <RefreshCcw className="tw:h-4 tw:w-4" />}
               Refresh

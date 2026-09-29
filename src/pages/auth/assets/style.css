@@ -451,19 +451,30 @@ form .code_container .code {
 }
 }
 
-/* ── Mobile, forced sane ──────────────────────────────────────────────────────
-   The auth screens kept a desktop minimum width: bootstrap's `row` carries -15px
-   side margins and its columns carry 15px padding, so on a 390px phone the layout
-   rendered ~500px wide and everything past the right edge was clipped (fields,
-   Terms/Privacy). Bootstrap + the legacy stylesheet both outrank a utility class
-   here, so this block is deliberately !important — a clipped signup form is worse
-   than an ugly specificity fight. */
-@media (max-width: 767px) {
-  html,
-  body {
-    overflow-x: hidden;
-  }
+/* ── Mobile: fit the viewport, without hiding the overflow ────────────────────
+   The auth screens rendered wider than the phone. Bootstrap's grid is the cause:
+   every column carries 15px side padding and `.row` carries -15px side margins,
+   so the card's containing block was pushed past the screen as soon as the grid
+   was in play — the form fields and the Terms/Privacy line were clipped at the
+   right edge even though the card itself was capped.
 
+   Measured at 390x844 (headless Chrome, device emulation, meta viewport
+   width=device-width) walking every ancestor of .form_container:
+     .form_container ................. offsetWidth 358   (x 16 → 374)
+     .row.inner_form_con ............. offsetWidth 358
+     .container-fluid.auth_container . offsetWidth 390   (16px gutters)
+     .auth-background / #root / body . offsetWidth 390
+     document.scrollWidth ............ 390
+   The fix therefore belongs at this layer: zero the grid gutters and stack the
+   columns. !important because bootstrap's .row / .col-* rules outrank a plain
+   class here.
+
+   This block used to also declare `html, body { overflow-x: hidden }`. That only
+   hid the symptom (the clipped content stayed clipped) and, because this file is
+   bundled into the app stylesheet — App.jsx imports the auth pages eagerly — it
+   disabled horizontal scrolling on *every* route at <=767px. It is gone: the
+   layout now fits on its own, verified with overflow-x forced back to visible. */
+@media (max-width: 767px) {
   .auth_container {
     padding-left: 16px !important;
     padding-right: 16px !important;
@@ -476,7 +487,15 @@ form .code_container .code {
     padding-right: 0 !important;
   }
 
-  /* Name fields side by side get cramped and overflow — stack the columns. */
+  /* A flex/grid item defaults to min-width:auto, so a single wide child could
+     still stretch the row past the viewport. Let them all shrink. */
+  .inner_form_con > *,
+  .form_container,
+  .form_container > * {
+    min-width: 0 !important;
+  }
+
+  /* Name fields side by side get cramped on a phone — stack the columns. */
   .inner_form_con > [class*="col"] {
     flex: 0 0 100% !important;
     max-width: 100% !important;
@@ -492,12 +511,9 @@ form .code_container .code {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-}
 
-/* Everything inside the card must fit the card. The clipping persisted with the
-   card itself capped, so the overflow is coming from a child (bootstrap columns
-   inside the form carry their own gutters) rather than the card. */
-@media (max-width: 767px) {
+  /* Everything inside the card must fit the card: bootstrap columns inside the
+     form carry their own gutters and would otherwise overhang it. */
   .form_container,
   .form_container * {
     max-width: 100% !important;

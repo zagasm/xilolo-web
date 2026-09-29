@@ -73,7 +73,7 @@ export default function Remarks({ eventId, remarks = [], onAppend }) {
               Write your remark…
             </label>
             <textarea
-              className="tw:mt-2 tw:w-full tw:min-h-[140px] tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+              className="tw:mt-2 tw:w-full tw:min-h-[140px] tw:rounded-xl tw:border tw:border-gray-200 tw:p-3 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
               placeholder="Write your remark…"
               value={text}
               onChange={(e) => setText(e.target.value)}

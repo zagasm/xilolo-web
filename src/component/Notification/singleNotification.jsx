@@ -65,7 +65,7 @@ function SingleNotificationTemplate({ notification, onClick }) {
 
         <div className="tw:min-w-0 tw:flex-1">
           <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
-            <span className="tw:block tw:text-sm tw:text-slate-900 sm:tw:text-[15px]">
+            <span className="tw:block tw:text-sm tw:text-slate-900 tw:sm:text-[15px]">
             {messageBody}
             </span>
             <span className="tw:shrink-0 tw:text-xs tw:text-slate-400">{timeLabel}</span>

@@ -23,7 +23,7 @@ export default function SelectField({
       <Listbox value={value ?? ""} onChange={onChange} disabled={disabled}>
         <div className="tw:relative">
           <Listbox.Button
-            className={`tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:bg-[#ffffff] tw:px-3 tw:py-2 tw:text-[15px] tw:text-left focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary tw:flex tw:items-center tw:justify-between ${
+            className={`tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:bg-[#ffffff] tw:px-3 tw:py-2 tw:text-[15px] tw:text-left tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary tw:flex tw:items-center tw:justify-between ${
               disabled ? "tw:bg-gray-50" : ""
             } ${error ? "tw:border-red-400" : ""}`}
           >

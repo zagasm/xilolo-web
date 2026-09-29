@@ -803,7 +803,7 @@ export default function TicketingStep({
                     const normalized = normalizeAmountInput(event.target.value);
                     field.onChange(normalized ? formatAmountDisplay(normalized) : "");
                   }}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
                   placeholder={`Enter ticket price in ${selectedCurrency.label}`}
                 />
               </div>
@@ -832,7 +832,7 @@ export default function TicketingStep({
               type="number"
               min="1"
               {...register("ticketLimit")}
-              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+              className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
             />
             {errors.ticketLimit && (
               <p className="tw:mt-1 tw:text-xs tw:text-red-500">{errors.ticketLimit.message}</p>
@@ -941,7 +941,7 @@ export default function TicketingStep({
                           field.onChange(normalized ? formatAmountDisplay(normalized) : "");
                           clearManualError("manualPrice");
                         }}
-                        className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                        className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-9 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
                         placeholder="Set material price"
                       />
                     </div>
@@ -1010,7 +1010,7 @@ export default function TicketingStep({
                   type="number"
                   min="1"
                   {...register("replayAvailableAfterMinutes")}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
                   placeholder="Minutes after the event ends"
                 />
                 {errors.replayAvailableAfterMinutes && (
@@ -1053,7 +1053,7 @@ export default function TicketingStep({
                   type="number"
                   min="1"
                   {...register("replayAvailableForMinutes")}
-                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+                  className="tw:w-full tw:rounded-xl tw:border tw:border-gray-200 tw:px-3 tw:py-2.5 tw:text-[15px] tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
                   placeholder="Minutes replay stays online"
                 />
                 {errors.replayAvailableForMinutes && (
@@ -1088,7 +1088,7 @@ export default function TicketingStep({
         <button
           type="submit"
           disabled={isUploadingVod || vodUploadMustFinish}
-          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+          className="tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
           style={{ borderRadius: 20, fontSize: 12 }}
         >
           {isUploadingVod || vodUploadMustFinish ? "Uploading video..." : "Continue to preview"}

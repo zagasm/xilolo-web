@@ -83,7 +83,7 @@ function AccountNotification() {
                     <button
                       type="button"
                       onClick={() => toggleAccordion("push")}
-                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left focus:tw:outline-none"
+                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left tw:focus:outline-none"
                     >
                       <div className="tw:flex tw:flex-col tw:gap-0.5">
                         <span className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
@@ -277,7 +277,7 @@ function AccountNotification() {
                     <button
                       type="button"
                       onClick={() => toggleAccordion("sms")}
-                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left focus:tw:outline-none"
+                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left tw:focus:outline-none"
                     >
                       <div className="tw:flex tw:flex-col tw:gap-0.5">
                         <span className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">
@@ -357,7 +357,7 @@ function AccountNotification() {
                     <button
                       type="button"
                       onClick={() => toggleAccordion("email")}
-                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left focus:tw:outline-none"
+                      className="tw:w-full tw:flex tw:items-center tw:justify-between tw:px-4 tw:py-3 tw:md:px-5 tw:md:py-4 tw:gap-3 tw:text-left tw:focus:outline-none"
                     >
                       <div className="tw:flex tw:flex-col tw:gap-0.5">
                         <span className="tw:text-sm tw:md:text-base tw:font-semibold tw:text-gray-900">

@@ -268,7 +268,7 @@ export default function EventCard({
               leaveFrom="tw:opacity-100 tw:scale-100"
               leaveTo="tw:opacity-0 tw:scale-95"
             >
-              <Menu.Items className="tw:absolute tw:right-0 tw:mt-2 tw:w-60 tw:origin-top-right tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14),0_0_20px_rgba(0,245,255,0.08)] focus:tw:outline-none">
+              <Menu.Items className="tw:absolute tw:right-0 tw:mt-2 tw:w-60 tw:origin-top-right tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:p-2 tw:shadow-[0_18px_48px_rgba(15,23,42,0.14),0_0_20px_rgba(0,245,255,0.08)] tw:focus:outline-none">
                 <Menu.Item>
                   {({ active }) => (
                     <button

@@ -529,7 +529,7 @@ export default function PosterMediaFields({
                 type="button"
                 onClick={commitCrop}
                 disabled={!completedCrop?.width || !completedCrop?.height}
-                className="tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                className="tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 style={{ borderRadius: 16, fontSize: 12 }}
               >
                 Save poster

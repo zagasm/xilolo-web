@@ -52,7 +52,7 @@ export default function AppleAuthSection({
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="tw:flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-900 tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-medium tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-70"
+        className="tw:flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-gray-900 tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-medium tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
       >
         <i className="fa-brands fa-apple tw:text-base" aria-hidden="true" />
         <span>{loading ? "Connecting to Apple..." : buttonText}</span>

@@ -224,7 +224,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type = "email" }) => 
               ref={(el) => (inputRefs.current[index] = el)}
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
-              className="tw:h-14 tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:text-center tw:text-xl tw:font-semibold tw:outline-none focus:tw:border-primary"
+              className="tw:h-14 tw:rounded-2xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:text-center tw:text-xl tw:font-semibold tw:outline-none tw:focus:border-primary"
             />
           ))}
         </div>

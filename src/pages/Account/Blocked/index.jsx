@@ -313,7 +313,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
         type="button"
         disabled={isUnblocking}
         onClick={onUnblock}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 disabled:tw:opacity-60 disabled:tw:cursor-not-allowed tw:transition"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
       >
         <span>{isUnblocking ? "Unblocking…" : "Unblock"}</span>
       </button>

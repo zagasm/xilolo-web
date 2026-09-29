@@ -49,7 +49,7 @@ export default function RequestFormCard() {
           placeholder="your.email@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:h-12 focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-primary"
+          className="tw:flex-1 tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:h-12 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-primary"
         />
         <button
           style={{

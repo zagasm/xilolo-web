@@ -202,7 +202,7 @@ function EventDetailShimmer() {
             <div className="tw:space-y-6">
               <div className="tw:h-80 tw:animate-pulse tw:rounded-[28px] tw:bg-[#ffffff]/70 tw:md:h-[520px] tw:md:rounded-4xl" />
 
-              <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-4">
+              <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2 tw:xl:grid-cols-4">
                 {[...Array(4)].map((_, index) => (
                   <div
                     key={index}
@@ -1032,7 +1032,7 @@ export default function ViewEvent() {
                   </div>
                 </div>
 
-                <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 xl:tw:grid-cols-5">
+                <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 tw:xl:grid-cols-5">
                   <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
                     <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
                       Event Schedule
@@ -1154,7 +1154,7 @@ export default function ViewEvent() {
                         type="button"
                         onClick={() => navigate(`/event/vod/${event.id}`)}
                         disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                       >
                         <Video className="tw:h-4 tw:w-4" />
                         <span>{vodIsReady ? "Watch video" : "Available soon"}</span>

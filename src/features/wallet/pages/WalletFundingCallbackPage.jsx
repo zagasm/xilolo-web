@@ -318,7 +318,7 @@ export default function WalletFundingCallbackPage() {
                   type="button"
                   onClick={() => handleVerify({ force: true })}
                   disabled={verifyFunding.isPending}
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   style={{ borderRadius: 16 }}
                 >
                   {verifyFunding.isPending ? "Checking..." : "Check status"}
@@ -364,7 +364,7 @@ export default function WalletFundingCallbackPage() {
                       type="button"
                       onClick={handleManualPurchase}
                       disabled={purchaseState.status === "loading"}
-                      className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+                      className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                       style={{ borderRadius: 16 }}
                     >
                       {purchaseState.status === "loading"

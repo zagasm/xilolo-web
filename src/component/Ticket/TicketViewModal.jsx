@@ -203,7 +203,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           type="button"
                           onClick={handleViewOrganiserProfile}
                           disabled={!organiserProfileId}
-                          className="tw:shrink-0 tw:rounded-full disabled:tw:cursor-default"
+                          className="tw:shrink-0 tw:rounded-full tw:disabled:cursor-default"
                           aria-label="View organiser profile"
                         >
                           <img
@@ -217,7 +217,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           type="button"
                           onClick={handleViewOrganiserProfile}
                           disabled={!organiserProfileId}
-                          className="tw:min-w-0 tw:flex-1 tw:text-left disabled:tw:cursor-default"
+                          className="tw:min-w-0 tw:flex-1 tw:text-left tw:disabled:cursor-default"
                         >
                           <span className="tw:block tw:text-[10px] tw:font-medium tw:uppercase tw:tracking-[0.12em] tw:text-gray-500 tw:sm:text-[11px]">
                             Organiser
@@ -285,7 +285,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                       type="button"
                       onClick={handleDownloadPdf}
                       disabled={!ticket?.ticket_id || isDownloading}
-                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-60 tw:sm:text-xs"
+                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                     >
                       {isDownloading ? "Downloading..." : "Download PDF"}
                     </button>
@@ -294,7 +294,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                       type="button"
                       onClick={handleViewEvent}
                       disabled={!event?.id}
-                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 disabled:tw:cursor-not-allowed disabled:tw:opacity-60 tw:sm:text-xs"
+                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                     >
                       View Event Details
                     </button>
@@ -304,7 +304,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                         type="button"
                         onClick={handleWatchVod}
                         disabled={!event?.id}
-                        className="tw:rounded-full tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-slate-800 disabled:tw:cursor-not-allowed disabled:tw:opacity-60 tw:sm:text-xs"
+                        className="tw:rounded-full tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-slate-800 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                       >
                         Watch video
                       </button>
