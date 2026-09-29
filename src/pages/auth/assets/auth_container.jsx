@@ -55,6 +55,8 @@ function AuthContainer({
                     style={{
                       display: "flex",
                       justifyContent: "center",
+                      // The mark sat flush against the top of the viewport.
+                      paddingTop: "28px",
                     }}
                   >
                     <Link to="/">

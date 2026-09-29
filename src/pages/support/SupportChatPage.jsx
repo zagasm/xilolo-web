@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api, authHeaders } from "../../lib/apiClient";
+import { Button, Chip, EmptyState, Input } from "../../component/ui";
 
 window.Pusher = Pusher;
 
@@ -369,23 +370,23 @@ export default function SupportChatPage() {
       style={HIDDEN_SCROLLBAR_STYLE}
     >
       <div className="tw:flex tw:items-center tw:justify-between">
-        <span className="tw:text-base tw:font-black">Recent</span>
-        <span className="tw:rounded-full tw:bg-white/70 tw:px-2.5 tw:py-1 tw:text-xs tw:font-black">
-          {conversations.length}
+        <span className="tw:font-display tw:text-base tw:font-bold tw:text-ink">
+          Recent
         </span>
+        <Chip>{conversations.length}</Chip>
       </div>
 
       {loading ? (
-        <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold">
-          <Loader2 className="tw:animate-spin" size={16} />
+        <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4 tw:text-sm tw:text-muted-strong">
+          <Loader2 className="tw:animate-spin" size={16} aria-hidden="true" />
           Loading support chats
         </div>
       ) : !hasAccess ? (
-        <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+        <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4 tw:text-sm tw:leading-6 tw:text-muted-strong">
           Support chat is available with an active Xilolo subscription.
         </div>
       ) : filteredConversations.length === 0 ? (
-        <div className="tw:rounded-[22px] tw:bg-white/70 tw:p-4 tw:text-sm tw:font-semibold tw:leading-6">
+        <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4 tw:text-sm tw:leading-6 tw:text-muted-strong">
           No matching chats yet.
         </div>
       ) : (
@@ -402,26 +403,21 @@ export default function SupportChatPage() {
                   setMobileDrawerOpen(false);
                 }}
                 className={[
-                  "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-[22px] tw:px-4 tw:py-3 tw:text-left tw:transition",
-                  active ? "tw:bg-white tw:shadow-sm" : "tw:bg-white/70 tw:hover:bg-white",
+                  "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-card tw:border tw:px-4 tw:py-3 tw:text-left tw:transition-colors",
+                  active
+                    ? "tw:border-accent tw:bg-paper-raised"
+                    : "tw:border-hairline tw:bg-paper-raised tw:hover:border-accent/40",
                 ].join(" ")}
               >
                 <span className="tw:flex tw:items-center tw:justify-between tw:gap-2">
-                  <span className="tw:min-w-0 tw:truncate tw:text-sm tw:font-black tw:text-primary">
+                  <span className="tw:min-w-0 tw:truncate tw:text-sm tw:font-semibold tw:text-ink">
                     {conversation.subject || "Support chat"}
                   </span>
-                  <span
-                    className={[
-                      "tw:shrink-0 tw:rounded-full tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-black tw:uppercase",
-                      conversation.status === "closed"
-                        ? "tw:bg-primary/10 tw:text-primary"
-                        : "tw:bg-emerald-50 tw:text-emerald-700",
-                    ].join(" ")}
-                  >
+                  <Chip active={conversation.status !== "closed"}>
                     {statusLabel(conversation.status)}
-                  </span>
+                  </Chip>
                 </span>
-                <span className="tw:line-clamp-2 tw:text-xs tw:font-semibold tw:leading-5 tw:text-[#6b625a]">
+                <span className="tw:line-clamp-2 tw:text-xs tw:leading-5 tw:text-muted">
                   {conversation.latest_message?.body || "No messages yet"}
                 </span>
               </button>
@@ -433,10 +429,9 @@ export default function SupportChatPage() {
   );
 
   return (
-    <main className="tw:min-h-screen tw:bg-white tw:px-2 tw:pb-2 tw:pt-[72px] tw:font-sans tw:text-primary tw:sm:px-3 tw:sm:pb-4 tw:md:px-5 tw:md:pt-[88px]">
+    <main className="tw:min-h-screen tw:bg-paper tw:px-2 tw:pb-2 tw:pt-[72px] tw:font-sans tw:text-ink tw:sm:px-3 tw:sm:pb-4 tw:md:px-5 tw:md:pt-[88px]">
       <style>{`
         .xilolo-support-scroll::-webkit-scrollbar{display:none;}
-        .xilolo-support-noise{background-image:radial-gradient(rgba(17,17,17,.045) .7px, transparent .7px);background-size:6px 6px;}
         @supports (height: 100dvh) {
           .xilolo-support-shell{height:calc(100dvh - 96px);}
           @media (max-width:520px){.xilolo-support-shell{height:calc(100dvh - 78px);}}
@@ -456,7 +451,7 @@ export default function SupportChatPage() {
             <button
               type="button"
               aria-label="Close support history"
-              className="tw:absolute tw:inset-0 tw:bg-black/35"
+              className="tw:absolute tw:inset-0 tw:bg-ink/48"
               onClick={() => setMobileDrawerOpen(false)}
             />
           </Transition.Child>
@@ -469,38 +464,45 @@ export default function SupportChatPage() {
             leaveFrom="tw:translate-x-0"
             leaveTo="tw:-translate-x-full"
           >
-            <aside className="tw:relative tw:flex tw:h-full tw:w-[min(84vw,330px)] tw:flex-col tw:bg-[#e9e0d5] tw:p-4 tw:shadow-2xl">
+            <aside className="tw:relative tw:flex tw:h-full tw:w-[min(84vw,330px)] tw:flex-col tw:border-r tw:border-hairline tw:bg-paper tw:p-4">
               <div className="tw:flex tw:items-center tw:justify-between">
-                <button
-                  style={{ borderRadius: 36 }}
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
                   onClick={createConversation}
                   disabled={!hasAccess || creating}
-                  className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/75 tw:px-4 tw:text-sm tw:font-black tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
                 >
-                  {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <Plus size={16} />}
+                  {creating ? (
+                    <Loader2 className="tw:animate-spin" size={16} aria-hidden="true" />
+                  ) : (
+                    <Plus size={16} aria-hidden="true" />
+                  )}
                   New chat
-                </button>
+                </Button>
 
                 <button
-                  style={{ borderRadius: 36 }}
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/75 tw:text-primary"
+                  className="tw:grid tw:size-11 tw:shrink-0 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
                   aria-label="Close support history"
                 >
-                  <X size={18} />
+                  <X size={18} aria-hidden="true" />
                 </button>
               </div>
 
-              <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
-                <input
+              <div className="tw:relative tw:mt-5 tw:flex tw:items-center">
+                <Input
                   value={conversationSearch}
                   onChange={(event) => setConversationSearch(event.target.value)}
                   placeholder="Search"
-                  className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+                  aria-label="Search support chats"
+                  style={{ paddingRight: 42 }}
                 />
-                <Search size={18} />
+                <Search
+                  className="tw:pointer-events-none tw:absolute tw:right-3.5 tw:size-4 tw:text-muted"
+                  aria-hidden="true"
+                />
               </div>
 
               {conversationList}
@@ -510,41 +512,47 @@ export default function SupportChatPage() {
       </Transition>
 
       <section
-        className="xilolo-support-shell xilolo-support-noise tw:mx-auto tw:flex tw:h-[calc(100vh-104px)] tw:min-h-0 tw:w-full tw:max-w-[1500px] tw:overflow-hidden tw:rounded-3xl tw:bg-white tw:shadow-[0_18px_60px_rgba(17,17,17,0.12)] max-[520px]:tw:h-[calc(100vh-82px)] max-[520px]:tw:rounded-[18px] tw:lg:rounded-[34px]"
+        className="xilolo-support-shell tw:mx-auto tw:flex tw:h-[calc(100vh-104px)] tw:min-h-0 tw:w-full tw:max-w-[1200px] tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:max-[520px]:h-[calc(100vh-82px)]"
         aria-label="Xilolo support chat"
       >
-        <aside className="tw:hidden tw:w-[290px] tw:shrink-0 tw:flex-col tw:bg-[#e9e0d5]/90 tw:p-4 tw:lg:flex">
+        <aside className="tw:hidden tw:w-[290px] tw:shrink-0 tw:flex-col tw:border-r tw:border-hairline tw:bg-paper tw:p-4 tw:lg:flex">
           <div className="tw:flex tw:items-center tw:justify-between">
             <button
-              style={{ borderRadius: 36 }}
               type="button"
               onClick={createConversation}
               disabled={!hasAccess || creating}
-              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70 disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="Start new support chat"
             >
-              {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <Plus size={17} />}
+              {creating ? (
+                <Loader2 className="tw:animate-spin" size={16} aria-hidden="true" />
+              ) : (
+                <Plus size={17} aria-hidden="true" />
+              )}
             </button>
 
             <button
-              style={{ borderRadius: 36 }}
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
               aria-label="Close support chat"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={18} aria-hidden="true" />
             </button>
           </div>
 
-          <div className="tw:mt-5 tw:flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-[20px] tw:bg-white/85 tw:px-4 tw:text-sm tw:font-semibold tw:text-primary">
-            <input
+          <div className="tw:relative tw:mt-5 tw:flex tw:items-center">
+            <Input
               value={conversationSearch}
               onChange={(event) => setConversationSearch(event.target.value)}
               placeholder="Search"
-              className="tw:min-w-0 tw:flex-1 tw:bg-transparent tw:text-sm tw:font-semibold tw:outline-none placeholder:tw:text-primary"
+              aria-label="Search support chats"
+              style={{ paddingRight: 42 }}
             />
-            <Search size={18} />
+            <Search
+              className="tw:pointer-events-none tw:absolute tw:right-3.5 tw:size-4 tw:text-muted"
+              aria-hidden="true"
+            />
           </div>
 
           {conversationList}
@@ -552,25 +560,28 @@ export default function SupportChatPage() {
 
         <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
           <div className="tw:flex tw:h-14 tw:shrink-0 tw:items-center tw:justify-between tw:px-3 tw:lg:hidden">
-            <button
-              style={{ borderRadius: 36 }}
+            <Button
               type="button"
+              variant="ghost"
+              size="md"
               onClick={() => setMobileDrawerOpen(true)}
-              className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/80 tw:px-4 tw:text-sm tw:font-black tw:text-primary"
             >
-              <MessageCircle size={17} />
+              <MessageCircle size={17} aria-hidden="true" />
               Recent
-            </button>
+            </Button>
 
             <button
-              style={{ borderRadius: 36 }}
               type="button"
               onClick={createConversation}
               disabled={!hasAccess || creating}
-              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/80 tw:text-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="New support chat"
             >
-              {creating ? <Loader2 className="tw:animate-spin" size={18} /> : <Plus size={18} />}
+              {creating ? (
+                <Loader2 className="tw:animate-spin" size={18} aria-hidden="true" />
+              ) : (
+                <Plus size={18} aria-hidden="true" />
+              )}
             </button>
           </div>
 
@@ -580,15 +591,15 @@ export default function SupportChatPage() {
           >
             <div className="tw:mx-auto tw:flex tw:min-h-full tw:w-full tw:max-w-5xl tw:flex-col">
               <div className="tw:pb-4 tw:pt-4 tw:text-center tw:sm:pt-6 tw:md:pb-6 tw:md:pt-7">
-                <div className="tw:mx-auto tw:mb-4 tw:grid tw:h-14 tw:w-14 tw:place-items-center tw:rounded-full tw:border-10 tw:border-[#d8d0c5] tw:bg-white tw:shadow-[inset_0_0_18px_rgba(17,17,17,.12)] tw:opacity-80 tw:sm:h-16 tw:sm:w-16 tw:sm:border-12">
-                  <Headphones size={22} />
+                <div className="tw:mx-auto tw:mb-4 tw:grid tw:size-14 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-accent-soft tw:text-accent-deep tw:sm:size-16">
+                  <Headphones size={22} aria-hidden="true" />
                 </div>
 
-                <span className="tw:block tw:text-2xl tw:font-black tw:tracking-tight tw:sm:text-3xl tw:md:text-4xl">
+                <span className="tw:block tw:font-display tw:text-2xl tw:font-extrabold tw:tracking-[-0.01em] tw:text-ink tw:sm:text-3xl tw:md:text-4xl">
                   Xilolo Support
                 </span>
 
-                <span className="tw:mt-2 tw:text-sm tw:tracking-wide tw:text-[#6b625a] tw:md:text-base">
+                <span className="tw:mt-2 tw:block tw:text-sm tw:text-muted tw:md:text-base">
                   {activeConversation
                     ? `Status: ${statusLabel(activeConversation.status)}`
                     : "Start a chat and our team can reply in real time."}
@@ -596,7 +607,10 @@ export default function SupportChatPage() {
               </div>
 
               {error && (
-                <div className="tw:mx-auto tw:mb-4 tw:w-full tw:max-w-4xl tw:rounded-[18px] tw:bg-white/75 tw:px-4 tw:py-2.5 tw:text-sm tw:font-bold tw:text-primary">
+                <div
+                  role="alert"
+                  className="tw:mx-auto tw:mb-4 tw:w-full tw:max-w-4xl tw:rounded-card tw:border tw:border-danger/30 tw:bg-paper-raised tw:px-4 tw:py-2.5 tw:text-sm tw:text-danger"
+                >
                   {error}
                 </div>
               )}
@@ -604,39 +618,41 @@ export default function SupportChatPage() {
               <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-1 tw:flex-col tw:gap-4 tw:pb-4">
                 <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-4">
                   {threadLoading || loading ? (
-                    <div className="tw:m-auto tw:flex tw:items-center tw:gap-2 tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-sm tw:font-black">
-                      <Loader2 className="tw:animate-spin" size={18} />
+                    <div className="tw:m-auto tw:flex tw:items-center tw:gap-2 tw:rounded-card tw:border tw:border-hairline tw:bg-paper tw:p-5 tw:text-sm tw:text-muted-strong">
+                      <Loader2 className="tw:animate-spin" size={18} aria-hidden="true" />
                       Loading support chat
                     </div>
                   ) : !hasAccess ? (
-                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center">
-                      <div className="tw:mx-auto tw:grid tw:h-12 tw:w-12 tw:place-items-center tw:rounded-full tw:bg-primary tw:text-white">
-                        <Headphones size={22} />
-                      </div>
-                      <div className="tw:mt-4 tw:text-sm tw:font-black tw:leading-6">
-                        Support chat is available to users with an active subscription.
-                      </div>
-                    </div>
+                    <EmptyState
+                      icon={Headphones}
+                      title="Support chat is available to users with an active subscription."
+                    />
                   ) : !activeConversation ? (
-                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center">
-                      <div className="tw:text-sm tw:font-black tw:leading-6">
-                        Start a new support chat or select one from your recent chats.
-                      </div>
-                      <button
-                        style={{ borderRadius: 36 }}
-                        type="button"
-                        onClick={createConversation}
-                        disabled={creating}
-                        className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-5 tw:text-sm tw:font-black tw:text-white disabled:tw:opacity-60"
-                      >
-                        {creating ? <Loader2 className="tw:animate-spin" size={16} /> : <MessageSquarePlus size={16} />}
-                        New chat
-                      </button>
-                    </div>
+                    <EmptyState
+                      icon={MessageSquarePlus}
+                      title="Start a new support chat or select one from your recent chats."
+                      action={
+                        <Button
+                          type="button"
+                          variant="primary"
+                          size="lg"
+                          onClick={createConversation}
+                          disabled={creating}
+                        >
+                          {creating ? (
+                            <Loader2 className="tw:animate-spin" size={16} aria-hidden="true" />
+                          ) : (
+                            <MessageSquarePlus size={16} aria-hidden="true" />
+                          )}
+                          New chat
+                        </Button>
+                      }
+                    />
                   ) : messages.length === 0 ? (
-                    <div className="tw:m-auto tw:w-full tw:max-w-sm tw:rounded-3xl tw:bg-white/65 tw:p-5 tw:text-center tw:text-sm tw:font-black tw:leading-6">
-                      Send your first message. Xilolo Support will reply here.
-                    </div>
+                    <EmptyState
+                      icon={MessageCircle}
+                      title="Send your first message. Xilolo Support will reply here."
+                    />
                   ) : (
                     <>
                       {messages.map((message) => {
@@ -652,10 +668,10 @@ export default function SupportChatPage() {
                           >
                             <div
                               className={[
-                                "tw:max-w-[86%] tw:whitespace-pre-wrap tw:wrap-break-word tw:text-sm tw:font-medium tw:leading-6 tw:sm:max-w-[78%]",
+                                "tw:max-w-[86%] tw:whitespace-pre-wrap tw:break-words tw:rounded-card tw:px-4 tw:py-3 tw:text-sm tw:leading-6 tw:sm:max-w-[78%]",
                                 isUser
-                                  ? "tw:rounded-[18px] tw:bg-primary tw:px-4 tw:py-3 tw:text-white"
-                                  : "tw:text-[#5f5a55]",
+                                  ? "tw:bg-accent tw:font-medium tw:text-ink"
+                                  : "tw:border tw:border-hairline tw:bg-chip tw:text-ink",
                               ].join(" ")}
                             >
                               {message.body}
@@ -672,26 +688,30 @@ export default function SupportChatPage() {
           </div>
 
           {activeConversation && !isClosed && (
-            <div className="tw:mx-4 tw:mb-3 tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:rounded-[18px] tw:bg-white/75 tw:px-4 tw:py-2.5 tw:text-[0.84rem] tw:font-bold tw:text-primary tw:md:mx-8">
+            <div className="tw:mx-4 tw:mb-3 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2.5 tw:rounded-card tw:border tw:border-hairline tw:bg-paper tw:px-4 tw:py-2.5 tw:text-sm tw:text-muted-strong tw:md:mx-8">
               <span>Done with this issue?</span>
-              <button
-                style={{ borderRadius: 36 }}
+              <Button
                 type="button"
+                variant="ghost"
+                size="md"
                 onClick={closeConversation}
                 disabled={closing}
-                className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-black tw:text-white disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
               >
-                {closing ? <Loader2 className="tw:animate-spin" size={14} /> : <XCircle size={14} />}
+                {closing ? (
+                  <Loader2 className="tw:animate-spin" size={14} aria-hidden="true" />
+                ) : (
+                  <XCircle size={14} aria-hidden="true" />
+                )}
                 Close chat
-              </button>
+              </Button>
             </div>
           )}
 
           <form
-            className="tw:grid tw:grid-cols-[1fr_44px] tw:gap-2 tw:px-3 tw:pb-16 tw:md:pb-3 tw:sm:px-4 tw:md:px-6"
+            className="tw:flex tw:items-center tw:gap-2 tw:px-3 tw:pb-16 tw:sm:px-4 tw:md:px-6 tw:md:pb-3"
             onSubmit={handleSubmit}
           >
-            <input
+            <Input
               value={input}
               onChange={(event) => setInput(event.target.value)}
               placeholder={
@@ -702,16 +722,19 @@ export default function SupportChatPage() {
                     : "Create a new chat to send a message..."
               }
               disabled={!hasAccess || loading || sending || isClosed}
-              className="tw:min-h-10 tw:min-w-0 tw:rounded-[16px] tw:border tw:border-[#d8d0c5] tw:bg-white/50 tw:px-3 tw:text-sm tw:font-semibold tw:text-primary tw:outline-none tw:transition placeholder:tw:text-[#8b8580] focus:tw:border-primary disabled:tw:cursor-not-allowed disabled:tw:opacity-60"
+              className="tw:min-w-0 tw:flex-1"
             />
             <button
-              style={{ borderRadius: 36 }}
               type="submit"
               disabled={!input.trim() || !hasAccess || sending || isClosed}
-              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition tw:hover:bg-black disabled:tw:cursor-not-allowed disabled:tw:opacity-50"
+              className="tw:grid tw:size-12 tw:shrink-0 tw:place-items-center tw:rounded-pill tw:bg-accent tw:text-ink tw:transition-colors tw:hover:bg-ink tw:hover:text-paper-raised tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="Send message"
             >
-              {sending ? <Loader2 className="tw:animate-spin" size={18} /> : <Send size={18} />}
+              {sending ? (
+                <Loader2 className="tw:animate-spin" size={18} aria-hidden="true" />
+              ) : (
+                <Send size={18} aria-hidden="true" />
+              )}
             </button>
           </form>
         </div>
