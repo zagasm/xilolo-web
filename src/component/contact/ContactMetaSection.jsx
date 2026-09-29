@@ -1,147 +1,76 @@
 import React from "react";
 import { Clock, LayoutTemplate, Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { Card, Chip, SectionHeading } from "../ui";
+
+/**
+ * "What happens after you reach out".
+ *
+ * Flat: hairline cards on the paper page, one accent element per card (an
+ * accent-soft icon pill with accent-deep iconography, or a single chip). The
+ * hardcoded #050505 panel, the cyan glow blob and the `0 14px 40px` shadows from
+ * the previous version are gone.
+ *
+ * `!` suffixes: Tailwind utilities sit in `@layer utilities` while Bootstrap's
+ * reboot / the template sheet are unlayered, so their element rules win on
+ * headings, paragraphs, anchors and buttons — including the arbitrary child
+ * variants used to reach inside the shared SectionHeading.
+ */
+
+const headingFixes =
+  "tw:[&>h2]:m-0! tw:[&>h2]:font-extrabold! tw:[&>p]:m-0! tw:[&>p]:text-muted-strong!";
 
 const cards = [
   {
     icon: Clock,
     title: "Fast response",
     body: "We reply within 24 hours. If your event is close, include the date.",
-    stat: "< 24 hrs",
-    statLabel: "Avg. reply time",
-    dark: true,
+    chip: "< 24 hrs avg. reply",
   },
   {
     icon: LayoutTemplate,
     title: "Clear plan",
     body: "We outline the steps from setup to going live, based on your exact needs.",
-    stat: null,
-    statLabel: null,
-    dark: false,
+    chip: null,
   },
   {
     icon: Users,
     title: "Made for real teams",
     body: "Solo host or full crew, we help you run the show without confusion.",
-    stat: null,
-    statLabel: null,
-    dark: false,
+    chip: null,
   },
 ];
 
 export default function ContactMetaSection() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 26 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
-      <div
-        className="tw:rounded-3xl tw:border tw:border-slate-200/70 tw:px-5 tw:py-6 tw:md:px-8 tw:md:py-8"
-        style={{ background: "rgba(250,250,250,0.85)", boxShadow: "0 20px 55px rgba(15,23,42,0.06), 0 0 20px rgba(0,245,255,0.04)" }}
-      >
-        <div className="tw:flex tw:flex-col tw:md:flex-row tw:items-start tw:md:items-center tw:gap-8">
-          {/* Left: label + headline */}
-          <div className="tw:max-w-sm tw:shrink-0">
-            <span className="tw:block tw:text-[10px] tw:uppercase tw:tracking-[0.2em] tw:text-slate-400 tw:font-semibold tw:mb-2">
-              What happens after you reach out
-            </span>
-            <span className="tw:font-league tw:block tw:text-base tw:md:text-xl tw:font-black tw:text-slate-900 tw:leading-snug">
-              A short call, a clear plan, and a smooth launch.
-            </span>
-            <span className="tw:block tw:mt-2 tw:text-[12px] tw:md:text-[13px] tw:text-slate-500 tw:leading-relaxed">
-              We keep it simple. We will understand your event, suggest the right setup, and help you decide how to run it on Xilolo.
-            </span>
-          </div>
+    <section className="tw:flex tw:flex-col tw:gap-6">
+      <SectionHeading
+        eyebrow="What happens after you reach out"
+        title="A short call, a clear plan, and a smooth launch."
+        subtitle="We keep it simple. We will understand your event, suggest the right setup, and help you decide how to run it on Xilolo."
+        className={headingFixes}
+      />
 
-          {/* Right: cards */}
-          <div className="tw:grid tw:grid-cols-1 tw:sm:grid-cols-3 tw:gap-3 tw:flex-1 tw:w-full">
-            {cards.map((card, i) => {
-              const Icon = card.icon;
-              return (
-                <motion.div
-                  key={card.title}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.4, delay: i * 0.07, ease: "easeOut" }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  className="tw:relative tw:rounded-2xl tw:overflow-hidden tw:p-4 tw:flex tw:flex-col tw:gap-2.5"
-                  style={
-                    card.dark
-                      ? {
-                          background: "#050505",
-                          color: "white",
-                          boxShadow: "0 16px 50px rgba(5,5,5,0.4), 0 0 18px rgba(0,245,255,0.10)",
-                        }
-                      : {
-                          background: "white",
-                          border: "1px solid rgba(15,23,42,0.08)",
-                          boxShadow: "0 14px 40px rgba(15,23,42,0.06)",
-                        }
-                  }
-                >
-                  {card.dark && (
-                    <div
-                      aria-hidden
-                      className="tw:absolute tw:-right-8 tw:-top-8 tw:w-24 tw:h-24 tw:rounded-full tw:blur-2xl tw:pointer-events-none"
-                      style={{ background: "rgba(0,245,255,0.07)" }}
-                    />
-                  )}
-                  <div className="tw:relative">
-                    <div
-                      className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-xl"
-                      style={
-                        card.dark
-                          ? { background: "rgba(255,255,255,0.08)" }
-                          : { background: "rgba(5,5,5,0.07)" }
-                      }
-                    >
-                      <Icon
-                        className="tw:w-4 tw:h-4"
-                        style={{ color: card.dark ? "rgba(255,255,255,0.7)" : "#050505" }}
-                      />
-                    </div>
-                  </div>
+      <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-3">
+        {cards.map(({ icon: Icon, title, body, chip }) => (
+          <Card key={title} className="tw:flex tw:flex-col tw:gap-3">
+            <span className="tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill tw:bg-accent-soft tw:text-accent-deep">
+              <Icon className="tw:size-4" aria-hidden="true" />
+            </span>
 
-                  {card.stat && (
-                    <div className="tw:relative">
-                      <span
-                        className="tw:block tw:text-[26px] tw:font-black tw:font-league tw:leading-none"
-                        style={{ color: card.dark ? "white" : "#050505" }}
-                      >
-                        {card.stat}
-                      </span>
-                      <span
-                        className="tw:block tw:text-[10px] tw:mt-0.5 tw:font-semibold"
-                        style={{ color: card.dark ? "rgba(255,255,255,0.4)" : "rgba(5,5,5,0.4)" }}
-                      >
-                        {card.statLabel}
-                      </span>
-                    </div>
-                  )}
+            <h3 className="tw:m-0! tw:font-display tw:text-base! tw:font-bold! tw:leading-snug! tw:tracking-[-0.01em] tw:text-ink!">
+              {title}
+            </h3>
 
-                  <div className="tw:relative">
-                    <span
-                      className="tw:block tw:text-[12px] tw:font-semibold tw:mb-0.5"
-                      style={{ color: card.dark ? "rgba(255,255,255,0.9)" : "#0f172a" }}
-                    >
-                      {card.title}
-                    </span>
-                    <span
-                      className="tw:block tw:text-[11px] tw:leading-relaxed"
-                      style={{ color: card.dark ? "rgba(255,255,255,0.5)" : "#64748b" }}
-                    >
-                      {card.body}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
+            <p className="tw:m-0! tw:text-sm tw:leading-relaxed tw:text-muted-strong!">{body}</p>
+
+            {chip ? (
+              <div className="tw:mt-auto tw:pt-1">
+                <Chip>{chip}</Chip>
+              </div>
+            ) : null}
+          </Card>
+        ))}
       </div>
-    </motion.section>
+    </section>
   );
 }

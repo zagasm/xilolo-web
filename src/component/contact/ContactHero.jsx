@@ -1,144 +1,106 @@
 import React from "react";
-import { Sparkles, Radio, Waves, Clock, HeadphonesIcon } from "lucide-react";
-import { motion } from "framer-motion";
+import { Radio, Waves, Clock, HeadphonesIcon } from "lucide-react";
+import { Card, Chip } from "../ui";
 
-const containerVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.08 },
+/**
+ * Contact hero.
+ *
+ * DESIGN.md: flat surfaces + hairline borders, no shadows, one accent per
+ * group, accent as a FILL only (accent TEXT uses accent-deep). The old version
+ * of this file carried the retired tells — neon-cyan glow blobs, a
+ * white-on-accent card, a coral/red headline span and a dozen drop shadows.
+ *
+ * Contact details here are the real ones already in the repo
+ * (support@xilolo.com) — nothing invented.
+ *
+ * ── Why the `!` suffixes ────────────────────────────────────────────────────
+ * Tailwind ships in `@layer utilities` while Bootstrap's reboot and the legacy
+ * template sheet are UNLAYERED, and unlayered declarations outrank layered ones
+ * in the cascade. So on element selectors their rules win on the properties they
+ * declare: `h1..h6{font-weight:500;margin-bottom:.5rem}`, `button{border-radius:0}`,
+ * `a{color:…}` and `#root p{color:inherit}`. Utilities that collide with those get
+ * Tailwind's important modifier so the design tokens actually land.
+ */
+
+const micro = "tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em]";
+
+const CHECK_INS = [
+  {
+    icon: Clock,
+    label: "Reply time",
+    value: "< 24 hrs",
+    note: "Same-day on weekdays.",
   },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
+  {
+    icon: HeadphonesIcon,
+    label: "Support",
+    value: "7 days",
+    note: "Available when it matters.",
+  },
+];
 
 export default function ContactHero() {
   return (
-    <motion.section
-      className="tw:relative"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      {/* Soft background glow */}
-      <div className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:-top-24 tw:-z-10 tw:flex tw:justify-center">
-        <motion.div
-          className="tw:h-72 tw:w-72 tw:rounded-full tw:bg-neon/12 tw:blur-3xl tw:opacity-60"
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-        />
+    <section className="tw:flex tw:flex-col tw:gap-10 tw:lg:flex-row tw:lg:items-start tw:lg:gap-12">
+      {/* ── Left: copy ─────────────────────────────────────────────────────── */}
+      <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-5">
+        <p className={`tw:m-0! tw:text-accent-deep! ${micro}`}>Contact Xilolo</p>
+
+        <h1 className="tw:m-0! tw:font-display tw:text-[clamp(2rem,4.2vw,3rem)]! tw:font-extrabold! tw:leading-[1.05]! tw:tracking-[-0.02em] tw:text-ink!">
+          Let&rsquo;s plan your next live event.
+        </h1>
+
+        <p className="tw:m-0! tw:max-w-[62ch] tw:text-sm tw:leading-relaxed tw:text-muted-strong! tw:md:text-base">
+          Tell us what you want to host and how soon it is. We will suggest a
+          simple setup, help you run a clean show, and guide you on ticketing if
+          you want to charge for access.
+        </p>
+
+        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <Chip icon={Radio}>Concerts · Shows · Talk sessions · Communities</Chip>
+          <Chip icon={Waves}>Ticketing · Live chat · Replays</Chip>
+        </div>
       </div>
 
-      <div className="tw:flex tw:flex-col tw:gap-10 tw:md:flex-row tw:md:items-center">
-        {/* Left: text */}
-        <motion.div className="tw:flex-1" variants={itemVariants}>
-          <motion.div
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary/5 tw:px-3 tw:py-1 tw:border tw:border-neon/20 tw:mb-4 tw:shadow-[0_0_18px_rgba(0,245,255,0.08)]"
-            whileHover={{ y: -1, scale: 1.01 }}
-          >
-            <Sparkles className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
-            <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.22em] tw:text-primary tw:font-semibold">
-              Contact Xilolo
-            </span>
-          </motion.div>
+      {/* ── Right: quick check-in card ─────────────────────────────────────── */}
+      <Card className="tw:flex tw:w-full tw:max-w-md tw:flex-col tw:gap-4 tw:p-5 tw:md:p-6">
+        <div className="tw:flex tw:flex-col tw:gap-2">
+          <p className={`tw:m-0! tw:text-accent-deep! ${micro}`}>Quick check-in</p>
+          <p className="tw:m-0! tw:text-[15px] tw:font-semibold tw:leading-snug tw:text-ink!">
+            Share your event date and what you want to host. We&rsquo;ll reply
+            with the best way to set it up on Xilolo.
+          </p>
+        </div>
 
-          <span className="tw:font-league tw:block tw:text-3xl tw:md:text-4xl tw:lg:text-[52px] tw:font-black tw:leading-[1] tw:mb-4">
-            Let's plan your next{" "}
-            <span className="tw:text-red-600">live event</span>.
-          </span>
-
-          <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-600 tw:max-w-xl tw:mb-5 tw:leading-relaxed">
-            Tell us what you want to host and how soon it is. We will suggest a
-            simple setup, help you run a clean show, and guide you on ticketing
-            if you want to charge for access.
-          </span>
-
-          <motion.div
-            className="tw:flex tw:flex-wrap tw:gap-3 tw:text-[11px] tw:text-slate-500"
-            variants={itemVariants}
-          >
-            <motion.div
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1.5 tw:border tw:border-slate-200/80"
-              style={{ boxShadow: "0 10px 30px rgba(15,23,42,0.07)" }}
-              whileHover={{ y: -2, scale: 1.02 }}
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3">
+          {CHECK_INS.map(({ icon: Icon, label, value, note }) => (
+            <div
+              key={label}
+              className="tw:flex tw:flex-col tw:gap-1 tw:rounded-card tw:border tw:border-hairline tw:bg-paper tw:px-3 tw:py-3"
             >
-              <Radio className="tw:w-3.5 tw:h-3.5 tw:text-primary" />
-              <span>Concerts · Shows · Talk sessions · Communities</span>
-            </motion.div>
-
-            <motion.div
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-900 tw:px-3 tw:py-1.5 tw:text-white tw:text-[11px]"
-              whileHover={{ y: -2, scale: 1.02 }}
-            >
-              <Waves className="tw:w-3.5 tw:h-3.5 tw:text-white/60" />
-              <span className="tw:text-white/80">Ticketing · Live chat · Replays</span>
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        {/* Right: highlight card */}
-        <motion.div
-          className="tw:flex-1 tw:max-w-md tw:mx-auto tw:w-full"
-          variants={itemVariants}
-        >
-          <motion.div
-            className="tw:rounded-3xl tw:bg-primary tw:text-white tw:p-5 tw:md:p-6 tw:relative tw:overflow-hidden"
-            animate={{ y: [0, -6, 0] }}
-            transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            style={{ boxShadow: "0 32px 80px rgba(5,5,5,0.55), 0 0 30px rgba(0,245,255,0.10)" }}
-          >
-            {/* Inner glow accents */}
-            <div aria-hidden className="tw:absolute tw:-right-12 tw:-top-12 tw:h-44 tw:w-44 tw:rounded-full tw:bg-neon/10 tw:blur-2xl" />
-            <div aria-hidden className="tw:absolute tw:-left-12 tw:bottom-0 tw:h-40 tw:w-40 tw:rounded-full tw:bg-white/4 tw:blur-2xl" />
-
-            <div className="tw:relative">
-              <span className="tw:block tw:text-[10px] tw:uppercase tw:tracking-[0.22em] tw:text-white/50 tw:mb-3 tw:font-semibold">
-                Quick check-in
+              <span className="tw:flex tw:items-center tw:gap-1.5">
+                <Icon className="tw:size-3.5 tw:text-accent-deep" aria-hidden="true" />
+                <span className={`${micro} tw:text-muted-strong`}>{label}</span>
               </span>
-
-              <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:mb-5 tw:text-white/95 tw:leading-snug">
-                Share your event date and what you want to host. We'll reply
-                with the best way to set it up on Xilolo.
+              <span className="tw:font-display tw:text-xl tw:font-extrabold tw:tracking-[-0.01em] tw:text-ink">
+                {value}
               </span>
-
-              <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:mb-4">
-                <div className="tw:rounded-2xl tw:bg-white/8 tw:border tw:border-white/10 tw:px-3 tw:py-3">
-                  <div className="tw:flex tw:items-center tw:gap-1.5 tw:mb-1">
-                    <Clock className="tw:w-3 tw:h-3 tw:text-white/50" />
-                    <span className="tw:block tw:text-[10px] tw:text-white/50">Reply time</span>
-                  </div>
-                  <span className="tw:block tw:text-xl tw:font-black tw:font-league">&lt; 24 hrs</span>
-                  <span className="tw:block tw:text-[10px] tw:text-white/45 tw:mt-0.5">
-                    Same-day on weekdays.
-                  </span>
-                </div>
-
-                <div className="tw:rounded-2xl tw:bg-white/8 tw:border tw:border-white/10 tw:px-3 tw:py-3">
-                  <div className="tw:flex tw:items-center tw:gap-1.5 tw:mb-1">
-                    <HeadphonesIcon className="tw:w-3 tw:h-3 tw:text-white/50" />
-                    <span className="tw:block tw:text-[10px] tw:text-white/50">Support</span>
-                  </div>
-                  <span className="tw:block tw:text-xl tw:font-black tw:font-league">7 days</span>
-                  <span className="tw:block tw:text-[10px] tw:text-white/45 tw:mt-0.5">
-                    Available when it matters.
-                  </span>
-                </div>
-              </div>
-
-              <div className="tw:rounded-2xl tw:bg-white/8 tw:border tw:border-white/10 tw:px-3 tw:py-2.5 tw:flex tw:items-center tw:justify-between">
-                <span className="tw:text-[11px] tw:text-white/60">Prefer email?</span>
-                <span className="tw:text-[11px] tw:font-semibold tw:text-white">
-                  support@xilolo.com
-                </span>
-              </div>
+              <span className="tw:text-xs tw:leading-snug tw:text-muted-strong">{note}</span>
             </div>
-          </motion.div>
-        </motion.div>
-      </div>
-    </motion.section>
+          ))}
+        </div>
+
+        <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-hairline tw:pt-3">
+          <span className="tw:text-sm tw:text-muted-strong">Prefer email?</span>
+          {/* 44px tap target; accent TEXT uses accent-deep, never the accent fill */}
+          <a
+            href="mailto:support@xilolo.com"
+            className="tw:inline-flex tw:h-11 tw:items-center tw:text-sm tw:font-semibold tw:text-accent-deep! tw:hover:underline!"
+          >
+            support@xilolo.com
+          </a>
+        </div>
+      </Card>
+    </section>
   );
 }

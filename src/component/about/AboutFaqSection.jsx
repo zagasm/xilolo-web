@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut", delay },
-  }),
-};
+import { Card, SectionHeading } from "../ui";
 
 const faqs = [
   {
@@ -39,79 +31,72 @@ function FaqItem({ item, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.4, delay: index * 0.06, ease: "easeOut" }}
-      className="tw:border-b tw:border-slate-100 last:tw:border-0"
+      transition={{ duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
     >
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-4 tw:py-4 tw:text-left tw:group"
-      >
-        <span className="tw:text-[13px] tw:md:text-[14px] tw:font-semibold tw:text-slate-900 tw:group-hover:text-primary tw:transition-colors tw:duration-200">
-          {item.q}
-        </span>
-        <span className="tw:shrink-0 tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-slate-100 tw:text-slate-500 tw:group-hover:bg-primary/10 tw:group-hover:text-primary tw:transition-colors tw:duration-200">
-          {open ? <Minus className="tw:w-3.5 tw:h-3.5" /> : <Plus className="tw:w-3.5 tw:h-3.5" />}
-        </span>
-      </button>
-
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            key="answer"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: "easeInOut" }}
-            className="tw:overflow-hidden"
+      <Card>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="tw:group tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-4 tw:text-left"
+        >
+          <span className="tw:text-sm tw:font-semibold tw:leading-snug tw:text-ink tw:transition-colors tw:group-hover:text-accent-deep tw:md:text-[15px]">
+            {item.q}
+          </span>
+          <span
+            aria-hidden="true"
+            className="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-pill tw:bg-chip tw:text-muted-strong"
           >
-            <p className="tw:pb-4 tw:text-[12px] tw:md:text-[13px] tw:text-slate-600 tw:leading-relaxed tw:max-w-2xl">
-              {item.a}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {open ? <Minus className="tw:size-3.5" /> : <Plus className="tw:size-3.5" />}
+          </span>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              key="answer"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.26, ease: "easeInOut" }}
+              className="tw:overflow-hidden"
+            >
+              {/* span, not <p>: `#root p { color: inherit }` beats tw:text-* on paragraphs */}
+              <span className="tw:block tw:max-w-[62ch] tw:pt-3 tw:text-[13px] tw:leading-relaxed tw:text-muted">
+                {item.a}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Card>
     </motion.div>
   );
 }
 
 export default function AboutFaqSection() {
   return (
-    <section className="tw:space-y-5">
+    <section className="tw:flex tw:flex-col tw:gap-8">
       <motion.div
-        initial="hidden"
-        whileInView="visible"
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.4 }}
-        custom={0}
-        variants={fadeUp}
+        transition={{ duration: 0.45, ease: "easeOut" }}
       >
-        <span className="tw:block tw:text-[11px] tw:uppercase tw:tracking-[0.2em] tw:text-slate-500 tw:font-semibold">
-          FAQ
-        </span>
-        <span className="tw:font-league tw:mt-2 tw:block tw:text-xl tw:md:text-3xl tw:font-black tw:text-slate-900">
-          Quick answers before you start.
-        </span>
-        <span className="tw:mt-1 tw:block tw:text-sm tw:text-slate-600 tw:max-w-xl">
-          These are the questions people ask before their first event.
-        </span>
+        <SectionHeading
+          eyebrow="FAQ"
+          title="Quick answers before you start."
+          subtitle="These are the questions people ask before their first event."
+        />
       </motion.div>
 
-      <motion.div
-        className="tw:rounded-3xl tw:bg-white tw:border tw:border-slate-200/80 tw:px-5 tw:md:px-6 tw:divide-y tw:divide-slate-100"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.25 }}
-        custom={0.1}
-        variants={fadeUp}
-        style={{ boxShadow: "0 18px 50px rgba(15,23,42,0.07)" }}
-      >
+      <div className="tw:flex tw:flex-col tw:gap-3">
         {faqs.map((item, index) => (
           <FaqItem key={item.q} item={item} index={index} />
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
