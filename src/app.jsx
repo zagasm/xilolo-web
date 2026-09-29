@@ -48,7 +48,6 @@ import SupportChatPage from "./pages/support/SupportChatPage.jsx";
 import Marketing from "./pages/marketing/index.jsx";
 import StreamingPage from "./pages/Streaming/index.jsx";
 import DataProtectionPage from "./pages/DataProtection/index.jsx";
-import ZagasmLanding from "./pages/LandingPage/index.jsx";
 import TicketsPage from "./pages/tickets/TicketsPage.jsx";
 import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
 import SearchPage from "./pages/Search/index.jsx";
@@ -65,6 +64,9 @@ import LandingLayout from "./layouts/LandingLayout.jsx";
 import AboutPage from "./pages/LandingPage/about.jsx";
 import ContactPage from "./pages/LandingPage/contact.jsx";
 import AdsPage from "./pages/LandingPage/ads.jsx";
+// Dev-only design showcase: /design (primitives + nav states). Registered below
+// behind import.meta.env.DEV so it can never ship to production.
+import DesignSystem from "./pages/DesignSystem/index.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
@@ -372,22 +374,51 @@ export function App() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const modalFlag = "zagasm-download-modal-shown";
-    const hasSeenModal = Boolean(localStorage.getItem(modalFlag));
+    // Shown after ENGAGEMENT, never on first paint (DESIGN.md + revamp plan §5).
+    // A modal at t=0 costs the first impression, competes with the hero, and
+    // delays first contentful paint. Trigger: 35% scroll or 20s dwell.
+    const dismissFlag = "xilolo-download-modal-dismissed-at";
+    const FOURTEEN_DAYS = 14 * 24 * 60 * 60 * 1000;
+    let dismissedAt = 0;
+    try {
+      dismissedAt = Number(localStorage.getItem(dismissFlag) || 0);
+    } catch {
+      /* storage unavailable (private mode): treat as never dismissed */
+    }
+    const recentlyDismissed = dismissedAt > 0 && Date.now() - dismissedAt < FOURTEEN_DAYS;
 
     setDownloadPlatform(detectDownloadPlatform());
+    if (recentlyDismissed) return;
 
-    if (!hasSeenModal) {
-      setShowDownloadModal(true);
-      localStorage.setItem(modalFlag, "true");
+    let shown = false;
+    function cleanup() {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
     }
-
-    // Previously the modal forced open on every full reload:
-    // setShowDownloadModal(true);
+    function show() {
+      if (shown) return;
+      shown = true;
+      setShowDownloadModal(true);
+      cleanup();
+    }
+    function onScroll() {
+      const reached = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight || 1;
+      if (reached / total >= 0.35) show();
+    }
+    const timer = window.setTimeout(show, 20000);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return cleanup;
   }, []);
 
   const closeDownloadModal = () => {
     setShowDownloadModal(false);
+    try {
+      // Remember the dismissal so the ask doesn't return every visit.
+      localStorage.setItem("xilolo-download-modal-dismissed-at", String(Date.now()));
+    } catch {
+      /* storage unavailable — the modal may ask again next visit */
+    }
   };
 
   const handleAppStoreDownload = () => {
@@ -426,7 +457,6 @@ export function App() {
         <Route path="/event/:id" element={<EventDeepLinkPage />} />
         <Route path="/signal-deck" element={<SignalDeck />} />
         <Route element={<LandingLayout />}>
-          <Route path="/" element={<ZagasmLanding />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/ads" element={<AdsPage />} />
@@ -452,6 +482,14 @@ export function App() {
           path="/organisers/:shareKey"
           element={<SharedProfileRedirectPage type="organiser" />}
         />
+        {/* No landing page: the root goes straight to signup. Deliberately the
+            same <SignUp /> inside the same <AuthLayout /> as /auth/signup, so
+            the two entry points can never diverge. Deep links that must survive
+            (/event/:id, /events/:shareKey, legal, /about, /contact) are untouched. */}
+        <Route element={<AuthLayout />}>
+          <Route path="/" element={<SignUp />} />
+        </Route>
+
         <Route path="/auth" element={<AuthLayout />}>
           <Route index element={<Signin />} />
           <Route path="signup" element={<SignUp />} />
@@ -541,6 +579,13 @@ export function App() {
             </Route>
           </Route>
         </Route>
+
+        {/* Dev-only design showcase — outside LandingLayout so it renders its own Nav,
+            and 404s in production where import.meta.env.DEV is false. */}
+        <Route
+          path="/design"
+          element={import.meta.env.DEV ? <DesignSystem /> : <Error404 />}
+        />
 
         <Route path="/page-not-found" element={<Error404 />} />
         <Route path="*" element={<Error404 />} />

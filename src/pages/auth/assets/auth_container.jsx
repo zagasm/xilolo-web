@@ -33,7 +33,22 @@ function AuthContainer({
         {/* Main Content */}
         <div className="container-fluid position-relative auth_container mb-5">
           <div className="row justify-content-center align-items-center d-flex align-center  inner_form_con">
-            <div className="col-xl-3 col-lg-7 col-md-6  col form_container ">
+            {/* Width pinned inline: bootstrap's .col-lg-7 sets width:58% at 1024-1199px and
+                outranks the stylesheet rule, which made the signup card sprawl across the
+                page on laptop widths. Inline wins outright, so the card is the same
+                sensible width at every breakpoint. */}
+            <div
+              className="form_container"
+              style={{
+                width: "100%",
+                boxSizing: "border-box",
+                // min() so the card can never exceed the viewport minus gutters —
+                // a plain maxWidth:420 clipped the form on a 390px phone.
+                maxWidth: "min(420px, calc(100vw - 32px))",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
               <div className="osahan-login ">
                 <div className="text-center pr-4 pl-4">
                   <p
