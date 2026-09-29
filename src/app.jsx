@@ -67,6 +67,9 @@ import AdsPage from "./pages/LandingPage/ads.jsx";
 // Dev-only design showcase: /design (primitives + nav states). Registered below
 // behind import.meta.env.DEV so it can never ship to production.
 import DesignSystem from "./pages/DesignSystem/index.jsx";
+// Dev-only preview of the AUTH-GATED signed-in home (/feed), so its layout can be
+// screenshotted and measured without an account. DEV-gated below; never shipped.
+import HomePreview from "./pages/Home/HomePreview.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
@@ -585,6 +588,15 @@ export function App() {
         <Route
           path="/design"
           element={import.meta.env.DEV ? <DesignSystem /> : <Error404 />}
+        />
+
+        {/* Dev-only preview of the signed-in home (/feed). Its own route because
+            /feed is auth-gated — this renders the same presentation components
+            with mock events, so the layout can be measured + screenshotted at any
+            width without an account. 404s in production. */}
+        <Route
+          path="/dev/home-preview"
+          element={import.meta.env.DEV ? <HomePreview /> : <Error404 />}
         />
 
         <Route path="/page-not-found" element={<Error404 />} />
