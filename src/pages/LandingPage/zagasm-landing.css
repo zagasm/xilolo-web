@@ -77,13 +77,14 @@ body {
   animation-delay: 4s;
 }
 
-/* Subtle neon accent blob — #00F5FF at very low opacity */
+/* Soft brand tint blob — accent #0EA5B4 at very low opacity.
+   Was #00F5FF neon cyan, which is retired (DESIGN.md). */
 .blob-neon {
   right: 25%;
   top: 5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle at 55% 45%, rgba(0, 245, 255, 0.055), transparent 65%);
+  background: radial-gradient(circle at 55% 45%, rgba(14, 165, 180, 0.055), transparent 65%);
   animation-delay: 7s;
 }
 
