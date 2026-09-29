@@ -41,12 +41,15 @@ function AuthLayout() {
   const showFooter = !token && FOOTER_PATHS.includes(normalised);
 
   return (
-    <div>
-      <Outlet />
-      {/* No min-h-screen / flex-1 wrapper here: it pushed the footer to the bottom
-          of the viewport, leaving a screenful of dead space and keeping the footer
-          permanently below the fold. The auth screens own their own height. */}
-      {showFooter ? <SectionFooterCTA showCta={false} /> : null}
+    <div className="tw:flex tw:min-h-screen tw:flex-col">
+      {/* flex-1 on the content pushes the slim footer to the bottom of the viewport
+          without creating a scrollbar, because the auth screens no longer force
+          90vh and the footer is a single strip. Together they fill exactly one
+          screen — which is the requirement for these pages. */}
+      <div className="tw:flex-1">
+        <Outlet />
+      </div>
+      {showFooter ? <SectionFooterCTA compact /> : null}
     </div>
   );
 }

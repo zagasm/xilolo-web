@@ -3,7 +3,9 @@ body {
 }
 
 .inner_form_con {
-  min-height: 90vh;
+  /* Was 90vh: it forced a full-screen page, so the footer landed off-screen and
+     a bare signup form needed scrolling. The auth screens must fit one viewport. */
+  min-height: auto;
 }
 .zagasm_logo{
   width: 150px;

@@ -31,6 +31,9 @@
   --color-muted: #76767C;
   --color-muted-strong: #5C5C62;
   --color-muted-dark: #7C7C82;
+  /* Secondary text ON the ink surface. muted-dark only reaches 4.4:1 on ink
+     and faint-dark just 2.0:1 — both fail WCAG AA. This is 6.1:1. */
+  --color-ink-muted: #9A9AA2;
   --color-faint: #C4C4CC;
   --color-faint-dark: #444444;
 
@@ -91,6 +94,20 @@
    The id-scoped selector wins on specificity without resorting to !important. */
 #root p {
   color: inherit;
+}
+
+/* The same stylesheet colours EVERY anchor (a{color:#333}) and sizes every
+   footer (footer{font-size:80%;color:#6c757d}). On a dark footer that made the
+   links near-invisible and shrank the whole block. These two rules outrank the
+   element selectors but still lose to any utility class on the element itself,
+   so explicit tw:text-* colours keep control. */
+#root footer {
+  font-size: inherit;
+  color: inherit;
+}
+footer a {
+  color: inherit;
+  text-decoration: none;
 }
 
 html{
