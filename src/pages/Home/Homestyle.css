@@ -145,8 +145,13 @@ img:hover { transform: scale(1.01); }
    surfaces: blurred poster fill, glass chips, gradient fallbacks).
    ========================================================================== */
 
-/* App body = Column[header, Expanded(feed)] — the header never scrolls away
-   and the feed scrolls beneath it (home_revamp_screen.dart:194-223).
+/* App body = Column[header, Expanded(feed)] — in the APP the header never
+   scrolls away and the feed scrolls beneath it (home_revamp_screen.dart:194-223).
+   The WEB deliberately diverges (founder brief, 2026-09-29): the greeting and
+   wallet card scroll away with the feed and only the All/Live tab row pins.
+   That is why <HomeHeader> renders as a fragment and is placed INSIDE
+   .home-feed — a sticky element is clamped to its parent's box, so a sticky tab
+   row nested in a header wrapper would unstick as soon as the header left view.
    The shell must be exactly "viewport minus the page's own top offset", and the
    page's top offset is `tw:pt-24` = 96px (the 74px fixed Navbar + 22px of air).
    It used to subtract 120px, which left a dead 24px strip under the feed and a
@@ -172,6 +177,17 @@ img:hover { transform: scale(1.01); }
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+/* The pinned All/Live row. Declared here as well as in the utility list so the
+   sticky behaviour cannot be lost to CSS-layer ordering: Homestyle.css is
+   unlayered, Tailwind utilities are layered, and unlayered wins outright. */
+.home-tabbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--color-paper);
+  border-bottom: 1px solid var(--color-hairline, rgba(0, 0, 0, 0.08));
 }
 
 /* App `_homeGradientFill()` — poster fallback when the image is missing

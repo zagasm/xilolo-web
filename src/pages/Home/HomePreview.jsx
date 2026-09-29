@@ -122,12 +122,17 @@ const MOCK_ORGANISERS = [
    Deliberately covers every `_resolveCta` branch: live ("Watch live now"), paid
    ("Buy Ticket"), free ("Reserve free seat"), ended + replay ("Watch replay"),
    already paid ("Ticket Purchased") and a poster-less card (gradient fallback).
-   `poster`/`price`/`status` shapes mirror what /api/v1/events/all/get returns. */
+   `poster`/`price`/`status` shapes mirror what /api/v1/events/all/get returns.
+   `hostId` mirrors EventResource (the host user id) because the organiser name +
+   avatar link to /profile/:hostId (Home/index.jsx `hostProfileHref`).
+   `mock-free-1` deliberately has NO hostId: that card must stay plain, and the
+   preview is where that branch stays visible. */
 const MOCK_EVENTS = [
   {
     id: "mock-live-1",
     title: "lagos tech summit — day two",
     status: "live",
+    hostId: 301,
     hostName: "Ada Obi",
     hostHasActiveSubscription: true,
     poster: [{ url: "/images/photos/livemusic.jpg", type: "image" }],
@@ -139,6 +144,7 @@ const MOCK_EVENTS = [
     id: "mock-paid-1",
     title: "afrobeats night with the lagos philharmonic",
     status: "upcoming",
+    hostId: 302,
     hostName: "Emeka Nwosu",
     hostHasActiveSubscription: true,
     poster: [{ url: "/images/photos/first.jpg", type: "image" }],
@@ -160,6 +166,7 @@ const MOCK_EVENTS = [
     id: "mock-poster-1",
     title: "studio lighting workshop (with poster)",
     status: "upcoming",
+    hostId: 304,
     hostName: "Tunde Adebayo",
     poster: [{ url: "/images/photos/art.jpg", type: "image" }],
     price: "₦3,000",
@@ -174,6 +181,7 @@ const MOCK_LIVE_EVENTS = [
     id: "mock-live-paid",
     title: "paystack product clinic — live",
     status: "live",
+    hostId: 305,
     hostName: "Ngozi Umeh",
     hostHasActiveSubscription: true,
     poster: [{ url: "/images/photos/third.jpg", type: "image" }],
@@ -187,6 +195,7 @@ const MOCK_LIVE_EVENTS = [
     title: "replay: product builders salon",
     status: "ended",
     enableReplay: true,
+    hostId: 306,
     hostName: "Kwame Mensah",
     poster: [{ url: "/images/photos/second.jpg", type: "image" }],
     price: "₦2,000",
@@ -251,14 +260,16 @@ export default function HomePreview() {
 
       <div className="tw:w-full tw:bg-paper tw:pt-24 tw:font-sans">
         <div className="home-feed-shell">
-          <HomeHeader
-            firstName="Ada"
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            liveCount={liveCount}
-          />
-
+          {/* Header lives inside the scroll container, mirroring /feed — the
+              greeting + wallet scroll away, the tab row pins. */}
           <div className="home-feed tw-no-scrollbar">
+            <HomeHeader
+              firstName="Ada"
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              liveCount={liveCount}
+            />
+
             <div className={`${HOME_CONTAINER} tw:pt-3 tw:pb-7`}>
               {state === "error" && activeTab === "all" ? (
                 <div className="tw:mb-4">

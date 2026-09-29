@@ -101,14 +101,35 @@ function AuthContainer({
                 {haveAccount ? (
                   <div className="text-center footer_text mt-4 ">
                     Don't have an account?{" "}
-                    <Link to="/auth/signup" className="">
+                    {/* Inline style on purpose: the legacy .footer_text a rule
+                        ships unlayered and greys this link into the page, which
+                        is what made it invisible. Inline wins outright. */}
+                    <Link
+                      to="/auth/signup"
+                      className="tw:font-bold tw:underline tw:text-accent"
+                      style={{
+                        color: "#16909C",
+                        fontWeight: 700,
+                        textDecoration: "underline",
+                        textUnderlineOffset: "2px",
+                      }}
+                    >
                       Sign up
                     </Link>
                   </div>
                 ) : (
                   <div className="text-center mt-4 footer_text ">
                     Have an account?{" "}
-                    <Link to="/auth/signin" className="">
+                    <Link
+                      to="/auth/signin"
+                      className="tw:font-bold tw:underline tw:text-accent"
+                      style={{
+                        color: "#16909C",
+                        fontWeight: 700,
+                        textDecoration: "underline",
+                        textUnderlineOffset: "2px",
+                      }}
+                    >
                       Sign In
                     </Link>
                   </div>

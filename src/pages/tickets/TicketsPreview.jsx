@@ -1,16 +1,17 @@
 /**
- * /dev/tickets-preview — DEV-ONLY preview of /tickets.
+ * /dev/tickets-preview — DEV-ONLY preview of /tickets and /tickets/:ticketId.
  *
- * WHY IT EXISTS: /tickets sits inside the auth gate (src/App.jsx:514,524), so the
- * real screen cannot be screenshotted or measured without an account. This route
- * renders the REAL presentation pieces of ./TicketsPage.jsx (TicketsHeader,
- * TicketFilterPills, TicketEmptyState, TicketRow, TICKET_ROW) plus the real card
- * from ./EventTicketCard.jsx, inside the real shell (the same Navbar, the same
- * page offset) with mock tickets and no API calls.
+ * WHY IT EXISTS: both are behind the auth gate (src/app.jsx:516,528-532), so the
+ * real screens cannot be screenshotted or measured without an account. This
+ * route renders the REAL presentation pieces of ./TicketsPage.jsx (TicketsHeader,
+ * TicketFilterPills, TicketEmptyState, TicketRow, TICKET_ROW), the real card from
+ * ./EventTicketCard.jsx and the real detail screen from ./TicketReceiptScreen.jsx,
+ * inside the real shell (the same Navbar, the same page offset) with mock tickets
+ * and no API calls.
  *
- * It is registered in src/App.jsx behind `import.meta.env.DEV`, so it 404s in
- * production. Kept on purpose: it is how this page gets verified at 390, 768 and
- * 1440 without signing in.
+ * It is registered in src/app.jsx behind `import.meta.env.DEV`, so it 404s in
+ * production. Kept on purpose: it is how these screens get verified at 390, 768
+ * and 1440 without signing in.
  *
  * Query options:
  *   /dev/tickets-preview                   All tab, 5 mock tickets
@@ -20,9 +21,12 @@
  *   /dev/tickets-preview?state=loading     4 shimmer cards
  *   /dev/tickets-preview?state=empty       empty state
  *   /dev/tickets-preview?state=error       error strip + empty state
+ *   /dev/tickets-preview?view=<ticket_id>  the ticket DETAIL screen (real
+ *                                          TicketReceiptScreen, fixture ticket)
+ *   /dev/tickets-preview?view=notfound     the detail's not-found fallback
  */
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import SEO from "../../component/SEO";
 import Navbar from "../pageAssets/Navbar";
@@ -34,89 +38,199 @@ import {
   TicketRow,
   TicketsHeader,
 } from "./TicketsPage";
+import TicketReceiptScreen from "./TicketReceiptScreen";
 
 /* Fixtures for the preview only — never rendered in production. Shapes mirror
-   what GET /api/v1/ticket/list returns (event.poster[] + payment.amount). */
+   exactly what GET /api/v1/ticket/list returns
+   (app/Http/Controllers/V1/Event/Ticket/TicketController.php:96-152):
+   event.poster is a media_url string, event.currency + payment.currency are
+   currency CODES, and organiser/user/payment are nested objects. */
 const MOCK_TICKETS = [
   {
     ticket_id: "mock-upcoming-1",
-    code: "XIL-8F42-QK1",
+    code: "XIL-8F42-QK19",
+    qr_code: "XIL-8F42-QK19",
+    status: "active",
+    payment_method: "card",
+    has_active_subscription: false,
+    status_date: "2026-09-01T18:04:00+01:00",
     event: {
+      id: "mock-event-1",
       title: "afrobeats night with the lagos philharmonic",
       status: "upcoming",
       event_date: "2026-11-12",
       start_time: "20:00",
-      poster: [{ url: "/images/photos/livemusic.jpg", type: "image" }],
-      price: "7500",
-      currency: "₦",
+      poster: "/images/photos/livemusic.jpg",
+      price: 7500,
+      currency: "NGN",
+      fullPrice: "₦7500",
     },
-    payment: { amount: "7500", currency: "₦" },
+    organiser: {
+      id: "mock-org-1",
+      user_id: "mock-user-9",
+      name: "Tunde Adeyemi",
+      user_name: "tundeafro",
+      profile_image: "",
+      status: "active",
+      kyc_status: "verified",
+    },
+    user: { id: "mock-me", name: "Chidi Okonkwo", has_active_subscription: true },
+    payment: {
+      id: "mock-pay-1",
+      amount: 7500,
+      currency: "NGN",
+      payment_method: "card",
+      provider: "card",
+      created_at: "2026-09-01T18:04:00+01:00",
+    },
   },
   {
     ticket_id: "mock-live-1",
-    code: "XIL-2C90-LV7",
+    code: "XIL-2C90-LV73",
+    qr_code: "XIL-2C90-LV73",
+    status: "active",
+    payment_method: "wallet",
+    has_active_subscription: false,
+    status_date: "2026-09-20T11:20:00+01:00",
     event: {
+      id: "mock-event-2",
       title: "lagos tech summit — day two",
       status: "live",
       event_date: "2026-09-29",
       start_time: "19:00",
-      poster: [{ url: "/images/photos/first.jpg", type: "image" }],
-      price: "15000",
-      currency: "₦",
+      poster: "/images/photos/first.jpg",
+      price: 15000,
+      currency: "NGN",
+      fullPrice: "₦15000",
     },
-    payment: { amount: "15000", currency: "₦" },
+    organiser: {
+      id: "mock-org-2",
+      user_id: "mock-user-10",
+      name: "Amaka Nwosu",
+      user_name: "amakabuilds",
+      profile_image: "",
+      status: "active",
+      kyc_status: "pending",
+    },
+    user: { id: "mock-me", name: "Chidi Okonkwo", has_active_subscription: true },
+    payment: {
+      id: "mock-pay-2",
+      amount: 15000,
+      currency: "NGN",
+      payment_method: "wallet",
+      provider: "wallet",
+      created_at: "2026-09-20T11:20:00+01:00",
+    },
   },
   {
     ticket_id: "mock-ended-1",
-    code: "XIL-71AB-ED3",
+    code: "XIL-71AB-ED38",
+    qr_code: "XIL-71AB-ED38",
+    status: "used",
+    payment_method: "card",
+    has_active_subscription: false,
+    status_date: "2026-09-10T21:40:00+01:00",
     event: {
+      id: "mock-event-3",
       title: "replay: product builders salon",
       status: "ended",
       event_date: "2026-09-10",
       start_time: "18:00",
-      /* first poster entry is not an image -> exercises resolvePosterUrl() */
-      poster: [
-        { url: "", type: "video" },
-        { url: "/images/photos/second.jpg", type: "image" },
-      ],
-      price: "2000",
-      currency: "₦",
+      poster: "/images/photos/second.jpg",
+      price: 2000,
+      currency: "NGN",
+      fullPrice: "₦2000",
     },
-    payment: { amount: "2000", currency: "₦" },
+    organiser: {
+      id: "mock-org-3",
+      user_id: "mock-user-11",
+      name: "Product Builders Lagos",
+      user_name: "pblagos",
+      profile_image: "",
+      status: "active",
+      kyc_status: "verified",
+    },
+    user: { id: "mock-me", name: "Chidi Okonkwo", has_active_subscription: false },
+    payment: {
+      id: "mock-pay-3",
+      amount: 2000,
+      currency: "NGN",
+      payment_method: "card",
+      provider: "card",
+      created_at: "2026-08-30T09:12:00+01:00",
+    },
   },
   {
     ticket_id: "mock-noposter-1",
-    code: "XIL-45DE-NP9",
+    code: "XIL-45DE-NP91",
+    qr_code: "",
+    status: "active",
+    payment_method: null,
+    has_active_subscription: false,
+    status_date: "2026-09-15T08:00:00+01:00",
     event: {
+      id: "mock-event-4",
       title: "creators in abuja: community meetup",
       status: "upcoming",
       event_date: "2026-11-20",
       start_time: "17:30",
-      poster: [],
-      price: "Free",
-      currency: "",
+      poster: "",
+      price: 0,
+      currency: "NGN",
+      fullPrice: "₦0",
     },
-    payment: { amount: "", currency: "" },
+    organiser: null,
+    user: { id: "mock-me", name: "Chidi Okonkwo", has_active_subscription: false },
+    payment: null,
   },
   {
     ticket_id: "mock-upcoming-2",
-    code: "XIL-93GH-UP5",
+    code: "XIL-93GH-UP52",
+    qr_code: "XIL-93GH-UP52",
+    status: "active",
+    payment_method: "transfer",
+    has_active_subscription: false,
+    status_date: "2026-10-02T14:30:00+01:00",
     event: {
+      id: "mock-event-5",
       title: "studio lighting workshop",
       status: "upcoming",
       event_date: "2026-12-01",
       start_time: "10:00",
-      poster: [{ url: "/images/photos/art.jpg", type: "image" }],
-      price: "3000",
-      currency: "₦",
+      poster: "/images/photos/art.jpg",
+      price: 3000,
+      currency: "NGN",
+      fullPrice: "₦3000",
     },
-    payment: { amount: "3000", currency: "₦" },
+    organiser: {
+      id: "mock-org-4",
+      user_id: "mock-user-12",
+      name: "Zainab Bello",
+      user_name: "zainablens",
+      profile_image: "",
+      status: "active",
+      kyc_status: "verified",
+    },
+    user: { id: "mock-me", name: "Chidi Okonkwo", has_active_subscription: true },
+    payment: {
+      id: "mock-pay-5",
+      amount: 3000,
+      currency: "NGN",
+      payment_method: "transfer",
+      provider: "transfer",
+      created_at: "2026-10-02T14:30:00+01:00",
+    },
   },
 ];
 
+const findFixture = (id) =>
+  MOCK_TICKETS.find((ticket) => ticket.ticket_id === id) || null;
+
 export default function TicketsPreview() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const state = params.get("state") || "";
+  const view = params.get("view") || "";
   const [activeTab, setActiveTab] = useState(params.get("tab") || "all");
 
   const tickets = state === "empty" || state === "error" ? [] : MOCK_TICKETS;
@@ -124,6 +238,22 @@ export default function TicketsPreview() {
     activeTab === "all"
       ? tickets
       : tickets.filter((t) => t.event.status === activeTab);
+
+  // ── ticket DETAIL mode (?view=mock-upcoming-1 | ?view=notfound) ────────────
+  // Renders the production component itself, only with the ticket handed to it
+  // (app: ReceiptScreen(ticket: ...) is handed the object the same way). No API.
+  if (view) {
+    return (
+      <>
+        <SEO title="Ticket detail preview (dev) - Xilolo" noIndex />
+        <Navbar />
+        <TicketReceiptScreen
+          previewTicket={view === "notfound" ? null : findFixture(view)}
+          previewNotFound={view === "notfound"}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -171,7 +301,15 @@ export default function TicketsPreview() {
                 <TicketRow
                   key={ticket.ticket_id}
                   ticket={ticket}
-                  onViewReceipt={() => {}}
+                  /* In the preview a tap opens the detail itself, so the whole
+                     flow is walkable without an account. */
+                  onViewReceipt={() => {
+                    navigate(
+                      `/dev/tickets-preview?view=${encodeURIComponent(
+                        ticket.ticket_id
+                      )}`
+                    );
+                  }}
                 />
               ))}
             </div>
@@ -183,7 +321,13 @@ export default function TicketsPreview() {
             <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-3 tw:text-[11px] tw:text-muted-strong">
               DEV-ONLY preview (import.meta.env.DEV). Renders the real /tickets
               presentation with mock tickets and no API calls. Tab: {activeTab} ·
-              state: {state || "list"}
+              state: {state || "list"} ·{" "}
+              <a
+                href="/dev/tickets-preview?view=mock-upcoming-1"
+                className="tw:font-semibold tw:text-accent tw:underline"
+              >
+                open the detail
+              </a>
             </div>
           </div>
         </div>
