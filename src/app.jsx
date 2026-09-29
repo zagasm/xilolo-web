@@ -70,6 +70,9 @@ import DesignSystem from "./pages/DesignSystem/index.jsx";
 // Dev-only preview of the AUTH-GATED signed-in home (/feed), so its layout can be
 // screenshotted and measured without an account. DEV-gated below; never shipped.
 import HomePreview from "./pages/Home/HomePreview.jsx";
+// Dev-only preview of the AUTH-GATED tickets screen (/tickets), so its layout can
+// be screenshotted and measured without an account. DEV-gated below; never shipped.
+import TicketsPreview from "./pages/tickets/TicketsPreview.jsx";
 import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
 import CryptoWalletsPage from "./pages/crypto/index.jsx";
 import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
@@ -597,6 +600,15 @@ export function App() {
         <Route
           path="/dev/home-preview"
           element={import.meta.env.DEV ? <HomePreview /> : <Error404 />}
+        />
+
+        {/* Dev-only preview of the signed-in tickets screen (/tickets). Same
+            reason as above: /tickets is auth-gated, so this renders the real
+            presentation pieces with mock tickets so the layout can be measured +
+            screenshotted at any width without an account. 404s in production. */}
+        <Route
+          path="/dev/tickets-preview"
+          element={import.meta.env.DEV ? <TicketsPreview /> : <Error404 />}
         />
 
         <Route path="/page-not-found" element={<Error404 />} />

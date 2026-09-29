@@ -23,6 +23,14 @@
  *                                     the REAL <WalletBalanceChip> the shell puts
  *                                     in the Navbar and prints whether the
  *                                     /feed rule hides it (exactly one balance).
+ *   /dev/home-preview?organizers=1    the REAL "Organizers you may know" rail
+ *                                     (component/Organizers/ForMobile/OrganisersForYou.jsx)
+ *                                     with fixtures, in its real position below
+ *                                     the grid — the section is otherwise only
+ *                                     visible on the auth-gated /feed after a
+ *                                     scroll (pages/Home/index.jsx `showOrganizers`).
+ *   /dev/home-preview?organizers=1&orgstate=loading
+ *                                     the app's 3-card shimmer state.
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -40,7 +48,75 @@ import {
   HomeHeader,
   InlineErrorCard,
   LiveFeedCard,
+  OrganizersRailHeading,
 } from "./index.jsx";
+import MobileSingleOrganizers from "../../component/Organizers/ForMobile/OrganisersForYou";
+
+/* Organisers fixture for the preview only (?organizers=1). Field names mirror
+   the real payload (xilolo backend app/Http/Resources/OrganiserResource.php):
+   organiser, userName, userId, profileImage, numberOfFollowers, tickets_total,
+   has_active_subscription, plan, isFollowing. It deliberately covers the card's
+   branches: photo vs initials (a null profileImage), verified vs not, following
+   vs not, 0 / K / M follower bands, a numeric tickets count and the public
+   milestone label string. */
+const MOCK_ORGANISERS = [
+  {
+    id: "mock-org-1",
+    userId: "mock-user-1",
+    organiser: "Ada Obi",
+    userName: "ada_obi",
+    profileImage: "/images/photos/art.jpg",
+    numberOfFollowers: 12400,
+    tickets_total: 9,
+    has_active_subscription: true,
+    isFollowing: false,
+  },
+  {
+    id: "mock-org-2",
+    userId: "mock-user-2",
+    organiser: "Emeka Nwosu",
+    userName: "emekan",
+    profileImage: null,
+    numberOfFollowers: 980,
+    tickets_total: "Under 1,000 tickets sold",
+    has_active_subscription: false,
+    isFollowing: true,
+  },
+  {
+    id: "mock-org-3",
+    userId: "mock-user-3",
+    organiser: "Halima Bello",
+    userName: "halimab",
+    profileImage: "/images/photos/first.jpg",
+    numberOfFollowers: 1250000,
+    tickets_total: 2400,
+    has_active_subscription: true,
+    isFollowing: false,
+  },
+  {
+    id: "mock-org-4",
+    userId: "mock-user-4",
+    organiser: "Tunde Adebayo",
+    userName: "tunde",
+    profileImage: "",
+    numberOfFollowers: 0,
+    tickets_total: 0,
+    has_active_subscription: false,
+    plan: { id: "mock-plan", name: "Pro" },
+    isFollowing: false,
+  },
+  {
+    id: "mock-org-5",
+    userId: "mock-user-5",
+    organiser: "Ngozi Umeh",
+    userName: "ngoziu",
+    profileImage: "null",
+    numberOfFollowers: 5400,
+    tickets_total: 1500000,
+    has_active_subscription: true,
+    isFollowing: true,
+  },
+];
 
 /* Mock events — fixtures for the preview only, never rendered in production.
    Deliberately covers every `_resolveCta` branch: live ("Watch live now"), paid
@@ -158,6 +234,8 @@ export default function HomePreview() {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [moreEvent, setMoreEvent] = useState(null);
   const showChipProbe = params.get("chip") === "1";
+  const showOrganizers = params.get("organizers") === "1";
+  const orgLoading = params.get("orgstate") === "loading";
   const state = params.get("state") || "";
 
   useEffect(() => setActiveTab(initialTab), [initialTab]);
@@ -254,6 +332,19 @@ export default function HomePreview() {
                   </span>
                 </div>
               </FeedGrid>
+
+              {/* ?organizers=1 — the real rail from the signed-in home with the
+                  fixture above. `orgstate=loading` shows the app's 3-card shimmer.
+                  Placement matches /feed: below the grid, inside HOME_CONTAINER. */}
+              {showOrganizers ? (
+                <div className="tw:mt-12">
+                  <OrganizersRailHeading />
+                  <MobileSingleOrganizers
+                    previewOrganisers={orgLoading ? [] : MOCK_ORGANISERS}
+                    previewLoading={orgLoading}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
