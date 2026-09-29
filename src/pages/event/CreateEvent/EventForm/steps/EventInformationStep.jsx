@@ -313,7 +313,7 @@ export default function EventInformationStep({
 
           <Field label="Description" className="tw:mb-5">
             <div className="tw:relative">
-              <TextAlignLeft
+              <AlignLeft
                 className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-3.5 tw:size-[18px] tw:text-muted"
                 aria-hidden="true"
               />

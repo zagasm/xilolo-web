@@ -26,7 +26,6 @@ export default defineConfig({
         secure: true,
         // Optional: if the upstream checks Origin, pretend to be the allowed site
         headers: { Origin: "https://xilolo.com" },
-        rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/media": {
         target: "https://api.xilolo.com",
