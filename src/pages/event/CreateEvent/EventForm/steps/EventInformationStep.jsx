@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { ArrowRight, Calendar, Globe, MapPin, MonitorSmartphone, Tag, TextAlignLeft } from "lucide-react";
+import { ArrowRight, Calendar, Globe, MapPin, MonitorSmartphone, Tag, AlignLeft } from "lucide-react";
 import { useAuth } from "../../../../../pages/auth/AuthContext";
 import { api } from "../../../../../lib/apiClient";
 import { showError } from "../../../../../component/ui/toast";
