@@ -12,7 +12,28 @@ export default defineConfig({
     // Ensure proper asset handling
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        /* Vendor splitting, deliberately MINIMAL.
+           Only react/react-dom/scheduler/react-router are forced into one chunk: they
+           must initialise together (splitting a renderer from its scheduler is the
+           classic cross-chunk order bug) and they change rarely, so they are worth
+           caching separately.
+
+           Everything ELSE returns undefined on purpose — i.e. Rollup decides. The first
+           attempt at this file used a catch-all `vendor` bucket, which measured badly:
+           the bucket merged unrelated libraries, so an eager dependency (axios) dragged
+           in libraries only lazy routes need (the Didit KYC SDK, react-player, hls.js,
+           bootstrap, zod) as one 1.66 MB first-load chunk — silently undoing the
+           route-level lazy() imports in src/app.jsx. Letting Rollup place modules
+           per-importer is what actually keeps a page's heavy deps in that page's chunk. */
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler|react-router|react-router-dom)[\\/]/.test(id)) {
+            return "vendor-react";
+          }
+
+          return undefined;
+        },
       },
     },
   },

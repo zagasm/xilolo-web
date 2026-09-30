@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useMemo } from "react";
+import { Fragment, useState, useEffect, useMemo, Suspense, lazy } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -21,95 +21,158 @@ import FullpagePreloader from "./component/assets/FullPagePreloader/index.jsx";
 
 import { SigninWithCode } from "./pages/auth/signin/SignCode.jsx";
 import { ChangePasswordSuccesffully } from "./pages/auth/ChangePassword/successPasswordChange.jsx";
-import AppleCallbackPage from "./pages/auth/AppleCallbackPage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AppleCallbackPage = lazy(() => import("./pages/auth/AppleCallbackPage.jsx"));
 import Navbar from "./pages/pageAssets/Navbar.jsx";
 import PostSignupForm from "./component/assets/ModalContext/signupForm/PostSignUpForm.jsx";
-import Sessionpage from "./pages/auth/SessionPage/index.jsx";
-import Event from "./pages/event/EventOutlet.jsx";
-import ViewEvent from "./pages/event/ViewEvent/index.jsx";
-import CreateEvent from "./pages/event/CreateEvent/index.jsx";
-import SaveEvents from "./pages/event/SaveEvent/index.jsx";
-import AllOrganizers from "./pages/Organizers/index.jsx";
-import AccountOutlet from "./pages/Account/AccountOutlet.jsx";
-import Account from "./pages/Account/index.jsx";
-import AccountInterest from "./pages/Account/interest/index.jsx";
-import AccountNotification from "./pages/Account/manageNotification/index.jsx";
-import EditProfile from "./pages/Profile/editProfile/index.jsx";
-import Profile from "./pages/Profile/index.jsx";
-import EditPassword from "./pages/Profile/EditPassword/index.jsx";
-import AllNotification from "./pages/Notification/AllNotification/index.jsx";
-import Notification from "./pages/Notification/index.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Sessionpage = lazy(() => import("./pages/auth/SessionPage/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Event = lazy(() => import("./pages/event/EventOutlet.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const ViewEvent = lazy(() => import("./pages/event/ViewEvent/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const CreateEvent = lazy(() => import("./pages/event/CreateEvent/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SaveEvents = lazy(() => import("./pages/event/SaveEvent/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AllOrganizers = lazy(() => import("./pages/Organizers/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AccountOutlet = lazy(() => import("./pages/Account/AccountOutlet.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Account = lazy(() => import("./pages/Account/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AccountInterest = lazy(() => import("./pages/Account/interest/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AccountNotification = lazy(() => import("./pages/Account/manageNotification/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EditProfile = lazy(() => import("./pages/Profile/editProfile/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Profile = lazy(() => import("./pages/Profile/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EditPassword = lazy(() => import("./pages/Profile/EditPassword/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AllNotification = lazy(() => import("./pages/Notification/AllNotification/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Notification = lazy(() => import("./pages/Notification/index.jsx"));
 import EventType from "./pages/event/CreateEvent/event_types.jsx";
-import ViewProfile from "./pages/Profile/ViewProfile/index.jsx";
-import Landing from "./pages/LandingPage/index.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const ViewProfile = lazy(() => import("./pages/Profile/ViewProfile/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Landing = lazy(() => import("./pages/LandingPage/index.jsx"));
 import { ToastHost } from "./component/ui/toast.jsx";
-import Support from "./pages/support/index.jsx";
-import SupportChatPage from "./pages/support/SupportChatPage.jsx";
-import Marketing from "./pages/marketing/index.jsx";
-import StreamingPage from "./pages/Streaming/index.jsx";
-import DataProtectionPage from "./pages/DataProtection/index.jsx";
-import TicketsPage from "./pages/tickets/TicketsPage.jsx";
-import TicketReceiptScreen from "./pages/tickets/TicketReceiptScreen.jsx";
-import PaymentCallback from "./pages/payment/PaymentCallback.jsx";
-import SearchPage from "./pages/Search/index.jsx";
-import OrganisersIFollow from "./pages/following/OrganisersIFollow.jsx";
-import OrganiserFollowers from "./pages/following/OrgaaniserFollowers.jsx";
-import BecomeOrganiser from "./pages/Organizers/BecomeOrganizer.jsx";
-import DiditCallback from "./pages/Organizers/DiditCallback.jsx";
-import SubscriptionsPage from "./pages/subscription/index.jsx";
-import PrivacyPolicyPage from "./pages/privacy/index.jsx";
-import CommunityGuidelinesPage from "./pages/communityGuideline/index.jsx";
-import TermsOfServicePage from "./pages/terms/index.jsx";
-import TaggedMentionsPage from "./pages/mentions/index.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Support = lazy(() => import("./pages/support/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SupportChatPage = lazy(() => import("./pages/support/SupportChatPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const Marketing = lazy(() => import("./pages/marketing/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const StreamingPage = lazy(() => import("./pages/Streaming/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const DataProtectionPage = lazy(() => import("./pages/DataProtection/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const TicketsPage = lazy(() => import("./pages/tickets/TicketsPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const TicketReceiptScreen = lazy(() => import("./pages/tickets/TicketReceiptScreen.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const PaymentCallback = lazy(() => import("./pages/payment/PaymentCallback.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SearchPage = lazy(() => import("./pages/Search/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const OrganisersIFollow = lazy(() => import("./pages/following/OrganisersIFollow.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const OrganiserFollowers = lazy(() => import("./pages/following/OrgaaniserFollowers.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const BecomeOrganiser = lazy(() => import("./pages/Organizers/BecomeOrganizer.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const DiditCallback = lazy(() => import("./pages/Organizers/DiditCallback.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SubscriptionsPage = lazy(() => import("./pages/subscription/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const PrivacyPolicyPage = lazy(() => import("./pages/privacy/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const CommunityGuidelinesPage = lazy(() => import("./pages/communityGuideline/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const TermsOfServicePage = lazy(() => import("./pages/terms/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const TaggedMentionsPage = lazy(() => import("./pages/mentions/index.jsx"));
 import LandingLayout from "./layouts/LandingLayout.jsx";
-import AboutPage from "./pages/LandingPage/about.jsx";
-import ContactPage from "./pages/LandingPage/contact.jsx";
-import AdsPage from "./pages/LandingPage/ads.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AboutPage = lazy(() => import("./pages/LandingPage/about.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const ContactPage = lazy(() => import("./pages/LandingPage/contact.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AdsPage = lazy(() => import("./pages/LandingPage/ads.jsx"));
 // Dev-only design showcase: /design (primitives + nav states). Registered below
 // behind import.meta.env.DEV so it can never ship to production.
-import DesignSystem from "./pages/DesignSystem/index.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const DesignSystem = lazy(() => import("./pages/DesignSystem/index.jsx"));
 // Dev-only preview of the AUTH-GATED signed-in home (/feed), so its layout can be
 // screenshotted and measured without an account. DEV-gated below; never shipped.
-import HomePreview from "./pages/Home/HomePreview.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const HomePreview = lazy(() => import("./pages/Home/HomePreview.jsx"));
 // Dev-only preview of the AUTH-GATED tickets screen (/tickets), so its layout can
 // be screenshotted and measured without an account. DEV-gated below; never shipped.
-import TicketsPreview from "./pages/tickets/TicketsPreview.jsx";
-import CreateEventPreview from "./pages/event/CreateEvent/CreateEventPreview.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const TicketsPreview = lazy(() => import("./pages/tickets/TicketsPreview.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const CreateEventPreview = lazy(() => import("./pages/event/CreateEvent/CreateEventPreview.jsx"));
 // Dev-only preview of the AUTH-GATED profile page (/profile/:profileId), so its
 // layout can be screenshotted and measured without an account. DEV-gated below;
 // never shipped.
-import ProfilePreview from "./pages/Profile/ProfilePreview.jsx";
-import EventPreview from "./pages/event/ViewEvent/EventPreview.jsx";
-import BlockedUsersPage from "./pages/Account/Blocked/index.jsx";
-import CryptoWalletsPage from "./pages/crypto/index.jsx";
-import FundWalletPage from "./pages/Account/FundWallet/index.jsx";
-import EventEditPage from "./pages/event/EventEditPage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const ProfilePreview = lazy(() => import("./pages/Profile/ProfilePreview.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventPreview = lazy(() => import("./pages/event/ViewEvent/EventPreview.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const BlockedUsersPage = lazy(() => import("./pages/Account/Blocked/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const CryptoWalletsPage = lazy(() => import("./pages/crypto/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const FundWalletPage = lazy(() => import("./pages/Account/FundWallet/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventEditPage = lazy(() => import("./pages/event/EventEditPage.jsx"));
 // import DisableRightClick from "./component/DisableRightClick.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
-import EventStreamControlPage from "./pages/event/EventStreamControlPage.jsx";
-import EventStreamAnalyticsPage from "./pages/event/EventStreamAnalyticsPage.jsx";
-import EventCheckinControlPage from "./pages/event/EventCheckinControlPage.jsx";
-import VodWatchPage from "./pages/event/VodWatchPage.jsx";
-import BankAccountsPage from "./pages/Account/BankAccountsPage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventStreamControlPage = lazy(() => import("./pages/event/EventStreamControlPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventStreamAnalyticsPage = lazy(() => import("./pages/event/EventStreamAnalyticsPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventCheckinControlPage = lazy(() => import("./pages/event/EventCheckinControlPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const VodWatchPage = lazy(() => import("./pages/event/VodWatchPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const BankAccountsPage = lazy(() => import("./pages/Account/BankAccountsPage.jsx"));
 import WalletPage from "./features/wallet/pages/WalletPage.jsx";
 import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCallbackPage.jsx";
 import WalletFundingCancelPage from "./features/wallet/pages/WalletFundingCancelPage.jsx";
-import SharedEventPage from "./pages/event/SharedEventPage.jsx";
-import EventDeepLinkPage from "./pages/event/EventDeepLinkPage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SharedEventPage = lazy(() => import("./pages/event/SharedEventPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const EventDeepLinkPage = lazy(() => import("./pages/event/EventDeepLinkPage.jsx"));
 
 import SEO from "./component/SEO/index.jsx";
 import DownloadAppModal from "./component/DownloadAppModal.jsx";
-import SignalDeck from "./pages/SignalDeck/index.jsx";
-import AccountPayouts from "./pages/Account/AccountPayouts.jsx";
-import AccountPayoutHistory from "./pages/Account/AccountPayoutHistory.jsx";
-import WalletHub from "./pages/Account/WalletHub.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SignalDeck = lazy(() => import("./pages/SignalDeck/index.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AccountPayouts = lazy(() => import("./pages/Account/AccountPayouts.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const AccountPayoutHistory = lazy(() => import("./pages/Account/AccountPayoutHistory.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const WalletHub = lazy(() => import("./pages/Account/WalletHub.jsx"));
 import ForcedLogoutModalHost from "./component/auth/ForcedLogoutModalHost.jsx";
-import SharedProfileRedirectPage from "./pages/Profile/SharedProfileRedirectPage.jsx";
-import SecurityPage from "./pages/Account/SecurityPage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SharedProfileRedirectPage = lazy(() => import("./pages/Profile/SharedProfileRedirectPage.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
+const SecurityPage = lazy(() => import("./pages/Account/SecurityPage.jsx"));
 import TwoFactorSecurityPrompt from "./component/auth/TwoFactorSecurityPrompt.jsx";
 import XiloloAssistantWidget from "./features/xiloloAssistant/XiloloAssistantWidget.jsx";
-import MaintenancePage from "./pages/MaintenancePage.jsx";
+/* lazily loaded — keeps this page out of the first-load bundle */
+const MaintenancePage = lazy(() => import("./pages/MaintenancePage.jsx"));
 
 const MainLayout = () => (
   <>
@@ -118,6 +181,23 @@ const MainLayout = () => (
     <Outlet />
   </>
 );
+
+/* Shown while a lazily-loaded route chunk arrives. Deliberately tiny, and the accent is
+   an inline style: this repo has unlayered legacy CSS that beats @layer utilities, and a
+   first-paint flash is the last place to gamble on that. Defined here — not in a page
+   module — so no page can drag it into the entry chunk. */
+function RouteFallback() {
+  return (
+    <div className="tw:flex tw:min-h-[60vh] tw:w-full tw:items-center tw:justify-center">
+      <div
+        role="status"
+        aria-label="Loading"
+        className="tw:size-8 tw:animate-spin tw:rounded-full tw:border-2 tw:border-solid tw:border-[#E6E6E6]"
+        style={{ borderTopColor: "#16909C" }}
+      />
+    </div>
+  );
+}
 
 export function App() {
   const [loading, setLoading] = useState(true);
@@ -465,7 +545,8 @@ export function App() {
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
-      <Routes>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
         <Route path="/maintenance" element={<MaintenancePage />} />
         <Route path="/event/:id" element={<EventDeepLinkPage />} />
         <Route path="/signal-deck" element={<SignalDeck />} />
@@ -651,7 +732,8 @@ export function App() {
 
         <Route path="/page-not-found" element={<Error404 />} />
         <Route path="*" element={<Error404 />} />
-      </Routes>
+        </Routes>
+      </Suspense>
 
       {state?.backgroundLocation && (
         <Routes>
