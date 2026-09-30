@@ -220,7 +220,7 @@ export function ProfileScreenView({
 
   return (
     <div className="tw:min-h-screen tw:bg-paper tw:pt-24 tw:pb-8 tw:font-sans">
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:md:max-w-[1040px] tw:md:px-6">
         {/* app bar — own: revamp:259-326 (back 42 circle, card fill + hairline,
             title "Profile" 21/w700, "Edit" pill r16) · other:
             organizer_profile.dart:186-265 (back 40 chip circle, title "Profile"
@@ -473,29 +473,39 @@ export function ProfileScreenView({
               </div>
             </div>
           ) : (
-            // 3) Normal profile layout — app section order, one column:
-            //    header -> followers -> about -> ranking (revamp:332-346),
-            //    then the separate My Events list (my_events_screen.dart)
-            <div className="tw:space-y-[10px]">
-              <ProfileHeader
-                user={profile}
-                isOwnProfile={isOwnProfile}
-                variant={variant}
-                isFollowing={isFollowing}
-                followLoading={followLoading}
-                onToggleFollow={onToggleFollow}
-              />
+            // 3) Normal profile layout — app section order. Founder (2026-09-30):
+            //    "the profile page also has so much space on the left and right,
+            //    not well spaced out on a desktop view". From md up the stack
+            //    flows into two balanced columns; on phones it collapses to the
+            //    app's single column, untouched. CSS multicol (not a
+            //    main+sidebar grid) keeps DOM order identical, so the app's
+            //    header -> about -> ranking order still reads top-to-bottom.
+            <div className="tw:space-y-[10px] tw:md:columns-2 tw:md:gap-x-6">
+              <div className="tw:break-inside-avoid">
+                <ProfileHeader
+                  user={profile}
+                  isOwnProfile={isOwnProfile}
+                  variant={variant}
+                  isFollowing={isFollowing}
+                  followLoading={followLoading}
+                  onToggleFollow={onToggleFollow}
+                />
+              </div>
 
-              <AboutPanel
-                user={profile}
-                isOwnProfile={isOwnProfile}
-                showInfoCards={variant === "user"}
-              />
+              <div className="tw:break-inside-avoid">
+                <AboutPanel
+                  user={profile}
+                  isOwnProfile={isOwnProfile}
+                  showInfoCards={variant === "user"}
+                />
+              </div>
 
               {/* app: ranking is the last block of the stack — own profile only
                   with an organiser object (revamp:343), organiser profile
                   always (organizer_profile.dart:292) */}
-              <ProfileRanking user={profile} variant={variant} />
+              <div className="tw:break-inside-avoid">
+                <ProfileRanking user={profile} variant={variant} />
+              </div>
             </div>
           )}
 

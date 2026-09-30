@@ -58,7 +58,11 @@ import { api, authHeaders } from "../../../lib/apiClient";
    a class built by interpolation (`tw:h-[${n}px]`) would never be generated. */
 // rail: height 190 + 12px separators (suggested_organisers_section.dart:79-84)
 const RAIL_BOX =
-  "tw:h-[190px] tw:w-full tw:gap-3 tw:overflow-x-auto tw-no-scrollbar";
+  // `tw:flex` is load-bearing: without it the computed display is BLOCK, so the
+  // 20 cards stack vertically and the 190px box clips everything after the
+  // first one — the rail looked like a single static card and never scrolled.
+  // `flex-nowrap` keeps them on one line so overflow-x actually overflows.
+  "tw:flex tw:flex-nowrap tw:h-[190px] tw:w-full tw:gap-3 tw:overflow-x-auto tw:overflow-y-hidden tw-no-scrollbar";
 // card: width clamp(220, 72vw, 290), radius 20 (:104-105, :120-134)
 const CARD_BOX =
   "tw:h-[190px] tw:w-[clamp(220px,72vw,290px)] tw:shrink-0";
@@ -318,6 +322,107 @@ export default function MobileSingleOrganizers({
     onAvailabilityChange?.(available);
   }, [loadingList, organizers.length, onAvailabilityChange]);
 
+  /* ── Auto-slide, right to left (founder, 2026-09-30) ──────────────────────
+     The rail is a discovery surface, so it drifts leftwards on its own instead
+     of waiting to be swiped. Three rules keep it from being annoying:
+       * it pauses the moment the pointer / finger / keyboard focus touches it,
+         and only resumes after a quiet beat, so a user reading a card keeps it;
+       * it pauses while it is off-screen (IntersectionObserver) — no wasted
+         frames, and no surprise motion when the user scrolls back to it;
+       * it does nothing at all under `prefers-reduced-motion: reduce`.
+     Seamlessness: the list is rendered TWICE and scrollLeft wraps by exactly one
+     set's width, so the drift never shows a jump or a gap. That is why the
+     duplicated half exists in the markup — do not "de-duplicate" it. */
+  const railRef = useRef(null);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el || organizers.length < 2) return undefined;
+
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduceMotion) return undefined;
+
+    const SPEED_PX_PER_SECOND = 26; // ~1 card every 9s: readable, not a blur
+    const RESUME_AFTER_MS = 2600;
+
+    let frame = 0;
+    let last = performance.now();
+    let accumulated = 0;
+    let paused = false;
+    let resumeTimer = 0;
+
+    const pause = () => {
+      paused = true;
+      clearTimeout(resumeTimer);
+    };
+    const resume = () => {
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        paused = false;
+        last = performance.now(); // don't bank the idle time as one big jump
+      }, RESUME_AFTER_MS);
+    };
+
+    const tick = (now) => {
+      // clamp dt: a backgrounded tab returns with a huge delta
+      const dt = Math.min((now - last) / 1000, 0.25);
+      last = now;
+
+      if (!paused) {
+        accumulated += SPEED_PX_PER_SECOND * dt;
+        if (accumulated >= 1) {
+          const px = Math.floor(accumulated);
+          accumulated -= px;
+          const half = el.scrollWidth / 2; // the width of ONE rendered set
+          el.scrollLeft += px;
+          if (half > 0 && el.scrollLeft >= half) el.scrollLeft -= half;
+        }
+      }
+
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+
+    el.addEventListener("pointerenter", pause);
+    el.addEventListener("pointerleave", resume);
+    el.addEventListener("pointerdown", pause);
+    el.addEventListener("pointerup", resume);
+    el.addEventListener("touchstart", pause, { passive: true });
+    el.addEventListener("touchend", resume);
+    el.addEventListener("focusin", pause);
+    el.addEventListener("focusout", resume);
+    el.addEventListener("wheel", pause, { passive: true });
+    el.addEventListener("wheel", resume);
+
+    const observer =
+      typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            ([entry]) => (entry.isIntersecting ? resume() : pause()),
+            { threshold: 0.05 },
+          )
+        : null;
+    observer?.observe(el);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(resumeTimer);
+      observer?.disconnect();
+      el.removeEventListener("pointerenter", pause);
+      el.removeEventListener("pointerleave", resume);
+      el.removeEventListener("pointerdown", pause);
+      el.removeEventListener("pointerup", resume);
+      el.removeEventListener("touchstart", pause);
+      el.removeEventListener("touchend", resume);
+      el.removeEventListener("focusin", pause);
+      el.removeEventListener("focusout", resume);
+      el.removeEventListener("wheel", pause);
+      el.removeEventListener("wheel", resume);
+    };
+  }, [organizers.length]);
+
   const fetchOrganizers = async () => {
     try {
       setLoadingList(true);
@@ -452,18 +557,33 @@ export default function MobileSingleOrganizers({
 
   if (organizers.length === 0) return null; // :40-46 — error and empty render nothing
 
+  /* Two identical sets: the auto-slide wraps scrollLeft by one set's width, so
+     the drift is seamless. The clone is display:contents (layout-neutral, so the
+     flex row is untouched) and aria-hidden (one set is enough for screen
+     readers, and it keeps the follow buttons out of the tab order twice). */
+  const looping = organizers.length > 1 ? [...organizers, ...organizers] : organizers;
+
+  const renderCard = (organizer, index) => (
+    <OrganiserCard
+      key={`${organizer?.id || organizer?.userId || "org"}-${index}`}
+      organizer={organizer}
+      isOwnProfile={isOwnProfile(organizer)}
+      isPending={!!pendingFollowRef.current[organizer?.userId]}
+      onOpen={(id) => navigate(`/profile/${id}`)}
+      onToggleFollow={toggleFollow}
+    />
+  );
+
   return (
-    <div className={`tw:font-sans ${RAIL_BOX}`}>
-      {organizers.map((organizer) => (
-        <OrganiserCard
-          key={organizer?.id || organizer?.userId}
-          organizer={organizer}
-          isOwnProfile={isOwnProfile(organizer)}
-          isPending={!!pendingFollowRef.current[organizer?.userId]}
-          onOpen={(id) => navigate(`/profile/${id}`)}
-          onToggleFollow={toggleFollow}
-        />
-      ))}
+    <div ref={railRef} className={`tw:font-sans ${RAIL_BOX}`}>
+      {looping.slice(0, organizers.length).map(renderCard)}
+      {looping.length > organizers.length ? (
+        <div style={{ display: "contents" }} aria-hidden="true">
+          {looping.slice(organizers.length).map((organizer, i) =>
+            renderCard(organizer, i + organizers.length),
+          )}
+        </div>
+      ) : null}
     </div>
   );
 }
