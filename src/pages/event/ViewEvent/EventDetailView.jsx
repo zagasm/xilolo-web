@@ -202,7 +202,7 @@ function EventHero({ v }) {
 /** DetailsAppBar — details_screen.dart:7103-7211 */
 function EventTopBar({ v }) {
   return (
-    <header className="tw:sticky tw:top-20 tw:z-30 tw:border-b tw:border-hairline tw:bg-paper-raised">
+    <header className="tw:static tw:z-30 tw:border-b tw:border-hairline tw:bg-paper-raised tw:md:sticky tw:md:top-20">
       <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-1.5 tw:px-2 tw:py-2">
         <button
           type="button"
@@ -389,7 +389,7 @@ function EventBottomBar({ v }) {
   const bar = bottomBarState(v);
   if (!bar) return null;
   return (
-    <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-40 tw:px-3 tw:pb-3">
+    <div className="tw:fixed tw:inset-x-0 tw:bottom-[56px] tw:z-40 tw:px-3 tw:pb-3 tw:md:bottom-0">
       <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:md:max-w-[1040px] tw:md:px-6">
         <div className="tw:flex tw:items-stretch tw:gap-3 tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-2.5 tw:shadow-[0_10px_30px_rgba(17,19,22,0.12)]">
           <div className="tw:flex tw:w-[44%] tw:flex-col tw:justify-center tw:gap-1.5 tw:px-1">
@@ -426,7 +426,7 @@ export default function EventDetailView({ v }) {
   const reviewsNode = v.reviewsNode;
 
   return (
-    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[150px] tw:pt-20 tw:font-sans tw:text-body">
+    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[180px] tw:pt-20 tw:font-sans tw:text-body tw:md:pb-[150px]">
       <EventTopBar v={v} />
 
       <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-8 tw:md:max-w-[1040px] tw:md:px-6">
