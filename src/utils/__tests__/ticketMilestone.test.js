@@ -76,22 +76,40 @@ test("the floor band is a label too, not '0'", () => {
   assert.equal(shown.value, "Under 100");
 });
 
-test("an exact count still renders for the owner/admin, who are allowed it", () => {
+test("an exact count renders only when the caller asserts it may — { exact: true }", () => {
   const owner = { tickets_total: 1240 };
-  const shown = ticketDisplay(owner);
+  const shown = ticketDisplay(owner, { exact: true });
   assert.equal(shown.kind, "number");
   assert.equal(shown.value, "1.2K");
   assert.equal(shown.label, "Tickets Sold");
-  assert.equal(ticketSentence(owner), "Tickets Sold (1.2K)");
+  assert.equal(ticketSentence(owner, { exact: true }), "Tickets Sold (1.2K)");
 });
 
-test("a singular count reads 'Ticket Sold'", () => {
-  assert.equal(ticketDisplay({ tickets_total: 1 }).label, "Ticket Sold");
-  assert.equal(ticketSentence({ tickets_total: 1 }), "Ticket Sold (1)");
+test("FAIL CLOSED: the same payload without the assertion is banded, not printed", () => {
+  // The whole point: a number reaching a public surface is banded from its own value, so
+  // a future endpoint cannot leak an exact count merely by including one.
+  const leaked = { tickets_total: 1240 };
+  const shown = ticketDisplay(leaked);
+  assert.equal(shown.kind, "label");
+  assert.equal(shown.value, "1,000+");
+  assert.match(ticketSentence(leaked), /tickets sold/i);
+  assert.doesNotMatch(String(shown.value), /1240|1,240/);
+  assert.doesNotMatch(ticketSentence(leaked), /1240|1,240/);
+
+  // and every band boundary holds under the default too
+  assert.equal(ticketDisplay({ tickets_total: 99 }).value, "Under 100");
+  assert.equal(ticketDisplay({ tickets_total: 100 }).value, "Under 1,000");
+  assert.equal(ticketDisplay({ tickets_total: 20_000 }).value, "20,000+");
 });
 
-test("a numeric string is still a count (the API sometimes stringifies)", () => {
-  assert.equal(ticketDisplay({ tickets_total: "1240" }).kind, "number");
+test("a singular count reads 'Ticket Sold' when being shown exactly", () => {
+  assert.equal(ticketDisplay({ tickets_total: 1 }, { exact: true }).label, "Ticket Sold");
+  assert.equal(ticketSentence({ tickets_total: 1 }, { exact: true }), "Ticket Sold (1)");
+});
+
+test("a numeric string counts as a number, but is still banded without the assertion", () => {
+  assert.equal(ticketDisplay({ tickets_total: "1240" }, { exact: true }).kind, "number");
+  assert.equal(ticketDisplay({ tickets_total: "1240" }).kind, "label");
 });
 
 test("a missing value falls back to the floor band rather than 0 tickets", () => {
