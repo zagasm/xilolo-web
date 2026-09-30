@@ -390,7 +390,7 @@ function EventBottomBar({ v }) {
   if (!bar) return null;
   return (
     <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-40 tw:px-3 tw:pb-3">
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px]">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:md:max-w-[1040px] tw:md:px-6">
         <div className="tw:flex tw:items-stretch tw:gap-3 tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-2.5 tw:shadow-[0_10px_30px_rgba(17,19,22,0.12)]">
           <div className="tw:flex tw:w-[44%] tw:flex-col tw:justify-center tw:gap-1.5 tw:px-1">
             <SectionLabel>Ticket Access</SectionLabel>
@@ -429,17 +429,29 @@ export default function EventDetailView({ v }) {
     <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[150px] tw:pt-20 tw:font-sans tw:text-body">
       <EventTopBar v={v} />
 
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-8">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-8 tw:md:max-w-[1040px] tw:md:px-6">
         {/* details_screen.dart:4975 */}
         <EventHero v={v} />
 
+        {/* DESKTOP DISTRIBUTION (founder, 2026-09-30): the page was one
+            560px column, so a desktop screen wasted ~880px of width and the
+            content ran long enough to need scrolling. From md up the sections
+            flow into two balanced columns (newspaper order: top-to-bottom,
+            then the next column) so the whole event fits one page. CSS
+            multicol is used ON PURPOSE instead of a main+sidebar grid: it
+            preserves DOM order exactly, so the app-parity section order
+            (hero, sponsored, manual, vod, schedule, access, replay, hosted,
+            countdown, about, report, reviews) is untouched on phones, where
+            the columns collapse back to a single one. */}
+        <div className="tw:md:columns-2 tw:md:gap-x-8">
+
         {/* details_screen.dart:4977-4978 */}
-        {sponsoredNode}
-        {manualNode}
-        {vodBlock}
+        <div className="tw:break-inside-avoid">{sponsoredNode}</div>
+        <div className="tw:break-inside-avoid">{manualNode}</div>
+        <div className="tw:break-inside-avoid">{vodBlock}</div>
 
         {/* details_screen.dart:4980 eventInfo() — 22px between meta sections */}
-        <div className="tw:mt-5 tw:flex tw:flex-col">
+        <div className="tw:mt-5">
           {/* Event Schedule :5823-5828 */}
           <MetaSection label="Event Schedule">
             <div className="tw:text-sm tw:font-semibold tw:text-body">
@@ -448,7 +460,7 @@ export default function EventDetailView({ v }) {
           </MetaSection>
 
           {/* Access Window :5830-5839 — green when unlocked */}
-          <div className="tw:mt-[22px]">
+          <div className="tw:break-inside-avoid tw:mt-[22px]">
             <MetaSection label="Access Window">
               <div
                 className={
@@ -463,10 +475,10 @@ export default function EventDetailView({ v }) {
           </div>
 
           {/* Replay :5841-5844 */}
-          {replayBlock ? <div className="tw:mt-[22px]">{replayBlock}</div> : null}
+          {replayBlock ? <div className="tw:break-inside-avoid tw:mt-[22px]">{replayBlock}</div> : null}
 
           {/* Hosted By :5845-5871 */}
-          <div className="tw:mt-[22px]">
+          <div className="tw:break-inside-avoid tw:mt-[22px]">
             <MetaSection label="Hosted By">
               <div className="tw:flex tw:items-center tw:gap-2">
                 <Link
@@ -537,7 +549,7 @@ export default function EventDetailView({ v }) {
           </div>
 
           {/* Countdown :5873-5899 */}
-          <div className="tw:mt-[22px]">
+          <div className="tw:break-inside-avoid tw:mt-[22px]">
             <MetaSection label="Countdown">
               <div className="tw:flex tw:items-center tw:gap-2">
                 <Clock className="tw:h-4 tw:w-4 tw:text-body" />
@@ -547,7 +559,7 @@ export default function EventDetailView({ v }) {
           </div>
 
           {/* About This Event :5901-5914 */}
-          <div className="tw:mt-[22px]">
+          <div className="tw:break-inside-avoid tw:mt-[22px]">
             <MetaSection label="About This Event">
               <div className="tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted">
                 {v.description}
@@ -557,7 +569,7 @@ export default function EventDetailView({ v }) {
         </div>
 
         {/* details_screen.dart:4983 reportEventSection() */}
-        <div className="tw:mt-[18px] tw:px-4">
+        <div className="tw:break-inside-avoid tw:mt-[18px] tw:px-4">
           <div
             role="button"
             tabIndex={0}
@@ -581,7 +593,7 @@ export default function EventDetailView({ v }) {
         </div>
 
         {/* details_screen.dart:4987 _buildReviewsSection() */}
-        <div className="tw:mt-[22px] tw:px-4">
+        <div className="tw:break-inside-avoid tw:mt-[22px] tw:px-4">
           <SectionLabel>Reviews</SectionLabel>
           <div className="tw:mt-2.5 tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-1">
             <div className="tw:flex tw:items-center tw:gap-1.5">
@@ -597,6 +609,7 @@ export default function EventDetailView({ v }) {
             </div>
           </div>
           <div className="tw:mt-3">{reviewsNode}</div>
+        </div>
         </div>
       </div>
 

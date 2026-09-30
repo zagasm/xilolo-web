@@ -249,3 +249,62 @@ already exists:
 The app is the source of truth for the behaviour of all of this:
 `lib/features/event/widgets/player/live_chat_overlay.dart`, `live_chat_reverb_client.dart`,
 `live_comment_api_service.dart`, and `lib/features/presentation/screens/home/screen/livestream_screen.dart`.
+
+---
+
+## 10. Founder's 09-30 follow-ups: desktop distribution + the count rule
+
+**a. Desktop event detail was one 560px column.** On a 1440 screen that wasted ~880px
+of width and ran 1568px tall. From `md` up the sections now flow into two balanced
+newspaper columns (`md:columns-2`, `md:gap-x-8`, `md:max-w-[1040px]`), with the hero still
+full width and each section wrapped in `break-inside-avoid` so nothing is cut mid-section.
+**CSS multicol was chosen deliberately over a main+sidebar grid: it preserves DOM order
+exactly, so the app-parity section order is untouched on phones**, where the columns collapse
+to one. Measured: desktop `docH` 1568 → **1138** (−27%; fits without scrolling on any window
+≥1150px tall), 0 elements past the viewport; **mobile `docH` 1623 → 1623, unchanged.**
+
+**b. The "under 1,000" count rule.** `src/utils/countFormat.js` is now the single
+implementation (999 → "999", 1,240 → "1.2K", 1,250,000 → "1.3M"; `toFixed(1)` ROUNDS, so it is
+never "1.25M"). It was copy-pasted in three places and missing where it mattered:
+- **The report was about production, not this branch.** The deployed bundle still renders the
+  old top-organizers cards with `{tickets_total ?? 0}` + a "Tickets Sold" label, raw. That code
+  is **gone from this branch** — `9cf422a` replaced those cards with the app's design (followers
+  only, compacted), and `9cf422a` is one of the unmerged commits. Verified by grepping the
+  deployed `/assets/index-BwR4Xlrg.js`: it contains `tickets_total)??0` + `"Tickets Sold"`, and
+  the current tree contains neither. **Merging fixes what he is looking at.**
+- Raw counts that WERE in this branch and are now fixed: the profile hero copy rows
+  (`Tickets Sold (1240)` → `(1.2K)`, `Events (12)`), and `AboutPanel`'s Social snapshot rows
+  (Followers, Tickets Sold).
+- `ProfileHeader` still re-exports `formatCount` so the old import path keeps working.
+
+**Open question for the founder:** the app shows NO ticket-sold stat on top organisers, so
+parity removed those chips. He asked for the *rule* to apply — does he want the chips restored
+with `1.2K` formatting, or is their absence fine? Not decided; do not guess.
+
+---
+
+## 11. VOD retention (lifetime) — plan, backend repo, awaiting a go-ahead
+
+The backend is closer than expected: `replay_expires_at` already exists and **NULL already means
+"never expires" in the read paths** (`CleanupExpiredReplays.php:74,77` uses
+`where('replay_expires_at', '<', now())`, which SQL never matches on NULL; `Event.php:875` guards
+with `$this->replay_expires_at &&`; `EventReplayService`/`RecordingService`/`StreamReplayService`
+already branch on `whereNull`). `MediaRecordingController.php:96,125` already does
+`$forMinutes > 0 ? $availableAt->addMinutes($forMinutes) : null` — i.e. the "no expiry" idiom
+exists in the codebase.
+
+What is missing is only the **per-event choice**. Today three write sites all hardcode the same
+global default: `ProcessAdaptiveRecording.php:316`, `SyncRecordingToStorage.php:319`,
+`StreamReplayService.php:179` → `now()->addDays(config('streaming.recording.retention_days', 30))`
+(`config/streaming.php:230`, `STREAM_RETENTION_DAYS`). Those jobs run when the recording is
+processed — which is the "recording completion" clock he asked for, not the scheduled start.
+
+Proposed change (additive, zero-downtime):
+1. migration: `events.replay_retention_days` nullable smallint — NULL = inherit the platform
+   default, `0` = **lifetime**, `n` = n days. Reuses the existing `> 0 ? … : null` idiom.
+2. accept 7 / 30 / lifetime on event create+update (and the replay-settings endpoint).
+3. the three write sites read the event's choice instead of the global config.
+4. expose `replay.retention` alongside the existing `replay.expires_at` in `EventResource`
+   (`:379`) so the web picker and the "available until" copy can render.
+5. nullable column, no backfill (NULL preserves today's behaviour) → safe deploy.
+6. test that a lifetime replay is not deleted by `CleanupExpiredReplays`.
