@@ -52,6 +52,8 @@ import {
 } from "../../../features/wallet/walletUtils";
 import ReplayUploadModal from "../../../component/Events/ReplayUploadModal";
 import ReactPlayer from "react-player";
+import EventDetailView, { EventStateScaffold } from "./EventDetailView.jsx";
+import { SponsorProfileLink } from "./sponsorLink.jsx";
 
 export function CountdownPill({ target }) {
   if (!target) return null;
@@ -75,30 +77,6 @@ export function CountdownPill({ target }) {
         }}
       />
     </div>
-  );
-}
-
-function sponsorDisplayName(sponsor) {
-  return sponsor?.username || sponsor?.user_name || sponsor?.name || "Someone";
-}
-
-function sponsorProfilePath(sponsor) {
-  const id = sponsor?.user_id || sponsor?.id || sponsor?.sponsor_user_id;
-  return id ? `/profile/${id}` : null;
-}
-
-function SponsorProfileLink({ sponsor, className = "" }) {
-  const name = sponsorDisplayName(sponsor);
-  const path = sponsorProfilePath(sponsor);
-
-  if (!path) {
-    return <span className={className}>{name}</span>;
-  }
-
-  return (
-    <Link to={path} className={className}>
-      {name}
-    </Link>
   );
 }
 
@@ -809,17 +787,263 @@ export default function ViewEvent() {
     }
   };
 
+
+  /* ---- sections whose inner markup stays owned by this data layer ---- */
+
+  // details_screen.dart:1874-1906 _buildSponsoredTicketSection()
+  const sponsoredNode =
+    hasSponsoredTicketsAvailable && !hasPaid ? (
+      <div className="tw:mt-5 tw:px-4">
+        <div className="tw:text-[10px] tw:font-extrabold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+          Sponsored Tickets
+        </div>
+        <div className="tw:mt-2.5 tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-3.5">
+          <div className="tw:text-sm tw:font-bold tw:text-body">
+            {sponsoredTicketSponsors.length ? (
+              <>
+                <SponsorProfileLink
+                  sponsor={firstSponsor}
+                  className="tw:text-accent-deep tw:font-bold"
+                />
+                {sponsorHeadlineSuffix}
+              </>
+            ) : (
+              "A kind person has bought tickets for others for this event."
+            )}
+          </div>
+          <div className="tw:mt-1 tw:text-[12px] tw:leading-[1.6] tw:text-muted">
+            You can grab one of the free tickets, get your own ticket, or chip in to buy for
+            others!
+          </div>
+          <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <span className="tw:rounded-full tw:bg-accent-soft tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-bold tw:text-accent-deep">
+              {sponsoredTicketsAvailableCount} available
+            </span>
+            {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
+              <SponsorProfileLink
+                key={sponsor.id || sponsor.username}
+                sponsor={sponsor}
+                className="tw:rounded-full tw:border tw:border-hairline tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-bold tw:text-body"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    ) : null;
+
+  // details_screen.dart:1913-2041 _buildManualAccessSection()
+  const manualNode = manualAvailable ? (
+    <div className="tw:mt-5 tw:px-4">
+      <div className="tw:text-[10px] tw:font-extrabold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+        Event Manual
+      </div>
+      <div className="tw:mt-2.5 tw:flex tw:items-start tw:gap-3 tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-3.5">
+        {manual?.cover_url ? (
+          <img
+            src={manual.cover_url}
+            alt="Manual cover"
+            className="tw:h-[72px] tw:w-[58px] tw:shrink-0 tw:rounded-xl tw:object-cover"
+          />
+        ) : (
+          <div className="tw:flex tw:h-[72px] tw:w-[58px] tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-[#E9E9EC]">
+            <BookOpen className="tw:h-5 tw:w-5 tw:text-muted" />
+          </div>
+        )}
+        <div className="tw:min-w-0 tw:flex-1">
+          <div className="tw:text-sm tw:font-bold tw:text-body">
+            {manual?.file_name || "Event Manual"}
+          </div>
+          <div className="tw:mt-1 tw:text-[12px] tw:font-medium tw:text-[#6B7280]">
+            {manualHasAccess
+              ? "You already have access to this manual."
+              : `Available for ${manualPriceDisplay}.`}
+          </div>
+          {canDownloadManual && (
+            <button
+              type="button"
+              onClick={handleDownloadManual}
+              className="tw:mt-2.5 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+            >
+              Download manual
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  // details_screen.dart:6455-6703 _buildReplaySection() (rendered at :5841-5844)
+  const replayNode = replayEnabled ? (
+    <div className="tw:px-4">
+      <div className="tw:text-[10px] tw:font-extrabold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+        Replay
+      </div>
+      <div className="tw:mt-2.5 tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-3.5">
+        {replayIsAvailable ? (
+          <div>
+            <div className="tw:text-sm tw:font-bold tw:text-body">Replay is available</div>
+            <div className="tw:mt-1 tw:text-[12px] tw:text-muted">
+              {replayExpiresAt
+                ? `Replay expires at ${formatReplayDateTime(replayExpiresAt)}`
+                : "Replay is ready to watch."}
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/event/vod/${event.id}`)}
+              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+            >
+              <Video className="tw:h-4 tw:w-4" />
+              <span>Watch replay</span>
+            </button>
+            <div className="tw:mt-3 tw:overflow-hidden tw:rounded-xl tw:bg-black">
+              <div className="tw:aspect-video">
+                <ReactPlayer url={replayUrl} controls width="100%" height="100%" />
+              </div>
+            </div>
+          </div>
+        ) : replayExpired ? (
+          <div>
+            <div className="tw:text-sm tw:font-bold tw:text-body">
+              Replay is no longer available.
+            </div>
+            <div className="tw:mt-1 tw:text-[12px] tw:text-muted">
+              The backend has already cleared access for this replay.
+            </div>
+          </div>
+        ) : hasReplay ? (
+          <div>
+            <div className="tw:text-sm tw:font-bold tw:text-body">
+              Replay will be available soon
+            </div>
+            <div className="tw:mt-1 tw:text-[12px] tw:text-muted">
+              Replay is scheduled but not available yet.
+            </div>
+            {replayAvailableAt && (
+              <div className="tw:mt-2 tw:text-[12px] tw:font-semibold tw:text-body">
+                Available at {formatReplayDateTime(replayAvailableAt)}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div>
+            <div className="tw:text-sm tw:font-bold tw:text-body">Replay not uploaded yet</div>
+            <div className="tw:mt-1 tw:text-[12px] tw:text-muted">
+              The organiser has enabled replay, but the replay video has not been uploaded yet.
+            </div>
+          </div>
+        )}
+
+        {isOwnerEvent && isEnded && (
+          <div className="tw:mt-3 tw:border-t tw:border-hairline tw:pt-3">
+            <div className="tw:text-[13px] tw:font-bold tw:text-body">Replay management</div>
+            <div className="tw:mt-2 tw:text-[12px] tw:text-muted">
+              <div>
+                <div className="tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+                  Unlock delay
+                </div>
+                <div className="tw:mt-0.5 tw:font-semibold tw:text-body">
+                  {formatReplayMinutes(event?.replay_available_after_minutes)}
+                </div>
+              </div>
+              <div className="tw:mt-2">
+                <div className="tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+                  Expiry duration
+                </div>
+                <div className="tw:mt-0.5 tw:font-semibold tw:text-body">
+                  {formatReplayMinutes(event?.replay_available_for_minutes)}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplayUploadOpen(true)}
+              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border tw:border-accent tw:bg-paper-raised tw:text-[13px] tw:font-bold tw:text-accent-deep tw:hover:bg-accent-soft"
+            >
+              <Upload className="tw:h-4 tw:w-4" />
+              <span>Upload replay video</span>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
+  // VOD delivery (app routes VOD to _buildVodEventDetailView, details_screen.dart:4917-4924)
+  const vodNode =
+    isVodEvent || vodIsReady ? (
+      <div className="tw:mt-5 tw:px-4">
+        <div className="tw:text-[10px] tw:font-extrabold tw:uppercase tw:tracking-[1.4px] tw:text-muted">
+          Event Video
+        </div>
+        <div className="tw:mt-2.5 tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-3.5">
+          <div className="tw:text-sm tw:font-bold tw:text-body">
+            {vodIsReady ? "Video is ready" : "Video will be available soon"}
+          </div>
+          <div className="tw:mt-1 tw:text-[12px] tw:text-muted">
+            {vodIsReady
+              ? "Ticket holders can stream this event on now."
+              : "We will make the video available here as soon as it is ready."}
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate(`/event/vod/${event.id}`)}
+            disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
+            className={`tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border-0 tw:text-[13px] tw:font-bold tw:text-white ${
+              !vodIsReady || (!canWatchVod && !event?.hasPaid)
+                ? "tw:cursor-not-allowed tw:bg-[#2F2F2F]"
+                : "tw:cursor-pointer tw:bg-[#16909C] tw:hover:bg-[#06707D]"
+            }`}
+          >
+            <Video className="tw:h-4 tw:w-4" />
+            <span>{vodIsReady ? "Watch video" : "Available soon"}</span>
+          </button>
+        </div>
+      </div>
+    ) : null;
+
+  // details_screen.dart:4987 _buildReviewsSection()
+  const reviewsNode = (
+    <EventReviewsSection
+      eventId={event?.id}
+      eventSummary={event?.reviews}
+      token={token}
+      currentUser={user}
+      onReviewMutationSuccess={refreshEventDetailSilently}
+    />
+  );
+
   if (loading) {
     return <EventDetailShimmer />;
   }
 
+  /* App parity: _EventDetailStateScaffold (details_screen.dart:6942-6994) - centred icon,
+     message and a 180px button; label flips to 'Try again' when offline. */
+  const handleRetryLoad = () => {
+    setError(null);
+    setLoading(true);
+    (async () => {
+      try {
+        const data = await fetchEventPayload();
+        syncEventPayload(data);
+      } catch (retryError) {
+        setError(
+          retryError?.response?.data?.message ||
+            retryError?.message ||
+            "Something went wrong."
+        );
+      } finally {
+        setLoading(false);
+      }
+    })();
+  };
+
   if (error) {
     return (
-      <div className="tw:flex tw:h-[60vh] tw:w-full tw:items-center tw:justify-center tw:bg-[#FEF2F2]">
-        <p className="tw:px-4 tw:text-center tw:text-sm tw:text-red-600">
-          {error}
-        </p>
-      </div>
+      <EventStateScaffold
+        message={error}
+        isOffline={typeof navigator !== "undefined" && navigator.onLine === false}
+        onRetry={handleRetryLoad}
+      />
     );
   }
 
@@ -844,7 +1068,6 @@ export default function ViewEvent() {
   const handleShareEvent = async () => {
     await shareFlow.startShare({ eventId: event?.id });
   };
-
   return (
     <>
       <SEO
@@ -907,756 +1130,93 @@ export default function ViewEvent() {
         </script>
       </Helmet>
 
-      <div className="tw:min-h-screen tw:w-full tw:bg-[#ffffff] tw:pb-32 tw:pt-20 tw:font-sans tw:text-slate-900 tw:md:pb-12">
-        <div className="tw:mx-auto tw:max-w-7xl tw:px-2 tw:md:px-6 tw:lg:px-8">
-          <div className="tw:mb-4 tw:mt-4 tw:sm:mt-10 tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:py-2 tw:md:mb-6 tw:md:rounded-[28px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:px-4 tw:md:py-3 tw:md:shadow-[0_24px_60px_rgba(148,163,184,0.10)]">
-            <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:md:size-11"
-                style={{ borderRadius: "9999px" }}
-              >
-                <ArrowLeft className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
-              </button>
-              <div className="tw:min-w-0">
-                <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.22em] tw:text-slate-500">
-                  Event Detail
-                </div>
-                <div className="tw:truncate tw:text-base tw:font-semibold tw:text-slate-900 tw:md:text-lg">
-                  {event.title}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleShareEvent}
-              disabled={shareFlow.shareInProgress}
-              className="tw:inline-flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/80 tw:text-slate-700 tw:shadow-sm tw:hover:bg-[#ffffff] tw:disabled:cursor-not-allowed tw:disabled:opacity-75 tw:md:size-11"
-              aria-label="Share event"
-              style={{ borderRadius: "9999px" }}
-            >
-              {shareFlow.shareInProgress ? (
-                <span className="tw:h-3.5 tw:w-3.5 tw:animate-spin tw:rounded-full tw:border-2 tw:border-slate-500/70 tw:border-t-transparent tw:md:h-4 tw:md:w-4" />
-              ) : (
-                <Share2 className="tw:h-3.5 tw:w-3.5 tw:md:h-4 tw:md:w-4" />
-              )}
-            </button>
-          </div>
-
-          <section className="tw:relative tw:overflow-hidden tw:md:rounded-[36px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:shadow-[0_30px_90px_rgba(15,23,42,0.06)]">
-            <div className="tw:absolute tw:-left-20 tw:top-16 tw:hidden tw:h-56 tw:w-56 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
-            <div className="tw:absolute tw:right-0 tw:top-0 tw:hidden tw:h-64 tw:w-64 tw:rounded-full tw:bg-white tw:blur-3xl tw:md:block" />
-
-            <div className="tw:relative tw:grid tw:grid-cols-1 tw:gap-5 tw:p-0 tw:md:gap-8 tw:md:p-8 tw:xl:grid-cols-[1.25fr_0.75fr]">
-              <div className="tw:space-y-6">
-                <div className="tw:relative tw:overflow-hidden tw:rounded-[28px] tw:bg-[#FFFFFF] tw:md:rounded-4xl tw:md:border tw:md:border-[#f1f5f9] tw:md:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-                  <div className="tw:relative tw:h-80 tw:w-full tw:overflow-hidden tw:md:h-[520px]">
-                    {posterUrl ? (
-                      <img
-                        src={posterUrl}
-                        alt={event.title}
-                        className="tw:h-full tw:w-full tw:object-cover"
-                      />
-                    ) : (
-                      <div className="tw:h-full tw:w-full tw:bg-[linear-gradient(135deg,#dbeafe_0%,#f8fafc_50%,#f3e8ff_100%)]" />
-                    )}
-
-                    <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(15,23,42,0.02)_0%,rgba(15,23,42,0.08)_42%,rgba(15,23,42,0.62)_100%)] tw:md:bg-[linear-gradient(180deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.18)_35%,rgba(15,23,42,0.75)_100%)]" />
-
-                    <div className="tw:absolute tw:left-4 tw:top-4 tw:flex tw:flex-wrap tw:gap-2">
-
-                      <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-[#ffffff]/20 tw:bg-[#ffffff]/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:backdrop-blur-xl">
-                        <Ticket className="tw:h-3 tw:w-3" />
-                        {event.eventType}
-                      </span>
-                      {event.genre && (
-                        <span className="tw:rounded-full tw:border tw:border-[#ffffff]/20 tw:bg-[#ffffff]/18 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:backdrop-blur-xl">
-                          {event.genre}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="tw:absolute tw:right-4 tw:top-4 tw:flex tw:flex-col tw:items-end tw:gap-2">
-                      {isSoldOut && !hasPaid && (
-                        <span className="tw:rounded-full tw:bg-[#ef4444] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:shadow-lg">
-                          Sold out
-                        </span>
-                      )}
-                      {hasPaid && (
-                        <span className="tw:rounded-full tw:bg-emerald-500/90 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#ffffff] tw:shadow-lg">
-                          Ticket purchased
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-0 tw:p-2.5 tw:md:p-6">
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ffffff]/12 tw:bg-[#ffffff]/10 tw:p-3 tw:text-[#ffffff] tw:shadow-[0_18px_40px_rgba(15,23,42,0.16)] tw:backdrop-blur-xl tw:md:rounded-[28px] tw:md:border-[#ffffff]/15 tw:md:bg-[#ffffff]/14 tw:md:p-6 tw:md:shadow-[0_20px_50px_rgba(15,23,42,0.18)] tw:md:backdrop-blur-2xl">
-                        <div className="tw:flex tw:flex-col tw:gap-3 tw:md:gap-5">
-                          <div className="tw:space-y-2 tw:md:space-y-3">
-                            <div className="tw:hidden tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.24em] tw:text-[#ffffff]/72 tw:md:block">
-                              Featured Experience
-                            </div>
-                            <span className="tw:block tw:max-w-3xl tw:text-[19px] tw:font-semibold tw:leading-tight tw:text-[#ffffff] tw:md:text-3xl">
-                              {event.title}
-                            </span>
-                            <span className="tw:hidden tw:max-w-2xl tw:text-sm tw:leading-6 tw:text-[#ffffff]/84 tw:md:block tw:md:text-base">
-                              {event.description ||
-                                "No description available for this event yet."}
-                            </span>
-                          </div>
-
-                          <div className="tw:grid tw:grid-cols-2 tw:gap-2.5 tw:md:grid-cols-3 tw:md:gap-3">
-                            <div className="tw:rounded-[18px] tw:border tw:border-[#ffffff]/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-[#ffffff]/15 tw:md:p-3.5">
-                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-[#ffffff]/55">
-                                Date & Time
-                              </div>
-                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[#ffffff] tw:md:mt-2 tw:md:text-sm">
-                                {formattedDateTime || formatMetaLine(event)}
-                              </div>
-                            </div>
-
-                            <div className="tw:rounded-[18px] tw:border tw:border-[#ffffff]/12 tw:bg-black/18 tw:p-3 tw:md:rounded-2xl tw:md:border-[#ffffff]/15 tw:md:p-3.5">
-                              <div className="tw:text-[11px] tw:uppercase tw:tracking-[0.18em] tw:text-[#ffffff]/55">
-                                Ticket Price
-                              </div>
-                              <div className="tw:mt-1.5 tw:text-[13px] tw:font-medium tw:leading-5 tw:text-[#ffffff] tw:md:mt-2 tw:md:text-sm">
-                                {priceDisplay}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:gap-4 tw:md:grid-cols-2 tw:xl:grid-cols-5">
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
-                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                      Event Schedule
-                    </div>
-                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
-                      {formatMetaLine(event)}
-                    </div>
-                  </div>
-
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
-                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                      Access Window
-                    </div>
-                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
-                      {event.status === "ended"
-                        ? "Event has ended"
-                        : hasPaid
-                          ? isLiveNow
-                            ? "Join now"
-                            : "Ticket secured"
-                          : "Tickets are available for purchase"}
-                    </div>
-                  </div>
-
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
-                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                      Hosted By
-                    </div>
-                    <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
-                      {event.hostName || "Event Organizer"}
-                    </div>
-                  </div>
-
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
-                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                      Countdown
-                    </div>
-                    <div className="tw:mt-3">
-                      {event.status !== "ended" ? (
-                        <CountdownPill target={startDate} />
-                      ) : (
-                        <span className="tw:text-sm tw:font-medium tw:text-slate-900">
-                          Closed
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[26px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-5 tw:md:shadow-[0_18px_50px_rgba(148,163,184,0.10)]">
-                    <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                      Reviews
-                    </div>
-                    <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-slate-900">
-                      <Star className="tw:h-4 tw:w-4 tw:fill-amber-400 tw:text-amber-400" />
-                      {reviewCount > 0
-                        ? `${reviewAverage.toFixed(1)} / 5`
-                        : "No reviews yet"}
-                    </div>
-                    <div className="tw:mt-1 tw:text-xs tw:text-slate-500">
-                      {reviewCount > 0
-                        ? `${reviewCount} attendee review${reviewCount === 1 ? "" : "s"}`
-                        : "Be the first attendee to share feedback."}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
-                  <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
-                    <div className="tw:max-w-3xl">
-                      <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                        About This Event
-                      </div>
-                      <spam className="tw:block tw:mt-4 tw:text-sm tw:leading-7 tw:text-slate-600 tw:md:text-[15px]">
-                        {event.description ||
-                          "This event does not have a published description yet."}
-                      </spam>
-                    </div>
-
-                    <div className="tw:w-full tw:max-w-sm tw:rounded-[22px] tw:bg-[linear-gradient(180deg,#fff7f7_0%,#fffdfd_100%)] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#fee2e2]">
-                      <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium tw:text-[#dc2626]">
-                        <Flag className="tw:h-4 tw:w-4" />
-                        Need to flag this event?
-                      </div>
-                      <span className="tw:block tw:mt-2 tw:text-sm tw:leading-6 tw:text-slate-600">
-                        Report suspicious or inappropriate listings and our team will review them.
-                      </span>
-                      <button
-                        style={{
-                          borderRadius: 12
-                        }}
-                        type="button"
-                        onClick={() => setReportOpen(true)}
-                        className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#ffffff] tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-[#dc2626] tw:shadow-sm tw:hover:bg-red-50 tw:md:gap-2 tw:md:px-4 tw:md:py-2 tw:md:text-sm"
-                      >
-                        Report this event
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {(isVodEvent || vodIsReady) && (
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
-                    <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
-                      <div>
-                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                          Event Video
-                        </div>
-                        <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
-                          {vodIsReady ? "Video is ready" : "Video will be available soon"}
-                        </div>
-                        <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
-                          {vodIsReady
-                            ? "Ticket holders can stream this event on now."
-                            : "We will make the video available here as soon as it is ready."}
-                        </div>
-                      </div>
-                      <button
-                        style={{ borderRadius: 24, fontSize: 12 }}
-                        type="button"
-                        onClick={() => navigate(`/event/vod/${event.id}`)}
-                        disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
-                      >
-                        <Video className="tw:h-4 tw:w-4" />
-                        <span>{vodIsReady ? "Watch video" : "Available soon"}</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {replayEnabled && (
-                  <div className="tw:px-1 tw:py-2 tw:md:rounded-[30px] tw:md:border tw:md:border-[#f1f5f9] tw:md:bg-[#FFFFFF] tw:md:p-7 tw:md:shadow-[0_20px_60px_rgba(148,163,184,0.10)]">
-                    <div className="tw:flex tw:flex-col tw:gap-6 tw:md:flex-row tw:md:items-start tw:md:justify-between">
-                      <div className="tw:max-w-3xl tw:flex-1">
-                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                          Event Replay
-                        </div>
-
-                        {replayIsAvailable ? (
-                          <div className="tw:mt-4 tw:space-y-4">
-                            <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
-                              <div>
-                                <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
-                                  Replay is available
-                                </div>
-                                <div className="tw:mt-1 tw:text-sm tw:text-slate-500">
-                                  {replayExpiresAt
-                                    ? `Replay expires at ${formatReplayDateTime(replayExpiresAt)}`
-                                    : "Replay is ready to watch."}
-                                </div>
-                              </div>
-                              <button
-                                style={{ borderRadius: 24, fontSize: 12 }}
-                                type="button"
-                                onClick={() => navigate(`/event/vod/${event.id}`)}
-                                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-slate-900 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-slate-800"
-                              >
-                                <Video className="tw:h-4 tw:w-4" />
-                                <span>Watch replay</span>
-                              </button>
-                            </div>
-
-                            <div className="tw:overflow-hidden tw:rounded-3xl tw:bg-black tw:shadow-[0_16px_40px_rgba(15,23,42,0.16)]">
-                              <div className="tw:aspect-video">
-                                <ReactPlayer
-                                  url={replayUrl}
-                                  controls
-                                  width="100%"
-                                  height="100%"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ) : replayExpired ? (
-                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
-                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
-                              Replay is no longer available.
-                            </div>
-                            <div className="tw:mt-2 tw:text-sm tw:text-slate-500">
-                              The backend has already cleared access for this replay.
-                            </div>
-                          </div>
-                        ) : hasReplay ? (
-                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-amber-100 tw:bg-amber-50 tw:p-5">
-                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
-                              Replay will be available soon
-                            </div>
-                            <div className="tw:mt-2 tw:text-sm tw:text-slate-600">
-                              Replay is scheduled but not available yet.
-                            </div>
-                            {replayAvailableAt && (
-                              <div className="tw:mt-3 tw:text-sm tw:font-medium tw:text-slate-900">
-                                Available at {formatReplayDateTime(replayAvailableAt)}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-5">
-                            <div className="tw:text-lg tw:font-semibold tw:text-slate-900">
-                              Replay not uploaded yet
-                            </div>
-                            <div className="tw:mt-2 tw:text-sm tw:text-slate-500">
-                              The organiser has enabled replay, but the replay video has not been uploaded yet.
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {isOwnerEvent && isEnded && replayEnabled && (
-                        <div className="tw:w-full tw:max-w-sm tw:rounded-[22px] tw:bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-slate-200">
-                          <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                            Replay management
-                          </div>
-                          <div className="tw:mt-3 tw:space-y-3 tw:text-sm tw:text-slate-600">
-                            <div>
-                              <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                                Unlock delay
-                              </div>
-                              <div className="tw:mt-1 tw:font-medium tw:text-slate-900">
-                                {formatReplayMinutes(event?.replay_available_after_minutes)}
-                              </div>
-                            </div>
-                            <div>
-                              <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                                Expiry duration
-                              </div>
-                              <div className="tw:mt-1 tw:font-medium tw:text-slate-900">
-                                {formatReplayMinutes(event?.replay_available_for_minutes)}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setReplayUploadOpen(true)}
-                            className="tw:mt-4 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
-                          >
-                            <Upload className="tw:h-4 tw:w-4" />
-                            <span>Upload replay video</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <aside className="tw:flex tw:flex-col tw:gap-6">
-                <div className="tw:px-1 tw:py-2 tw:md:sticky tw:md:top-28">
-                  <div className="tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5">
-                    <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
-                      <div>
-                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                          Ticket Access
-                        </div>
-                        <div className="tw:mt-3 tw:text-3xl tw:font-semibold tw:text-slate-900">
-                          {priceDisplay}
-                        </div>
-                      </div>
-                      <div className="tw:text-[11px] tw:font-medium">
-                        <span className={`tw:px-3 tw:py-1 tw:rounded-full ${isEnded === "ended" ? "tw:bg-gray-500/20 tw:text-gray-700" : isLiveNow ? "tw:bg-red-500/20 tw:text-red-600" : isPaused ? "tw:bg-blue-300/30 tw:text-blue-800" : "tw:bg-amber-300/30 tw:text-amber-800"}`}>
-
-                          {isLiveNow ? "Happening now" : event.status || "Upcoming"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="tw:mt-5 tw:space-y-3">
-                      <div className="tw:flex tw:items-start tw:gap-3 tw:py-3">
-                        <CalendarDays className="tw:mt-0.5 tw:h-4 tw:w-4 tw:text-primary" />
-                        <div>
-                          <div className="tw:text-xs tw:text-slate-500">When</div>
-                          <div className="tw:text-sm tw:font-medium tw:text-slate-900">
-                            {formattedDateTime || "Date not available"}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {hasPaid && !isOwnerEvent && (
-                      <div className="tw:mt-4 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-emerald-50 tw:px-3 tw:py-1.5 tw:text-[11px] tw:text-emerald-700">
-                        <span className="tw:inline-block tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-emerald-500" />
-                        <span>You already paid for this event</span>
-                      </div>
-                    )}
-
-                    {manualAvailable && (
-                      <div className="tw:my-6">
-                        <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
-                          <div>
-                            <div className="tw:text-xs tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                              Event Manual
-                            </div>
-                            <div className="tw:mt-1 tw:text-sm tw:font-semibold tw:text-slate-900">
-                              {manual?.file_name || "Soft-copy manual"}
-                            </div>
-                            <div className="tw:my-1 tw:text-xs tw:text-slate-500">
-                              {manualHasAccess
-                                ? "You already have access to this manual."
-                                : `Available for ${manualPriceDisplay}.`}
-                            </div>
-                          </div>
-                          {manual?.cover_url && (
-                            <img
-                              src={manual.cover_url}
-                              alt="Manual cover"
-                              className="tw:h-16 tw:w-16 tw:rounded-2xl tw:object-cover"
-                            />
-                          )}
-                        </div>
-
-                        {canDownloadManual && (
-                          <button
-                            style={{
-                              borderRadius: 24, marginTop: 12
-                            }}
-                            type="button"
-                            onClick={handleDownloadManual}
-                            className=" tw:w-full tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:px-4 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
-                          >
-                            Download manual
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {hasSponsoredTicketsAvailable && !hasPaid && (
-                      <div className="tw:mb-4 tw:rounded-[18px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-4">
-                        <div className="tw:text-sm tw:font-semibold tw:text-slate-900">
-                          {sponsoredTicketSponsors.length ? (
-                            <>
-                              <SponsorProfileLink sponsor={firstSponsor} className="tw:text-primary tw:hover:underline" />
-                              {sponsorHeadlineSuffix}
-                            </>
-                          ) : (
-                            "A kind person has bought tickets for others for this event."
-                          )}
-                        </div>
-                        <div className="tw:mt-1 tw:text-xs tw:leading-5 tw:text-slate-600">
-                          You can grab one of the free tickets, get your own ticket, or chip in to buy for others!
-                        </div>
-                        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                          <span className="tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-slate-700">
-                            {sponsoredTicketsAvailableCount} available
-                          </span>
-                          {sponsoredTicketSponsors.slice(0, 3).map((sponsor) => (
-                            <SponsorProfileLink
-                              key={sponsor.id || sponsor.username}
-                              sponsor={sponsor}
-                              className="tw:rounded-full tw:bg-white/80 tw:px-3 tw:py-1 tw:text-[11px] tw:font-semibold tw:text-primary tw:hover:bg-white tw:hover:underline"
-                            />
-                          ))}
-
-                        </div>
-                      </div>
-                    )}
-
-                    {isOwnerEvent ? (
-                      <>
-                        {!isVodEvent && (
-                          <>
-                            <button
-                              style={{
-                                borderRadius: 24
-                              }}
-                              type="button"
-                              disabled={startingStream}
-                              onClick={handleOwnerStreamAction}
-                              className="tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
-                            >
-                              {startingStream
-                                ? "Starting stream..."
-                                : isLiveNow || isPaused
-                                  ? "Manage stream"
-                                  : isEnded
-                                    ? "View stream"
-                                    : "Start stream"}
-                            </button>
-
-                            <span className="tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
-                              Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
-                            </span>
-                          </>
-                        )}
-
-                        {isVodEvent && (
-                          <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
-                            This is a VOD event. Stream controls are not needed.
-                          </span>
-                        )}
-
-                        {canSponsorOwnEvent && (
-                          <button
-                            style={{
-                              borderRadius: 24,
-                              marginTop: 12
-                            }}
-                            type="button"
-                            disabled={purchaseTicketMutation.isPending}
-                            onClick={() => {
-                              setPreferredPurchaseType("sponsored_only");
-                              setPurchaseModalOpen(true);
-                              setModalAutoTrigger(false);
-                            }}
-                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
-                          >
-                            {purchaseTicketMutation.isPending ? "Processing..." : "Buy Tickets for Others"}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          style={{
-                            borderRadius: 24
-                          }}
-                          type="button"
-                          disabled={ctaDisabled}
-                          onClick={handlePrimaryAction}
-                          className={`tw:mt-5 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:px-4 tw:text-xs tw:font-semibold tw:transition tw:md:h-12 tw:md:px-5 tw:md:text-sm ${ctaDisabled
-                            ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                            : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
-                            }`}
-                        >
-                          {primaryCtaLabel}
-                          {!ctaDisabled && !hasPaid && !canClaimSponsoredTicket && !shouldChoosePurchaseType && (
-                            <span className="tw:ml-1 tw:text-[11px] tw:opacity-80 tw:md:text-xs">
-                              ({priceText(event)})
-                            </span>
-                          )}
-                        </button>
-
-                        {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
-                          <button
-                            style={{
-                              borderRadius: 24,
-                              marginTop: 12
-                            }}
-                            type="button"
-                            disabled={purchaseTicketMutation.isPending}
-                            onClick={handleOpenPurchaseOptions}
-                            className="tw:mt-3 tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:md:h-12 tw:md:px-5 tw:md:text-sm"
-                          >
-                            {purchaseTicketMutation.isPending
-                              ? "Processing..."
-                              : "Buy Tickets or Buy for Others"}
-                          </button>
-                        ) : null}
-
-                        <span className="tw:block tw:mt-3 tw:text-xs tw:leading-6 tw:text-slate-500">
-                          {hasPaid
-                            ? isLiveNow
-                              ? "You already have access. Tap the button above to join the live experience."
-                              : canBuyManualOnly
-                                ? "Your ticket is secured. You can still buy the event manual."
-                                : "Your ticket is secured. We will notify you when the event starts."
-                            : canClaimSponsoredTicket
-                              ? "A free ticket is available for you to claim now. You can still buy a ticket or buy for others from the purchase options."
-                              : shouldChoosePurchaseType
-                                ? "Choose whether you want the ticket only, ticket plus manual, or manual access where available."
-                                : "Secure checkout and fast access to your purchased ticket."}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
-                    <div className="tw:flex tw:items-start tw:gap-4">
-                      <div className="tw:flex tw:h-14 tw:w-14 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-white">
-                        {hostHasImage ? (
-                          <img
-                            src={event.hostImage}
-                            alt={hostName}
-                            className="tw:h-full tw:w-full tw:object-cover"
-                          />
-                        ) : (
-                          <span className="tw:text-sm tw:font-semibold tw:text-primary">
-                            {hostInitials}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="tw:min-w-0 tw:flex-1">
-                        <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                          Organizer
-                        </div>
-                        <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2 tw:text-lg tw:font-semibold tw:text-slate-900">
-                          <span className="tw:truncate">
-                            {event.hostName || "Organizer"}
-                          </span>
-                          {event.hostHasActiveSubscription && (
-                            <SubscriptionBadge className="tw:size-4" />
-                          )}
-                        </div>
-
-                      </div>
-                    </div>
-
-                    <div className="tw:mt-4 tw:flex tw:flex-wrap tw:gap-2">
-
-                      {isSaved && (
-                        <div className="tw:inline-flex tw:items-center tw:rounded-full tw:bg-[#eef4ff] tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-medium tw:text-[#3158c9]">
-                          Saved
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="tw:mt-5 tw:grid tw:grid-cols-2 tw:md:grid-cols-2 tw:gap-3">
-                      <button
-                        style={{
-                          borderRadius: 24
-                        }}
-                        type="button"
-                        onClick={handleToggleFollow}
-                        disabled={followLoading || !event.hostId}
-                        className={`tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-2xl tw:border tw:px-3 tw:text-xs tw:font-medium tw:transition tw:md:h-11 tw:md:text-sm ${isFollowing
-                          ? "tw:border-primary/25 tw:bg-[#ffffff] tw:text-primary"
-                          : "tw:border-transparent tw:bg-[#f4f7fb] tw:text-slate-800 tw:hover:bg-[#ebf1f8]"
-                          } ${followLoading ? "tw:cursor-not-allowed tw:opacity-70" : ""
-                          }`}
-                      >
-                        {followLoading
-                          ? "Updating..."
-                          : isFollowing
-                            ? "Following"
-                            : "Follow Organizer"}
-                      </button>
-
-                      <Link
-                        style={{
-                          color: "#ffffff"
-                        }}
-                        to={
-                          event.organiserUserId || event.organiserId
-                            ? `/profile/${event.organiserUserId || event.organiserId}`
-                            : "/organizers"
-                        }
-                        className="tw:flex tw:h-10 tw:items-center tw:justify-center tw:rounded-3xl tw:px-3 tw:bg-primary tw:text-xs tw:font-medium tw:text-[#ffffff] tw:hover:bg-primarySecond tw:md:h-11 tw:md:text-sm"
-                      >
-                        View Profile
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="tw:mt-4 tw:rounded-3xl tw:bg-[#FFFFFF] tw:p-4 tw:md:mt-5 tw:md:rounded-3xl tw:md:border tw:md:border-[#f1f5f9] tw:md:p-5 tw:md:shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
-                    <div className="tw:rounded-[24px] tw:border tw:border-slate-100 tw:bg-[radial-gradient(circle_at_top,_rgba(0,245,255,0.10),_transparent_38%),linear-gradient(180deg,_#ffffff_0%,_#f8fafc_100%)] tw:p-4">
-                      <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.2em] tw:text-slate-500">
-                        About Organizer
-                      </div>
-                      <div className="tw:mt-2 tw:text-lg tw:font-semibold tw:text-slate-900">
-                        {hostName}
-                      </div>
-                      <p className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-slate-600">
-                        {hostAbout ||
-                          "This organizer has not added a public introduction yet. You can still explore their profile and other events."}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-            </div>
-          </section>
-
-          <EventReviewsSection
-            eventId={event?.id}
-            eventSummary={event?.reviews}
-            token={token}
-            currentUser={user}
-            onReviewMutationSuccess={refreshEventDetailSilently}
-          />
-        </div>
-      </div>
-
-      <div className="tw:fixed tw:bottom-20 tw:left-0 tw:right-0 tw:z-40 tw:px-3 tw:md:hidden">
-        <div className="tw:rounded-[28px] tw:border tw:border-[#ffffff]/80 tw:bg-[#ffffff]/88 tw:p-3 tw:shadow-[0_18px_45px_rgba(15,23,42,0.18)] tw:backdrop-blur-2xl">
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
-            <div className="tw:min-w-0">
-              <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-slate-500">
-                Ticket Access
-              </div>
-              <div className="tw:truncate tw:text-lg tw:font-semibold tw:text-slate-900">
-                {priceDisplay}
-              </div>
-            </div>
-
-            {isOwnerEvent ? (
-              <button
-                style={{ borderRadius: 18 }}
-                type="button"
-                disabled={startingStream}
-                onClick={handleOwnerStreamAction}
-                className="tw:flex tw:h-10 tw:min-w-[138px] tw:shrink-0 tw:items-center tw:justify-center tw:bg-primary tw:px-3 tw:text-xs tw:font-semibold tw:text-[#ffffff] tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
-              >
-                {startingStream ? "Starting..." : isLiveNow || isPaused ? "Manage stream" : "Start stream"}
-              </button>
-            ) : (
-              <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2">
-                <button
-                  style={{ borderRadius: 18 }}
-                  type="button"
-                  disabled={ctaDisabled}
-                  onClick={handlePrimaryAction}
-                  className={`tw:flex tw:h-10 tw:min-w-[138px] tw:items-center tw:justify-center tw:px-3 tw:text-xs tw:font-semibold tw:transition ${ctaDisabled
-                    ? "tw:cursor-not-allowed tw:bg-slate-200 tw:text-slate-500"
-                    : "tw:bg-primary tw:text-[#ffffff] tw:hover:bg-primarySecond"
-                    }`}
-                >
-                  {primaryCtaLabel}
-                </button>
-                {canClaimSponsoredTicket && canOpenPurchaseOptions ? (
-                  <button
-                    style={{ borderRadius: 18 }}
-                    type="button"
-                    disabled={purchaseTicketMutation.isPending}
-                    onClick={handleOpenPurchaseOptions}
-                    className="tw:flex tw:h-9 tw:min-w-[138px] tw:items-center tw:justify-center tw:border tw:border-primary/20 tw:bg-white tw:px-3 tw:text-[11px] tw:font-semibold tw:text-primary tw:transition tw:hover:bg-primary/5 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
-                  >
-                    Buy for others
-                  </button>
-                ) : null}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* App→web parity screen: EventDetailView mirrors
+          lib/features/presentation/screens/home/screen/details_screen.dart
+          (section order = details_screen.dart:4969-5257, bottom bar = :5265-5628). */}
+      <EventDetailView
+        v={{
+          event,
+          posters: event?.poster || [],
+          formattedDateTime,
+          formattedLocation,
+          priceDisplay,
+          reviewCount,
+          reviewAverage,
+          countdownTarget: startDate,
+          description:
+            String(event?.description || "").trim() ||
+            "This event does not have a published description yet.",
+          accessLabel: hasPaid
+            ? "Ticket secured"
+            : manualHasAccess
+              ? "Manual unlocked"
+              : isLiveNow
+                ? "Live"
+                : isPaused
+                  ? "Paused"
+                  : isEnded
+                    ? "Ended"
+                    : "Upcoming",
+          statusLabel: isLiveNow
+            ? "Live"
+            : isPaused
+              ? "Paused"
+              : isEnded
+                ? "Ended"
+                : "Upcoming",
+          hostName,
+          hostInitials,
+          hostHasImage,
+          hostAbout,
+          hostHasActiveSubscription: !!event?.hostHasActiveSubscription,
+          profileHref:
+            event?.organiserUserId || event?.organiserId
+              ? `/profile/${event.organiserUserId || event.organiserId}`
+              : "/organizers",
+          isLiveNow,
+          isPaused,
+          isEnded,
+          isSoldOut,
+          isOwnerEvent,
+          isVodEvent,
+          hasPaid,
+          manualHasAccess,
+          canWatchVod,
+          replayEnabled,
+          hasReplay,
+          replayIsAvailable,
+          replayExpired,
+          replayUrl,
+          canOpenPurchaseOptions,
+          canBuyManualOnly,
+          canSponsorOwnEvent,
+          viewerHasSponsoredTickets,
+          shouldChoosePurchaseType,
+          primaryCtaLabel,
+          ctaDisabled,
+          startingStream,
+          followLoading,
+          isFollowing,
+          isSaved,
+          ownerStreamLabel:
+            isLiveNow || isPaused ? "Manage stream" : isEnded ? "View stream" : "Start stream",
+          sponsoredNode,
+          manualNode,
+          replayNode,
+          vodNode,
+          reviewsNode,
+          onBack: () => navigate(-1),
+          onShare: handleShareEvent,
+          onToggleFollow: handleToggleFollow,
+          onOwnerStreamAction: handleOwnerStreamAction,
+          onPrimaryAction: handlePrimaryAction,
+          onOpenPurchaseOptions: handleOpenPurchaseOptions,
+          onGetTicket: () =>
+            handleGetTicket(ticketAndManualAvailable ? "ticket_and_manual" : "ticket_only"),
+          onWatchVod: () => navigate(`/event/vod/${event.id}`),
+          onReport: () => setReportOpen(true),
+        }}
+      />
 
       <ReportModal
         open={reportOpen}

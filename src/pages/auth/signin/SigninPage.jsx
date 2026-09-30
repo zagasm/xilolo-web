@@ -529,13 +529,13 @@ export function Signin() {
       <style>{`
         .continue-btn {
           background-color: ${isCredentialFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
-          color: white;
+          color: ${isCredentialFilled ? "#FFFFFF" : "rgba(17, 19, 22, 0.38)"};
           cursor: ${isCredentialFilled ? "pointer" : "not-allowed"};
         }
 
         .signin-btn {
           background-color: ${isPasswordFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
-          color: white;
+          color: ${isPasswordFilled ? "#FFFFFF" : "rgba(17, 19, 22, 0.38)"};
           cursor: ${isPasswordFilled ? "pointer" : "not-allowed"};
         }
 

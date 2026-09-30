@@ -46,7 +46,6 @@ import {
   BadgeCheck,
   CalendarDays,
   CalendarX2,
-  ChevronRight,
   Info,
   MoreHorizontal,
   Play,
@@ -746,24 +745,36 @@ export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
 }
 
 /**
- * Heading for the "Organizers you may know" rail. Exported so the DEV preview in
- * ./HomePreview.jsx renders this exact node instead of a copy that can drift.
- * App parity: suggested_organisers_section.dart:52-76 — title 16/w700 in
- * textPrimary on the left, its action on the right, then a 12px gap to the rail.
+ * Heading for the "Suggested Organisers For You" rail. Exported so the DEV
+ * preview in ./HomePreview.jsx renders this exact node instead of a copy that
+ * can drift.
+ *
+ * App parity: suggested_organisers_section.dart:35 — the LIVE section's title
+ * is the literal 'Suggested Organisers For You' (16/w700, textPrimary, left)
+ * and its action is a 'Refresh' TextButton at :64-74 (accent text, w600,
+ * rendered because home_revamp_screen.dart:405 always passes `onRetry`).
+ *
+ * DEFECT FIXED HERE: the heading used to read "Organizers you may know" with a
+ * "View all" link. That copy/action pair belongs to `organizers_section.dart`
+ * (dead code: `OrganizersSection(` has no call site; its only consumer is
+ * `home/screen/organizer_screen.dart`, itself reachable only from
+ * `profile.dart`'s ProfileScreen, which nothing constructs). Replaced with the
+ * live section's copy + action; /organizers stays reachable from the Navbar
+ * (src/pages/pageAssets/Navbar.jsx:359) and the mobile nav (MobileNav.jsx:54).
  */
-export function OrganizersRailHeading() {
+export function OrganizersRailHeading({ onRefresh }) {
   return (
-    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-1 tw:pb-3">
+    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:pb-3">
       <span className="tw:text-base tw:font-bold tw:text-body">
-        Organizers you may know
+        Suggested Organisers For You
       </span>
-      <Link
-        to="/organizers"
-        className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-semibold tw:text-accent-deep tw:hover:underline!"
+      <button
+        type="button"
+        onClick={onRefresh}
+        className="tw:shrink-0 tw:cursor-pointer tw:text-sm tw:font-semibold tw:text-accent-deep tw:hover:underline!"
       >
-        View all
-        <ChevronRight className="tw:size-[15px] tw:shrink-0" aria-hidden />
-      </Link>
+        Refresh
+      </button>
     </div>
   );
 }
@@ -777,6 +788,9 @@ export default function Home() {
   const [organisersAvailable, setOrganisersAvailable] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const eventsScrollRef = useRef(null);
+  // The rail owns its fetch; the heading (rendered here) owns the app's
+  // "Refresh" action, so the rail publishes its re-fetch through this ref.
+  const organisersRefreshRef = useRef(null);
   const { user } = useAuth();
 
   // Same endpoints, same hook, same response shape as before. The app loads
@@ -936,13 +950,19 @@ export default function Home() {
 
               {showOrganizers && !showSkeletons ? (
                 <div className="tw:mt-12">
-                  {/* App parity: suggested_organisers_section.dart:52-76 — title
-                      16/w700 in textPrimary, action on the right. The heading is
-                      hidden when the app would render nothing at all (:40-46), so
-                      it waits for the rail to report whether it has content. */}
-                  {organisersAvailable ? <OrganizersRailHeading /> : null}
+                  {/* App parity: suggested_organisers_section.dart:35 + :64-74 —
+                      title 16/w700 in textPrimary, the "Refresh" action on the
+                      right. The heading is hidden when the app would render
+                      nothing at all (:40-46), so it waits for the rail to report
+                      whether it has content. */}
+                  {organisersAvailable ? (
+                    <OrganizersRailHeading
+                      onRefresh={() => organisersRefreshRef.current?.()}
+                    />
+                  ) : null}
                   <MobileSingleOrganizers
                     onAvailabilityChange={setOrganisersAvailable}
+                    refreshRef={organisersRefreshRef}
                   />
                 </div>
               ) : null}

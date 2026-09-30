@@ -58,7 +58,7 @@ import { api, authHeaders } from "../../../lib/apiClient";
    a class built by interpolation (`tw:h-[${n}px]`) would never be generated. */
 // rail: height 190 + 12px separators (suggested_organisers_section.dart:79-84)
 const RAIL_BOX =
-  "tw:h-[190px] tw:w-full tw:gap-3 tw:overflow-x-auto tw:pb-1 tw-no-scrollbar";
+  "tw:h-[190px] tw:w-full tw:gap-3 tw:overflow-x-auto tw-no-scrollbar";
 // card: width clamp(220, 72vw, 290), radius 20 (:104-105, :120-134)
 const CARD_BOX =
   "tw:h-[190px] tw:w-[clamp(220px,72vw,290px)] tw:shrink-0";
@@ -130,12 +130,21 @@ const displayNameOf = (org) =>
       "Organizer",
   ).trim();
 
-/** :335-368 — stat chip. */
-function StatChip({ icon: Icon, label }) {
+/** :335-368 — stat chip. `shrink` lets a long milestone label ellipsize instead
+    of forcing a second chip row (the app never wraps with its own data: its
+    `_formatTickets` collapses the API's label string to "0 tickets"). */
+function StatChip({ icon: Icon, label, title, shrink = false }) {
   return (
-    <span className="tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-xl tw:border tw:border-hairline tw:bg-inner tw:px-2.5 tw:py-2">
+    <span
+      title={title}
+      className={`tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-xl tw:border tw:border-hairline tw:bg-inner tw:px-2.5 tw:py-2 ${shrink ? "tw:min-w-0 tw:shrink" : "tw:shrink-0"}`}
+    >
       <Icon className="tw:size-3.5 tw:shrink-0 tw:text-muted" aria-hidden />
-      <span className="tw:text-[11px] tw:font-semibold tw:text-body">{label}</span>
+      <span
+        className={`tw:text-[11px] tw:font-semibold tw:text-body ${shrink ? "tw:truncate" : ""}`}
+      >
+        {label}
+      </span>
     </span>
   );
 }
@@ -237,17 +246,22 @@ function OrganiserCard({
         </div>
       </div>
 
-      <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-2.5 tw:gap-y-2">
+      <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2.5">
         <StatChip
           icon={Users}
           label={compact(organizer?.numberOfFollowers, "followers")}
         />
-        <StatChip icon={Ticket} label={ticketsLabel(organizer?.tickets_total)} />
+        <StatChip
+          icon={Ticket}
+          label={ticketsLabel(organizer?.tickets_total)}
+          title={ticketsLabel(organizer?.tickets_total)}
+          shrink
+        />
       </div>
 
       {/* :228 + :203-209 — no button at all when there is no follow target. */}
       {followUserId ? (
-        <div className="tw:mt-auto tw:flex tw:pt-3">
+        <div className="tw:mt-auto tw:flex">
           <button
             type="button"
             disabled={isOwnProfile || isPending}

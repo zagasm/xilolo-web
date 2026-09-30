@@ -93,3 +93,27 @@ test("create-event gate sends unverified organisers back to instant setup copy",
   assert.match(source, /Complete setup/);
   assert.doesNotMatch(source, /under review|KYC in progress|compliance team is reviewing|once a decision/i);
 });
+
+test("profile KYC card separates a FAILED applicant from an in-flight review", () => {
+  const source = readSource("pages/Profile/ViewProfile/index.jsx");
+
+  // status must be read, not assumed
+  assert.match(source, /const isKycFailed = kycStatus === "failed"/);
+  // the reviewer's reason has to reach the user
+  assert.match(source, /kycFailureReason/);
+  assert.match(source, /failureReason/);
+  // a rejected applicant gets an actionable retry, not a spinner
+  assert.match(source, /Try again/);
+  assert.match(source, /become-an-organiser/);
+  // and the terminal copy must be distinct from the pending copy
+  assert.match(source, /Verification failed/);
+  assert.match(source, /We couldn't verify your details/);
+  assert.match(source, /Not approved/);
+  // the misleading "under review" copy may only live in the non-failed branch
+  const underReviewUses = source.match(/Your organiser account is under review/g) || [];
+  assert.equal(underReviewUses.length, 1);
+
+  const preview = readSource("pages/Profile/ProfilePreview.jsx");
+  assert.match(preview, /screen === "own-kyc-failed"/);
+  assert.match(preview, /status: "failed"/);
+});
