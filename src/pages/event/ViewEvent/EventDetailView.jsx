@@ -4,6 +4,7 @@ import Countdown from "react-countdown";
 import SubscriptionBadge from "../../../component/ui/SubscriptionBadge.jsx";
 import { SponsorProfileLink } from "./sponsorLink.jsx";
 import {
+  BarChart3,
   BookOpen,
   ChevronLeft,
   Clock,
@@ -544,6 +545,21 @@ export default function EventDetailView({ v }) {
                 <div className="tw:mt-3 tw:text-[12px] tw:leading-[1.6] tw:text-muted">
                   Open the stream control page to manage OBS credentials, go live, pause, resume, or end this event.
                 </div>
+              )}
+
+              {/* Founder, 2026-09-30: a BUTTON through to the analytics page rather than an
+                  embedded dashboard. Owner-only — the founder's call. The API enforces this
+                  too (every events/{event}/analytics endpoint returns 403 for a non-owner,
+                  verified 2026-09-30), so this is hiding an action that would otherwise
+                  just fail, not the only thing standing between a viewer and the data. */}
+              {v.isOwnerEvent && v.eventId && (
+                <Link
+                  to={`/event/analytics/${v.eventId}`}
+                  className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-xl tw:border tw:border-hairline tw:bg-paper-raised tw:text-[13px] tw:font-bold tw:text-body tw:transition-colors tw:hover:bg-inner"
+                >
+                  <BarChart3 className="tw:size-4 tw:shrink-0 tw:text-accent" />
+                  View stream analytics
+                </Link>
               )}
             </MetaSection>
           </div>
