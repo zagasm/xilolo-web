@@ -27,6 +27,10 @@ import { Pencil, PlusCircle, User as UserIcon } from "lucide-react";
 
 import { truncate } from "../../utils/helpers";
 import { formatCount } from "../../utils/countFormat";
+/* Ticket sales are banded for anyone but the owner/admin. The Social card was calling
+   formatCount() on a milestone label, so a public profile read "Tickets Sold 0" — wrong
+   for the viewer and, for an owner/admin payload, an exact count leaked. */
+import { ticketDisplay } from "../../utils/ticketMilestone";
 
 function safeValue(v) {
   if (v === undefined || v === null || v === "") return "—";
@@ -170,10 +174,7 @@ export default function AboutPanel({
               /* The count rule (see utils/countFormat): exact under 1,000, then
                  1.2K / 1.25M. These two rows printed the raw payload value. */
               ["Followers", formatCount(user?.numberOfFollowers ?? user?.followers_count)],
-              [
-                "Tickets Sold",
-                formatCount(user?.tickets_total ?? user?.successfulPayments),
-              ],
+              ["Tickets Sold", ticketDisplay(user).value],
               ["Ranking", user?.rank],
             ]}
           />

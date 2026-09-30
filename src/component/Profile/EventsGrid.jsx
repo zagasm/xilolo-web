@@ -107,7 +107,14 @@ export default function EventsGrid({
     return () => observer.disconnect();
   }, [hasMore, loading, loadingMore, items.length]);
 
-  const handleDeleted = (id) => {
+  /* One column on phones — the app's layout, unchanged. On desktop a single card was
+   stretching the full width of the profile column (~1000px on a 1440 screen), which is
+   the founder's "events are over stretch on desktop view". CSS grid keeps DOM order, so
+   the mobile ordering the app depends on is untouched. */
+const EVENTS_GRID =
+  "tw:grid tw:grid-cols-1 tw:gap-[14px] tw:md:grid-cols-2 tw:2xl:grid-cols-3";
+
+const handleDeleted = (id) => {
     setItems((prev) => prev.filter((e) => e.id !== id));
   };
 
@@ -123,7 +130,7 @@ export default function EventsGrid({
 
   if (loading) {
     return (
-      <div className="tw:space-y-[14px]">
+      <div className={EVENTS_GRID}>
         {Array.from({ length: 3 }).map((_, i) => (
           <EventCardShimmer key={i} />
         ))}
@@ -149,7 +156,7 @@ export default function EventsGrid({
 
   return (
     <>
-      <div className="tw:flex tw:flex-col tw:gap-[14px]">
+      <div className={EVENTS_GRID}>
         {items.map((e) => (
           <EventCard
             key={e.id}
@@ -166,7 +173,7 @@ export default function EventsGrid({
       <div ref={observerRef} className="tw:h-4 tw:w-full" />
 
       {loadingMore ? (
-        <div className="tw:mt-[14px] tw:space-y-[14px]">
+        <div className={`tw:mt-[14px] ${EVENTS_GRID}`}>
           {Array.from({ length: 2 }).map((_, i) => (
             <EventCardShimmer key={`more-${i}`} />
           ))}
