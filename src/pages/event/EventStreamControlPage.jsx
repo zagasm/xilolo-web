@@ -31,6 +31,90 @@ import { formatEventDateTime } from "../../utils/ui";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
 
+/* The broadcasting tools we support today, in the order they are offered. Both
+   publish the SAME RTMP stream; only the setup path differs. `steps` receives
+   the resolved server/key so the copy can embed them (or tell the creator to
+   press Start stream first). */
+const STREAM_PROVIDERS = [
+  {
+    id: "obs",
+    name: "OBS Studio",
+    tagline: "Desktop app",
+    blurb: "Free and the most flexible: multiple cameras, screen share, pro audio routing.",
+    badge: "Recommended",
+    buildSteps: ({ server, key }) => [
+      {
+        title: "Open OBS Studio",
+        description: "Launch OBS Studio on your computer and select the scene you want to stream.",
+      },
+      {
+        title: "Add your video and audio sources",
+        description:
+          'In the "Sources" panel, click "+" to add your camera, screen capture or media sources, and check the audio mixer.',
+      },
+      {
+        title: "Open Settings → Stream",
+        description: 'Click "Settings" in the bottom-right corner of OBS, then choose the "Stream" tab.',
+      },
+      {
+        title: "Paste your stream details",
+        description:
+          server && key
+            ? `Set "Service" to "Custom". Paste ${server} into "Server" and ${key} into "Stream Key".`
+            : "Press Start stream above to generate your server and stream key — they appear here immediately.",
+      },
+      {
+        title: "Apply and close",
+        description: 'Click "Apply", then "OK" to save the configuration.',
+      },
+      {
+        title: "Check your output settings",
+        description:
+          'In "Settings" → "Output", use 3500-6000 Kbps for 1080p, keep the keyframe interval at 2 seconds, and a hardware encoder where available.',
+      },
+      {
+        title: "Start streaming, then go live",
+        description:
+          'Click "Start Streaming" in OBS. Once the encoder is connected, come back here and press "Go Live" so viewers can join.',
+      },
+    ],
+  },
+  {
+    id: "streamyard",
+    name: "StreamYard",
+    tagline: "Runs in your browser",
+    blurb: "Nothing to install, and easy to bring guests or co-hosts on screen.",
+    badge: "",
+    buildSteps: ({ server, key }) => [
+      {
+        title: "Open StreamYard",
+        description: "Sign in at streamyard.com and create a broadcast, or open the studio you want to go live from.",
+      },
+      {
+        title: "Add a custom RTMP destination",
+        description:
+          'Open "Destinations", click "Add a destination" and choose "Custom RTMP" (not YouTube/Facebook — Xilolo is your destination).',
+      },
+      {
+        title: "Paste your stream details",
+        description:
+          server && key
+            ? `Paste ${server} into "RTMP URL" and ${key} into "Stream key", then save the destination.`
+            : "Press Start stream above to generate your RTMP URL and stream key — they appear here immediately.",
+      },
+      {
+        title: "Add your camera and guests",
+        description: "Invite guests or share your screen, and check that your microphone and camera are picked up in the studio.",
+      },
+      {
+        title: "Go live in StreamYard, then here",
+        description:
+          'Press "Go Live" in StreamYard. When it reports that it is streaming, come back here and press "Go Live" so viewers can join.',
+      },
+    ],
+  },
+];
+
 // The RTMP ingest endpoint is owned by the backend, not by this file. It comes
 // back on the stream/credentials payloads as `credentials.rtmp.server` /
 // `credentials.rtmp.url` and `stream.rtmp_server` / `stream.rtmp_link` /
@@ -670,13 +754,20 @@ export default function EventStreamControlPage() {
     streamingApi?.rtmp_server,
   );
 
-  const shouldShowObsDetails = hasStartedStream && !isEnded;
+  const shouldShowStreamDetails = hasStartedStream && !isEnded;
   // Server AND key are read from the API response (see resolveRtmpServer /
   // resolveStreamKey above). There is deliberately no hardcoded fallback host:
   // a wrong server is worse than none, because creators publish into it and it
   // silently fails.
-  const rtmpServer = shouldShowObsDetails ? resolveRtmpServer(eventData) : "";
-  const rtmpKey = shouldShowObsDetails ? resolveStreamKey(eventData) : "";
+  /* Which tool the creator broadcasts with. Founders' ask (2026-09-30): the
+     screen assumed OBS everywhere ("OBS details", "How to stream this event
+     using OBS Studio") even though Xilolo accepts any RTMP encoder, so the
+     copy now names the chosen tool and the steps switch with it. The stream
+     itself is identical either way — same server, same key, same SRS app. */
+  const [streamProvider, setStreamProvider] = useState("obs");
+
+  const rtmpServer = shouldShowStreamDetails ? resolveRtmpServer(eventData) : "";
+  const rtmpKey = shouldShowStreamDetails ? resolveStreamKey(eventData) : "";
   const isPreLiveStage =
     hasStartedStream && !isEnded && stageOverride === "started";
   const showGoLive =
@@ -797,46 +888,14 @@ export default function EventStreamControlPage() {
     }
   };
 
+  const activeProvider =
+    STREAM_PROVIDERS.find((provider) => provider.id === streamProvider) ||
+    STREAM_PROVIDERS[0];
+
   const instructionSteps = useMemo(
-    () => [
-      {
-        title: "Open OBS Studio",
-        description:
-          "Launch OBS Studio on your computer and select the scene you want to stream.",
-      },
-      {
-        title: "Add your video and audio sources",
-        description:
-          'In the "Sources" panel, click the "+" button to add your camera, screen capture, or media sources, and confirm audio inputs are present in the mixer.',
-      },
-      {
-        title: "Open OBS settings",
-        description:
-          'Click "Settings" in the bottom-right corner of OBS, then choose the "Stream" tab.',
-      },
-      {
-        title: "Configure the stream target",
-        description: rtmpServer && rtmpKey
-          ? `In the "Stream" tab, set "Service" to "Custom". In the "Server" field, paste ${rtmpServer}. In the "Stream Key" field, paste ${rtmpKey}.`
-          : 'Start the stream first so we can generate the RTMP server and stream key you need for OBS.',
-      },
-      {
-        title: "Apply and close settings",
-        description:
-          'Click "Apply", then "OK" to save your stream configuration.',
-      },
-      {
-        title: "Check output settings",
-        description:
-          'In "Settings" → "Output", set a video bitrate between 3500 and 6000 Kbps for 1080p, keep keyframe interval at 2 seconds, and use a hardware encoder when available.',
-      },
-      {
-        title: "Start streaming from OBS",
-        description:
-          'Click "Start Streaming" in OBS. Once your encoder is connected and ready, return here and press "Go Live" so viewers can access the event.',
-      },
-    ],
-    [rtmpKey, rtmpServer],
+    () =>
+      activeProvider.buildSteps({ server: rtmpServer, key: rtmpKey }),
+    [activeProvider, rtmpKey, rtmpServer],
   );
 
   const runAction = async ({
@@ -883,7 +942,7 @@ export default function EventStreamControlPage() {
       request: () =>
         api.post(`/api/v1/events/${eventId}/streams/start`, {}, authHeaders(token)),
       loadingText: "Generating stream credentials…",
-      successText: "Stream details ready. Configure OBS, then go live.",
+      successText: "Stream details ready. Configure your streaming tool, then go live.",
     });
   };
 
@@ -1028,10 +1087,10 @@ export default function EventStreamControlPage() {
                 </span>
                 <p className="tw:mt-2 tw:max-w-2xl tw:text-sm tw:text-gray-600 tw:md:text-base">
                   {status === "expired"
-                    ? "This event expired because it did not go live. Streaming controls and OBS setup are no longer available."
+                    ? "This event expired because it did not go live. Streaming controls and setup are no longer available."
                     : isEnded
-                      ? "This event has ended. Streaming controls and OBS setup are no longer available for this session."
-                    : "Start the stream to generate your OBS credentials, then switch the event live when you are ready for viewers."}
+                      ? "This event has ended. Streaming controls and setup are no longer available for this session."
+                    : "Start the stream to generate your stream credentials, then switch the event live when you are ready for viewers."}
                 </p>
               </div>
 
@@ -1068,7 +1127,7 @@ export default function EventStreamControlPage() {
                       This live session has ended
                     </span>
                     <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:leading-7 tw:text-gray-600 tw:md:text-base">
-                      OBS connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
+                      Stream connection details, stream controls, and setup instructions are hidden because this event is no longer active. If you need help reviewing what happened or have feedback about the streaming experience, contact{" "}
                       <a
                         href="mailto:support@xilolo.com"
                         className="tw:font-semibold tw:text-primary tw:hover:underline"
@@ -1139,10 +1198,10 @@ export default function EventStreamControlPage() {
                     <div className="tw:flex tw:flex-col tw:gap-2 tw:md:flex-row tw:md:items-end tw:md:justify-between">
                       <div>
                         <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-gray-900">
-                          OBS details
+                          Stream details
                         </span>
                         <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                          Start the stream first, then copy these values into OBS.
+                          Start the stream first, then paste these into your streaming tool.
                         </p>
                       </div>
                     </div>
@@ -1151,7 +1210,7 @@ export default function EventStreamControlPage() {
                       <DetailCard
                         icon={KeyRound}
                         label="RTMP Server and Stream Key"
-                        helperText="Set OBS Service to Custom, then paste the RTMP server and stream key into their matching fields."
+                        helperText="Both StreamYard (custom RTMP) and OBS (Service: Custom) use exactly these two values."
                       >
                         <div className="tw:space-y-4">
                           <div>
@@ -1333,12 +1392,12 @@ export default function EventStreamControlPage() {
 
                       <div className="tw:mt-3 tw:text-sm tw:leading-7 tw:text-gray-600">
                         {!hasStartedStream
-                          ? "Use Start stream to generate the RTMP server and stream key. Those OBS details will appear here immediately after."
+                          ? "Use Start stream to generate the RTMP server and stream key. Your stream details will appear here immediately after."
                           : isLive
                             ? "Your event is live. You can pause it temporarily, let viewers join, or end it when the broadcast is over."
                             : isPaused
                               ? "The event is currently paused. Resume it when you are ready for viewers to continue watching."
-                              : "OBS details are ready. Start encoding from OBS, then press Go Live here when the feed is stable."}
+                              : "Stream details are ready. Start broadcasting, then press Go Live here when the feed is stable."}
                       </div>
                     </div>
                   </aside>
@@ -1348,21 +1407,74 @@ export default function EventStreamControlPage() {
                   <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div>
                       <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-                        How to stream this event using OBS Studio
+                        How to stream this event
                       </span>
                       <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-                        Use these steps to connect OBS to Xilolo before you press Go Live.
+                        Pick the tool you will broadcast with, then follow its steps. The stream details are the same for both.
                       </p>
                     </div>
 
-                    <div className="tw:flex tw:flex-wrap tw:gap-2">
-                      <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
-                        OBS Studio
-                      </span>
-                      <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700">
-                        Recommended: OBS Studio 28+
-                      </span>
-                    </div>
+                  </div>
+
+                  {/* ── Which tool? (founder, 2026-09-30) ────────────────────
+                      Xilolo accepts any RTMP encoder, so the screen asks instead
+                      of assuming OBS. Both options publish the SAME stream; only
+                      the setup path differs, which is why the steps below swap. */}
+                  <div
+                    role="radiogroup"
+                    aria-label="Which tool are you streaming with?"
+                    className="tw:mt-5 tw:grid tw:gap-3 tw:sm:grid-cols-2"
+                  >
+                    {STREAM_PROVIDERS.map((provider) => {
+                      const selected = provider.id === activeProvider.id;
+                      return (
+                        <button
+                          key={provider.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={selected}
+                          onClick={() => setStreamProvider(provider.id)}
+                          className={cx(
+                            "tw:rounded-3xl tw:border tw:p-4 tw:text-left tw:transition-colors tw:duration-200 tw:cursor-pointer",
+                            selected
+                              ? "tw:border-[#16909C] tw:bg-[#16909C]/5"
+                              : "tw:border-[#ded6cd] tw:bg-white tw:hover:border-gray-400",
+                          )}
+                        >
+                          <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+                            <span className="tw:text-sm tw:font-bold tw:text-gray-900">
+                              {provider.name}
+                            </span>
+                            <span className="tw:flex tw:items-center tw:gap-2">
+                              {provider.badge ? (
+                                <span className="tw:rounded-full tw:bg-[#16909C] tw:px-2.5 tw:py-1 tw:text-[10px] tw:font-bold tw:text-white">
+                                  {provider.badge}
+                                </span>
+                              ) : null}
+                              {selected ? (
+                                <CheckCircle2 className="tw:h-4 tw:w-4 tw:text-primary" />
+                              ) : null}
+                            </span>
+                          </div>
+
+                          <p className="tw:mt-1 tw:text-xs tw:font-medium tw:uppercase tw:tracking-wide tw:text-gray-500">
+                            {provider.tagline}
+                          </p>
+                          <p className="tw:mt-2 tw:text-xs tw:leading-5 tw:text-gray-600">
+                            {provider.blurb}
+                          </p>
+
+                          <span
+                            className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:font-semibold"
+                            style={{ color: "#16909C" }}
+                          >
+                            {selected
+                              ? `Steps below are for ${provider.name}`
+                              : `Use ${provider.name} instead`}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <div className="tw:mt-8 tw:space-y-6">
