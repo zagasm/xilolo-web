@@ -85,14 +85,19 @@ function asCount(raw) {
 
 /**
  * Ready-to-render ticket figures, split so a card can show the figure big and the
- * caption small: { value, label, kind }. `value` is "1,000+" for a band and "1.2K"
- * for an exact count (owner/admin); `label` is always "Tickets Sold".
+ * caption small: { value, label, kind }.
+ *
+ * FAIL CLOSED: an exact count is rendered ONLY when the caller asserts this viewer is
+ * allowed to see it (`{ exact: true }` — the profile owner, or an admin). Without that
+ * assertion a number is banded from its own value, so no future endpoint can leak an
+ * exact figure merely by including one in its payload. The page has to opt IN to showing
+ * a real count; nothing opts in by accident.
  */
-export function ticketDisplay(user) {
+export function ticketDisplay(user, { exact = false } = {}) {
   const raw = firstTicketValue(user);
   const count = asCount(raw);
 
-  if (count !== null) {
+  if (count !== null && exact) {
     return {
       kind: "number",
       value: formatCount(count),
@@ -100,7 +105,15 @@ export function ticketDisplay(user) {
     };
   }
 
-  const band = typeof raw === "string" && raw.trim() !== "" ? raw.trim() : MILESTONE_FLOOR;
+  // Band it: from the number if one arrived, otherwise print the label the API sent, or
+  // the floor band when there is nothing at all.
+  const band =
+    count !== null
+      ? ticketMilestoneLabel(count)
+      : typeof raw === "string" && raw.trim() !== ""
+        ? raw.trim()
+        : MILESTONE_FLOOR;
+
   // "Under 1,000 tickets sold" -> "Under 1,000" / "1,000+ tickets sold" -> "1,000+"
   const split = /^(.*?)\s*tickets?\s*sold\s*$/i.exec(band);
 
@@ -113,14 +126,17 @@ export function ticketDisplay(user) {
 
 /**
  * The full sentence form, for copy that reads as prose rather than a figure:
- * "1,000+ tickets sold". Kept separate from ticketDisplay so neither call site has
- * to reassemble the string.
+ * "1,000+ tickets sold". Same fail-closed rule as ticketDisplay — see above.
  */
-export function ticketSentence(user) {
+export function ticketSentence(user, { exact = false } = {}) {
   const raw = firstTicketValue(user);
   const count = asCount(raw);
-  if (count !== null) {
+
+  if (count !== null && exact) {
     return `${count === 1 ? "Ticket Sold" : "Tickets Sold"} (${formatCount(count)})`;
   }
+
+  if (count !== null) return ticketMilestoneLabel(count);
+
   return typeof raw === "string" && raw.trim() !== "" ? raw.trim() : MILESTONE_FLOOR;
 }

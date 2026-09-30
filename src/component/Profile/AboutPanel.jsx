@@ -174,7 +174,7 @@ export default function AboutPanel({
               /* The count rule (see utils/countFormat): exact under 1,000, then
                  1.2K / 1.25M. These two rows printed the raw payload value. */
               ["Followers", formatCount(user?.numberOfFollowers ?? user?.followers_count)],
-              ["Tickets Sold", ticketDisplay(user).value],
+              ["Tickets Sold", ticketDisplay(user, { exact: isOwnProfile }).value],
               ["Ranking", user?.rank],
             ]}
           />

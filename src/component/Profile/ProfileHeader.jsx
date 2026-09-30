@@ -416,7 +416,7 @@ export function ProfileRanking({ user, variant = "own" }) {
  */
 export default function ProfileHeader({
   user,
-  isOwnProfile = true,
+  isOwnProfile = false,
   variant,
   isFollowing = false,
   followLoading = false,
@@ -437,7 +437,9 @@ export default function ProfileHeader({
   const showFollow = mode !== "own" && typeof onToggleFollow === "function";
   const navigate = useNavigate();
 
-  const tickets = ticketDisplay(user);
+  /* exact: isOwnProfile — fail closed. Only your own profile may show a real count;
+     anyone else's is banded even if a NUMBER reaches the browser. */
+  const tickets = ticketDisplay(user, { exact: isOwnProfile });
   const eventsCount = profileEventsCount(user);
   const labels = heroLabels(eventsCount);
 
@@ -487,7 +489,7 @@ export default function ProfileHeader({
             <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
               <Ticket className="tw:size-[18px] tw:shrink-0 tw:text-success" />
               <span className="tw:truncate tw:text-[13px] tw:font-medium tw:text-body">
-                {ticketSentence(user)}
+                {ticketSentence(user, { exact: isOwnProfile })}
               </span>
             </div>
 

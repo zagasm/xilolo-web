@@ -37,12 +37,18 @@ export default function EventPreview() {
 
   const v = useMemo(() => {
     const paidLive = state === "paid-live";
+    /* ?state=owner previews the HOST view. Owner-only affordances — the "View stream
+       analytics" link, the start-stream bar — could otherwise only be seen by someone who
+       owns a real event, which no test account does. */
+    const ownerView = state === "owner";
     return {
       event: {
         id: "preview-event-1",
         title: "Lagos Afrobeat Night — Live Band & DJ Set",
         hostImage: "",
       },
+      // the route id the owner-only links build their href from
+      eventId: "preview-event-1",
       posters: [{ url: POSTER, type: "image" }],
       formattedDateTime: "12th Sep, 2026 - 8:00 PM",
       formattedLocation: "Eko Hotel & Suites, Victoria Island, Lagos",
@@ -52,7 +58,7 @@ export default function EventPreview() {
       countdownTarget: novelDate(),
       description:
         "An intimate evening of live Afrobeat, highlife and amapiano with a full band, guest vocalists and a late DJ set. Doors open one hour before showtime.",
-      accessLabel: paidLive ? "Ticket secured" : "Upcoming",
+      accessLabel: ownerView ? "You are hosting this event" : paidLive ? "Ticket secured" : "Upcoming",
       statusLabel: paidLive ? "Live" : "Upcoming",
       hostName: "Adaeze Okonkwo",
       hostInitials: "AO",
@@ -65,7 +71,7 @@ export default function EventPreview() {
       isPaused: false,
       isEnded: false,
       isSoldOut: false,
-      isOwnerEvent: false,
+      isOwnerEvent: ownerView,
       isVodEvent: false,
       hasPaid: paidLive,
       manualHasAccess: false,
@@ -77,7 +83,7 @@ export default function EventPreview() {
       replayUrl: "",
       canOpenPurchaseOptions: true,
       canBuyManualOnly: false,
-      canSponsorOwnEvent: false,
+      canSponsorOwnEvent: ownerView,
       viewerHasSponsoredTickets: false,
       shouldChoosePurchaseType: true,
       primaryCtaLabel: "Buy Ticket",

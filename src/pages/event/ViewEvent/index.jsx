@@ -1137,6 +1137,9 @@ export default function ViewEvent() {
         v={{
           event,
           posters: event?.poster || [],
+          /* The route id, so owner-only affordances (the analytics link) can build their
+             href without a child component re-reading the URL. */
+          eventId,
           formattedDateTime,
           formattedLocation,
           priceDisplay,
