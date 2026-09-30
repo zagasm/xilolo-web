@@ -107,8 +107,11 @@ const OTHER_ORGANISER = {
   profileImage: "",
   numberOfFollowers: 2180,
   followings_count: 96,
-  ticketsSold: 1240,
-  tickets_total: 1240,
+  /* A PUBLIC view of another organiser: the API never sends a count here, it sends a
+     milestone label (App\Support\TicketMilestone → "1,000+ tickets sold"). The fixture
+     used to carry 1240, which is exactly the payload a non-owner must never receive —
+     and it is what made the old resolver print an exact number on a public profile. */
+  tickets_total: "1,000+ tickets sold",
   eventsCount: 9,
   has_active_subscription: true,
   rank: 12,

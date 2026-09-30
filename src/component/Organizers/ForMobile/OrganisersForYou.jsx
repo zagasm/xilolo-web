@@ -41,13 +41,13 @@
  * Deliberate deviations (see the task report): (1) no 4%-black drop shadow —
  * DESIGN.md is flat + hairline outside overlays; (2) accent-coloured TEXT uses
  * accent-deep (DESIGN.md's on-light rule) where the app uses raw accent;
- * (3) a non-numeric `tickets_total` (the backend sends public viewers a
- * milestone label, TicketMilestone.php) is printed verbatim instead of the app's
- * "0 tickets".
+ * (3) the card shows followers only — the ticket chip and its milestone label were
+ * removed on the founder's call (2026-09-30); tickets are shown on the profile,
+ * banded, via utils/ticketMilestone.js.
  */
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BadgeCheck, Ticket, Users } from "lucide-react";
+import { BadgeCheck, Users } from "lucide-react";
 
 import { useAuth } from "../../../pages/auth/AuthContext";
 import { showError, showSuccess } from "../../ui/toast";
@@ -93,18 +93,6 @@ const compact = (value, unit) => {
   return `${Math.trunc(safe)} ${unit}`;
 };
 
-/**
- * :570-579 — the app mirrors _formatTickets. `tickets_total` is an exact number
- * only for the owner/admin; everyone else gets a milestone label string from the
- * API (TicketMilestone.php), which the app's num-parse silently flattens to
- * "0 tickets". Printing the label the API actually sent is the honest read.
- */
-const ticketsLabel = (value) => {
-  if (value === null || value === undefined || value === "") return compact(0, "tickets");
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? compact(numeric, "tickets") : String(value);
-};
-
 /** :552-557 — user_name, else the display name lower-cased and de-spaced. */
 const buildUsername = (org, displayName) => {
   const username = String(org?.userName ?? "").trim();
@@ -134,9 +122,9 @@ const displayNameOf = (org) =>
       "Organizer",
   ).trim();
 
-/** :335-368 — stat chip. `shrink` lets a long milestone label ellipsize instead
-    of forcing a second chip row (the app never wraps with its own data: its
-    `_formatTickets` collapses the API's label string to "0 tickets"). */
+/** :335-368 — stat chip. `shrink` lets a long label ellipsize instead of forcing a
+    second chip row. Kept: the followers chip is the only caller now, and a display
+    name-free count can still be long. */
 function StatChip({ icon: Icon, label, title, shrink = false }) {
   return (
     <span
@@ -250,16 +238,14 @@ function OrganiserCard({
         </div>
       </div>
 
+      {/* Followers only: the founder removed the ticket chip from this rail (2026-09-30).
+          The milestone labels are sentences ("Under 1,000 tickets sold") and the chip
+          truncated them mid-word, so the rail was showing a clipped privacy label that
+          told the viewer nothing. Ticket volume belongs on the profile, banded. */}
       <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2.5">
         <StatChip
           icon={Users}
           label={compact(organizer?.numberOfFollowers, "followers")}
-        />
-        <StatChip
-          icon={Ticket}
-          label={ticketsLabel(organizer?.tickets_total)}
-          title={ticketsLabel(organizer?.tickets_total)}
-          shrink
         />
       </div>
 
