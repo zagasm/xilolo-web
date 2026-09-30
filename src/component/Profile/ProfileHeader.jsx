@@ -68,6 +68,10 @@
 // greys any <p>, so every coloured string in this file is a <div> or <span>.
 import React from "react";
 import { formatCount } from "../../utils/countFormat";
+/* Ticket sales are BANDED for anyone but the owner/admin — see the util. This used to
+   resolve a number locally, which summed user.allEvents and printed an exact count to
+   the very viewers the backend milestone system hides it from. */
+import { ticketDisplay, ticketSentence } from "../../utils/ticketMilestone";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -178,29 +182,6 @@ export function profileUsername(user) {
   return nonEmpty(user?.userName || user?.user_name);
 }
 
-/** app: _resolveTicketsSold (organizer_profile.dart:494-510). */
-export function profileTicketsSold(user) {
-  const candidates = [
-    user?.ticketsSold,
-    user?.tickets_sold,
-    user?.tickets_total,
-    user?.ticketsTotal,
-    user?.successfulPayments,
-    user?.successful_payments,
-  ];
-  for (const c of candidates) {
-    const n = Number(c);
-    if (Number.isFinite(n) && n > 0) return n;
-  }
-  // last resort the app uses: sum the per-event payment count
-  const events = Array.isArray(user?.allEvents) ? user.allEvents : [];
-  const sum = events.reduce((total, e) => {
-    const n = Number(e?.paymentCount ?? e?.payment_count ?? 0);
-    return Number.isFinite(n) ? total + n : total;
-  }, 0);
-  return sum > 0 ? sum : 0;
-}
-
 /** app: _resolveEventCount (organizer_profile.dart:482-492). */
 export function profileEventsCount(user) {
   const candidates = [
@@ -233,9 +214,11 @@ function pickRank(user) {
 
 /** app: hero metric labels are l10n strings with the count stripped
  *  (_labelWithoutCount :574-576) -> "Tickets Sold" / "Ticket Sold" / "Events". */
-function heroLabels(tickets, events) {
+/* The tickets half of this moved into ticketDisplay(), which returns the figure and its
+   caption together (a banded value reads "1,000+" / "Tickets Sold", an exact one "1.2K" /
+   "Tickets Sold"), so the singular-plural decision lives next to the value it describes. */
+function heroLabels(events) {
   return {
-    tickets: tickets === 1 ? "Ticket Sold" : "Tickets Sold",
     events: events === 1 ? "Event" : "Events",
   };
 }
@@ -454,9 +437,9 @@ export default function ProfileHeader({
   const showFollow = mode !== "own" && typeof onToggleFollow === "function";
   const navigate = useNavigate();
 
-  const ticketsSold = profileTicketsSold(user);
+  const tickets = ticketDisplay(user);
   const eventsCount = profileEventsCount(user);
-  const labels = heroLabels(ticketsSold, eventsCount);
+  const labels = heroLabels(eventsCount);
 
   /* ── OTHER-USER header card: organizer_profile.dart:299-472 ─────────────── */
   if (mode === "organiser") {
@@ -504,9 +487,7 @@ export default function ProfileHeader({
             <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
               <Ticket className="tw:size-[18px] tw:shrink-0 tw:text-success" />
               <span className="tw:truncate tw:text-[13px] tw:font-medium tw:text-body">
-                {`${
-                  ticketsSold === 1 ? "Ticket Sold" : "Tickets Sold"
-                } (${formatCount(ticketsSold)})`}
+                {ticketSentence(user)}
               </span>
             </div>
 
@@ -589,8 +570,8 @@ export default function ProfileHeader({
               <div className="tw:min-w-0 tw:flex-1">
                 <HeroMetric
                   icon={Ticket}
-                  value={formatCount(ticketsSold)}
-                  label={labels.tickets}
+                  value={tickets.value}
+                  label={tickets.label}
                   iconClass="tw:text-accent"
                 />
               </div>
