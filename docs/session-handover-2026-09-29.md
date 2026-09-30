@@ -89,7 +89,10 @@ verify — and treat a report with no build result and no screenshots as unverif
 - Focus ring on dark buttons may be invisible
 - Duplicate-wallet fix is a CSS rule (`body:has(...)`) — should be a Navbar prop
 - Legal pages carry ~588px tables at 390px
-- First load is 1.12MB gzipped JS with **no code-splitting**
+- First load: main chunk is **3,860 kB raw / 1,123.78 kB gzip**. IMPORTANT correction:
+  react-player's providers ARE already lazy-split (Vimeo, YouTube, Mux, Twitch, Facebook,
+  Wistia, Streamable, DailyMotion, SoundCloud, Vidyard, FilePlayer — 1-9 kB each), so the
+  remaining win is `manualChunks`/vendor splitting of app+vendor code, NOT the players.
 
 ---
 

@@ -79,6 +79,51 @@
   --radius-sheet: 24px;
   --radius-pill: 999px;
 }
+/* -- Token-name compatibility aliases --------------------------------------
+   Tailwind v4 with `prefix(tw)` emits every @theme token as `--tw-color-*`.
+   Hand-written stylesheets here (pages/Home/Homestyle.css, pages/tickets/
+   tickets.css) and the rules just below still read the UN-prefixed
+   `--color-*` names. A var() naming an undefined property makes the whole
+   declaration invalid at computed-value time — it does not fall back to the
+   previous cascade value — so those rules silently rendered as nothing:
+   `html/body/:root` painted no background at all, and the sticky All/Live
+   row (`.home-tabbar{background-color:var(--color-paper)}`) had no fill, so
+   feed posters scrolled visibly THROUGH the pinned tabs.
+   Alias every token back, with its literal value as the fallback so these
+   keep resolving even if Tailwind changes its emitted variable name.
+   @theme above remains the single source of truth — do not edit values here. */
+:root {
+  --color-accent: var(--tw-color-accent, #16909C);
+  --color-accent-deep: var(--tw-color-accent-deep, #06707D);
+  --color-accent-soft: var(--tw-color-accent-soft, rgba(22, 144, 156, 0.11));
+  --color-paper: var(--tw-color-paper, #F3F2F0);
+  --color-paper-raised: var(--tw-color-paper-raised, #FFFFFF);
+  --color-ink: var(--tw-color-ink, #111316);
+  --color-ink-raised: var(--tw-color-ink-raised, #1A1D21);
+  --color-body: var(--tw-color-body, #050505);
+  --color-body-dark: var(--tw-color-body-dark, #E5E4E2);
+  --color-muted: var(--tw-color-muted, #76767C);
+  --color-muted-strong: var(--tw-color-muted-strong, #5C5C62);
+  --color-muted-dark: var(--tw-color-muted-dark, #7C7C82);
+  --color-ink-muted: var(--tw-color-ink-muted, #9AA0AA);
+  --color-faint: var(--tw-color-faint, #C4C4CC);
+  --color-faint-dark: var(--tw-color-faint-dark, #444444);
+  --color-chip: var(--tw-color-chip, #EFEFF2);
+  --color-chip-dark: var(--tw-color-chip-dark, #24272B);
+  --color-inner: var(--tw-color-inner, #E9E9EC);
+  --color-inner-dark: var(--tw-color-inner-dark, #2B2F34);
+  --color-hairline: var(--tw-color-hairline, rgba(17, 19, 22, 0.10));
+  --color-hairline-dark: var(--tw-color-hairline-dark, rgba(229, 228, 226, 0.10));
+  --color-success: var(--tw-color-success, #16A34A);
+  --color-warning: var(--tw-color-warning, #D97706);
+  --color-danger: var(--tw-color-danger, #DC2626);
+  --color-primary: var(--tw-color-primary, #111316);
+  --color-primarySecond: var(--tw-color-primarySecond, #1A1D21);
+  --color-neon: var(--tw-color-neon, #0EA5B4);
+  --color-white: var(--tw-color-white, #FFFFFF);
+  --color-lightPurple: var(--tw-color-lightPurple, #F3F2F0);
+}
+
 :root {
   font-family: var(--font-sans);
   background-color: var(--color-paper);

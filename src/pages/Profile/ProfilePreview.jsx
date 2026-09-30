@@ -18,7 +18,9 @@
  *   /dev/profile-preview                      own organiser profile (ranking #7)
  *   /dev/profile-preview?screen=own-new        own profile, no organisation
  *                                              (the become-an-organiser branch)
- *   /dev/profile-preview?screen=own-kyc        own organiser, KYC under review
+ *   /dev/profile-preview?screen=own-kyc        own organiser, KYC pending review
+ *   /dev/profile-preview?screen=own-kyc-failed own organiser, KYC REJECTED
+ *                                              (must NOT look "in progress")
  *   /dev/profile-preview?screen=organiser      another organiser (public design)
  *   /dev/profile-preview?screen=user           plain user (share-link design)
  *   &rank=none                                 organiser with no rank -> "—"
@@ -82,6 +84,17 @@ const OWN_KYC_PENDING = {
   kyc: { status: "pending" },
 };
 
+/* A rejected applicant. Must render the terminal "failed" card — not the
+ * in-flight "under review" one. */
+const OWN_KYC_FAILED = {
+  ...OWN_ORGANISER,
+  kyc: {
+    status: "failed",
+    failureReason:
+      "We could not verify your identity with the information submitted. Please check that your details are correct, use a clear photo of your ID and face, and try again.",
+  },
+};
+
 const OTHER_ORGANISER = {
   id: "mock-org-2",
   userId: "mock-org-2",
@@ -125,6 +138,7 @@ export default function ProfilePreview() {
   let profile = OWN_ORGANISER;
   let isOwnProfile = true;
   let kycStatus = "verified";
+  let kycFailureReason = null;
 
   if (screen === "own-new") {
     profile = OWN_NO_ORGANISER;
@@ -132,6 +146,10 @@ export default function ProfilePreview() {
   } else if (screen === "own-kyc") {
     profile = OWN_KYC_PENDING;
     kycStatus = "pending";
+  } else if (screen === "own-kyc-failed") {
+    profile = OWN_KYC_FAILED;
+    kycStatus = "failed";
+    kycFailureReason = OWN_KYC_FAILED.kyc.failureReason;
   } else if (screen === "organiser") {
     profile = { ...OTHER_ORGANISER };
     isOwnProfile = false;
@@ -158,6 +176,7 @@ export default function ProfilePreview() {
         <ProfileScreenView
           profile={loading || error || !profile ? null : profile}
           kycStatus={kycStatus}
+          kycFailureReason={kycFailureReason}
           isOwnProfile={isOwnProfile}
           isLoading={loading}
           error={error}

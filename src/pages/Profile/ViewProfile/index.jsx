@@ -33,7 +33,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, Pencil, Share2, TriangleAlert } from "lucide-react";
+import { ChevronLeft, Pencil, RefreshCw, Share2, ShieldAlert, TriangleAlert } from "lucide-react";
 
 import useProfile from "../../../hooks/useProfile";
 import ProfileHeader, {
@@ -153,6 +153,7 @@ function ProfileErrorState({ message, onBack }) {
 export function ProfileScreenView({
   profile = null,
   kycStatus = null,
+  kycFailureReason = null,
   isOwnProfile = true,
   isLoading = false,
   error = null,
@@ -169,6 +170,15 @@ export function ProfileScreenView({
 
   const isOrganiser = isOwnProfile && profileIsOrganiser(profile);
   const isKycVerified = kycStatus === "verified";
+  /* `failed` is terminal AND actionable — the applicant has to submit again.
+   * It must never be rendered with the in-flight "under review" copy, or the
+   * person waits forever for a decision that already went the other way.
+   * Backend truth: user.kyc.status = verified | pending | failed,
+   * user.kyc.failureReason carries the reviewer's reason. */
+  const isKycFailed = kycStatus === "failed";
+  const kycFailedMessage =
+    (typeof kycFailureReason === "string" && kycFailureReason.trim()) ||
+    "We couldn't verify your identity with the information submitted. Check that your details are correct, use a clear photo of your ID and face, then try again.";
   const shouldShowBecomeOrganiser =
     isOwnProfile && !isOrganiser && !isKycVerified;
   const isSharedOrganiserProfile =
@@ -315,26 +325,58 @@ export function ProfileScreenView({
             <div className="tw:flex tw:justify-center tw:py-6">
               <div className="tw:w-full tw:rounded-[22px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:md:p-8">
                 <div className="tw:flex tw:flex-col tw:items-center tw:gap-4">
-                  <div className="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-[16px] tw:bg-accent-soft">
-                    <span className="tw:size-6 tw:animate-spin tw:rounded-full tw:border-[3px] tw:border-accent tw:border-t-transparent" />
+                  <div
+                    className={
+                      isKycFailed
+                        ? "tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-[16px] tw:bg-danger/10"
+                        : "tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-[16px] tw:bg-accent-soft"
+                    }
+                  >
+                    {isKycFailed ? (
+                      <ShieldAlert className="tw:size-6 tw:text-danger" />
+                    ) : (
+                      <span className="tw:size-6 tw:animate-spin tw:rounded-full tw:border-[3px] tw:border-accent tw:border-t-transparent" />
+                    )}
                   </div>
 
                   <div className="tw:min-w-0 tw:text-center">
-                    <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-success/10 tw:px-3 tw:py-1">
-                      <span className="tw:size-2 tw:animate-pulse tw:rounded-full tw:bg-success" />
-                      <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-success">
-                        KYC in progress
+                    {isKycFailed ? (
+                      <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-danger/10 tw:px-3 tw:py-1">
+                        <TriangleAlert className="tw:size-3 tw:text-danger" />
+                        <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-danger">
+                          Verification failed
+                        </span>
                       </span>
-                    </span>
+                    ) : (
+                      <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-success/10 tw:px-3 tw:py-1">
+                        <span className="tw:size-2 tw:animate-pulse tw:rounded-full tw:bg-success" />
+                        <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-success">
+                          KYC in progress
+                        </span>
+                      </span>
+                    )}
 
                     <span className="tw:mt-3 tw:block tw:text-[20px] tw:font-semibold tw:text-body tw:md:text-2xl">
-                      Your organiser account is under review
+                      {isKycFailed
+                        ? "We couldn't verify your details"
+                        : "Your organiser account is under review"}
                     </span>
 
                     <div className="tw:mt-2 tw:text-[14px] tw:text-muted">
-                      We&apos;re currently verifying the details you submitted.
-                      Once your KYC is approved, you&apos;ll unlock organiser
-                      tools like event creation, payouts and more.
+                      {isKycFailed ? (
+                        <>
+                          Your verification was not approved, so organiser tools
+                          stay locked for now. You can submit your details again
+                          right away.
+                        </>
+                      ) : (
+                        <>
+                          We&apos;re currently verifying the details you
+                          submitted. Once your KYC is approved, you&apos;ll
+                          unlock organiser tools like event creation, payouts
+                          and more.
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -344,32 +386,82 @@ export function ProfileScreenView({
                     <span className="tw:text-[12px] tw:font-medium tw:text-body">
                       Verification status
                     </span>
-                    <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-muted">
-                      Under review
+                    <span
+                      className={
+                        isKycFailed
+                          ? "tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-danger"
+                          : "tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-muted"
+                      }
+                    >
+                      {isKycFailed ? "Not approved" : "Under review"}
                     </span>
                   </div>
 
-                  <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-inner">
-                    <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-accent tw:transition-all tw:duration-500" />
-                  </div>
+                  {isKycFailed ? (
+                    <div className="tw:space-y-3">
+                      <div className="tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-3">
+                        <span className="tw:block tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.16em] tw:text-muted">
+                          Reason given
+                        </span>
+                        <span className="tw:mt-1 tw:block tw:text-[13px] tw:leading-5 tw:text-body">
+                          {kycFailedMessage}
+                        </span>
+                      </div>
 
-                  <div className="tw:space-y-1.5 tw:text-[12px] tw:text-muted">
-                    <div className="tw:flex tw:items-center tw:gap-2">
-                      <span className="tw:size-1.5 tw:rounded-full tw:bg-accent" />
-                      ID &amp; bank details submitted
+                      <div className="tw:space-y-1.5 tw:text-[12px] tw:text-muted">
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-danger" />
+                          Identity not verified
+                        </div>
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-accent" />
+                          Your bank details are still saved
+                        </div>
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-faint" />
+                          Resubmitting usually takes a few minutes
+                        </div>
+                      </div>
                     </div>
-                    <div className="tw:flex tw:items-center tw:gap-2">
-                      <span className="tw:size-1.5 tw:rounded-full tw:bg-success" />
-                      Our compliance team is reviewing your information
-                    </div>
-                    <div className="tw:flex tw:items-center tw:gap-2">
-                      <span className="tw:size-1.5 tw:rounded-full tw:bg-faint" />
-                      You&apos;ll be notified once a decision is made
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className="tw:h-2.5 tw:w-full tw:rounded-full tw:bg-inner">
+                        <div className="tw:h-full tw:w-2/3 tw:rounded-full tw:bg-accent tw:transition-all tw:duration-500" />
+                      </div>
+
+                      <div className="tw:space-y-1.5 tw:text-[12px] tw:text-muted">
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-accent" />
+                          ID &amp; bank details submitted
+                        </div>
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-success" />
+                          Our compliance team is reviewing your information
+                        </div>
+                        <div className="tw:flex tw:items-center tw:gap-2">
+                          <span className="tw:size-1.5 tw:rounded-full tw:bg-faint" />
+                          You&apos;ll be notified once a decision is made
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <div className="tw:mt-6">
+                <div className="tw:mt-6 tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:items-center">
+                  {isKycFailed && (
+                    <Link
+                      to="/become-an-organiser"
+                      /* `tw:text-white!` — the legacy unlayered `div a{color:#050505}`
+                       * in assets/css beats @layer utilities no matter the
+                       * specificity, so an ink pill on an <a> renders its label
+                       * near-black-on-black unless the utility is important. */
+                      className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:bg-ink tw:px-5 tw:text-[12px] tw:font-semibold tw:text-white!"
+                    >
+                      <RefreshCw className="tw:size-3.5" />
+                      Try again
+                    </Link>
+                  )}
+
                   <button
                     type="button"
                     onClick={() => navigate("/")}
@@ -545,6 +637,9 @@ export default function ViewProfile() {
       finalProfileUser?.userId;
 
   const kycStatus = isOwnProfile ? finalProfileUser?.kyc?.status || null : null;
+  const kycFailureReason = isOwnProfile
+    ? finalProfileUser?.kyc?.failureReason || null
+    : null;
 
   /* ------------------ follow / unfollow organiser ------------------ */
   const handleToggleFollow = async () => {
@@ -658,6 +753,7 @@ export default function ViewProfile() {
       <ProfileScreenView
         profile={finalProfileUser}
         kycStatus={kycStatus}
+        kycFailureReason={kycFailureReason}
         isOwnProfile={isOwnProfile}
         isLoading={isLoading}
         error={profileError}
