@@ -38,7 +38,7 @@
  * Data is untouched: the feed still reads the same endpoints through the same
  * `usePaginatedEvents` hook the previous implementation used.
  */
-import React, { useMemo, useRef, useState } from "react";
+import React, { Fragment, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
 import Countdown from "react-countdown";
@@ -783,6 +783,11 @@ export function OrganizersRailHeading({ onRefresh }) {
 export default function Home() {
   const [activeTab, setActiveTab] = useState("all");
   const [showOrganizers, setShowOrganizers] = useState(false);
+
+  /* Between which events the rail appears. 3 = after the 4th card: far enough in
+     that the user is already engaged, early enough to be found without a deep
+     scroll. */
+  const ORGANISERS_RAIL_AFTER_INDEX = 3;
   // Whether the organisers rail has anything to show (loading or loaded). The
   // rail reports it so its heading disappears when the app's section would.
   const [organisersAvailable, setOrganisersAvailable] = useState(false);
@@ -870,6 +875,24 @@ export default function Home() {
         body: "Events will appear here once they are available. Please check back soon.",
       };
 
+  /* App parity for the heading (suggested_organisers_section.dart:35 + :64-74):
+     title 16/w700 in textPrimary with a "Refresh" action on the right, hidden
+     when the rail would render nothing at all (:40-46). */
+  const organizersRail =
+    showOrganizers && !showSkeletons ? (
+      <div className="tw:col-span-full tw:mt-2">
+        {organisersAvailable ? (
+          <OrganizersRailHeading
+            onRefresh={() => organisersRefreshRef.current?.()}
+          />
+        ) : null}
+        <MobileSingleOrganizers
+          onAvailabilityChange={setOrganisersAvailable}
+          refreshRef={organisersRefreshRef}
+        />
+      </div>
+    ) : null;
+
   return (
     <>
       <SEO title="Discover Events - Xilolo" />
@@ -928,17 +951,24 @@ export default function Home() {
                   </div>
                 ) : null}
 
-                {list.map((event) =>
-                  isLive ? (
-                    <LiveFeedCard
-                      key={event.id}
-                      event={event}
-                      onMore={() => setSelectedEvent(event)}
-                    />
-                  ) : (
-                    <HeroFeedCard key={event.id} event={event} />
-                  ),
-                )}
+                {list.map((event, index) => (
+                  <Fragment key={event.id}>
+                    {isLive ? (
+                      <LiveFeedCard
+                        event={event}
+                        onMore={() => setSelectedEvent(event)}
+                      />
+                    ) : (
+                      <HeroFeedCard event={event} />
+                    )}
+
+                    {/* The organisers rail sits BETWEEN events, not at the bottom
+                        of the feed (founder, 2026-09-30): discovery should happen
+                        while scrolling, not only after the last card. `col-span-full`
+                        makes it a full-width row inside the 1/2/3-column grid. */}
+                    {index === ORGANISERS_RAIL_AFTER_INDEX ? organizersRail : null}
+                  </Fragment>
+                ))}
 
                 {feed.loadingMore && list.length > 0 ? (
                   <>
@@ -952,24 +982,6 @@ export default function Home() {
                 <div ref={loadMoreRef} className="tw:h-10 tw:w-full" aria-hidden="true" />
               ) : null}
 
-              {showOrganizers && !showSkeletons ? (
-                <div className="tw:mt-12">
-                  {/* App parity: suggested_organisers_section.dart:35 + :64-74 —
-                      title 16/w700 in textPrimary, the "Refresh" action on the
-                      right. The heading is hidden when the app would render
-                      nothing at all (:40-46), so it waits for the rail to report
-                      whether it has content. */}
-                  {organisersAvailable ? (
-                    <OrganizersRailHeading
-                      onRefresh={() => organisersRefreshRef.current?.()}
-                    />
-                  ) : null}
-                  <MobileSingleOrganizers
-                    onAvailabilityChange={setOrganisersAvailable}
-                    refreshRef={organisersRefreshRef}
-                  />
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
