@@ -852,7 +852,11 @@ export default function Home() {
     feed.error?.response?.data?.message ||
     feed.error?.message ||
     "Please try again later.";
-  const isDone = feed.meta?.current_page >= feed.meta?.last_page;
+  /* `isDone` comes from the hook. It must not be recomputed here: the old
+     `meta.current_page >= meta.last_page` was `1 >= 1` against this API (which
+     sends neither field), so it was permanently true and the sentinel below
+     never rendered — the feed silently stopped at the first page. */
+  const isDone = feed.isDone;
 
   const emptyState = isLive
     ? {

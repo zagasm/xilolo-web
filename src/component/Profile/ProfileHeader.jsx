@@ -67,6 +67,7 @@
 // Legacy cascade note (src/styles/tailwind.css:95-97): `#root p { color: inherit }`
 // greys any <p>, so every coloured string in this file is a <div> or <span>.
 import React from "react";
+import { formatCount } from "../../utils/countFormat";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -82,19 +83,9 @@ import {
 } from "lucide-react";
 
 /** app: _formatCount (revamp:764-774) — 1.5K / 2.1M, '.0' stripped. */
-export function formatCount(value) {
-  const n = Number(value ?? 0);
-  if (!Number.isFinite(n)) return "0";
-  if (n >= 1000000) {
-    const v = (n / 1000000).toFixed(1);
-    return v.endsWith(".0") ? `${v.slice(0, -2)}M` : `${v}M`;
-  }
-  if (n >= 1000) {
-    const v = (n / 1000).toFixed(1);
-    return v.endsWith(".0") ? `${v.slice(0, -2)}K` : `${v}K`;
-  }
-  return String(n);
-}
+/* The count rule lives in one place now — see src/utils/countFormat.js. This
+   re-export keeps the existing import path working. */
+export { formatCount };
 
 const nonEmpty = (v) => {
   const s = String(v ?? "").trim();
@@ -515,7 +506,7 @@ export default function ProfileHeader({
               <span className="tw:truncate tw:text-[13px] tw:font-medium tw:text-body">
                 {`${
                   ticketsSold === 1 ? "Ticket Sold" : "Tickets Sold"
-                } (${ticketsSold})`}
+                } (${formatCount(ticketsSold)})`}
               </span>
             </div>
 
@@ -524,8 +515,8 @@ export default function ProfileHeader({
               <CalendarDays className="tw:size-[18px] tw:shrink-0 tw:text-accent" />
               <span className="tw:truncate tw:text-[13px] tw:font-medium tw:text-body">
                 {eventsCount === 1
-                  ? `Event (${eventsCount})`
-                  : `Events (${eventsCount})`}
+                  ? `Event (${formatCount(eventsCount)})`
+                  : `Events (${formatCount(eventsCount)})`}
               </span>
             </div>
           </div>

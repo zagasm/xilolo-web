@@ -50,6 +50,9 @@ const OWN_ORGANISER = {
   email: "ada@example.com",
   about: "I host intimate Afrobeats nights across Lagos and Abuja.",
   profileImage: "",
+  /* Above 1,000 on purpose: the preview must EXERCISE the count rule
+     (utils/countFormat) — the copy-style row renders "Tickets Sold (1.2K)",
+     never "(1240)". A fixture below 1,000 proved nothing about it. */
   ticketsSold: 1240,
   eventsCount: 12,
   followersCount: 3480,
@@ -104,8 +107,8 @@ const OTHER_ORGANISER = {
   profileImage: "",
   numberOfFollowers: 2180,
   followings_count: 96,
-  ticketsSold: 860,
-  tickets_total: 860,
+  ticketsSold: 1240,
+  tickets_total: 1240,
   eventsCount: 9,
   has_active_subscription: true,
   rank: 12,

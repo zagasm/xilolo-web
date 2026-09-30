@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "test": "node --test src/hooks/__tests__/usePaginatedEvents.test.js src/utils/__tests__/countFormat.test.js src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
+    "test:organizers": "node --test src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
+    "test:paging": "node --test src/hooks/__tests__/usePaginatedEvents.test.js",
+    "test:count-format": "node --test src/utils/__tests__/countFormat.test.js",
     "test:organiser-verification": "node --test src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
     "preview": "vite preview"
   },

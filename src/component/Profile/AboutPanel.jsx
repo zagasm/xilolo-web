@@ -26,6 +26,7 @@ import { Link } from "react-router-dom";
 import { Pencil, PlusCircle, User as UserIcon } from "lucide-react";
 
 import { truncate } from "../../utils/helpers";
+import { formatCount } from "../../utils/countFormat";
 
 function safeValue(v) {
   if (v === undefined || v === null || v === "") return "—";
@@ -166,10 +167,12 @@ export default function AboutPanel({
           <InfoCard
             title="Social"
             rows={[
-              ["Followers", user?.numberOfFollowers ?? user?.followers_count],
+              /* The count rule (see utils/countFormat): exact under 1,000, then
+                 1.2K / 1.25M. These two rows printed the raw payload value. */
+              ["Followers", formatCount(user?.numberOfFollowers ?? user?.followers_count)],
               [
                 "Tickets Sold",
-                user?.tickets_total ?? user?.successfulPayments,
+                formatCount(user?.tickets_total ?? user?.successfulPayments),
               ],
               ["Ranking", user?.rank],
             ]}
