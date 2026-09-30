@@ -502,11 +502,11 @@ export default function EventTemplate({
 }) {
   const {
     items,
-    meta,
     loading,
     loadingMore,
     loadNext,
     error,
+    isDone: isDoneFromHook,
   } = usePaginatedEvents(endpoint);
 
   const [visibleEvents, setVisibleEvents] = useState([]);
@@ -529,7 +529,10 @@ export default function EventTemplate({
     if (inView) loadNext();
   }, [inView, loadNext]);
 
-  const isDone = useMemo(() => meta?.current_page >= meta?.last_page, [meta]);
+  /* From the hook, not from meta: this API sends no `current_page`/`last_page`,
+     so `meta.current_page >= meta.last_page` was always true and the load-more
+     sentinel below never rendered. */
+  const isDone = isDoneFromHook;
 
   const variant = live ? "live" : upcoming ? "upcoming" : "all";
   const emptyTitle =
