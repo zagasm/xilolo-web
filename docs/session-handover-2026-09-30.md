@@ -157,3 +157,21 @@ node _verify_sweep.mjs <cases.json> <token.txt> <userdata.json> <outdir>
 15. **Do not trust a locally-built bundle for data.** See §4.
 16. Chrome headless will happily run for minutes on a page with a live video player and
     then die — always flush sweep results per case.
+
+---
+
+## 7. Skill updates made from this session
+
+- `scripts/verify-sweep.mjs` (new) — the harness above, packaged. Run it instead of writing
+  another CDP driver.
+- `references/verification-harness.md` (new) — run recipe, the "data on :5180 / built artifact on
+  :5181" rule, the login-field (`input`, not `email`) and ticket-prompt gotchas.
+- `references/design-token-css-traps.md` §2 — "anchors lose their colour, root cause not pinned
+  down" is now **pinned**: an unlayered `div a{color:#050505}` beats `@layer utilities`
+  regardless of specificity; fix is `tw:text-white!`.
+- `references/tailwind-prefix-cascade-traps.md` §"The `--tw-` variable rename" — recorded as
+  FIXED by the alias block, with the before/after measurements and the instruction to add new
+  tokens to the alias block.
+- ⚠️ `SKILL.md` is **at its 100,000-character limit** — a patch that only adds text is rejected
+  outright. Put new material in `references/` (auto-listed in `linked_files`) or make the edit
+  net-neutral. Worth a deliberate compaction pass before the next big addition.
