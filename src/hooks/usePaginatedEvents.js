@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { dedupeEvents, readNextPageParam } from "./paginationUtils";
 import { api, authHeaders } from "../lib/apiClient";
 import { useAuth } from "../pages/auth/AuthContext";
 
@@ -43,63 +44,8 @@ import { useAuth } from "../pages/auth/AuthContext";
  * fixed here, is the web pretending the feed was complete.
  */
 
-/** `next_cursor` arrives as an array of cursors, one per feed section. */
-function firstUsableString(value) {
-  if (Array.isArray(value)) {
-    return value.find((v) => typeof v === "string" && v.trim()) || null;
-  }
-  return typeof value === "string" && value.trim() ? value : null;
-}
-
-/** A cursor is preferred; `links.next` is the fallback for a rebuilt payload. */
-function readNextPageParam(payload) {
-  const meta = payload?.meta || {};
-  const links = payload?.links || {};
-
-  const cursor =
-    firstUsableString(meta.next_cursor) ||
-    (() => {
-      const link = firstUsableString(links.next) || firstUsableString(meta.next);
-      if (!link) return null;
-      try {
-        return new URL(link).searchParams.get("cursor");
-      } catch {
-        return null;
-      }
-    })();
-
-  if (cursor) return { cursor };
-
-  const current = Number(meta.current_page);
-  const last = Number(meta.last_page);
-  if (Number.isFinite(current) && Number.isFinite(last) && last > current) {
-    return { page: current + 1 };
-  }
-
-  return null;
-}
-
-function eventKey(event) {
-  return event?.id || event?.event_id || event?.shareable_link || null;
-}
-
-/** Same event delivered on two pages must render once. */
-function dedupeEvents(items) {
-  const seen = new Set();
-  const out = [];
-  for (const item of items) {
-    const key = eventKey(item);
-    if (!key) {
-      out.push(item);
-      continue;
-    }
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(item);
-  }
-  return out;
-}
-
+/* The pagination helpers (firstUsableString / readNextPageParam / dedupeEvents) live in
+   ./paginationUtils so they can be unit-tested without React or import.meta. */
 export default function usePaginatedEvents(endpoint) {
   const { token, user } = useAuth();
   const userKey = user?.user_id || user?.id || "anonymous";

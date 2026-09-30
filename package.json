@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "test": "node --test src/hooks/__tests__/usePaginatedEvents.test.js src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
     "test:organiser-verification": "node --test src/pages/Organizers/__tests__/organiserVerificationFlow.test.js",
+    "test:paging": "node --test src/hooks/__tests__/usePaginatedEvents.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
