@@ -762,20 +762,13 @@ export function HomeHeader({ firstName, activeTab, onTabChange, liveCount }) {
  * live section's copy + action; /organizers stays reachable from the Navbar
  * (src/pages/pageAssets/Navbar.jsx:359) and the mobile nav (MobileNav.jsx:54).
  */
-export function OrganizersRailHeading({ onRefresh }) {
+export function OrganizersRailHeading() {
+  /* Title only: the founder removed the "Refresh" action (2026-09-30). It was wired
+     to a ref the rail never accepted, so it could not have refreshed anything. */
   return (
-    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:pb-3">
-      <span className="tw:text-base tw:font-bold tw:text-body">
-        Suggested Organisers For You
-      </span>
-      <button
-        type="button"
-        onClick={onRefresh}
-        className="tw:shrink-0 tw:cursor-pointer tw:text-sm tw:font-semibold tw:text-accent-deep tw:hover:underline!"
-      >
-        Refresh
-      </button>
-    </div>
+    <span className="tw:block tw:pb-3 tw:text-base tw:font-bold tw:text-body">
+      Suggested Organisers For You
+    </span>
   );
 }
 
@@ -793,9 +786,6 @@ export default function Home() {
   const [organisersAvailable, setOrganisersAvailable] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const eventsScrollRef = useRef(null);
-  // The rail owns its fetch; the heading (rendered here) owns the app's
-  // "Refresh" action, so the rail publishes its re-fetch through this ref.
-  const organisersRefreshRef = useRef(null);
   const { user } = useAuth();
 
   // Same endpoints, same hook, same response shape as before. The app loads
@@ -875,21 +865,16 @@ export default function Home() {
         body: "Events will appear here once they are available. Please check back soon.",
       };
 
-  /* App parity for the heading (suggested_organisers_section.dart:35 + :64-74):
-     title 16/w700 in textPrimary with a "Refresh" action on the right, hidden
-     when the rail would render nothing at all (:40-46). */
+  /* App parity for the heading (suggested_organisers_section.dart:35): title
+     16/w700 in textPrimary, hidden when the rail would render nothing at all
+     (:40-46). The app's "Refresh" action was dropped on the founder's call
+     (2026-09-30) — and it never worked here anyway: it pointed at a ref the rail
+     component does not accept. */
   const organizersRail =
     showOrganizers && !showSkeletons ? (
       <div className="tw:col-span-full tw:mt-2">
-        {organisersAvailable ? (
-          <OrganizersRailHeading
-            onRefresh={() => organisersRefreshRef.current?.()}
-          />
-        ) : null}
-        <MobileSingleOrganizers
-          onAvailabilityChange={setOrganisersAvailable}
-          refreshRef={organisersRefreshRef}
-        />
+        {organisersAvailable ? <OrganizersRailHeading /> : null}
+        <MobileSingleOrganizers onAvailabilityChange={setOrganisersAvailable} />
       </div>
     ) : null;
 
