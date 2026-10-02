@@ -46,7 +46,11 @@ export function connectSessionRealtime({
     wssPort: Number(reverbPort),
     forceTLS: Boolean(forceTLS),
     encrypted: Boolean(forceTLS),
-    enabledTransports: forceTLS ? ["wss"] : ["ws", "wss"],
+    /* NOT `enabledTransports: ["wss"]` — see src/lib/liveEventRealtime.js:
+       restricting pusher-js to the wss transport alone leaves every strategy
+       branch unsupported and the socket dies in `failed` with no error event
+       (measured 2026-10-02). That silently killed forced-logout/support-chat
+       realtime on the web build. Unset = wss is still chosen first. */
     authEndpoint: buildApiUrl(apiUrl, "/api/v1/realtime/pusher/auth"),
     auth: {
       headers: {

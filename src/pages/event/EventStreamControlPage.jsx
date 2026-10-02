@@ -27,6 +27,8 @@ import {
   showSuccess,
 } from "../../component/ui/toast";
 import StartStreamAppDownloadModal from "../../component/Events/StartStreamAppDownloadModal";
+import HostLiveConsole from "../../component/stream/HostLiveConsole.jsx";
+import LiveControlBar from "../../component/stream/LiveControlBar.jsx";
 import { formatEventDateTime } from "../../utils/ui";
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
@@ -169,6 +171,24 @@ function resolveRtmpServer(event) {
   }
 
   return server;
+}
+
+/* The host's own view of what viewers get. Sourced from the SAME streams call
+   this page already makes (`GET /events/{id}/streams` ->
+   `event.stream.playback.{hls,master,abr}`; verified 2026-10-02 on an event
+   with a finished broadcast). Empty until the stream has actually been started,
+   which is what makes the console show its "preview appears here" state. */
+function resolvePlaybackUrl(event) {
+  const stream = event?.stream || {};
+  const playback = stream.playback || {};
+
+  return firstNonEmptyString(
+    playback.hls,
+    playback.master,
+    playback.abr,
+    stream.hls_url,
+    stream.playback_url,
+  );
 }
 
 function getErrorMessage(error, fallback = "Something went wrong.") {
@@ -779,6 +799,15 @@ export default function EventStreamControlPage() {
     (isLive || isPaused || stageOverride === "live");
   const showEnd = hasStartedStream && !isEnded;
   const showWatch = hasStartedStream && !isEnded;
+  /* The console (own preview + reactions + live numbers) is for events that can
+     still broadcast: a host waiting to start sees the shape of the room and the
+     preview fills in the moment the feed is up. Expired/ended events keep the
+     existing screens — there is nothing to watch back there. */
+  const playbackUrl = resolvePlaybackUrl(eventData);
+  const showLiveConsole = !isEnded && !isExpired;
+  /* Sticky while broadcasting: pause/resume, end, chat and analytics stay in
+     reach no matter how far down the page the host has scrolled. */
+  const showStickyControls = hasStartedStream && !isEnded && (isLive || isPaused);
   const ticketSalesCount = getTicketSalesCount(eventData);
   const hasKnownTicketSalesCount = ticketSalesCount !== null;
   const streamStartRequiresTicketPurchase =
@@ -1113,6 +1142,40 @@ export default function EventStreamControlPage() {
                 ) : null}
               </div>
             </div>
+
+            {/* ── Host live console (founder's brief, 2026-09-30) ─────────────
+                While the host is broadcasting nothing may scroll out of reach:
+                the sticky bar keeps Pause / End / Chat / Analytics pinned, and
+                the console below holds the own-stream preview, the live numbers
+                and the reactions panel. Measured before/after 2026-10-02. */}
+            {showStickyControls ? (
+              <LiveControlBar
+                statusTone={getStatusTone(status)}
+                isPaused={isPaused}
+                showPause={showPause}
+                showEnd={showEnd}
+                pendingAction={pendingAction}
+                onTogglePause={handleTogglePause}
+                onEnd={handleEnd}
+                onJumpToChat={() =>
+                  document
+                    .getElementById("live-chat")
+                    ?.scrollIntoView({ behavior: "smooth", block: "start" })
+                }
+                onOpenAnalytics={() => navigate(`/event/analytics/${eventId}`)}
+              />
+            ) : null}
+
+            {showLiveConsole ? (
+              <HostLiveConsole
+                eventId={eventId}
+                token={token}
+                isLive={isLive}
+                isPaused={isPaused}
+                hasStartedStream={hasStartedStream}
+                playbackUrl={playbackUrl}
+              />
+            ) : null}
 
             {isEnded ? (
               <section className="tw:overflow-hidden tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#ffffff_0%,#e5e4e2_52%,#e5e4e2_100%)] tw:p-6 tw:shadow-sm tw:md:p-8">
