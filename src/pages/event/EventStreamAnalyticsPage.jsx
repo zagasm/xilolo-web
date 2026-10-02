@@ -117,11 +117,10 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
       }
     >
       <div className="tw:overflow-x-auto">
-        <table className="tw:w-full tw:min-w-[720px] tw:text-left tw:text-sm">
+        <table className="tw:w-full tw:min-w-[560px] tw:text-left tw:text-sm">
           <thead>
             <tr className="tw:border-b tw:border-slate-200 tw:text-xs tw:uppercase tw:text-slate-500">
               <th className="tw:py-3">Viewer</th>
-              <th className="tw:py-3">Email</th>
               <th className="tw:py-3">Watch minutes</th>
               <th className="tw:py-3">Sessions</th>
               <th className="tw:py-3">Last seen</th>
@@ -130,7 +129,7 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
           <tbody>
             {loading ? (
               <tr>
-                <td className="tw:py-6 tw:text-slate-500" colSpan={5}>
+                <td className="tw:py-6 tw:text-slate-500" colSpan={4}>
                   Loading viewers...
                 </td>
               </tr>
@@ -138,7 +137,6 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
               viewers.map((viewer) => (
                 <tr key={viewer.user_id} className="tw:border-b tw:border-slate-100">
                   <td className="tw:py-3 tw:font-medium tw:text-slate-900">{viewer.name || "Viewer"}</td>
-                  <td className="tw:py-3 tw:text-slate-600">{viewer.email || "Not available"}</td>
                   <td className="tw:py-3 tw:text-slate-900">{viewer.watch_minutes ?? 0}</td>
                   <td className="tw:py-3 tw:text-slate-600">{viewer.total_sessions ?? 0}</td>
                   <td className="tw:py-3 tw:text-slate-600">{viewer.last_seen || "Not available"}</td>
@@ -146,7 +144,7 @@ function TopViewersTable({ viewers, meta, loading, onPage }) {
               ))
             ) : (
               <tr>
-                <td className="tw:py-6 tw:text-slate-500" colSpan={5}>
+                <td className="tw:py-6 tw:text-slate-500" colSpan={4}>
                   No viewer sessions have been recorded.
                 </td>
               </tr>
