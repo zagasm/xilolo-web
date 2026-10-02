@@ -126,6 +126,8 @@ const ProfilePreview = lazy(() => import("./pages/Profile/ProfilePreview.jsx"));
 /* lazily loaded — keeps this page out of the first-load bundle */
 const EventPreview = lazy(() => import("./pages/event/ViewEvent/EventPreview.jsx"));
 /* lazily loaded — keeps this page out of the first-load bundle */
+const StreamConsolePreview = lazy(() => import("./pages/event/StreamConsolePreview.jsx"));
+/* lazily loaded — keeps this page out of the first-load bundle */
 const BlockedUsersPage = lazy(() => import("./pages/Account/Blocked/index.jsx"));
 /* lazily loaded — keeps this page out of the first-load bundle */
 const CryptoWalletsPage = lazy(() => import("./pages/crypto/index.jsx"));
@@ -728,6 +730,16 @@ export function App() {
         <Route
           path="/dev/event-preview"
           element={import.meta.env.DEV ? <EventPreview /> : <Error404 />}
+        />
+
+        {/* Dev-only preview of the HOST LIVE CONSOLE on /event/stream/:eventId.
+            That route is owner-only and its live state cannot be reached without
+            taking a real event on air (forbidden), so this renders the REAL
+            HostLiveConsole against fixtures — measurable + screenshottable at
+            any width, no writes. 404s in production. */}
+        <Route
+          path="/dev/stream-console-preview"
+          element={import.meta.env.DEV ? <StreamConsolePreview /> : <Error404 />}
         />
 
         <Route path="/page-not-found" element={<Error404 />} />

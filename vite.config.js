@@ -48,6 +48,16 @@ export default defineConfig({
         // Optional: if the upstream checks Origin, pretend to be the allowed site
         headers: { Origin: "https://xilolo.com" },
       },
+      /* Laravel's broadcast channel authorization. NOT under /api, so it needs
+         its own entry or the host live console cannot open its realtime channel
+         locally (`private-live-event.{id}` authenticates here, verified
+         2026-10-02). Dev-only: production talks to api.xilolo.com directly. */
+      "/broadcasting": {
+        target: "https://api.xilolo.com",
+        changeOrigin: true,
+        secure: true,
+        headers: { Origin: "https://xilolo.com" },
+      },
       "/media": {
         target: "https://api.xilolo.com",
         changeOrigin: true,
