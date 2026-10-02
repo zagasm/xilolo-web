@@ -1110,7 +1110,7 @@ export default function EventStreamControlPage() {
         </div> */}
 
         <div className="col-md-12 col-lg-10 col-xl-10 tw:lg:ml-30 tw:py-24">
-          <div className="tw:mx-auto tw:max-w-[1240px] tw:space-y-6">
+          <div className="tw:mx-auto tw:max-w-[1240px] tw:space-y-6 tw:2xl:max-w-[1520px]">
             <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-center tw:lg:justify-between">
               <div>
                 <button

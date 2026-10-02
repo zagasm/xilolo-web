@@ -114,6 +114,41 @@ const LIVE_VIEWERS = [
   { user_id: "preview-viewer-4", name: "Tunde Adeyemi", avatar: "" },
 ];
 
+/* Guest queue fixture: one ask with a live countdown, one audio-only, and one
+   guest already on the stream. Mirrors GuestController's payloads. */
+const LIVE_GUEST_REQUESTS = [
+  {
+    id: 9001,
+    status: "pending",
+    audio_only: false,
+    requested_at: new Date(Date.now() - 12000).toISOString(),
+    expires_at: new Date(Date.now() + 48000).toISOString(),
+    seconds_left: 48,
+    user: { id: "g1", name: "Chidi Nwosu" },
+  },
+  {
+    id: 9002,
+    status: "pending",
+    audio_only: true,
+    requested_at: new Date(Date.now() - 5000).toISOString(),
+    expires_at: new Date(Date.now() + 55000).toISOString(),
+    seconds_left: 55,
+    user: { id: "g2", name: "Amaka Obi" },
+  },
+];
+
+const LIVE_GUESTS = [
+  {
+    id: 8001,
+    user_id: "g3",
+    name: "Bola Ade",
+    role: "guest",
+    audio_only: true,
+    status: "joined",
+    joined_at: new Date(Date.now() - 300000).toISOString(),
+  },
+];
+
 export default function StreamConsolePreview() {
   const [params] = useSearchParams();
   const state = params.get("state") || "live";
@@ -164,6 +199,8 @@ export default function StreamConsolePreview() {
               likesTotal: live ? 47 : 0,
               viewerCount: live ? 128 : 0,
               viewers: live ? LIVE_VIEWERS : [],
+              guestRequests: live ? LIVE_GUEST_REQUESTS : [],
+              guests: live ? LIVE_GUESTS : [],
               realtime: forceRealtime ? "subscribed" : "off",
             }}
           />
