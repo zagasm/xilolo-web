@@ -52,7 +52,7 @@ import {
 } from "../../../features/wallet/walletUtils";
 import ReplayUploadModal from "../../../component/Events/ReplayUploadModal";
 import ReactPlayer from "react-player";
-import EventDetailView, { EventStateScaffold } from "./EventDetailView.jsx";
+import EventDetailView, { EventStateScaffold, liveActionFor } from "./EventDetailView.jsx";
 import { SponsorProfileLink } from "./sponsorLink.jsx";
 
 export function CountdownPill({ target }) {
@@ -1267,6 +1267,21 @@ export default function ViewEvent() {
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
         preferredPurchaseType={preferredPurchaseType}
+        /* While the event is on air the sheet offers the way back: the host to
+           their console ("Go live"), a ticket holder to the stream. */
+        liveAction={liveActionFor({
+          isLiveNow,
+          isOwnerEvent,
+          hasPaid,
+          onGoLive: () => {
+            closePurchaseModal();
+            navigate(`/event/stream/${event?.id}`);
+          },
+          onJoinLive: () => {
+            closePurchaseModal();
+            handleEnterLive();
+          },
+        })}
       />
       <WalletFundingRequiredModal
         open={fundingRequiredOpen}

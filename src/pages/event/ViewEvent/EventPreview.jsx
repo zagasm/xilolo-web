@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import EventDetailView from "./EventDetailView.jsx";
+import EventDetailView, { liveActionFor } from "./EventDetailView.jsx";
+import TicketPromptModal from "../../../component/Events/TicketPromptModal.jsx";
 
 /**
  * DEV-ONLY preview of the event detail screen.
@@ -30,9 +31,31 @@ const POSTER =
 
 const noop = () => {};
 
+/* Data for the real buy-for-others sheet (?modal=1). Fields only — the component
+   is the shipping one and nothing in this preview writes anything. */
+const MODAL_EVENT = {
+  id: "preview-event-1",
+  title: "Lagos Afrobeat Night — Live Band & DJ Set",
+  poster: [{ url: POSTER }],
+  price: 15000,
+  price_display: "₦15,000",
+  currency: { symbol: "₦", code: "NGN" },
+  eventDate: "2026-09-12",
+  startTime: "20:00",
+  purchase_options: { ticket_only: true },
+  hasPaid: true,
+  user_has_ticket: true,
+  /* Without this the sheet has no option to select, so it renders as an empty
+     frame and the preview would "prove" a sheet nobody ever sees. */
+  user_can_sponsor_tickets: true,
+  user_has_sponsored_tickets: false,
+  manual: {},
+};
+
 export default function EventPreview() {
   const [params] = useSearchParams();
   const state = params.get("state") || "upcoming";
+  const isModalLive = state === "paid-live" || params.get("live") === "1";
   const [isFollowing, setIsFollowing] = useState(false);
 
   const v = useMemo(() => {
@@ -190,6 +213,28 @@ export default function EventPreview() {
   return (
     <div className="tw:bg-paper">
       <EventDetailView v={v} />
+
+      {/* ?modal=1 — the REAL buy-for-others sheet, so the live shortcut inside it
+          ("Go live" for the host, "Join live" for a ticket holder) can be seen and
+          measured without an account. Same liveActionFor() the page ships. */}
+      {params.get("modal") === "1" ? (
+        <TicketPromptModal
+          open
+          onClose={noop}
+          event={MODAL_EVENT}
+          onBuy={noop}
+          onDownloadManual={noop}
+          buying={false}
+          preferredPurchaseType="sponsored_only"
+          liveAction={liveActionFor({
+            isLiveNow: isModalLive,
+            isOwnerEvent: state === "owner",
+            hasPaid: state === "paid-live" || state === "bought",
+            onGoLive: noop,
+            onJoinLive: noop,
+          })}
+        />
+      ) : null}
     </div>
   );
 }

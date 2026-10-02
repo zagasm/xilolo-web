@@ -369,6 +369,20 @@ export function bottomBarState(v) {
   };
 }
 
+/**
+ * The live shortcut that belongs inside the buy-for-others sheet: while the
+ * event is on air, the purchase flow must not be a trap — the host goes back to
+ * the console and a ticket holder goes back to watching, each named for what it
+ * actually does ("Go live" is the host's verb; a viewer cannot broadcast).
+ * Exported so /dev/event-preview drives the same rule the page ships.
+ */
+export function liveActionFor({ isLiveNow, isOwnerEvent, hasPaid, onGoLive, onJoinLive }) {
+  if (!isLiveNow) return null;
+  if (isOwnerEvent) return { label: "Go live", tone: "live", onClick: onGoLive };
+  if (hasPaid) return { label: "Join live", tone: "watch", onClick: onJoinLive };
+  return null;
+}
+
 function ActionButton({ action }) {
   const cls =
     action.tone === "disabled"
