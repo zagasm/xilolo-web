@@ -28,6 +28,7 @@ export default function TicketPromptModal({
   onDownloadManual,
   buying = false,
   preferredPurchaseType,
+  liveAction,
 }) {
   const [selectedPurchaseType, setSelectedPurchaseType] = useState("ticket_only");
   const [quantity, setQuantity] = useState(1);
@@ -348,6 +349,26 @@ export default function TicketPromptModal({
                           : `Continue with ${selectedOption.label} (${selectedTotalLabel})`}
                       </button>
                     )}
+
+                    {/* Founder, 2026-10-02: while the event is on air this sheet
+                        carries a way back to the stream, so buying for other
+                        people never strands the host inside a purchase flow. */}
+                    {liveAction?.onClick ? (
+                      <button
+                        style={{
+                          borderRadius: 24,
+                        }}
+                        type="button"
+                        onClick={liveAction.onClick}
+                        className={
+                          liveAction.tone === "live"
+                            ? "tw:w-full tw:rounded-[16px] tw:bg-red-500 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-red-600"
+                            : "tw:w-full tw:rounded-[16px] tw:bg-accent tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-accent-deep"
+                        }
+                      >
+                        {liveAction.label}
+                      </button>
+                    ) : null}
 
                     <button
                       style={{

@@ -9,6 +9,7 @@ import React, {
 import { Link } from "react-router-dom";
 import {
   BarChart3,
+  ChevronRight,
   CornerDownRight,
   Eye,
   Heart,
@@ -21,6 +22,7 @@ import {
   Send,
   Trash2,
   TriangleAlert,
+  Users,
   X,
 } from "lucide-react";
 import HlsVideoPlayer from "../HlsVideoPlayer.jsx";
@@ -33,13 +35,17 @@ import {
 
 const cx = (...classes) => classes.filter(Boolean).join(" ");
 
-/* Polling cadences, kept inside the backend's own rate limits
-   (AppServiceProvider: live-polling 20/min, live-actions 30/min):
-   5s comments + 10s viewers = 12 + 6 requests/min, and the comments call only
-   polls this fast while realtime is NOT carrying the channel. */
+/* Polling is the guaranteed path and the fallback, so the intervals live inside
+   the backend's own limits (AppServiceProvider: live-polling 20/min per user,
+   live-actions 30/min, live-likes 30/min):
+     - viewers + likes  every 5s  -> 12/min each (separate buckets)
+     - comments         every 7s  ->  8.6/min   (20s once realtime carries it)
+     - viewer list      every 8s, only while its panel is open -> 7.5/min
+   Realtime events overwrite these instantly; the poll is just the floor. */
+const VIEWER_POLL_INTERVAL = 5000;
 const COMMENT_POLL_INTERVAL = 7000;
 const COMMENT_POLL_INTERVAL_WITH_REALTIME = 20000;
-const VIEWER_POLL_INTERVAL = 10000;
+const VIEWER_LIST_POLL_INTERVAL = 8000;
 const NEAR_BOTTOM_PX = 96;
 
 function timeValue(comment) {
@@ -62,13 +68,15 @@ function displayName(user, fallback = "Viewer") {
 }
 
 function initialsOf(label) {
-  return String(label || "?")
-    .replace(/[^A-Za-z0-9 ]/g, "")
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "?";
+  return (
+    String(label || "?")
+      .replace(/[^A-Za-z0-9 ]/g, "")
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("") || "?"
+  );
 }
 
 function clockLabel(iso) {
@@ -88,21 +96,79 @@ function describeError(error, fallback) {
   return error?.response?.data?.message || fallback;
 }
 
+function Avatar({ name, url, size = 8 }) {
+  return (
+    <span
+      className={cx(
+        "tw:flex tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-accent-soft tw:text-[11px] tw:font-bold tw:text-accent-deep",
+        size === 8 ? "tw:h-8 tw:w-8" : "tw:h-9 tw:w-9",
+      )}
+    >
+      {url ? (
+        <img
+          src={url}
+          alt=""
+          className={cx(size === 8 ? "tw:h-8 tw:w-8" : "tw:h-9 tw:w-9", "tw:object-cover")}
+        />
+      ) : (
+        initialsOf(name)
+      )}
+    </span>
+  );
+}
+
 /* ── Own-stream player ──────────────────────────────────────────────────────
    The host watches back exactly what viewers get. `playbackUrl` is
    `event.stream.playback.hls` from GET /api/v1/events/{id}/streams — the same
    call this page already makes to build its controls. Muted by default (the
-   host is the source of the audio) and `controls` stays on so they can unmute. */
-function LivePreviewCard({ playbackUrl, isLive, isPaused, hasStartedStream }) {
-  const status = isLive ? "Live" : isPaused ? "Paused" : hasStartedStream ? "Ready" : "Off air";
-  const tone = isLive
-    ? "tw:border-emerald-200 tw:bg-emerald-50 tw:text-emerald-700"
-    : isPaused
-      ? "tw:border-amber-200 tw:bg-amber-50 tw:text-amber-800"
-      : "tw:border-[#ded6cd] tw:bg-white tw:text-gray-600";
+   host is the source of the audio); the player reconnects on its own. */
+function LivePreviewCard({
+  playbackUrl,
+  aspectRatio,
+  preferHls,
+  isLive,
+  isPaused,
+  hasStartedStream,
+  onPlayerStatus,
+}) {
+  const [playerStatus, setPlayerStatus] = useState(playbackUrl ? "connecting" : "idle");
+
+  useEffect(() => {
+    setPlayerStatus(playbackUrl ? "connecting" : "idle");
+  }, [playbackUrl]);
+
+  const handleStatus = useCallback(
+    (next) => {
+      setPlayerStatus(next);
+      onPlayerStatus?.(next);
+    },
+    [onPlayerStatus],
+  );
+
+  /* The pill tells the truth about the picture, not just about the event status:
+     "Reconnecting" / "Waiting for feed" only appear while that is what the host
+     is actually looking at. */
+  const pill = (() => {
+    if (playerStatus === "reconnecting") return { label: "Reconnecting", tone: "warn" };
+    if (playerStatus === "waiting") return { label: "Waiting for feed", tone: "warn" };
+    if (playerStatus === "connecting") return { label: "Connecting", tone: "warn" };
+    if (playerStatus === "error") return { label: "Preview unavailable", tone: "warn" };
+    if (isLive) return { label: "Live", tone: "live" };
+    if (isPaused) return { label: "Paused", tone: "warn" };
+    return { label: hasStartedStream ? "Ready" : "Off air", tone: "idle" };
+  })();
+
+  const toneClass =
+    pill.tone === "live"
+      ? "tw:border-emerald-200 tw:bg-emerald-50 tw:text-emerald-700"
+      : pill.tone === "warn"
+        ? "tw:border-amber-200 tw:bg-amber-50 tw:text-amber-800"
+        : "tw:border-[#ded6cd] tw:bg-white tw:text-gray-600";
 
   return (
-    <section className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6">
+    /* self-start: the chat rail is the taller column, and letting the grid
+       stretch this card left a block of empty white under the player. */
+    <section className="tw:self-start tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4 tw:shadow-sm tw:md:p-5">
       <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
         <div>
           <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
@@ -114,22 +180,33 @@ function LivePreviewCard({ playbackUrl, isLive, isPaused, hasStartedStream }) {
         </div>
 
         <span
+          data-console-part="player-status"
           className={cx(
             "tw:inline-flex tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold",
-            tone,
+            toneClass,
           )}
         >
           <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-current" />
-          {status}
+          {pill.label}
         </span>
       </div>
 
       <div className="tw:mt-4" data-console-part="player">
         {playbackUrl ? (
-          <HlsVideoPlayer src={playbackUrl} autoPlay muted controls />
+          <HlsVideoPlayer
+            src={playbackUrl}
+            live
+            preferHls={preferHls}
+            autoPlay
+            muted
+            controls
+            aspectRatio={aspectRatio || "16 / 9"}
+            maxHeight="72vh"
+            onStatus={handleStatus}
+          />
         ) : (
-          <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:rounded-3xl tw:border tw:border-dashed tw:border-[#ded6cd] tw:bg-[#faf8f6] tw:px-6 tw:py-14 tw:text-center">
-            <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep tw:shadow-sm">
+          <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:rounded-3xl tw:border tw:border-dashed tw:border-[#ded6cd] tw:bg-[#faf8f6] tw:px-6 tw:py-16 tw:text-center">
+            <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep">
               <Radio className="tw:h-5 tw:w-5" />
             </span>
             <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
@@ -148,13 +225,20 @@ function LivePreviewCard({ playbackUrl, isLive, isPaused, hasStartedStream }) {
 }
 
 /* ── Live analytics strip ─────────────────────────────────────────────────── */
-function StatTile({ icon: Icon, label, value }) {
+function StatTile({ icon: Icon, label, value, onClick, hint }) {
+  const Wrapper = onClick ? "button" : "div";
   return (
-    <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-3 tw:shadow-sm">
+    <Wrapper
+      {...(onClick ? { type: "button", onClick, "aria-label": hint || label } : {})}
+      className={cx(
+        "tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-3 tw:shadow-sm tw:text-left",
+        onClick ? "tw:cursor-pointer tw:transition tw:hover:border-gray-400" : "",
+      )}
+    >
       <span className="tw:flex tw:h-10 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep">
         <Icon className="tw:h-4 tw:w-4" />
       </span>
-      <span className="tw:min-w-0">
+      <span className="tw:min-w-0 tw:flex-1">
         <span className="tw:block tw:text-xl tw:font-bold tw:leading-tight tw:text-gray-900">
           {value}
         </span>
@@ -162,20 +246,70 @@ function StatTile({ icon: Icon, label, value }) {
           {label}
         </span>
       </span>
-    </div>
+      {hint ? (
+        <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:text-[11px] tw:font-semibold tw:text-accent-deep">
+          See who
+          <ChevronRight className="tw:h-3.5 tw:w-3.5" />
+        </span>
+      ) : null}
+    </Wrapper>
   );
 }
 
-function LiveStatsStrip({ eventId, viewerCount, likesTotal, commentsTotal, realtime }) {
+function LiveStatsStrip({
+  eventId,
+  viewerCount,
+  likesTotal,
+  commentsTotal,
+  realtime,
+  onOpenViewers,
+  likesBusy,
+  onLike,
+}) {
   return (
     <section
       className="tw:flex tw:flex-col tw:gap-3 tw:lg:flex-row tw:lg:items-center"
       data-console-part="stats"
     >
       <div className="tw:grid tw:flex-1 tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-3">
-        <StatTile icon={Eye} label="Viewers now" value={viewerCount} />
-        <StatTile icon={Heart} label="Likes" value={likesTotal} />
+        <StatTile
+          icon={Eye}
+          label="Viewers now"
+          value={viewerCount}
+          onClick={onOpenViewers}
+          hint="See who is watching this event"
+        />
         <StatTile icon={MessageCircle} label="Comments" value={commentsTotal} />
+        <div
+          className="tw:flex tw:items-center tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-3 tw:shadow-sm"
+          data-console-part="likes-tile"
+        >
+          <span className="tw:flex tw:h-10 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep">
+            <Heart className="tw:h-4 tw:w-4" />
+          </span>
+          <span className="tw:min-w-0 tw:flex-1">
+            <span className="tw:block tw:text-xl tw:font-bold tw:leading-tight tw:text-gray-900">
+              {likesTotal}
+            </span>
+            <span className="tw:block tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.14em] tw:text-gray-500">
+              Likes
+            </span>
+          </span>
+          <button
+            type="button"
+            onClick={onLike}
+            disabled={likesBusy}
+            aria-label="Add a like to this event"
+            className="tw:inline-flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-3 tw:text-[11px] tw:font-semibold tw:text-gray-600 tw:transition tw:hover:border-accent tw:hover:text-accent-deep tw:disabled:opacity-60"
+          >
+            {likesBusy ? (
+              <LoaderCircle className="tw:h-3.5 tw:w-3.5 tw:animate-spin" />
+            ) : (
+              <Heart className="tw:h-3.5 tw:w-3.5" />
+            )}
+            Like
+          </button>
+        </div>
       </div>
 
       <div className="tw:flex tw:items-center tw:gap-3 tw:lg:shrink-0">
@@ -188,25 +322,23 @@ function LiveStatsStrip({ eventId, viewerCount, likesTotal, commentsTotal, realt
           )}
           title={
             realtime === "subscribed"
-              ? "Comments arrive the moment they are sent"
-              : "Comments refresh every few seconds"
+              ? "Counts and comments update the moment they change"
+              : "Counts refresh every few seconds"
           }
         >
           <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-current" />
-          {/* Deliberately NOT the word "Live": on a page that can read "Off air"
-              at the same time, a pill saying "Live" reads as "your event is
-              live". This describes the chat connection, not the broadcast. */}
+          {/* Deliberately NOT the word "Live": the owner subscribes before going
+              live, so a green pill reading "Live" would claim the event is on air. */}
           {realtime === "subscribed" ? "Live updates" : "Refreshing"}
         </span>
 
         <Link
           to={`/event/analytics/${eventId}`}
           data-console-part="analytics-link"
-          /* Deliberately NOT a filled brand button: this repo has an unlayered
-             `div a { color }` rule that beats layered Tailwind, so a white label
-             on a filled anchor renders near-black-on-dark (invisible). The
-             bordered-light pattern is the one EventDetailView's own analytics
-             link uses and it measures readable. */
+          /* Not a filled brand button on purpose: an unlayered `div a { color }`
+             rule beats layered Tailwind here, so a white label on a fill renders
+             near-black-on-dark. Bordered-light is the pattern that measures
+             readable (as EventDetailView's own analytics link does). */
           className="tw:inline-flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:border-gray-400"
         >
           <BarChart3 className="tw:h-4 tw:w-4 tw:text-accent-deep" />
@@ -214,6 +346,121 @@ function LiveStatsStrip({ eventId, viewerCount, likesTotal, commentsTotal, realt
         </Link>
       </div>
     </section>
+  );
+}
+
+/* ── Who is watching ──────────────────────────────────────────────────────── */
+function ViewersPanel({ open, onClose, viewerCount, viewers, loading, errorText, onRefresh }) {
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  const listedCount = viewers.length;
+  const guests = Math.max(0, Number(viewerCount || 0) - listedCount);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Who is watching"
+      data-console-part="viewers-panel"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-end tw:justify-center tw:bg-black/40 tw:sm:items-center tw:sm:p-6"
+    >
+      <div className="tw:flex tw:max-h-[85vh] tw:w-full tw:max-w-md tw:flex-col tw:rounded-t-4xl tw:bg-white tw:p-5 tw:shadow-xl tw:sm:rounded-4xl">
+        <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+          <div>
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:text-lg tw:font-semibold tw:text-gray-900">
+              <Users className="tw:h-4 tw:w-4 tw:text-accent-deep" />
+              Watching now
+            </span>
+            <p className="tw:mt-1 tw:text-sm tw:text-gray-600" data-console-part="viewers-count">
+              {viewerCount} {Number(viewerCount) === 1 ? "person is" : "people are"} in this event.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="tw:inline-flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ded6cd] tw:text-gray-600 tw:hover:border-gray-400"
+          >
+            <X className="tw:h-4 tw:w-4" />
+          </button>
+        </div>
+
+        <div className="tw:mt-4 tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:pr-1">
+          {loading && listedCount === 0 ? (
+            <div className="tw:flex tw:h-32 tw:items-center tw:justify-center tw:gap-2 tw:text-sm tw:text-gray-500">
+              <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
+              Loading viewers
+            </div>
+          ) : errorText ? (
+            <div className="tw:flex tw:items-start tw:gap-2 tw:rounded-3xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-[13px] tw:leading-6 tw:text-amber-800">
+              <TriangleAlert className="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0" />
+              <span className="tw:flex-1">{errorText}</span>
+              <button
+                type="button"
+                onClick={onRefresh}
+                className="tw:inline-flex tw:items-center tw:gap-1 tw:font-semibold tw:hover:underline"
+              >
+                <RefreshCw className="tw:h-3.5 tw:w-3.5" />
+                Retry
+              </button>
+            </div>
+          ) : listedCount === 0 ? (
+            <div className="tw:flex tw:h-32 tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:px-6 tw:text-center">
+              <span className="tw:flex tw:h-11 tw:w-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep">
+                <Users className="tw:h-5 tw:w-5" />
+              </span>
+              <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
+                No one is watching yet
+              </div>
+              <div className="tw:text-sm tw:leading-6 tw:text-gray-600">
+                Names appear here as people join the event.
+              </div>
+            </div>
+          ) : (
+            <ul className="tw:space-y-1">
+              {viewers.map((viewer) => (
+                <li
+                  key={viewer.user_id}
+                  className="tw:flex tw:items-center tw:gap-3 tw:rounded-2xl tw:px-2 tw:py-2 tw:hover:bg-[#faf8f6]"
+                >
+                  <Avatar name={viewer.name} url={viewer.avatar} size={9} />
+                  <span className="tw:min-w-0 tw:flex-1">
+                    <span className="tw:block tw:truncate tw:text-[13px] tw:font-semibold tw:text-gray-900">
+                      {viewer.name || "Viewer"}
+                    </span>
+                  </span>
+                  <span className="tw:rounded-full tw:border tw:border-emerald-200 tw:bg-emerald-50 tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-bold tw:text-emerald-700">
+                    Watching
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Count and list come from two different endpoints: /viewers/count also
+            counts anonymous guests, /viewers/list can only name signed-in
+            people. Saying so beats a list that looks short for no reason. */}
+        {guests > 0 ? (
+          <p className="tw:mt-3 tw:rounded-2xl tw:bg-[#faf8f6] tw:px-3 tw:py-2 tw:text-[11px] tw:leading-5 tw:text-gray-500">
+            {guests} more {guests === 1 ? "viewer is" : "viewers are"} signed out, so they
+            cannot be listed by name. Totals include them.
+          </p>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
@@ -225,12 +472,8 @@ function ChatRow({ comment, canModerate, onPin, onUnpin, onDelete, onReply, busy
 
   return (
     <div className="tw:group tw:flex tw:gap-3 tw:rounded-3xl tw:px-2 tw:py-2 tw:hover:bg-[#faf8f6]">
-      <span className="tw:mt-0.5 tw:flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-accent-soft tw:text-[11px] tw:font-bold tw:text-accent-deep">
-        {avatar ? (
-          <img src={avatar} alt="" className="tw:h-8 tw:w-8 tw:object-cover" />
-        ) : (
-          initialsOf(name)
-        )}
+      <span className="tw:mt-0.5">
+        <Avatar name={name} url={avatar} />
       </span>
 
       <div className="tw:min-w-0 tw:flex-1">
@@ -250,7 +493,9 @@ function ChatRow({ comment, canModerate, onPin, onUnpin, onDelete, onReply, busy
             </span>
           ) : null}
 
-          <span className="tw:text-[11px] tw:text-gray-400">{clockLabel(comment.created_at)}</span>
+          <span className="tw:text-[11px] tw:text-gray-400">
+            {clockLabel(comment.created_at)}
+          </span>
         </div>
 
         {comment.parent ? (
@@ -310,7 +555,6 @@ function ChatRow({ comment, canModerate, onPin, onUnpin, onDelete, onReply, busy
 }
 
 function LiveChatPanel({
-  eventId,
   comments,
   canModerate,
   loading,
@@ -320,19 +564,16 @@ function LiveChatPanel({
   onPin,
   onUnpin,
   onDelete,
+  onReply,
   sending,
   busy,
   realtime,
   viewerCount,
   likesTotal,
-  likedByMe,
-  onToggleLike,
-  likeBusy,
   newBelow,
   onJumpToLatest,
   listRef,
   onListScroll,
-  onReply,
   replyTo,
   onClearReply,
 }) {
@@ -355,8 +596,8 @@ function LiveChatPanel({
   return (
     <section
       id="live-chat"
-      className="tw:flex tw:min-h-[520px] tw:flex-col tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:md:p-6"
       data-console-part="chat"
+      className="tw:flex tw:min-h-[520px] tw:flex-col tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-5 tw:shadow-sm tw:xl:h-[calc(100vh-7rem)] tw:xl:max-h-[900px] tw:md:p-6"
     >
       <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
         <div>
@@ -366,24 +607,13 @@ function LiveChatPanel({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onToggleLike}
-          disabled={likeBusy}
-          aria-label={likedByMe ? "Remove your like" : "Like this event"}
-          className={cx(
-            "tw:inline-flex tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:transition tw:disabled:opacity-60",
-            likedByMe
-              ? "tw:border-accent tw:bg-accent-soft tw:text-accent-deep"
-              : "tw:border-[#ded6cd] tw:bg-white tw:text-gray-600 tw:hover:border-gray-400",
-          )}
+        <span
+          className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1.5 tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-gray-600"
+          title="Comments"
         >
-          <Heart
-            className="tw:h-3.5 tw:w-3.5"
-            fill={likedByMe ? "currentColor" : "none"}
-          />
-          {likesTotal}
-        </button>
+          <MessageCircle className="tw:h-3.5 tw:w-3.5 tw:text-accent-deep" />
+          {comments.length}
+        </span>
       </div>
 
       {pinnedComment && canModerate ? (
@@ -423,12 +653,12 @@ function LiveChatPanel({
         </div>
       ) : null}
 
-      <div className="tw:relative tw:mt-4 tw:flex-1">
+      <div className="tw:relative tw:mt-4 tw:min-h-0 tw:flex-1">
         <div
           ref={listRef}
           onScroll={onListScroll}
           data-console-part="chat-list"
-          className="tw:h-[380px] tw:overflow-y-auto tw:pr-1 tw:xl:h-[420px]"
+          className="tw:h-[380px] tw:overflow-y-auto tw:pr-1 tw:xl:h-full"
         >
           {loading ? (
             <div className="tw:flex tw:h-full tw:items-center tw:justify-center tw:gap-2 tw:text-sm tw:text-gray-500">
@@ -527,8 +757,8 @@ function LiveChatPanel({
       </div>
 
       <p className="tw:mt-2 tw:text-[11px] tw:text-gray-500">
-        {viewerCount} watching now · comments refresh automatically
-          {realtime === "subscribed" ? " as they arrive" : " every few seconds"}.
+        {viewerCount} watching · {likesTotal} likes · comments refresh automatically
+        {realtime === "subscribed" ? " as they arrive" : " every few seconds"}.
       </p>
     </section>
   );
@@ -537,14 +767,18 @@ function LiveChatPanel({
 /**
  * Host live console for /event/stream/:eventId — owner-only surface.
  *
- * Player + reactions + live analytics in one block so the host never has to
- * scroll between "am I on air", "what are they saying" and "how many are
- * watching" while broadcasting. Data comes from the existing live endpoints
- * (comments / likes / viewers) plus `private-live-event.{eventId}` for push.
+ * Player, live counts and reactions in one block so the host never has to scroll
+ * between "am I on air", "how many are watching" and "what are they saying".
+ * The chat sits beside the player as a rail; the player takes the rest of the
+ * width and reconnects by itself.
  *
- * `fixture` renders the identical markup against fixed data with no fetching
- * and no writes — that is what the /dev/stream-console-preview route uses to
- * measure this screen at real widths without taking an event live.
+ * Counts: `live.session.updated` (viewers) and `live.like.toggled` (likes) arrive
+ * over `private-live-event.{eventId}` and land instantly; a 5s poll is the floor
+ * so nothing is ever stale if the socket is down. Clicking the viewers tile opens
+ * the list of who is actually watching.
+ *
+ * `fixture` renders the identical markup against fixed data with no fetching and
+ * no writes — that is what /dev/stream-console-preview uses.
  */
 export default function HostLiveConsole({
   eventId,
@@ -553,6 +787,8 @@ export default function HostLiveConsole({
   isPaused = false,
   hasStartedStream = false,
   playbackUrl = "",
+  aspectRatio = "",
+  preferHls = true,
   canModerate = true,
   fixture = null,
 }) {
@@ -560,8 +796,11 @@ export default function HostLiveConsole({
 
   const [comments, setComments] = useState(fixture?.comments || []);
   const [likesTotal, setLikesTotal] = useState(fixture?.likesTotal ?? 0);
-  const [likedByMe, setLikedByMe] = useState(Boolean(fixture?.likedByMe));
   const [viewerCount, setViewerCount] = useState(fixture?.viewerCount ?? 0);
+  const [viewers, setViewers] = useState(fixture?.viewers || []);
+  const [viewersOpen, setViewersOpen] = useState(false);
+  const [viewersLoading, setViewersLoading] = useState(false);
+  const [viewersError, setViewersError] = useState("");
   const [loading, setLoading] = useState(!demo);
   const [errorText, setErrorText] = useState("");
   const [realtime, setRealtime] = useState(fixture?.realtime || "off");
@@ -573,6 +812,12 @@ export default function HostLiveConsole({
 
   const listRef = useRef(null);
   const atBottomRef = useRef(true);
+  const viewersOpenRef = useRef(false);
+  const lastListFetchRef = useRef(0);
+
+  useEffect(() => {
+    viewersOpenRef.current = viewersOpen;
+  }, [viewersOpen]);
 
   const scrollToLatest = useCallback((smooth = false) => {
     const node = listRef.current;
@@ -590,16 +835,13 @@ export default function HostLiveConsole({
     if (atBottomRef.current) setNewBelow(false);
   }, []);
 
-  const applyComments = useCallback(
-    (incoming) => {
-      setComments((previous) => {
-        const next = mergeComments(previous, incoming);
-        if (next.length > previous.length && !atBottomRef.current) setNewBelow(true);
-        return next;
-      });
-    },
-    [],
-  );
+  const applyComments = useCallback((incoming) => {
+    setComments((previous) => {
+      const next = mergeComments(previous, incoming);
+      if (next.length > previous.length && !atBottomRef.current) setNewBelow(true);
+      return next;
+    });
+  }, []);
 
   const loadComments = useCallback(
     async ({ silent = false } = {}) => {
@@ -621,52 +863,67 @@ export default function HostLiveConsole({
     [applyComments, demo, eventId, token],
   );
 
-  const loadLikes = useCallback(async () => {
+  const loadCounts = useCallback(async () => {
     if (demo || !eventId || !token) return;
-    try {
-      const response = await api.get(
-        `/api/v1/events/${eventId}/live/likes?per_page=500`,
-        authHeaders(token),
-      );
-      const payload = response?.data;
-      setLikesTotal(Number(payload?.meta?.total ?? payload?.data?.length ?? 0));
-    } catch {
-      /* likes are cosmetic here — the strip keeps its last value */
-    }
-  }, [demo, eventId, token]);
+    const [viewersResult, likesResult] = await Promise.allSettled([
+      api.get(`/api/v1/events/${eventId}/live/viewers/count`, authHeaders(token)),
+      api.get(`/api/v1/events/${eventId}/live/likes?per_page=1`, authHeaders(token)),
+    ]);
 
-  const loadViewers = useCallback(async () => {
-    if (demo || !eventId || !token) return;
-    try {
-      const response = await api.get(
-        `/api/v1/events/${eventId}/live/viewers/count`,
-        authHeaders(token),
-      );
-      const count = response?.data?.data?.viewer_count;
+    if (viewersResult.status === "fulfilled") {
+      const count = viewersResult.value?.data?.data?.viewer_count;
       if (Number.isFinite(Number(count))) setViewerCount(Number(count));
-    } catch {
-      /* keep the last known count */
+    }
+    if (likesResult.status === "fulfilled") {
+      const payload = likesResult.value?.data;
+      setLikesTotal(Number(payload?.meta?.total ?? payload?.data?.length ?? 0));
     }
   }, [demo, eventId, token]);
 
-  /* Poll — the guaranteed path (works with or without Reverb configured). */
+  const loadViewers = useCallback(
+    async ({ silent = true } = {}) => {
+      if (demo || !eventId || !token) return;
+      if (!silent) setViewersLoading(true);
+      try {
+        const response = await api.get(
+          `/api/v1/events/${eventId}/live/viewers/list`,
+          authHeaders(token),
+        );
+        const payload = response?.data?.data || {};
+        setViewers(Array.isArray(payload.viewers) ? payload.viewers : []);
+        setViewersError("");
+        lastListFetchRef.current = Date.now();
+      } catch (error) {
+        if (!silent) setViewersError(describeError(error, "Could not load the viewer list."));
+      } finally {
+        if (!silent) setViewersLoading(false);
+      }
+    },
+    [demo, eventId, token],
+  );
+
+  /* The poll floor: viewers + likes every 5s, comments slower once realtime is
+     carrying them, and the viewer list only while its panel is open. */
   useEffect(() => {
     if (demo) return undefined;
 
     loadComments();
-    loadLikes();
-    loadViewers();
+    loadCounts();
 
+    const countsTimer = setInterval(loadCounts, VIEWER_POLL_INTERVAL);
     const commentMs =
       realtime === "subscribed" ? COMMENT_POLL_INTERVAL_WITH_REALTIME : COMMENT_POLL_INTERVAL;
-    const commentTimer = setInterval(() => loadComments({ silent: true }), commentMs);
-    const viewerTimer = setInterval(loadViewers, VIEWER_POLL_INTERVAL);
+    const commentsTimer = setInterval(() => loadComments({ silent: true }), commentMs);
+    const listTimer = setInterval(() => {
+      if (viewersOpenRef.current) loadViewers({ silent: true });
+    }, VIEWER_LIST_POLL_INTERVAL);
 
     return () => {
-      clearInterval(commentTimer);
-      clearInterval(viewerTimer);
+      clearInterval(countsTimer);
+      clearInterval(commentsTimer);
+      clearInterval(listTimer);
     };
-  }, [demo, loadComments, loadLikes, loadViewers, realtime]);
+  }, [demo, loadComments, loadCounts, loadViewers, realtime]);
 
   /* Realtime push over the event's private channel. Degrades to polling. */
   useEffect(() => {
@@ -686,19 +943,17 @@ export default function HostLiveConsole({
       onPinned: (comment) => applyComments([comment]),
       onUnpinned: (comment) => applyComments([{ ...comment, is_pinned: false }]),
       onLike: (payload) => {
-        if (Number.isFinite(Number(payload?.likes_count))) {
-          setLikesTotal(Number(payload.likes_count));
-        } else {
-          loadLikes();
-        }
-        if (payload?.liked === false && payload?.user) {
-          const mine = String(payload.user.id) === String(fixture?.viewerId || "");
-          if (mine) setLikedByMe(false);
-        }
+        const count = payload?.likes_count ?? payload?.likesCount;
+        if (Number.isFinite(Number(count))) setLikesTotal(Number(count));
       },
       onSession: (payload) => {
         const count = payload?.viewer_count ?? payload?.metrics?.viewer_count;
         if (Number.isFinite(Number(count))) setViewerCount(Number(count));
+        // Membership changed — refresh the open list, but never faster than the
+        // 8s list poll would allow.
+        if (viewersOpenRef.current && Date.now() - lastListFetchRef.current > 5000) {
+          loadViewers({ silent: true });
+        }
       },
       onStatus: (status) => {
         setRealtime(status === "subscribed" ? "subscribed" : status);
@@ -711,10 +966,8 @@ export default function HostLiveConsole({
     }
 
     return () => subscription.disconnect();
-  }, [applyComments, demo, eventId, loadLikes, token, fixture?.viewerId]);
+  }, [applyComments, demo, eventId, loadViewers, token]);
 
-  /* Keep the newest comment in view — but never yank the host away from a
-     message they scrolled back to read. */
   useLayoutEffect(() => {
     if (comments.length === 0) return;
     if (atBottomRef.current) scrollToLatest();
@@ -723,19 +976,20 @@ export default function HostLiveConsole({
   const handleSend = useCallback(
     async (body, parentId) => {
       if (demo) {
-        const localComment = {
-          id: `local-${Date.now()}`,
-          body,
-          parent_id: parentId || null,
-          is_pinned: false,
-          likes_count: 0,
-          created_at: new Date().toISOString(),
-          created_at_unix: Math.floor(Date.now() / 1000),
-          is_event_organizer: true,
-          author_role: "organizer",
-          user: { id: "preview-host", name: "You", userName: "you" },
-        };
-        applyComments([localComment]);
+        applyComments([
+          {
+            id: `local-${Date.now()}`,
+            body,
+            parent_id: parentId || null,
+            is_pinned: false,
+            likes_count: 0,
+            created_at: new Date().toISOString(),
+            created_at_unix: Math.floor(Date.now() / 1000),
+            is_event_organizer: true,
+            author_role: "organizer",
+            user: { id: "preview-host", name: "You", userName: "you" },
+          },
+        ]);
         return true;
       }
 
@@ -791,9 +1045,7 @@ export default function HostLiveConsole({
         "Comment pinned for viewers.",
       );
       if (ok) {
-        applyComments([
-          { ...comment, is_pinned: true, pinned_at: new Date().toISOString() },
-        ]);
+        applyComments([{ ...comment, is_pinned: true, pinned_at: new Date().toISOString() }]);
         await loadComments({ silent: true });
       }
     },
@@ -841,35 +1093,42 @@ export default function HostLiveConsole({
     [demo, eventId, token],
   );
 
-  const handleToggleLike = useCallback(async () => {
+  /* The API's like endpoint ADDS a like (LiveLikeService::like creates rows —
+     "toggle" is a misnomer and there is no unlike), so this is a "like" action
+     that raises the live total, exactly as viewers' taps do. */
+  const handleLike = useCallback(async () => {
     if (demo) {
-      setLikedByMe((current) => {
-        setLikesTotal((total) => Math.max(0, total + (current ? -1 : 1)));
-        return !current;
-      });
+      setLikesTotal((total) => total + 1);
       return;
     }
-
     setLikeBusy(true);
     try {
       const response = await api.post(
         `/api/v1/events/${eventId}/live/likes/toggle`,
-        {},
+        { tap_count: 1 },
         authHeaders(token),
       );
       const payload = response?.data?.data || {};
-      if (Number.isFinite(Number(payload.likes_count))) {
-        setLikesTotal(Number(payload.likes_count));
-      } else {
-        await loadLikes();
-      }
-      if (typeof payload.liked === "boolean") setLikedByMe(payload.liked);
+      const count = payload?.likes_count ?? payload?.likesCount;
+      if (Number.isFinite(Number(count))) setLikesTotal(Number(count));
+      else await loadCounts();
     } catch (error) {
       showError(describeError(error, "Could not register that like."));
     } finally {
       setLikeBusy(false);
     }
-  }, [demo, eventId, loadLikes, token]);
+  }, [demo, eventId, loadCounts, token]);
+
+  const openViewers = useCallback(() => {
+    setViewersOpen(true);
+    viewersOpenRef.current = true;
+    if (!demo) loadViewers({ silent: false });
+  }, [demo, loadViewers]);
+
+  const closeViewers = useCallback(() => {
+    setViewersOpen(false);
+    viewersOpenRef.current = false;
+  }, []);
 
   return (
     <div
@@ -884,43 +1143,59 @@ export default function HostLiveConsole({
         likesTotal={likesTotal}
         commentsTotal={comments.length}
         realtime={realtime}
+        onOpenViewers={openViewers}
+        likesBusy={likeBusy}
+        onLike={handleLike}
       />
 
-      <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+      {/* Player takes the width; chat is a rail beside it and keeps its own
+          scroll, so neither pushes the other out of reach. */}
+      <div className="tw:grid tw:grid-cols-1 tw:gap-6 tw:xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)]">
         <LivePreviewCard
           playbackUrl={playbackUrl}
+          aspectRatio={aspectRatio}
+          preferHls={preferHls}
           isLive={isLive}
           isPaused={isPaused}
           hasStartedStream={hasStartedStream}
         />
 
-        <LiveChatPanel
-          eventId={eventId}
-          comments={comments}
-          canModerate={canModerate}
-          loading={loading}
-          errorText={errorText}
-          onRetry={() => loadComments()}
-          onSend={handleSend}
-          onPin={handlePin}
-          onUnpin={handleUnpin}
-          onDelete={handleDelete}
-          sending={sending}
-          busy={busy}
-          realtime={realtime}
-          viewerCount={viewerCount}
-          likesTotal={likesTotal}
-          likedByMe={likedByMe}
-          onToggleLike={handleToggleLike}
-          likeBusy={likeBusy}
-          newBelow={newBelow}
-          onJumpToLatest={() => scrollToLatest(true)}
-          listRef={listRef}
-          onListScroll={handleListScroll}
-          replyTo={replyTo}
-          onClearReply={() => setReplyTo(null)}
-        />
+        <div className="tw:xl:sticky tw:xl:top-4 tw:xl:self-start">
+          <LiveChatPanel
+            comments={comments}
+            canModerate={canModerate}
+            loading={loading}
+            errorText={errorText}
+            onRetry={() => loadComments()}
+            onSend={handleSend}
+            onPin={handlePin}
+            onUnpin={handleUnpin}
+            onDelete={handleDelete}
+            onReply={setReplyTo}
+            sending={sending}
+            busy={busy}
+            realtime={realtime}
+            viewerCount={viewerCount}
+            likesTotal={likesTotal}
+            newBelow={newBelow}
+            onJumpToLatest={() => scrollToLatest(true)}
+            listRef={listRef}
+            onListScroll={handleListScroll}
+            replyTo={replyTo}
+            onClearReply={() => setReplyTo(null)}
+          />
+        </div>
       </div>
+
+      <ViewersPanel
+        open={viewersOpen}
+        onClose={closeViewers}
+        viewerCount={viewerCount}
+        viewers={viewers}
+        loading={viewersLoading}
+        errorText={viewersError}
+        onRefresh={() => loadViewers({ silent: false })}
+      />
     </div>
   );
 }

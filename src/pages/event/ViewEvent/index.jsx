@@ -52,7 +52,7 @@ import {
 } from "../../../features/wallet/walletUtils";
 import ReplayUploadModal from "../../../component/Events/ReplayUploadModal";
 import ReactPlayer from "react-player";
-import EventDetailView, { EventStateScaffold } from "./EventDetailView.jsx";
+import EventDetailView, { EventStateScaffold, liveActionFor } from "./EventDetailView.jsx";
 import { SponsorProfileLink } from "./sponsorLink.jsx";
 
 export function CountdownPill({ target }) {
@@ -639,7 +639,20 @@ export default function ViewEvent() {
       ? ` and ${sponsoredTicketSponsors.length - 1} other${sponsoredTicketSponsors.length === 2 ? "" : "s"} bought tickets for others for this event.`
       : " bought tickets for others for this event.";
   const canClaimSponsoredTicket = !!event?.can_claim_sponsored_ticket;
+  /* The host's own flag (used for host-only copy further down the page)… */
   const canSponsorOwnEvent = !!(isOwnerEvent && event?.user_can_sponsor_tickets && !isSoldOut);
+  /* …and the flag that actually drives "Buy for others". The API grants
+     user_can_sponsor_tickets to ANY signed-in viewer while sales are open
+     (`EventResource: $userCanSponsorTickets = $viewer && ! ticketSalesAreClosed()`),
+     and the app shows "Buy for Others" to anyone with hasPaid. Gating this on
+     isOwnerEvent is why a ticket holder had no way to buy for other people. */
+  const ticketSalesClosed = !!event?.ticket_sales_closed;
+  const canSponsorTickets = !!(
+    event?.user_can_sponsor_tickets &&
+    !isSoldOut &&
+    !ticketSalesClosed &&
+    (isOwnerEvent || hasPaid)
+  );
   const canOpenPurchaseOptions =
     (!isOwnerEvent || canSponsorOwnEvent) &&
     !isSoldOut &&
@@ -727,10 +740,8 @@ export default function ViewEvent() {
       return;
     }
 
-    if (shouldChoosePurchaseType || canBuyManualOnly || (hasPaid && event?.user_can_sponsor_tickets)) {
-      setPreferredPurchaseType(
-        hasPaid && event?.user_can_sponsor_tickets ? "sponsored_only" : null
-      );
+    if (shouldChoosePurchaseType || canBuyManualOnly || canSponsorTickets) {
+      setPreferredPurchaseType(canSponsorTickets ? "sponsored_only" : null);
       setPurchaseModalOpen(true);
       setModalAutoTrigger(false);
       return;
@@ -749,8 +760,10 @@ export default function ViewEvent() {
     }
 
     setPurchaseModalOpen(true);
+    // Mirrors the app's _preferredSponsorPurchaseType: a viewer who can sponsor
+    // lands on "Buy for others" rather than having to pick it out of a list.
     setPreferredPurchaseType(
-      viewerHasSponsoredTickets ? "sponsored_only" : null
+      canSponsorTickets || viewerHasSponsoredTickets ? "sponsored_only" : null
     );
     setModalAutoTrigger(false);
   };
@@ -1193,6 +1206,7 @@ export default function ViewEvent() {
           canOpenPurchaseOptions,
           canBuyManualOnly,
           canSponsorOwnEvent,
+          canSponsorTickets,
           viewerHasSponsoredTickets,
           shouldChoosePurchaseType,
           primaryCtaLabel,
@@ -1253,6 +1267,21 @@ export default function ViewEvent() {
         onDownloadManual={handleDownloadManual}
         buying={purchaseTicketMutation.isPending}
         preferredPurchaseType={preferredPurchaseType}
+        /* While the event is on air the sheet offers the way back: the host to
+           their console ("Go live"), a ticket holder to the stream. */
+        liveAction={liveActionFor({
+          isLiveNow,
+          isOwnerEvent,
+          hasPaid,
+          onGoLive: () => {
+            closePurchaseModal();
+            navigate(`/event/stream/${event?.id}`);
+          },
+          onJoinLive: () => {
+            closePurchaseModal();
+            handleEnterLive();
+          },
+        })}
       />
       <WalletFundingRequiredModal
         open={fundingRequiredOpen}

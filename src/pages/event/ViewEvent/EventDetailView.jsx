@@ -261,7 +261,7 @@ export function bottomBarState(v) {
   const {
     isOwnerEvent, isEnded, isSoldOut, hasPaid, manualHasAccess, isLiveNow,
     startingStream, canBuyManualOnly, canOpenPurchaseOptions, canSponsorOwnEvent,
-    viewerHasSponsoredTickets, shouldChoosePurchaseType, primaryCtaLabel,
+    canSponsorTickets, viewerHasSponsoredTickets, shouldChoosePurchaseType, primaryCtaLabel,
     replayIsAvailable, replayUrl, replayExpired, hasReplay, replayEnabled,
     canWatchVod, onPrimaryAction, onOpenPurchaseOptions, onGetTicket, onWatchVod,
     onOwnerStreamAction,
@@ -278,7 +278,7 @@ export function bottomBarState(v) {
         onClick: onOwnerStreamAction,
         disabled: !!startingStream,
       },
-      secondary: v.canSponsorOwnEvent
+      secondary: v.canSponsorTickets
         ? { label: "Buy for others", onClick: onOpenPurchaseOptions }
         : null,
     };
@@ -331,7 +331,10 @@ export function bottomBarState(v) {
   }
 
   // :5542-5565
-  if (hasPaid && canSponsorOwnEvent) {
+  /* The app's :5542-5565 branch: access confirmed + sponsoring open = the button
+     to buy for other people. It used to require owning the event, so a ticket
+     holder had no route to buy for anyone else. */
+  if (hasPaid && canSponsorTickets) {
     return {
       statusLabel: "Ticket access confirmed",
       action: { label: "Buy for Others", tone: "active", onClick: onOpenPurchaseOptions },
@@ -364,6 +367,20 @@ export function bottomBarState(v) {
       ? { label: "Choose purchase options", onClick: onOpenPurchaseOptions }
       : null,
   };
+}
+
+/**
+ * The live shortcut that belongs inside the buy-for-others sheet: while the
+ * event is on air, the purchase flow must not be a trap — the host goes back to
+ * the console and a ticket holder goes back to watching, each named for what it
+ * actually does ("Go live" is the host's verb; a viewer cannot broadcast).
+ * Exported so /dev/event-preview drives the same rule the page ships.
+ */
+export function liveActionFor({ isLiveNow, isOwnerEvent, hasPaid, onGoLive, onJoinLive }) {
+  if (!isLiveNow) return null;
+  if (isOwnerEvent) return { label: "Go live", tone: "live", onClick: onGoLive };
+  if (hasPaid) return { label: "Join live", tone: "watch", onClick: onJoinLive };
+  return null;
 }
 
 function ActionButton({ action }) {
