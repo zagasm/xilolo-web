@@ -17,7 +17,9 @@ import LiveControlBar from "../../component/stream/LiveControlBar.jsx";
  * import.meta.env.DEV and 404s in production, like /dev/event-preview.
  *
  * ?state=live (default) | upcoming   — switches which console state is shown.
- * ?rt=1                              — force the "Live" realtime indicator.
+ * ?rt=1                              — force the subscribed realtime indicator.
+ * ?src=broken                        — point the player at a 404 manifest, to
+ *                                      exercise the reconnect/waiting path.
  */
 
 /* A public HLS ladder used ONLY so the fixture's player really plays (it is the
@@ -27,6 +29,13 @@ import LiveControlBar from "../../component/stream/LiveControlBar.jsx";
    account is a 404 today — the VOD retention cleanup removed them (checked
    2026-10-02, 13/13 dead), so a captured Xilolo URL cannot serve as the fixture. */
 const FIXTURE_HLS = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+
+/* ?src=broken — a manifest that really 404s, which is what the host's preview
+   sees between "Go live" and the first segment being published. It is how the
+   reconnect path is verified: the player must keep retrying and SAY what it is
+   waiting for instead of dying into a silent black box. */
+const BROKEN_HLS =
+  "https://studios1.b-cdn.net/live/does-not-exist-fixture_master.m3u8";
 
 const minutesAgo = (m) => Math.floor(Date.now() / 1000) - m * 60;
 const iso = (m) => new Date(Date.now() - m * 60000).toISOString();
@@ -98,11 +107,24 @@ const LIVE_COMMENTS = [
   },
 ];
 
+const LIVE_VIEWERS = [
+  { user_id: "preview-viewer-1", name: "Miracle Chigozie", avatar: "" },
+  { user_id: "preview-viewer-2", name: "Henry Falolu", avatar: "" },
+  { user_id: "preview-viewer-3", name: "Ngozi Bell", avatar: "" },
+  { user_id: "preview-viewer-4", name: "Tunde Adeyemi", avatar: "" },
+];
+
 export default function StreamConsolePreview() {
   const [params] = useSearchParams();
   const state = params.get("state") || "live";
   const live = state !== "upcoming";
   const forceRealtime = params.get("rt") === "1";
+  const useBrokenSrc = params.get("src") === "broken";
+  const playbackUrl = !live ? "" : useBrokenSrc ? BROKEN_HLS : FIXTURE_HLS;
+  /* ?ar=9:16 — most Xilolo broadcasts are portrait, and the preview box has to
+     grow tall instead of wide for those. */
+  const arParam = params.get("ar");
+  const aspectRatio = arParam ? arParam.replace(":", " / ") : live ? "16 / 9" : "";
 
   return (
     <div className="tw:bg-paper tw:px-3 tw:py-6 tw:md:px-6">
@@ -133,13 +155,15 @@ export default function StreamConsolePreview() {
             isLive={live}
             isPaused={false}
             hasStartedStream={live}
-            playbackUrl={live ? FIXTURE_HLS : ""}
+            playbackUrl={playbackUrl}
+            aspectRatio={aspectRatio}
+            preferHls={params.get("player") !== "native"}
             canModerate
             fixture={{
               comments: live ? LIVE_COMMENTS : [],
               likesTotal: live ? 47 : 0,
-              likedByMe: false,
               viewerCount: live ? 128 : 0,
+              viewers: live ? LIVE_VIEWERS : [],
               realtime: forceRealtime ? "subscribed" : "off",
             }}
           />

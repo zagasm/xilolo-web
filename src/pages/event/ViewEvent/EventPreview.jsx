@@ -37,6 +37,10 @@ export default function EventPreview() {
 
   const v = useMemo(() => {
     const paidLive = state === "paid-live";
+    /* ?state=bought — a viewer who owns a ticket but is NOT the host and is not
+       live yet. That is the exact case the founder reported: with a ticket in
+       hand there used to be no way to buy for other people. */
+    const bought = state === "bought";
     /* ?state=owner previews the HOST view. Owner-only affordances — the "View stream
        analytics" link, the start-stream bar — could otherwise only be seen by someone who
        owns a real event, which no test account does. */
@@ -58,7 +62,11 @@ export default function EventPreview() {
       countdownTarget: novelDate(),
       description:
         "An intimate evening of live Afrobeat, highlife and amapiano with a full band, guest vocalists and a late DJ set. Doors open one hour before showtime.",
-      accessLabel: ownerView ? "You are hosting this event" : paidLive ? "Ticket secured" : "Upcoming",
+      accessLabel: ownerView
+        ? "You are hosting this event"
+        : paidLive || bought
+          ? "Ticket secured"
+          : "Upcoming",
       statusLabel: paidLive ? "Live" : "Upcoming",
       hostName: "Adaeze Okonkwo",
       hostInitials: "AO",
@@ -73,7 +81,7 @@ export default function EventPreview() {
       isSoldOut: false,
       isOwnerEvent: ownerView,
       isVodEvent: false,
-      hasPaid: paidLive,
+      hasPaid: paidLive || bought,
       manualHasAccess: false,
       canWatchVod: false,
       replayEnabled: true,
@@ -84,6 +92,7 @@ export default function EventPreview() {
       canOpenPurchaseOptions: true,
       canBuyManualOnly: false,
       canSponsorOwnEvent: ownerView,
+      canSponsorTickets: ownerView || bought,
       viewerHasSponsoredTickets: false,
       shouldChoosePurchaseType: true,
       primaryCtaLabel: "Buy Ticket",

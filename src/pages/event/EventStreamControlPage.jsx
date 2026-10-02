@@ -178,6 +178,16 @@ function resolveRtmpServer(event) {
    `event.stream.playback.{hls,master,abr}`; verified 2026-10-02 on an event
    with a finished broadcast). Empty until the stream has actually been started,
    which is what makes the console show its "preview appears here" state. */
+/* "9:16" / "9x16" -> a CSS aspect-ratio, so a portrait broadcast gets a portrait
+   preview box instead of a 16:9 letterbox. Empty when the API has no opinion. */
+function resolveAspectRatio(event) {
+  const raw = firstNonEmptyString(event?.stream?.aspect_ratio);
+  const match = /^\s*(\d+(?:\.\d+)?)\s*[:x/]\s*(\d+(?:\.\d+)?)\s*$/.exec(raw);
+  if (!match) return "";
+
+  return `${match[1]} / ${match[2]}`;
+}
+
 function resolvePlaybackUrl(event) {
   const stream = event?.stream || {};
   const playback = stream.playback || {};
@@ -804,6 +814,7 @@ export default function EventStreamControlPage() {
      preview fills in the moment the feed is up. Expired/ended events keep the
      existing screens — there is nothing to watch back there. */
   const playbackUrl = resolvePlaybackUrl(eventData);
+  const streamAspectRatio = resolveAspectRatio(eventData);
   const showLiveConsole = !isEnded && !isExpired;
   /* Sticky while broadcasting: pause/resume, end, chat and analytics stay in
      reach no matter how far down the page the host has scrolled. */
@@ -1174,6 +1185,7 @@ export default function EventStreamControlPage() {
                 isPaused={isPaused}
                 hasStartedStream={hasStartedStream}
                 playbackUrl={playbackUrl}
+                aspectRatio={streamAspectRatio}
               />
             ) : null}
 

@@ -261,7 +261,7 @@ export function bottomBarState(v) {
   const {
     isOwnerEvent, isEnded, isSoldOut, hasPaid, manualHasAccess, isLiveNow,
     startingStream, canBuyManualOnly, canOpenPurchaseOptions, canSponsorOwnEvent,
-    viewerHasSponsoredTickets, shouldChoosePurchaseType, primaryCtaLabel,
+    canSponsorTickets, viewerHasSponsoredTickets, shouldChoosePurchaseType, primaryCtaLabel,
     replayIsAvailable, replayUrl, replayExpired, hasReplay, replayEnabled,
     canWatchVod, onPrimaryAction, onOpenPurchaseOptions, onGetTicket, onWatchVod,
     onOwnerStreamAction,
@@ -278,7 +278,7 @@ export function bottomBarState(v) {
         onClick: onOwnerStreamAction,
         disabled: !!startingStream,
       },
-      secondary: v.canSponsorOwnEvent
+      secondary: v.canSponsorTickets
         ? { label: "Buy for others", onClick: onOpenPurchaseOptions }
         : null,
     };
@@ -331,7 +331,10 @@ export function bottomBarState(v) {
   }
 
   // :5542-5565
-  if (hasPaid && canSponsorOwnEvent) {
+  /* The app's :5542-5565 branch: access confirmed + sponsoring open = the button
+     to buy for other people. It used to require owning the event, so a ticket
+     holder had no route to buy for anyone else. */
+  if (hasPaid && canSponsorTickets) {
     return {
       statusLabel: "Ticket access confirmed",
       action: { label: "Buy for Others", tone: "active", onClick: onOpenPurchaseOptions },
