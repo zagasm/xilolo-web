@@ -23,6 +23,8 @@ import {
   Trash2,
   TriangleAlert,
   Users,
+  Maximize2,
+  Minimize2,
   X,
 } from "lucide-react";
 import HlsVideoPlayer from "../HlsVideoPlayer.jsx";
@@ -132,10 +134,30 @@ function LivePreviewCard({
   onPlayerStatus,
 }) {
   const [playerStatus, setPlayerStatus] = useState(playbackUrl ? "connecting" : "idle");
+  /* Expanded preview: the host's own picture, as large as the screen allows.
+     Only classes change when this toggles — the player element itself is never
+     remounted, so expanding never restarts the stream. */
+  const [theatre, setTheatre] = useState(false);
 
   useEffect(() => {
     setPlayerStatus(playbackUrl ? "connecting" : "idle");
   }, [playbackUrl]);
+
+  useEffect(() => {
+    if (!theatre) return undefined;
+
+    const onKey = (event) => {
+      if (event.key === "Escape") setTheatre(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [theatre]);
 
   const handleStatus = useCallback(
     (next) => {
@@ -167,44 +189,89 @@ function LivePreviewCard({
 
   return (
     /* self-start: the chat rail is the taller column, and letting the grid
-       stretch this card left a block of empty white under the player. */
-    <section className="tw:self-start tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4 tw:shadow-sm tw:md:p-5">
-      <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
-        <div>
-          <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
-            Your live preview
-          </span>
-          <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
-            The picture your viewers are watching right now.
-          </p>
+       stretch this card left a block of empty white under the player.
+       Expanded: the same element turns into an overlay — classes change, the
+       subtree does not, so the stream is never restarted by expanding. */
+    <section
+      data-console-part="player-card"
+      data-theatre={theatre ? "1" : "0"}
+      className={cx(
+        "tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4 tw:shadow-sm tw:md:p-5",
+        theatre
+          ? "tw:fixed tw:inset-0 tw:z-50 tw:overflow-auto tw:rounded-none tw:border-0 tw:bg-[#faf8f6] tw:p-4 tw:sm:p-6"
+          : "tw:self-start",
+      )}
+    >
+      <div
+        className={
+          theatre
+            ? "tw:mx-auto tw:flex tw:h-full tw:w-full tw:max-w-[1680px] tw:flex-col"
+            : "tw:flex tw:w-full tw:flex-col"
+        }
+      >
+        <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:items-center tw:sm:justify-between">
+          <div>
+            <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+              Your live preview
+            </span>
+            <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+              {theatre
+                ? "Expanded to your whole screen. Press Escape to go back."
+                : "The picture your viewers are watching right now."}
+            </p>
+          </div>
+
+          <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
+            <span
+              data-console-part="player-status"
+              className={cx(
+                "tw:inline-flex tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold",
+                toneClass,
+              )}
+            >
+              <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-current" />
+              {pill.label}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setTheatre((value) => !value)}
+              aria-label={theatre ? "Exit expanded preview" : "Expand preview"}
+              title={theatre ? "Exit expanded preview (Esc)" : "Expand preview"}
+              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee]"
+            >
+              {theatre ? (
+                <Minimize2 className="tw:h-4 tw:w-4" />
+              ) : (
+                <Maximize2 className="tw:h-4 tw:w-4" />
+              )}
+            </button>
+          </div>
         </div>
 
-        <span
-          data-console-part="player-status"
-          className={cx(
-            "tw:inline-flex tw:shrink-0 tw:items-center tw:gap-2 tw:rounded-full tw:border tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold",
-            toneClass,
-          )}
+        <div
+          className={
+            theatre
+              ? "tw:mt-4 tw:flex tw:flex-1 tw:items-center tw:justify-center"
+              : "tw:mt-4"
+          }
+          data-console-part="player"
         >
-          <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-current" />
-          {pill.label}
-        </span>
-      </div>
-
-      <div className="tw:mt-4" data-console-part="player">
-        {playbackUrl ? (
-          <HlsVideoPlayer
-            src={playbackUrl}
-            live
-            preferHls={preferHls}
-            autoPlay
-            muted
-            controls
-            aspectRatio={aspectRatio || "16 / 9"}
-            maxHeight="72vh"
-            onStatus={handleStatus}
-          />
-        ) : (
+          {playbackUrl ? (
+            <div className={theatre ? "tw:w-full" : ""}>
+              <HlsVideoPlayer
+                src={playbackUrl}
+                live
+                preferHls={preferHls}
+                autoPlay
+                muted
+                controls
+                aspectRatio={aspectRatio || "16 / 9"}
+                maxHeight={theatre ? "80vh" : "72vh"}
+                onStatus={handleStatus}
+              />
+            </div>
+          ) : (
           <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:rounded-3xl tw:border tw:border-dashed tw:border-[#ded6cd] tw:bg-[#faf8f6] tw:px-6 tw:py-16 tw:text-center">
             <span className="tw:flex tw:h-12 tw:w-12 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-accent-soft tw:text-accent-deep">
               <Radio className="tw:h-5 tw:w-5" />
@@ -219,6 +286,7 @@ function LivePreviewCard({
             </div>
           </div>
         )}
+      </div>
       </div>
     </section>
   );
@@ -464,7 +532,231 @@ function ViewersPanel({ open, onClose, viewerCount, viewers, loading, errorText,
   );
 }
 
-/* ── Reactions panel: comments + likes + moderation ───────────────────────── */
+/* ── Guests ─────────────────────────────────────────────────────────────────
+   Viewers ask to join from the app; the creator answers here. Requests expire
+   in about a minute (StreamGuestRequest::TTL_SECONDS), so the card counts down
+   rather than showing a stale ask — and the queue refreshes on the realtime
+   guest events rather than waiting for the poll. */
+function GuestsPanel({ eventId, token, refreshSignal, fixtureRows }) {
+  /* Dev fixture: renders the identical markup against fixed rows, no fetching. */
+  const demo = Boolean(fixtureRows);
+  const [requests, setRequests] = useState(fixtureRows?.requests || []);
+  const [guests, setGuests] = useState(fixtureRows?.guests || []);
+  const [loading, setLoading] = useState(!demo);
+  const [busyId, setBusyId] = useState(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  const load = useCallback(async () => {
+    if (demo) return;
+    if (!eventId || !token) return;
+
+    try {
+      const [pendingResponse, guestsResponse] = await Promise.all([
+        api.get(`/api/v1/events/${eventId}/guests/requests`, authHeaders(token)),
+        api.get(`/api/v1/events/${eventId}/guests`, authHeaders(token)),
+      ]);
+
+      const pendingRows = pendingResponse?.data?.data;
+      setRequests(Array.isArray(pendingRows) ? pendingRows : []);
+
+      const guestRows = guestsResponse?.data?.data;
+      const list = Array.isArray(guestRows) ? guestRows : guestRows?.guests;
+      setGuests(Array.isArray(list) ? list : []);
+    } catch (error) {
+      // A 404 simply means no stream row exists yet; other errors are noise here.
+      if (import.meta.env.DEV) console.warn("[guests] load failed", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [demo, eventId, token]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    const timer = window.setInterval(load, 8000);
+    return () => window.clearInterval(timer);
+  }, [load]);
+
+  useEffect(() => {
+    if (refreshSignal) load();
+  }, [refreshSignal, demo, load]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const answer = async (request, accept) => {
+    setBusyId(request.id);
+    try {
+      await api.post(
+        `/api/v1/guests/requests/${request.id}/${accept ? "accept" : "decline"}`,
+        {},
+        authHeaders(token),
+      );
+      showSuccess(
+        accept
+          ? `${request.user?.name || "Your guest"} can join — they get the link in the app.`
+          : `Request from ${request.user?.name || "that viewer"} declined.`,
+      );
+      await load();
+    } catch (error) {
+      showError(describeError(error, "Could not answer that request."));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const remove = async (guest) => {
+    setBusyId(guest.id);
+    try {
+      await api.post(`/api/v1/guests/${guest.id}/kick`, {}, authHeaders(token));
+      showSuccess(`${guest.name || "That guest"} has been removed from the stream.`);
+      await load();
+    } catch (error) {
+      showError(describeError(error, "Could not remove that guest."));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const secondsLeft = (request) => {
+    const expiry = request?.expires_at ? Date.parse(request.expires_at) : NaN;
+    if (Number.isFinite(expiry)) {
+      return Math.max(0, Math.round((expiry - now) / 1000));
+    }
+    return Number(request?.seconds_left ?? 0);
+  };
+
+  return (
+    <section
+      data-console-part="guests"
+      className="tw:rounded-4xl tw:border tw:border-[#ded6cd] tw:bg-white tw:p-4 tw:shadow-sm tw:md:p-5"
+    >
+      <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+        <div>
+          <span className="tw:text-xl tw:font-semibold tw:text-gray-900">Guests</span>
+          <p className="tw:mt-1 tw:text-sm tw:text-gray-600">
+            Viewers asking to join your stream.
+          </p>
+        </div>
+
+        {requests.length ? (
+          <span
+            data-console-part="guest-pending-count"
+            className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-accent tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-white"
+          >
+            {requests.length} waiting
+          </span>
+        ) : null}
+      </div>
+
+      <div className="tw:mt-4 tw:space-y-2" data-console-part="guest-requests">
+        {loading && !requests.length ? (
+          <p className="tw:text-sm tw:text-gray-500">Checking for requests…</p>
+        ) : requests.length ? (
+          requests.map((request) => {
+            const left = secondsLeft(request);
+            const busy = busyId === request.id;
+
+            return (
+              <div
+                key={request.id}
+                data-console-part="guest-request"
+                className="tw:flex tw:flex-col tw:gap-3 tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[#faf8f6] tw:p-3"
+              >
+                <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
+                  <Avatar name={request.user?.name || "Guest"} size={9} />
+                  <div className="tw:min-w-0">
+                    <div className="tw:truncate tw:text-sm tw:font-semibold tw:text-gray-900">
+                      {request.user?.name || "A viewer"}
+                    </div>
+                    <div className="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+                      {request.audio_only ? (
+                        <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-2 tw:py-0.5 tw:text-[11px] tw:font-semibold tw:text-gray-600">
+                          Audio only
+                        </span>
+                      ) : null}
+                      <span className="tw:text-xs tw:text-gray-500">
+                        {left > 0 ? `${left}s left to answer` : "Expiring…"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tw:flex tw:items-center tw:gap-2">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => answer(request, true)}
+                    className="tw:flex-1 tw:rounded-full tw:bg-accent tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-60"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => answer(request, false)}
+                    className="tw:flex-1 tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-60"
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <p className="tw:text-sm tw:text-gray-600">
+            No one is waiting to join right now.
+          </p>
+        )}
+      </div>
+
+      <div className="tw:mt-5 tw:border-t tw:border-[#eee7e0] tw:pt-4">
+        <div className="tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wide tw:text-gray-500">
+          On stream
+        </div>
+
+        <div className="tw:mt-2 tw:space-y-2" data-console-part="guest-on-stream">
+          {guests.length ? (
+            guests.map((guest) => (
+              <div
+                key={guest.id}
+                className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-2xl tw:bg-[#faf8f6] tw:px-3 tw:py-2"
+              >
+                <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-2">
+                  <Avatar name={guest.name || "Guest"} size={8} />
+                  <span className="tw:truncate tw:text-sm tw:font-medium tw:text-gray-900">
+                    {guest.name || "Guest"}
+                  </span>
+                  {guest.audio_only ? (
+                    <span className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-2 tw:py-0.5 tw:text-[11px] tw:font-semibold tw:text-gray-600">
+                      Audio only
+                    </span>
+                  ) : null}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={busyId === guest.id}
+                  onClick={() => remove(guest)}
+                  className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 tw:transition tw:hover:bg-red-50 tw:disabled:opacity-60"
+                >
+                  Remove
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="tw:text-sm tw:text-gray-600">No guests on stream yet.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ChatRow({ comment, canModerate, onPin, onUnpin, onDelete, onReply, busy }) {
   const name = displayName(comment.user);
   const avatar = comment.user?.profileUrl || comment.user?.profile_url || "";
@@ -554,6 +846,7 @@ function ChatRow({ comment, canModerate, onPin, onUnpin, onDelete, onReply, busy
   );
 }
 
+/* ── Reactions panel: comments + likes + moderation ───────────────────────── */
 function LiveChatPanel({
   comments,
   canModerate,
@@ -809,6 +1102,8 @@ export default function HostLiveConsole({
   const [likeBusy, setLikeBusy] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
   const [newBelow, setNewBelow] = useState(false);
+  /* Bumped by the realtime guest events so the requests card refreshes at once. */
+  const [guestPing, setGuestPing] = useState(0);
 
   const listRef = useRef(null);
   const atBottomRef = useRef(true);
@@ -958,6 +1253,10 @@ export default function HostLiveConsole({
       onStatus: (status) => {
         setRealtime(status === "subscribed" ? "subscribed" : status);
       },
+      /* A viewer asking to join: refresh the queue now instead of on the next
+         poll, and the same for every answer (accepted / declined / left / removed). */
+      onGuestRequest: () => setGuestPing((count) => count + 1),
+      onGuestChange: () => setGuestPing((count) => count + 1),
     });
 
     if (!subscription) {
@@ -1160,7 +1459,21 @@ export default function HostLiveConsole({
           hasStartedStream={hasStartedStream}
         />
 
-        <div className="tw:xl:sticky tw:xl:top-4 tw:xl:self-start">
+        <div className="tw:space-y-6 tw:xl:sticky tw:xl:top-4 tw:xl:max-h-[calc(100vh-2rem)] tw:xl:self-start tw:xl:overflow-y-auto tw:xl:pr-1">
+          <GuestsPanel
+            eventId={eventId}
+            token={token}
+            refreshSignal={guestPing}
+            fixtureRows={
+              fixture
+                ? {
+                    requests: fixture.guestRequests || [],
+                    guests: fixture.guests || [],
+                  }
+                : null
+            }
+          />
+
           <LiveChatPanel
             comments={comments}
             canModerate={canModerate}

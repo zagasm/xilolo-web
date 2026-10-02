@@ -74,6 +74,8 @@ export function subscribeToLiveEvent({
   onUnpinned,
   onStreamState,
   onStatus,
+  onGuestRequest,
+  onGuestChange,
 }) {
   const config = reverbConfig();
   if (!config || !eventId || !token) return null;
@@ -156,6 +158,14 @@ export function subscribeToLiveEvent({
 
   channel.listen(".stream.paused", (payload) => onStreamState?.("paused", payload));
   channel.listen(".stream.resumed", (payload) => onStreamState?.("live", payload));
+
+  /* Guest requests ride this same channel (GuestController: broadcastOn
+     'live-event.{id}'), so the host's queue updates the moment someone asks. */
+  channel.listen(".live.guest.requested", (payload) => onGuestRequest?.(payload));
+
+  ["accepted", "declined", "joined", "left", "removed"].forEach((change) => {
+    channel.listen(`.live.guest.${change}`, (payload) => onGuestChange?.(change, payload));
+  });
 
   channel.subscribed(() => onStatus?.("subscribed"));
   channel.error?.(() => onStatus?.("error"));
