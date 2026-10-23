@@ -200,6 +200,15 @@ export async function disqualifyEntry(id, entryId, { reason, password, code }, t
   return unwrap(response);
 }
 
+/**
+ * Delete a contest. Allowed only while it has taken no votes — the API refuses
+ * the moment a single vote exists, because people paid into it.
+ */
+export async function deleteContest(id, token) {
+  const response = await api.delete(`/api/v1/organiser/contests/${id}`, authHeaders(token));
+  return unwrap(response);
+}
+
 export async function getContestEarnings(id, token) {
   const response = await api.get(
     `/api/v1/organiser/contests/${id}/earnings`,

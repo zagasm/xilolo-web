@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Button,
   Card,
@@ -22,6 +22,7 @@ import {
 import { useAuth } from "../auth/AuthContext";
 import { HOME_CONTAINER } from "../Home/index.jsx";
 import { money, timeLeft } from "./components/ContestCard";
+import DeleteContestSheet from "./components/DeleteContestSheet";
 
 function Stat({ label, value, hint }) {
   return (
@@ -50,6 +51,7 @@ function Stat({ label, value, hint }) {
 export default function ContestConsole() {
   const { id } = useParams();
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const [dashboard, setDashboard] = useState(null);
   const [pending, setPending] = useState([]);
@@ -60,6 +62,7 @@ export default function ContestConsole() {
   const [declineForm, setDeclineForm] = useState({ reason: "", password: "", code: "" });
   const [busy, setBusy] = useState(false);
 
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [extendOpen, setExtendOpen] = useState(false);
   const [extendForm, setExtendForm] = useState({ voting_close_at: "", reason: "" });
 
@@ -236,6 +239,13 @@ export default function ContestConsole() {
             <Button size="sm" variant="secondary" onClick={() => setExtendOpen(true)}>
               Extend voting
             </Button>
+            {/* Only shown while the contest has taken no votes — the API refuses
+                the request once money is involved. */}
+            {dashboard.can_delete ? (
+              <Button size="sm" variant="ghost" onClick={() => setDeleteOpen(true)}>
+                Delete
+              </Button>
+            ) : null}
             <Button as={Link} to={`/vote/${contest.slug}`} size="sm" variant="ghost">
               View page
             </Button>
@@ -408,6 +418,13 @@ export default function ContestConsole() {
           </Button>
         </form>
       </Modal>
+
+      <DeleteContestSheet
+        contest={{ id: contest.id, title: contest.title }}
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onDeleted={() => navigate("/account/contests")}
+      />
 
       {/* Extend voting: forward only. */}
       <Modal open={extendOpen} onClose={() => setExtendOpen(false)} title="Extend voting">
