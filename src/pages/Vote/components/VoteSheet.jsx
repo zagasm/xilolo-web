@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Modal, Spinner } from "../../../component/ui";
 import { showError } from "../../../component/ui/toast";
+import { friendlyError } from "../../../lib/errors";
 import { castVotes, getVoteQuote } from "../../../api/contestApi";
 import { money } from "./ContestCard";
 

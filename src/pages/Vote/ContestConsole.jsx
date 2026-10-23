@@ -23,6 +23,7 @@ import { useAuth } from "../auth/AuthContext";
 import { HOME_CONTAINER } from "../Home/index.jsx";
 import { money, timeLeft } from "./components/ContestCard";
 import DeleteContestSheet from "./components/DeleteContestSheet";
+import { friendlyError } from "../../lib/errors";
 
 function Stat({ label, value, hint }) {
   return (
@@ -109,7 +110,7 @@ export default function ContestConsole() {
       showSuccess(`${entry.display_name} is live.`);
       await load();
     } catch (err) {
-      showError(err?.response?.data?.message || "That entry could not be approved.");
+      showError(friendlyError(err, "That entry could not be approved."));
     } finally {
       setBusy(false);
     }
@@ -137,7 +138,7 @@ export default function ContestConsole() {
     } catch (err) {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
-      showError(first || err?.response?.data?.message || "That decision did not go through.");
+      showError(friendlyError(err, "That did not go through. Please try again."));
     } finally {
       setBusy(false);
     }
@@ -156,7 +157,7 @@ export default function ContestConsole() {
     } catch (err) {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
-      showError(first || "The deadline could not be changed.");
+      showError(friendlyError(err, "That did not go through. Please try again."));
     } finally {
       setBusy(false);
     }
@@ -164,7 +165,7 @@ export default function ContestConsole() {
 
   if (loading) {
     return (
-      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
         <div className={HOME_CONTAINER}>
           <Skeleton className="tw:h-10 tw:w-1/2" />
           <div className="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4">
@@ -179,7 +180,7 @@ export default function ContestConsole() {
 
   if (error || !contest) {
     return (
-      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
         <div className={HOME_CONTAINER}>
           <Card className="tw:p-6 tw:text-center">
             <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-ink">{error}</span>
@@ -193,7 +194,7 @@ export default function ContestConsole() {
   }
 
   return (
-    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
         <div className="tw:flex tw:flex-col tw:gap-3 tw:pb-5 tw:md:flex-row tw:md:items-start tw:md:justify-between">
           <div className="tw:min-w-0">

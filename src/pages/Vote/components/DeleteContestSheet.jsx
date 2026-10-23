@@ -3,6 +3,7 @@ import { Button, Modal } from "../../../component/ui";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { deleteContest } from "../../../api/contestApi";
 import { useAuth } from "../../auth/AuthContext";
+import { friendlyError } from "../../../lib/errors";
 
 /**
  * Delete a contest.
@@ -26,7 +27,7 @@ export default function DeleteContestSheet({ contest, open, onClose, onDeleted }
     } catch (err) {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
-      showError(first || err?.response?.data?.message || "That contest could not be deleted.");
+      showError(friendlyError(err, "That did not go through. Please try again."));
     } finally {
       setBusy(false);
     }

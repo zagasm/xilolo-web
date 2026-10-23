@@ -55,7 +55,7 @@ export default function MyContests() {
   }, [token]);
 
   return (
-    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
         <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:pb-5">
           <div>

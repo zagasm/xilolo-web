@@ -53,10 +53,19 @@ function ordinal(n) {
 
 function prizeRange(prize) {
   const from = ordinal(prize.rank_from);
-  if (prize.rank_to && Number(prize.rank_to) !== Number(prize.rank_from)) {
-    return `${from} – ${ordinal(prize.rank_to)}`;
-  }
-  return from;
+  const to = prize.rank_to ? ordinal(prize.rank_to) : null;
+
+  // "1st place", "2nd – 10th place". The label IS the meaning; printing a
+  // separate title like "winner" next to 1st place said the same thing twice.
+  if (to && to !== from) return `${from} – ${to} place`;
+  return `${from} place`;
+}
+
+/** Auto-generated titles ("Prize 1") are noise; only show a real one. */
+function prizeLabel(prize) {
+  const title = (prize.title || "").trim();
+  if (!title || /^Prize \d+$/i.test(title)) return null;
+  return title;
 }
 
 function coverUrl(media) {
@@ -142,7 +151,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (loading) {
     return (
-      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-24 tw:pt-20 tw:font-sans">
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:md:pb-24 tw:font-sans">
         <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
           <Skeleton className="tw:h-[210px] tw:w-full tw:rounded-[24px]" />
           <Skeleton className="tw:mt-4 tw:h-6 tw:w-2/3" />
@@ -154,7 +163,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (error || !contest) {
     return (
-      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-24 tw:pt-20 tw:font-sans">
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:md:pb-24 tw:font-sans">
         <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:py-16 tw:text-center">
           <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-body!">{error}</span>
           <Button as={Link} to="/vote" variant="secondary" className="tw:mt-4">
@@ -166,7 +175,7 @@ export default function ContestPage({ sharedToken = null }) {
   }
 
   return (
-    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[150px] tw:pt-20 tw:font-sans tw:text-body">
+    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[250px] tw:pt-20 tw:font-sans tw:text-body tw:md:pb-[150px]">
       {/* Top bar — identical anatomy to the event page's. */}
       <div className="tw:border-b tw:border-hairline tw:bg-paper-raised tw:md:sticky tw:md:top-20">
         <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-1.5 tw:px-2 tw:py-2 md:tw:max-w-[1040px]">
@@ -259,8 +268,10 @@ export default function ContestPage({ sharedToken = null }) {
                     >
                       <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
                         {prizeRange(prize)}
-                        {prize.title ? (
-                          <span className="tw:ml-1.5 tw:font-medium tw:text-muted!">{prize.title}</span>
+                        {prizeLabel(prize) ? (
+                          <span className="tw:ml-1.5 tw:font-medium tw:text-muted!">
+                            {prizeLabel(prize)}
+                          </span>
                         ) : null}
                       </span>
                       {prize.amount !== null && prize.amount !== undefined ? (
@@ -443,7 +454,7 @@ export default function ContestPage({ sharedToken = null }) {
       </div>
 
       {/* Sticky action bar, mirroring the event page's bottom bar. */}
-      <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-40 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur">
+      <div className="tw:fixed tw:inset-x-0 tw:bottom-[72px] tw:z-40 tw:md:bottom-0 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur">
         <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-3 tw:px-3 tw:py-3 md:tw:max-w-[1040px]">
           <div className="tw:min-w-0 tw:flex-1">
             <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1px] tw:text-muted!">
