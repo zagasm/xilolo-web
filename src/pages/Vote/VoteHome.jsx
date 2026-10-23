@@ -63,7 +63,7 @@ export default function VoteHome() {
   const showAll = showTrending || (!showTrending && contests.length > 0);
 
   return (
-    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
         {/* Header follows the app's search screen: one 24px line, one 13px
             line, 5px apart. No eyebrow stack, no oversized display type — on a

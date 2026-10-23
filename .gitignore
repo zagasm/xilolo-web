@@ -5,3 +5,5 @@ node_modules/
 .DS_Store
 build/
 dist/
+# /brag renders: frames + intermediates are 50MB of build artefacts, not source
+brag-output/

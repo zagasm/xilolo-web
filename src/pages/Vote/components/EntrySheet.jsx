@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Field, Input, Modal } from "../../../component/ui";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { submitEntry } from "../../../api/contestApi";
+import { friendlyError } from "../../../lib/errors";
 import { useAuth } from "../../auth/AuthContext";
 
 /**
@@ -46,9 +47,7 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
       onSubmitted?.();
       onClose?.();
     } catch (err) {
-      const errors = err?.response?.data?.errors;
-      const first = errors ? Object.values(errors)[0]?.[0] : null;
-      setError(first || err?.response?.data?.message || "That entry could not be sent.");
+      setError(friendlyError(err, "That entry could not be sent. Please try again."));
     } finally {
       setBusy(false);
     }

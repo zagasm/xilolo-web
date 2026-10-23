@@ -4,6 +4,13 @@ import { Button, Card, Field, Input } from "../../component/ui";
 import CoverPicker from "./components/CoverPicker";
 import { showError, showSuccess } from "../../component/ui/toast";
 import { createContest, publishContest, uploadContestCover } from "../../api/contestApi";
+import { friendlyError } from "../../lib/errors";
+
+const RANK = (n) => {
+  const value = Number(n);
+  const suffix = ["th", "st", "nd", "rd"][(value % 100 > 10 && value % 100 < 14) ? 0 : value % 10] || "th";
+  return `${value}${suffix}`;
+};
 import { useAuth } from "../auth/AuthContext";
 
 /**
@@ -33,7 +40,10 @@ export default function CreateContest() {
     prize_summary: "",
   });
 
-  const [prizes, setPrizes] = useState([{ rank_from: 1, rank_to: 1, title: "", amount: "" }]);
+  // A prize is a place and an amount. `rank_to` stays empty for a single
+  // position — "1st place" already says winner, so asking for a label again was
+  // how organisers ended up with "1st ... winner".
+  const [prizes, setPrizes] = useState([{ rank_from: "1", rank_to: "", amount: "" }]);
 
   // Contest artwork. Without it a card has no picture and never looks finished.
   const [cover, setCover] = useState(null);
@@ -58,7 +68,7 @@ export default function CreateContest() {
       setCover(uploaded);
       showSuccess("Cover uploaded.");
     } catch (err) {
-      showError(err?.response?.data?.message || "That image could not be uploaded.");
+      showError(friendlyError(err, "That image could not be uploaded."));
     } finally {
       setCoverUploading(false);
     }
@@ -72,6 +82,28 @@ export default function CreateContest() {
   const updatePrize = (index, key, value) => {
     setPrizes((prev) => prev.map((prize, i) => (i === index ? { ...prize, [key]: value } : prize)));
   };
+
+  const prizeRows = prizes.map((prize) => {
+    const from = Number(prize.rank_from) || 0;
+    const to = prize.rank_to === "" ? from : Number(prize.rank_to) || 0;
+    return { from, to, amount: prize.amount };
+  });
+
+  // Same rule the API enforces, checked here so the organiser sees it inline
+  // instead of getting a 422 after saving.
+  const prizeProblem = (() => {
+    const filled = prizeRows.filter((row) => row.from > 0);
+    for (const row of filled) {
+      if (row.to < row.from) return "A prize range cannot end before it starts.";
+    }
+    const sorted = [...filled].sort((a, b) => a.from - b.from);
+    for (let i = 1; i < sorted.length; i += 1) {
+      if (sorted[i].from <= sorted[i - 1].to) {
+        return "Two prizes cover the same place. Each position can only be won once.";
+      }
+    }
+    return null;
+  })();
 
   const submit = async (event) => {
     event.preventDefault();
@@ -91,11 +123,11 @@ export default function CreateContest() {
         prize_summary: form.prize_summary.trim() || null,
         cover_media: cover ? { path: cover.path, url: cover.url } : null,
         prizes: prizes
-          .filter((prize) => prize.title.trim())
+          .filter((prize) => Number(prize.rank_from) > 0)
           .map((prize) => ({
             rank_from: Number(prize.rank_from),
-            rank_to: Number(prize.rank_to),
-            title: prize.title.trim(),
+            // empty means a single position, not a copy of rank_from
+            rank_to: prize.rank_to === "" ? null : Number(prize.rank_to),
             amount: prize.amount === "" ? null : Number(prize.amount),
           })),
       };
@@ -106,7 +138,7 @@ export default function CreateContest() {
     } catch (err) {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
-      showError(first || "That contest could not be saved.");
+      showError(friendlyError(err, "That did not go through. Please try again."));
     } finally {
       setSaving(false);
     }
@@ -122,7 +154,7 @@ export default function CreateContest() {
     } catch (err) {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
-      showError(first || "The contest could not be published yet.");
+      showError(friendlyError(err, "That did not go through. Please try again."));
     } finally {
       setPublishing(false);
     }
@@ -130,7 +162,7 @@ export default function CreateContest() {
 
   if (created) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
         <Card className="tw:p-5">
           <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
             Draft saved
@@ -162,7 +194,7 @@ export default function CreateContest() {
   }
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
       <div className="tw:mb-5">
         <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
           New contest
@@ -259,55 +291,95 @@ export default function CreateContest() {
             A single position, a range, or both — "1st" and "2nd–10th" can sit side by side.
           </span>
 
-          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3">
-            {prizes.map((prize, index) => (
-              <div key={index} className="tw:grid tw:grid-cols-12 tw:gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  value={prize.rank_from}
-                  onChange={(event) => updatePrize(index, "rank_from", event.target.value)}
-                  aria-label="From position"
-                  className="tw:col-span-2"
-                />
-                <Input
-                  type="number"
-                  min={1}
-                  value={prize.rank_to}
-                  onChange={(event) => updatePrize(index, "rank_to", event.target.value)}
-                  aria-label="To position"
-                  className="tw:col-span-2"
-                />
-                <Input
-                  value={prize.title}
-                  onChange={(event) => updatePrize(index, "title", event.target.value)}
-                  placeholder="Winner"
-                  className="tw:col-span-5"
-                />
-                <Input
-                  type="number"
-                  min={0}
-                  value={prize.amount}
-                  onChange={(event) => updatePrize(index, "amount", event.target.value)}
-                  placeholder="Amount"
-                  className="tw:col-span-3"
-                />
-              </div>
-            ))}
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2">
+            {prizes.map((prize, index) => {
+              const from = Number(prize.rank_from) || 0;
+              const to = prize.rank_to === "" ? from : Number(prize.rank_to) || 0;
+              const label =
+                from <= 0
+                  ? "New place"
+                  : to > from
+                    ? `${RANK(from)} – ${RANK(to)} place`
+                    : `${RANK(from)} place`;
+
+              return (
+                <div
+                  key={index}
+                  className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper tw:p-3"
+                >
+                  <div className="tw:flex tw:items-center tw:justify-between tw:gap-2">
+                    <span className="tw:text-[13px] tw:font-semibold tw:text-ink">{label}</span>
+                    {prizes.length > 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => setPrizes((prev) => prev.filter((_, i) => i !== index))}
+                        className="tw:rounded-full tw:px-2 tw:py-1 tw:text-[12px] tw:font-medium tw:text-muted tw:hover:text-danger"
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+
+                  {/* Three tight fields, one per line label — the old row tried to
+                      fit place, range, a title and an amount side by side and
+                      collapsed into a column of full-width inputs. */}
+                  <div className="tw:mt-2 tw:grid tw:grid-cols-3 tw:gap-2">
+                    <Field label="Place">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={prize.rank_from}
+                        onChange={(event) => updatePrize(index, "rank_from", event.target.value)}
+                        placeholder="1"
+                      />
+                    </Field>
+                    <Field label="To (optional)">
+                      <Input
+                        type="number"
+                        min={1}
+                        value={prize.rank_to}
+                        onChange={(event) => updatePrize(index, "rank_to", event.target.value)}
+                        placeholder="same"
+                      />
+                    </Field>
+                    <Field label="Amount">
+                      <Input
+                        type="number"
+                        min={0}
+                        value={prize.amount}
+                        onChange={(event) => updatePrize(index, "amount", event.target.value)}
+                        placeholder="0"
+                      />
+                    </Field>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
+          {prizeProblem ? (
+            <span className="tw:mt-2 tw:block tw:text-[12px] tw:font-medium tw:text-danger">
+              {prizeProblem}
+            </span>
+          ) : null}
 
           <Button
             type="button"
             variant="ghost"
             size="sm"
             className="tw:mt-3"
-            onClick={() => setPrizes((prev) => [...prev, { rank_from: 2, rank_to: 2, title: "", amount: "" }])}
+            onClick={() =>
+              setPrizes((prev) => [
+                ...prev,
+                { rank_from: String(Number(prev[prev.length - 1]?.rank_to || prev[prev.length - 1]?.rank_from || 1) + 1), rank_to: "", amount: "" },
+              ])
+            }
           >
-            Add a prize
+            Add another place
           </Button>
         </Card>
 
-        <Button type="submit" loading={saving}>
+        <Button type="submit" loading={saving} disabled={Boolean(prizeProblem)}>
           Save draft
         </Button>
       </form>
