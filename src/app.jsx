@@ -153,6 +153,12 @@ import WalletFundingCallbackPage from "./features/wallet/pages/WalletFundingCall
 import WalletFundingCancelPage from "./features/wallet/pages/WalletFundingCancelPage.jsx";
 /* lazily loaded — keeps this page out of the first-load bundle */
 const SharedEventPage = lazy(() => import("./pages/event/SharedEventPage.jsx"));
+/* Vote — contests with paid voting. Lazily loaded: most visits are not votes. */
+const VoteHome = lazy(() => import("./pages/Vote/VoteHome.jsx"));
+const ContestPage = lazy(() => import("./pages/Vote/ContestPage.jsx"));
+const SharedContestPage = lazy(() => import("./pages/Vote/SharedContestPage.jsx"));
+const ContestReceiptPage = lazy(() => import("./pages/Vote/ReceiptPage.jsx"));
+const CreateContest = lazy(() => import("./pages/Vote/CreateContest.jsx"));
 /* lazily loaded — keeps this page out of the first-load bundle */
 const EventDeepLinkPage = lazy(() => import("./pages/event/EventDeepLinkPage.jsx"));
 
@@ -569,6 +575,10 @@ export function App() {
         <Route element={<MainLayout />}>
           <Route path="/event/view/share/:slug" element={<EventShareRedirect />} />
           <Route path="/events/:shareKey" element={<SharedEventPage />} />
+          {/* A shared contest link is the only reason a visitor with no account
+              can read a contest. The token in the URL is the permission. */}
+          <Route path="/v/:token" element={<SharedContestPage />} />
+          <Route path="/vote/receipt/:reference" element={<ContestReceiptPage />} />
         </Route>
         <Route
           path="/users/:shareKey"
@@ -607,6 +617,9 @@ export function App() {
           <Route element={<MainLayout />}>
             <Route index exact path="/feed" element={<Home />} />
             <Route path="organizers" element={<AllOrganizers />} />
+            <Route path="/vote" element={<VoteHome />} />
+            <Route path="/vote/:slug" element={<ContestPage />} />
+            <Route path="/organiser/contests/new" element={<CreateContest />} />
             <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
             <Route path="/kyc/didit/callback" element={<DiditCallback />} />
             <Route path="/profile" element={<Profile />}>
