@@ -107,6 +107,22 @@ export async function listMyContests(token) {
   return { items: unwrap(response) ?? [], meta: response?.data?.meta ?? null };
 }
 
+/** Upload contest artwork before saving, so the organiser sees the real card. */
+export async function uploadContestCover(file, token) {
+  const form = new FormData();
+  form.append("cover", file);
+
+  const response = await api.post("/api/v1/organiser/contests/cover", form, {
+    ...authHeaders(token),
+    headers: {
+      ...(authHeaders(token).headers || {}),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return unwrap(response);
+}
+
 export async function createContest(payload, token) {
   const response = await api.post("/api/v1/organiser/contests", payload, authHeaders(token));
   return unwrap(response);

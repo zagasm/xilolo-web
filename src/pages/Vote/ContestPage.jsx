@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { Button, Chip, Skeleton } from "../../component/ui";
 import { formatCount } from "../../utils/countFormat";
 import { resolveMediaUrl } from "../../utils/media";
@@ -31,6 +32,7 @@ function coverUrl(media) {
 export default function ContestPage({ sharedToken = null }) {
   const { slug } = useParams();
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [contest, setContest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,6 +89,16 @@ export default function ContestPage({ sharedToken = null }) {
 
   return (
     <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans sm:tw:px-6">
+      {/* There was no way back to the list once you opened a contest. */}
+      <button
+        type="button"
+        onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/vote"))}
+        className="tw:mb-3 tw:-ml-1 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2 tw:py-1 tw:text-[13px] tw:font-medium tw:text-muted tw:transition-colors tw:hover:bg-inner tw:hover:text-ink"
+      >
+        <ChevronLeft className="tw:size-4" aria-hidden="true" />
+        All contests
+      </button>
+
       <div className="tw:relative tw:aspect-[16/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-inner md:tw:aspect-[21/9]">
         {cover ? (
           <img src={cover} alt="" className="tw:size-full tw:object-cover" />

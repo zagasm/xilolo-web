@@ -57,6 +57,11 @@ export default function VoteHome() {
   const featured = useMemo(() => contests.filter((contest) => contest.trending), [contests]);
   const rest = useMemo(() => contests.filter((contest) => !contest.trending), [contests]);
 
+  // One contest appears once. A trending row is only worth its own section
+  // when at least one other contest follows it.
+  const showTrending = !query && featured.length > 0 && rest.length > 0;
+  const showAll = showTrending || (!showTrending && contests.length > 0);
+
   return (
     <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
@@ -164,7 +169,10 @@ export default function VoteHome() {
           />
         ) : (
           <div className="tw:flex tw:flex-col tw:gap-8">
-            {featured.length > 0 && !query ? (
+            {/* Trending gets its own row only when there is something else to
+                follow it. Previously the grid fell back to `featured` when the
+                rest was empty, so a lone contest rendered twice. */}
+            {showTrending ? (
               <section>
                 <SectionHeading eyebrow="Right now" title="Trending contests" />
                 <div className="tw:mt-4">
@@ -177,19 +185,21 @@ export default function VoteHome() {
               </section>
             ) : null}
 
-            <section>
-              {featured.length > 0 && rest.length > 0 ? (
-                <SectionHeading eyebrow="Keep voting" title="All contests" />
-              ) : null}
+            {showAll ? (
+              <section>
+                {showTrending ? (
+                  <SectionHeading eyebrow="Keep voting" title="All contests" />
+                ) : null}
 
-              <div className={featured.length > 0 && rest.length > 0 ? "tw:mt-4" : ""}>
-                <FeedGrid>
-                  {(rest.length > 0 ? rest : featured).map((contest) => (
-                    <ContestCard key={contest.slug} contest={contest} />
-                  ))}
-                </FeedGrid>
-              </div>
-            </section>
+                <div className={showTrending ? "tw:mt-4" : ""}>
+                  <FeedGrid>
+                    {(showTrending ? rest : contests).map((contest) => (
+                      <ContestCard key={contest.slug} contest={contest} />
+                    ))}
+                  </FeedGrid>
+                </div>
+              </section>
+            ) : null}
           </div>
         )}
 

@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
-import { Card, Chip, CreatorRow, LiveBadge } from "../../../component/ui";
 import { formatCount } from "../../../utils/countFormat";
 import { resolveMediaUrl } from "../../../utils/media";
 
 /**
- * A contest on the vote home.
+ * Contest card.
  *
- * Deliberately the same anatomy as the event card the rest of the product uses
- * (EventCard in component/ui): poster → badge → title → creator → one meta line
- * → one chip. One focal element, hairline border, no shadow. A contest should
- * feel like something Xilolo made, not like a generic card grid.
+ * Structure, in order: artwork → title (two lines, fixed height so a row of
+ * cards lines up) → organiser → price and time left on one baseline. No chip
+ * pile: the card carries three facts a voter decides on, and nothing else.
  */
 
 function coverUrl(media) {
@@ -44,52 +42,63 @@ export default function ContestCard({ contest }) {
   const cover = coverUrl(contest.cover_media);
   const closing = timeLeft(contest.voting?.closes_at);
   const entrants = Number(contest.entry_count || 0);
+  const organiser = contest.organiser?.name || "Organiser";
+  const initial = organiser.trim().charAt(0).toUpperCase() || "X";
 
   return (
     <Link
       to={`/vote/${contest.slug}`}
-      className="tw:group tw:block tw:h-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:no-underline tw:transition-colors tw:hover:border-accent/40"
+      className="tw:group tw:flex tw:h-full tw:flex-col tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:no-underline tw:transition-colors tw:hover:border-accent/50"
     >
-      <div className="tw:relative tw:aspect-video tw:overflow-hidden tw:bg-inner">
+      <div className="tw:relative tw:aspect-[4/3] tw:w-full tw:overflow-hidden tw:bg-inner">
         {cover ? (
           <img
             src={cover}
             alt=""
             loading="lazy"
-            className="tw:size-full tw:object-cover tw:transition-transform tw:duration-300 tw:group-hover:scale-[1.02]"
+            className="tw:size-full tw:object-cover tw:transition-transform tw:duration-500 tw:group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="tw:flex tw:size-full tw:items-center tw:justify-center tw:px-6 tw:text-center">
-            <span className="tw:text-[13px] tw:text-muted">{contest.title}</span>
+          <div className="tw:flex tw:size-full tw:items-center tw:justify-center tw:bg-accent/10">
+            <span className="tw:text-[44px] tw:font-[800] tw:leading-none tw:text-accent-deep/35">
+              {initial}
+            </span>
           </div>
         )}
 
         {contest.trending ? (
-          <span className="tw:absolute tw:left-2.5 tw:top-2.5 tw:inline-flex tw:items-center tw:rounded-pill tw:bg-ink tw:px-2.5 tw:py-1 tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-paper-raised">
+          <span className="tw:absolute tw:left-2.5 tw:top-2.5 tw:rounded-pill tw:bg-ink/92 tw:px-2 tw:py-[3px] tw:text-[10px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-paper-raised">
             Trending
           </span>
-        ) : contest.entries?.open ? (
-          <LiveBadge label="Entries open" className="tw:absolute tw:left-2.5 tw:top-2.5 tw:bg-accent tw:text-ink" />
+        ) : null}
+
+        {contest.entries?.open ? (
+          <span className="tw:absolute tw:right-2.5 tw:top-2.5 tw:rounded-pill tw:bg-paper-raised/95 tw:px-2 tw:py-[3px] tw:text-[10px] tw:font-semibold tw:text-accent-deep">
+            Entries open
+          </span>
         ) : null}
       </div>
 
-      <div className="tw:flex tw:h-[calc(100%-0px)] tw:flex-col tw:gap-2 tw:p-4">
-        <h3 className="tw:m-0 tw:line-clamp-2 tw:text-base tw:font-semibold tw:leading-snug tw:text-ink">
+      <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-2 tw:p-3.5">
+        <h3 className="tw:m-0 tw:line-clamp-2 tw:min-h-[38px] tw:text-[15px] tw:font-semibold tw:leading-[1.25] tw:text-ink">
           {contest.title}
         </h3>
 
-        <CreatorRow name={contest.organiser?.name || "Organiser"} />
-
-        <div className="tw:mt-auto tw:flex tw:items-center tw:justify-between tw:gap-3 tw:pt-1">
-          <span className="tw:truncate tw:text-xs tw:text-muted">
-            {[
-              `${formatCount(entrants)} contestant${entrants === 1 ? "" : "s"}`,
-              closing,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
+        <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
+          <span className="tw:flex tw:size-5 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-accent/15 tw:text-[10px] tw:font-bold tw:text-accent-deep">
+            {initial}
           </span>
-          <Chip>{`${money(contest.vote_price, contest.currency)}/vote`}</Chip>
+          <span className="tw:truncate tw:text-[12px] tw:text-muted">{organiser}</span>
+        </div>
+
+        <div className="tw:mt-auto tw:flex tw:items-end tw:justify-between tw:gap-2 tw:border-t tw:border-hairline tw:pt-2.5">
+          <span className="tw:text-[14px] tw:font-semibold tw:leading-none tw:text-ink">
+            {money(contest.vote_price, contest.currency)}
+            <span className="tw:ml-1 tw:text-[11px] tw:font-medium tw:text-muted">/vote</span>
+          </span>
+          <span className="tw:text-[11px] tw:leading-none tw:text-muted">
+            {closing || `${formatCount(entrants)} in`}
+          </span>
         </div>
       </div>
     </Link>
