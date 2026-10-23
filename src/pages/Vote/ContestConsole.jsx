@@ -161,10 +161,10 @@ export default function ContestConsole() {
 
   if (loading) {
     return (
-      <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
         <div className={HOME_CONTAINER}>
           <Skeleton className="tw:h-10 tw:w-1/2" />
-          <div className="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-3 md:tw:grid-cols-4">
+          <div className="tw:mt-4 tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4">
             {[0, 1, 2, 3].map((key) => (
               <Skeleton key={key} className="tw:h-[96px] tw:w-full" />
             ))}
@@ -176,7 +176,7 @@ export default function ContestConsole() {
 
   if (error || !contest) {
     return (
-      <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
         <div className={HOME_CONTAINER}>
           <Card className="tw:p-6 tw:text-center">
             <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-ink">{error}</span>
@@ -190,14 +190,14 @@ export default function ContestConsole() {
   }
 
   return (
-    <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
-        <header className="tw:flex tw:flex-col tw:gap-3 tw:pb-5 md:tw:flex-row md:tw:items-start md:tw:justify-between">
+        <div className="tw:flex tw:flex-col tw:gap-3 tw:pb-5 tw:md:flex-row tw:md:items-start tw:md:justify-between">
           <div className="tw:min-w-0">
             <Link to="/account/contests" className="tw:text-[12px] tw:font-medium tw:text-accent-deep tw:no-underline">
               ← My contests
             </Link>
-            <h1 className="tw:m-0 tw:mt-1 tw:text-[24px] tw:font-semibold tw:leading-tight tw:text-ink md:tw:text-[28px]">
+            <h1 className="tw:m-0! tw:mt-1! tw:text-[24px]! tw:font-[800]! tw:leading-[1.1]! tw:tracking-[-0.02em]! tw:text-ink!">
               {contest.title}
             </h1>
             <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -240,9 +240,9 @@ export default function ContestConsole() {
               View page
             </Button>
           </div>
-        </header>
+        </div>
 
-        <div className="tw:grid tw:grid-cols-2 tw:gap-3 md:tw:grid-cols-4">
+        <div className="tw:grid tw:grid-cols-2 tw:gap-3 tw:md:grid-cols-4">
           <Stat
             label="Earned"
             value={money(dashboard.amount_earned, "NGN")}
@@ -261,7 +261,7 @@ export default function ContestConsole() {
           />
         </div>
 
-        <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-6 lg:tw:grid-cols-2">
+        <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-2">
           <section>
             <SectionHeading
               eyebrow="Moderation"

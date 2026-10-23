@@ -53,14 +53,14 @@ export default function MyContests() {
   }, [token]);
 
   return (
-    <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
+    <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
-        <header className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:pb-5">
+        <div className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:pb-5">
           <div>
             <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-accent-deep">
               Account
             </span>
-            <h1 className="tw:m-0 tw:mt-1 tw:text-[26px] tw:font-semibold tw:text-ink md:tw:text-[30px]">
+            <h1 className="tw:m-0! tw:mt-1! tw:text-[24px]! tw:font-[800]! tw:leading-[1.05]! tw:tracking-[-0.02em]! tw:text-ink!">
               My contests
             </h1>
             <span className="tw:mt-1 tw:block tw:text-[13px] tw:text-muted">
@@ -71,7 +71,7 @@ export default function MyContests() {
           <Button as={Link} to="/organiser/contests/new" size="sm" className="tw:mt-1 tw:shrink-0">
             New contest
           </Button>
-        </header>
+        </div>
 
         {loading ? (
           <div className="tw:flex tw:flex-col tw:gap-3">
@@ -96,7 +96,7 @@ export default function MyContests() {
           <div className="tw:flex tw:flex-col tw:gap-3">
             {contests.map((contest) => (
               <Card key={contest.id} className="tw:p-4">
-                <div className="tw:flex tw:flex-col tw:gap-3 md:tw:flex-row md:tw:items-center md:tw:justify-between">
+                <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                   <div className="tw:min-w-0">
                     <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                       <span className="tw:truncate tw:text-[15px] tw:font-semibold tw:text-ink">

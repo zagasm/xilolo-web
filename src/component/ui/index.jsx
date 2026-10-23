@@ -129,7 +129,7 @@ export function SectionHeading({ eyebrow, title, subtitle, align = "left", class
   return (
     <div className={`tw:flex tw:flex-col tw:gap-3 ${centre ? "tw:items-center tw:text-center" : ""} ${className}`}>
       {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-      <h2 className="tw:font-display tw:text-[clamp(1.5rem,3vw,2rem)] tw:font-extrabold tw:leading-tight tw:tracking-[-0.01em]">
+      <h2 className="tw:font-display tw:text-[clamp(1.5rem,3vw,2rem)]! tw:font-extrabold! tw:leading-tight! tw:tracking-[-0.01em]!">
         {title}
       </h2>
       {subtitle ? (
@@ -222,7 +222,7 @@ export function EventCard({
         {isLive ? <LiveBadge className="tw:absolute tw:left-2.5 tw:top-2.5" /> : null}
       </div>
       <div className="tw:flex tw:flex-col tw:gap-2 tw:p-4">
-        <h3 className="tw:line-clamp-2 tw:text-base tw:font-semibold tw:leading-snug">{title}</h3>
+        <h3 className="tw:line-clamp-2 tw:text-base! tw:font-semibold! tw:leading-snug!">{title}</h3>
         {creator ? (
           <CreatorRow name={creator} avatar={creatorAvatar} verified={verified} />
         ) : null}
@@ -300,7 +300,7 @@ export function Modal({ open, onClose, title, children, className = "" }) {
         aria-label={title}
         className={`tw:relative tw:w-full tw:max-w-md tw:rounded-t-sheet tw:bg-paper-raised tw:p-6 tw:shadow-[0_8px_24px_rgba(17,19,22,0.12)] tw:sm:rounded-sheet ${className}`}
       >
-        {title ? <h3 className="tw:mb-3 tw:text-lg tw:font-bold">{title}</h3> : null}
+        {title ? <h3 className="tw:mb-3 tw:text-lg! tw:font-bold!">{title}</h3> : null}
         {children}
       </div>
     </div>

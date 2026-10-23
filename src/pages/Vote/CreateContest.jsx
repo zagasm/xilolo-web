@@ -126,7 +126,7 @@ export default function CreateContest() {
 
   if (created) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
         <Card className="tw:p-5">
           <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
             Draft saved
@@ -158,18 +158,18 @@ export default function CreateContest() {
   }
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
-      <header className="tw:mb-5">
+    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:mb-5">
         <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
           New contest
         </span>
-        <h1 className="tw:m-0 tw:mt-1 tw:text-[24px] tw:font-semibold tw:text-ink">
+        <h1 className="tw:m-0! tw:text-[24px]! tw:font-[800]! tw:leading-[1.1]! tw:tracking-[-0.02em]! tw:text-ink!">
           Set up your contest
         </h1>
         <span className="tw:mt-1 tw:block tw:text-[13px] tw:text-muted">
           Saved as a draft first. Nothing goes live until you publish.
         </span>
-      </header>
+      </div>
 
       <form onSubmit={submit} className="tw:flex tw:flex-col tw:gap-4">
         <Field label="Cover image" hint="Shown on the contest card and page. JPG/PNG/WebP up to 5MB.">
@@ -221,7 +221,7 @@ export default function CreateContest() {
           />
         </Field>
 
-        <div className="tw:grid tw:grid-cols-1 tw:gap-4 sm:tw:grid-cols-2">
+        <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2">
           <Field label="Price per vote" hint="Minimum ₦100. Locked once the first vote is cast.">
             <Input
               type="number"
