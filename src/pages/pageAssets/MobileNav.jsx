@@ -7,6 +7,7 @@ import {
   Ticket,
   User,
   Star,
+  Trophy,
 } from "lucide-react";
 
 export default function MobileNav() {
@@ -18,6 +19,18 @@ export default function MobileNav() {
       to: "/feed",
       icon: (active) => (
         <HomeIcon
+          className={`tw:size-4 ${
+            active ? "tw:text-white" : "tw:text-[#4A4A4A]"
+          }`}
+          fill={active ? "black" : "none"}
+        />
+      ),
+    },
+    {
+      name: "Vote",
+      to: "/vote",
+      icon: (active) => (
+        <Trophy
           className={`tw:size-4 ${
             active ? "tw:text-white" : "tw:text-[#4A4A4A]"
           }`}
@@ -38,7 +51,8 @@ export default function MobileNav() {
       ),
     },
     {
-      name: "Create Event",
+      // Short label: the bar carries seven tabs now, and "Create Event" wraps.
+      name: "Create",
       to: "/event/select-event-type",
       icon: (active) => (
         <PlusSquare
@@ -92,7 +106,9 @@ export default function MobileNav() {
     <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-3 tw:z-999 tw:block">
       <div className="tw:flex tw:items-center tw:justify-between tw:px-4">
         {navItems.map((item) => {
-          const active = location.pathname === item.to;
+          const active =
+            location.pathname === item.to ||
+            (item.to !== "/feed" && location.pathname.startsWith(`${item.to}/`));
 
           return (
             <Link

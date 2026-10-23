@@ -153,7 +153,10 @@ export default function VoteHome() {
       )}
 
       <footer className="tw:mt-10">
-        <Link to="/become-an-organiser" className="tw:text-[13px] tw:font-semibold tw:text-accent-deep tw:no-underline">
+        <Link
+          to="/organiser/contests/new"
+          className="tw:text-[13px] tw:font-semibold tw:text-accent-deep tw:no-underline"
+        >
           Host your own contest
         </Link>
       </footer>

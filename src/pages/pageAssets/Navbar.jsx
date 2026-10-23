@@ -15,6 +15,7 @@ import {
   LogOut,
   LayoutGrid,
   Sparkles,
+  Trophy,
 } from "lucide-react";
 import { Popover, Transition } from "@headlessui/react";
 import { useAuth } from "../auth/AuthContext";
@@ -354,6 +355,9 @@ export default function Navbar() {
 
   const nav = [
     { name: "Home", to: "/feed", icon: HomeIcon },
+    // Contests live under their own tab: an average user should never have to
+    // know a URL to find the vote section.
+    { name: "Vote", to: "/vote", icon: Trophy },
     { name: "Tickets", to: "/tickets", icon: Ticket },
     { name: "Create Event", to: "/event/select-event-type", icon: PlusSquare },
     { name: "Organizers", to: "/organizers", icon: Star },
@@ -438,7 +442,9 @@ export default function Navbar() {
 
         <div className="tw:hidden tw:md:flex tw:md:justify-center tw:gap-8 tw:lg:gap-10 tw:mr-8 tw:lg:mr-12">
           {nav.map((item) => {
-            const active = location.pathname === item.to;
+            const active =
+              location.pathname === item.to ||
+              (item.to !== "/feed" && location.pathname.startsWith(`${item.to}/`));
             const Icon = item.icon;
 
             return (
