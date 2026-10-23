@@ -6,6 +6,7 @@ import { listMyContests } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
 import { HOME_CONTAINER } from "../Home/index.jsx";
 import { money, timeLeft } from "./components/ContestCard";
+import DeleteContestSheet from "./components/DeleteContestSheet";
 
 const STATUS_LABEL = {
   draft: "Draft",
@@ -32,6 +33,7 @@ export default function MyContests() {
   const [contests, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,6 +133,11 @@ export default function MyContests() {
                     <Button as={Link} to={`/vote/${contest.slug}`} size="sm" variant="ghost">
                       View
                     </Button>
+                    {contest.can_delete ? (
+                      <Button size="sm" variant="ghost" onClick={() => setDeleting(contest)}>
+                        Delete
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
               </Card>
@@ -138,6 +145,16 @@ export default function MyContests() {
           </div>
         )}
       </div>
+
+      <DeleteContestSheet
+        contest={deleting}
+        open={Boolean(deleting)}
+        onClose={() => setDeleting(null)}
+        onDeleted={() => {
+          setDeleting(null);
+          setContests((prev) => prev.filter((item) => item.id !== deleting?.id));
+        }}
+      />
     </div>
   );
 }
