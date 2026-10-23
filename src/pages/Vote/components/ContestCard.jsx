@@ -80,7 +80,7 @@ export default function ContestCard({ contest }) {
       </div>
 
       <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-2 tw:p-3.5">
-        <h3 className="tw:m-0 tw:line-clamp-2 tw:min-h-[38px] tw:text-[15px] tw:font-semibold tw:leading-[1.25] tw:text-ink">
+        <h3 className="tw:m-0! tw:line-clamp-2 tw:min-h-[38px] tw:text-[15px]! tw:font-semibold! tw:leading-[1.3]! tw:text-ink!">
           {contest.title}
         </h3>
 

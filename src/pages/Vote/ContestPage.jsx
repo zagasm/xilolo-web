@@ -61,7 +61,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (loading) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
         <Skeleton className="tw:h-[220px] tw:w-full" />
         <Skeleton className="tw:mt-4 tw:h-8 tw:w-2/3" />
         <Skeleton className="tw:mt-3 tw:h-4 tw:w-1/2" />
@@ -88,7 +88,7 @@ export default function ContestPage({ sharedToken = null }) {
   const myEntry = contest.my_entry;
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans sm:tw:px-6">
+    <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans tw:sm:px-6">
       {/* There was no way back to the list once you opened a contest. */}
       <button
         type="button"
@@ -99,18 +99,14 @@ export default function ContestPage({ sharedToken = null }) {
         All contests
       </button>
 
-      <div className="tw:relative tw:aspect-[16/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-inner md:tw:aspect-[21/9]">
-        {cover ? (
+      {cover ? (
+        <div className="tw:relative tw:aspect-[16/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-inner tw:md:aspect-[21/9]">
           <img src={cover} alt="" className="tw:size-full tw:object-cover" />
-        ) : (
-          <div className="tw:flex tw:size-full tw:items-center tw:justify-center tw:text-[13px] tw:text-muted">
-            <span>{contest.title}</span>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : null}
 
-      <header className="tw:mt-5">
-        <h1 className="tw:m-0 tw:text-[24px] tw:font-semibold tw:leading-tight tw:text-ink sm:tw:text-[30px]">
+      <div className="tw:mt-4">
+        <h1 className="tw:m-0! tw:text-[26px]! tw:font-[800]! tw:leading-[1.1]! tw:tracking-[-0.02em]! tw:text-ink!">
           {contest.title}
         </h1>
 
@@ -167,7 +163,7 @@ export default function ContestPage({ sharedToken = null }) {
             ) : null}
           </div>
         ) : null}
-      </header>
+      </div>
 
       <nav className="tw:mt-6 tw:flex tw:gap-2 tw:border-b tw:border-hairline tw:pb-2">
         {TABS.map((item) => (
