@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ImagePlus } from "lucide-react";
 import { Button, Card, Field, Input } from "../../component/ui";
 import { showError, showSuccess } from "../../component/ui/toast";
-import { createContest, publishContest } from "../../api/contestApi";
+import { createContest, publishContest, uploadContestCover } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
 
 /**
@@ -34,6 +35,31 @@ export default function CreateContest() {
 
   const [prizes, setPrizes] = useState([{ rank_from: 1, rank_to: 1, title: "", amount: "" }]);
 
+  // Contest artwork. Without it a card has no picture and never looks finished.
+  const [cover, setCover] = useState(null);
+  const [coverUploading, setCoverUploading] = useState(false);
+
+  const pickCover = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      showError("Cover images must be 5MB or smaller.");
+      return;
+    }
+
+    setCoverUploading(true);
+    try {
+      const uploaded = await uploadContestCover(file, token);
+      setCover(uploaded);
+      showSuccess("Cover uploaded.");
+    } catch (err) {
+      showError(err?.response?.data?.message || "That image could not be uploaded.");
+    } finally {
+      setCoverUploading(false);
+    }
+  };
+
   const set = (key) => (event) => {
     const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -59,6 +85,7 @@ export default function CreateContest() {
         entries_close_at: form.entries_close_at || null,
         voting_close_at: form.voting_close_at || null,
         prize_summary: form.prize_summary.trim() || null,
+        cover_media: cover ? { path: cover.path, url: cover.url } : null,
         prizes: prizes
           .filter((prize) => prize.title.trim())
           .map((prize) => ({
@@ -145,6 +172,29 @@ export default function CreateContest() {
       </header>
 
       <form onSubmit={submit} className="tw:flex tw:flex-col tw:gap-4">
+        <Field label="Cover image" hint="Shown on the contest card and page. JPG/PNG/WebP up to 5MB.">
+          <label className="tw:block tw:cursor-pointer">
+            <div className="tw:relative tw:aspect-[4/3] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-dashed tw:border-hairline tw:bg-paper-raised">
+              {cover?.url ? (
+                <img src={cover.url} alt="Contest cover" className="tw:size-full tw:object-cover" />
+              ) : (
+                <div className="tw:flex tw:size-full tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:text-muted">
+                  <ImagePlus className="tw:size-7" aria-hidden="true" />
+                  <span className="tw:text-[13px] tw:font-medium">
+                    {coverUploading ? "Uploading…" : "Add a cover image"}
+                  </span>
+                </div>
+              )}
+            </div>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={pickCover}
+              className="tw:hidden"
+            />
+          </label>
+        </Field>
+
         <Field label="Contest title">
           <Input value={form.title} onChange={set("title")} required maxLength={120} placeholder="Face of Lagos" />
         </Field>

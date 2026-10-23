@@ -68,10 +68,13 @@ function TopOrganizersHeader({ onBack }) {
         <ArrowLeft className="tw:size-6" aria-hidden="true" />
       </button>
 
-      <h1 className="tw:m-0! tw:text-[30px]! tw:font-extrabold! tw:leading-none! tw:tracking-[-0.5px]! tw:text-body">
+      {/* Heading scale matched to the app's search screen: 24/800, leading
+          1.05, subtitle 13/500 five pixels below. The old 30px extrabold with
+          leading-none crushed the two lines together. */}
+      <h1 className="tw:m-0! tw:text-[24px]! tw:font-[800]! tw:leading-[1.05]! tw:tracking-[-0.02em]! tw:text-body">
         {TITLE}
       </h1>
-      <p className="tw:mt-1.5 tw:mb-0! tw:text-[13.5px] tw:text-muted">
+      <p className="tw:mt-[5px]! tw:mb-0! tw:text-[13px] tw:font-medium tw:text-muted">
         {SUBTITLE}
       </p>
     </header>
