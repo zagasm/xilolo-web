@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Chip, Input, Skeleton } from "../../component/ui";
-import { formatCount } from "../../utils/countFormat";
+import { Button, Chip, EmptyState, Input, SectionHeading, Skeleton } from "../../component/ui";
+import { Trophy } from "lucide-react";
 import { listContests, getContestCategories } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
+import { FeedGrid, HOME_CONTAINER } from "../Home/index.jsx";
 import ContestCard from "./components/ContestCard";
 
 /**
  * Vote home.
  *
- * Requires an account (the API answers 401 without one), so this page assumes
- * a session. Browsing by shared link is handled on the contest page instead.
+ * Uses the same shell as the event feed — paper background, pt-24 so the fixed
+ * navbar never covers the header, the shared container width and feed grid —
+ * so the vote section reads as part of Xilolo rather than a page bolted on.
  */
 export default function VoteHome() {
   const { token } = useAuth();
@@ -27,10 +29,7 @@ export default function VoteHome() {
       setError(null);
 
       try {
-        const { items } = await listContests(
-          { q: searchTerm, category: category?.slug },
-          token
-        );
+        const { items } = await listContests({ q: searchTerm, category: category?.slug }, token);
         setContests(items);
       } catch (err) {
         setError("Contests could not be loaded right now.");
@@ -56,110 +55,135 @@ export default function VoteHome() {
   const rest = useMemo(() => contests.filter((contest) => !contest.trending), [contests]);
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[1180px] tw:px-4 tw:pb-16 tw:pt-6 sm:tw:px-6">
-      <header className="tw:flex tw:flex-col tw:gap-2">
-        <span className="tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
-          Vote
-        </span>
-        <h1 className="tw:m-0 tw:text-[26px] tw:font-semibold tw:leading-tight tw:text-ink sm:tw:text-[32px]">
-          Vote for who you believe in
-        </h1>
-        <span className="tw:block tw:text-[14px] tw:text-muted">
-          Contests from organisers across Xilolo. Every vote is a real vote — and every receipt is
-          yours to keep.
-        </span>
-      </header>
-
-      <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-3">
-        <Input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search a contest, an organiser, or a contestant"
-          aria-label="Search contests"
-        />
-
-        {categories.length > 0 ? (
-          <div className="tw:flex tw:flex-wrap tw:gap-2">
-            <Chip active={category === null} onClick={() => setCategory(null)}>
-              All
-            </Chip>
-            {categories.map((item) => (
-              <Chip
-                key={item.slug}
-                active={category?.slug === item.slug}
-                onClick={() => setCategory(item)}
-              >
-                {item.name}
-              </Chip>
-            ))}
+    <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
+      <div className={HOME_CONTAINER}>
+        <header className="tw:flex tw:flex-col tw:gap-4 tw:pb-4 tw:pt-2 md:tw:flex-row md:tw:items-end md:tw:justify-between">
+          <div className="tw:max-w-[560px]">
+            <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-accent-deep">
+              Vote
+            </span>
+            <h1 className="tw:m-0 tw:mt-1 tw:text-[28px] tw:font-semibold tw:leading-[1.15] tw:tracking-[-0.01em] tw:text-ink md:tw:text-[34px]">
+              Vote for who you believe in
+            </h1>
+            <span className="tw:mt-2 tw:block tw:text-[14px] tw:leading-relaxed tw:text-muted">
+              Contests from organisers across Xilolo. Every vote is a real vote, and every receipt
+              is yours to keep.
+            </span>
           </div>
-        ) : null}
-      </div>
 
-      {loading && contests.length === 0 ? (
-        <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:gap-4 sm:tw:grid-cols-2 lg:tw:grid-cols-3">
-          {[0, 1, 2].map((key) => (
-            <Skeleton key={key} className="tw:h-[286px] tw:w-full" />
-          ))}
-        </div>
-      ) : error ? (
-        <div className="tw:mt-8 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:text-center">
-          <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-ink">{error}</span>
-          <Button type="button" variant="secondary" className="tw:mt-4" onClick={() => load(query)}>
-            Try again
-          </Button>
-        </div>
-      ) : contests.length === 0 ? (
-        <div className="tw:mt-8 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-8 tw:text-center">
-          <span className="tw:block tw:text-[16px] tw:font-semibold tw:text-ink">
-            {query ? "No contest matches that search" : "No contests are running yet"}
-          </span>
-          <span className="tw:mt-1 tw:block tw:text-[13px] tw:text-muted">
-            {query
-              ? "Try a contestant's name, the organiser, or a shorter word."
-              : "When an organiser opens a contest it will appear here."}
-          </span>
-        </div>
-      ) : (
-        <>
-          {featured.length > 0 && !query ? (
-            <section className="tw:mt-6">
-              <span className="tw:block tw:text-[13px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-muted">
-                Trending
-              </span>
-              <div className="tw:mt-3 tw:grid tw:grid-cols-1 tw:gap-4 sm:tw:grid-cols-2">
-                {featured.map((contest) => (
-                  <ContestCard key={contest.slug} contest={contest} />
-                ))}
-              </div>
-            </section>
-          ) : null}
+          <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
+            <Button as={Link} to="/organiser/contests/new" variant="primary" size="md">
+              Create a contest
+            </Button>
+          </div>
+        </header>
 
-          <section className="tw:mt-6">
-            {featured.length > 0 && rest.length > 0 ? (
-              <span className="tw:block tw:text-[13px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-muted">
-                All contests
-              </span>
-            ) : null}
+        <div className="tw:flex tw:flex-col tw:gap-3 tw:pb-5">
+          <Input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search a contest, an organiser, or a contestant"
+            aria-label="Search contests"
+            className="tw:max-w-[520px]"
+          />
 
-            <div className="tw:mt-3 tw:grid tw:grid-cols-1 tw:gap-4 sm:tw:grid-cols-2 lg:tw:grid-cols-3">
-              {(rest.length > 0 ? rest : featured).map((contest) => (
-                <ContestCard key={contest.slug} contest={contest} />
+          {categories.length > 0 ? (
+            <div className="tw:flex tw:flex-wrap tw:gap-2">
+              <Chip active={category === null} onClick={() => setCategory(null)}>
+                All
+              </Chip>
+              {categories.map((item) => (
+                <Chip
+                  key={item.slug}
+                  active={category?.slug === item.slug}
+                  onClick={() => setCategory(item)}
+                >
+                  {item.name}
+                </Chip>
               ))}
             </div>
-          </section>
-        </>
-      )}
+          ) : null}
+        </div>
 
-      <footer className="tw:mt-10">
-        <Link
-          to="/organiser/contests/new"
-          className="tw:text-[13px] tw:font-semibold tw:text-accent-deep tw:no-underline"
-        >
-          Host your own contest
-        </Link>
-      </footer>
+        {loading && contests.length === 0 ? (
+          <FeedGrid>
+            {[0, 1, 2].map((key) => (
+              <Skeleton key={key} className="tw:h-[320px] tw:w-full" />
+            ))}
+          </FeedGrid>
+        ) : error ? (
+          <EmptyState
+            icon={Trophy}
+            title={error}
+            body="Check your connection and try again."
+            action={
+              <Button variant="secondary" size="md" onClick={() => load(query)}>
+                Retry
+              </Button>
+            }
+          />
+        ) : contests.length === 0 ? (
+          <EmptyState
+            icon={Trophy}
+            title={query ? "No contest matches that search" : "No contests are running yet"}
+            body={
+              query
+                ? "Try a contestant's name, the organiser, or a shorter word."
+                : "Contests appear here the moment an organiser opens one. You could be first."
+            }
+            action={
+              query ? null : (
+                <Button as={Link} to="/organiser/contests/new" size="md">
+                  Create the first one
+                </Button>
+              )
+            }
+          />
+        ) : (
+          <div className="tw:flex tw:flex-col tw:gap-8">
+            {featured.length > 0 && !query ? (
+              <section>
+                <SectionHeading eyebrow="Right now" title="Trending contests" />
+                <div className="tw:mt-4">
+                  <FeedGrid>
+                    {featured.map((contest) => (
+                      <ContestCard key={contest.slug} contest={contest} />
+                    ))}
+                  </FeedGrid>
+                </div>
+              </section>
+            ) : null}
+
+            <section>
+              {featured.length > 0 && rest.length > 0 ? (
+                <SectionHeading eyebrow="Keep voting" title="All contests" />
+              ) : null}
+
+              <div className={featured.length > 0 && rest.length > 0 ? "tw:mt-4" : ""}>
+                <FeedGrid>
+                  {(rest.length > 0 ? rest : featured).map((contest) => (
+                    <ContestCard key={contest.slug} contest={contest} />
+                  ))}
+                </FeedGrid>
+              </div>
+            </section>
+          </div>
+        )}
+
+        <footer className="tw:mt-10 tw:border-t tw:border-hairline tw:pt-4">
+          <span className="tw:block tw:text-[12px] tw:text-muted">
+            Running a contest?{" "}
+            <Link
+              to="/organiser/contests/new"
+              className="tw:font-semibold tw:text-accent-deep tw:no-underline"
+            >
+              Set one up
+            </Link>{" "}
+            — entries, moderation, vote pricing and prizes are all yours to control.
+          </span>
+        </footer>
+      </div>
     </div>
   );
 }
