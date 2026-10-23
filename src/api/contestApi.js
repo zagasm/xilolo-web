@@ -201,6 +201,19 @@ export async function disqualifyEntry(id, entryId, { reason, password, code }, t
 }
 
 /**
+ * Ask to take part in a contest. Lands as `pending` — the organiser approves.
+ * Organiser-defined fields go in `answers`, keyed by field key.
+ */
+export async function submitEntry(slug, payload, token) {
+  const response = await api.post(
+    `/api/v1/contests/${slug}/entries`,
+    payload,
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
+/**
  * Delete a contest. Allowed only while it has taken no votes — the API refuses
  * the moment a single vote exists, because people paid into it.
  */
