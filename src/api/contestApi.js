@@ -156,6 +156,34 @@ export async function declineEntry(id, entryId, { reason, password, code }, toke
   return unwrap(response);
 }
 
+/** Everything needed to watch a contest: funnel, throughput, top five, earnings. */
+export async function getContestDashboard(id, token) {
+  const response = await api.get(
+    `/api/v1/organiser/contests/${id}/dashboard`,
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
+/** Forward-only: the API refuses a close time earlier than the current one. */
+export async function extendVoting(id, votingCloseAt, reason, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/extend-voting`,
+    { voting_close_at: votingCloseAt, reason },
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
+export async function disqualifyEntry(id, entryId, { reason, password, code }, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/entries/${entryId}/disqualify`,
+    { reason, password, code },
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
 export async function getContestEarnings(id, token) {
   const response = await api.get(
     `/api/v1/organiser/contests/${id}/earnings`,

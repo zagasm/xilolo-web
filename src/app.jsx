@@ -159,6 +159,8 @@ const ContestPage = lazy(() => import("./pages/Vote/ContestPage.jsx"));
 const SharedContestPage = lazy(() => import("./pages/Vote/SharedContestPage.jsx"));
 const ContestReceiptPage = lazy(() => import("./pages/Vote/ReceiptPage.jsx"));
 const CreateContest = lazy(() => import("./pages/Vote/CreateContest.jsx"));
+const MyContests = lazy(() => import("./pages/Vote/MyContests.jsx"));
+const ContestConsole = lazy(() => import("./pages/Vote/ContestConsole.jsx"));
 /* lazily loaded — keeps this page out of the first-load bundle */
 const EventDeepLinkPage = lazy(() => import("./pages/event/EventDeepLinkPage.jsx"));
 
@@ -620,6 +622,9 @@ export function App() {
             <Route path="/vote" element={<VoteHome />} />
             <Route path="/vote/:slug" element={<ContestPage />} />
             <Route path="/organiser/contests/new" element={<CreateContest />} />
+            {/* Contest monitoring lives in the account centre, like Payouts. */}
+            <Route path="/account/contests" element={<MyContests />} />
+            <Route path="/account/contests/:id" element={<ContestConsole />} />
             <Route path="/become-an-organiser" element={<BecomeOrganiser />} />
             <Route path="/kyc/didit/callback" element={<DiditCallback />} />
             <Route path="/profile" element={<Profile />}>

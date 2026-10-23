@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Chip, EmptyState, Input, SectionHeading, Skeleton } from "../../component/ui";
-import { Trophy } from "lucide-react";
+import { Search, Trophy } from "lucide-react";
 import { listContests, getContestCategories } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
 import { FeedGrid, HOME_CONTAINER } from "../Home/index.jsx";
@@ -15,7 +15,10 @@ import ContestCard from "./components/ContestCard";
  * so the vote section reads as part of Xilolo rather than a page bolted on.
  */
 export default function VoteHome() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  // Only a verified organiser can create a contest, so only they see the door
+  // to it. Everyone else is here to explore, enter and vote.
+  const isOrganiser = Boolean(user?.is_organiser_verified);
   const [contests, setContests] = useState([]);
   const [categories, setCategories] = useState([]);
   const [query, setQuery] = useState("");
@@ -57,7 +60,7 @@ export default function VoteHome() {
   return (
     <div className="tw:w-full tw:bg-paper tw:pb-24 tw:pt-24 tw:font-sans">
       <div className={HOME_CONTAINER}>
-        <header className="tw:flex tw:flex-col tw:gap-4 tw:pb-4 tw:pt-2 md:tw:flex-row md:tw:items-end md:tw:justify-between">
+        <header className="tw:flex tw:items-start tw:justify-between tw:gap-4 tw:pb-4 tw:pt-2">
           <div className="tw:max-w-[560px]">
             <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.08em] tw:text-accent-deep">
               Vote
@@ -66,27 +69,39 @@ export default function VoteHome() {
               Vote for who you believe in
             </h1>
             <span className="tw:mt-2 tw:block tw:text-[14px] tw:leading-relaxed tw:text-muted">
-              Contests from organisers across Xilolo. Every vote is a real vote, and every receipt
-              is yours to keep.
+              Explore contests, back a contestant, and keep every receipt. Every vote is a real
+              vote.
             </span>
           </div>
 
-          <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
-            <Button as={Link} to="/organiser/contests/new" variant="primary" size="md">
+          {isOrganiser ? (
+            <Button
+              as={Link}
+              to="/organiser/contests/new"
+              variant="secondary"
+              size="sm"
+              className="tw:mt-1 tw:shrink-0"
+            >
               Create a contest
             </Button>
-          </div>
+          ) : null}
         </header>
 
         <div className="tw:flex tw:flex-col tw:gap-3 tw:pb-5">
-          <Input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search a contest, an organiser, or a contestant"
-            aria-label="Search contests"
-            className="tw:max-w-[520px]"
-          />
+          <div className="tw:relative tw:w-full tw:max-w-[520px]">
+            <Search
+              className="tw:pointer-events-none tw:absolute tw:left-3.5 tw:top-1/2 tw:size-4 tw:-translate-y-1/2 tw:text-muted"
+              aria-hidden="true"
+            />
+            <Input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search a contest, organiser or contestant"
+              aria-label="Search contests"
+              className="tw:pl-10!"
+            />
+          </div>
 
           {categories.length > 0 ? (
             <div className="tw:flex tw:flex-wrap tw:gap-2">
@@ -130,14 +145,7 @@ export default function VoteHome() {
             body={
               query
                 ? "Try a contestant's name, the organiser, or a shorter word."
-                : "Contests appear here the moment an organiser opens one. You could be first."
-            }
-            action={
-              query ? null : (
-                <Button as={Link} to="/organiser/contests/new" size="md">
-                  Create the first one
-                </Button>
-              )
+                : "New contests appear here as soon as organisers open them. Check back soon."
             }
           />
         ) : (
@@ -173,14 +181,8 @@ export default function VoteHome() {
 
         <footer className="tw:mt-10 tw:border-t tw:border-hairline tw:pt-4">
           <span className="tw:block tw:text-[12px] tw:text-muted">
-            Running a contest?{" "}
-            <Link
-              to="/organiser/contests/new"
-              className="tw:font-semibold tw:text-accent-deep tw:no-underline"
-            >
-              Set one up
-            </Link>{" "}
-            — entries, moderation, vote pricing and prizes are all yours to control.
+            Votes are paid and receipted. If a contest is cancelled, votes are refunded to your
+            wallet.
           </span>
         </footer>
       </div>
