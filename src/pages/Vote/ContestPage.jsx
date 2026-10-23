@@ -1,55 +1,110 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, Share2, Wifi } from "lucide-react";
 import { Button, Chip, Skeleton } from "../../component/ui";
-import { formatCount } from "../../utils/countFormat";
-import { resolveMediaUrl } from "../../utils/media";
+import { showSuccess, showError } from "../../component/ui/toast";
 import { getContest, getSharedContest } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
+import { formatCount } from "../../utils/countFormat";
+import { resolveMediaUrl } from "../../utils/media";
 import Leaderboard from "./components/Leaderboard";
 import VoteSheet from "./components/VoteSheet";
+import EntrySheet from "./components/EntrySheet";
 import { money, timeLeft } from "./components/ContestCard";
 
-const TABS = [
-  { key: "leaderboard", label: "Leaderboard" },
-  { key: "prizes", label: "Prizes" },
-  { key: "rules", label: "Rules" },
-];
+/* ── The event detail page's small parts, reused so both surfaces match ───── */
+
+function SectionLabel({ children }) {
+  return (
+    <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1.2px] tw:text-muted!">
+      {children}
+    </span>
+  );
+}
+
+function MetaSection({ label, children }) {
+  return (
+    <div>
+      <SectionLabel>{label}</SectionLabel>
+      <div className="tw:mt-2">{children}</div>
+    </div>
+  );
+}
+
+function SummaryPill({ label, value }) {
+  return (
+    <div className="tw:min-w-0 tw:flex-1">
+      <span className="tw:block tw:text-[9px] tw:font-bold tw:uppercase tw:tracking-[1px] tw:text-white/70">
+        {label}
+      </span>
+      <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[12px] tw:font-bold tw:text-white">
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function ordinal(n) {
+  const value = Number(n);
+  if (!Number.isFinite(value)) return "";
+  const suffix = ["th", "st", "nd", "rd"][(value % 100 > 10 && value % 100 < 14) ? 0 : value % 10] || "th";
+  return `${value}${suffix}`;
+}
+
+function prizeRange(prize) {
+  const from = ordinal(prize.rank_from);
+  if (prize.rank_to && Number(prize.rank_to) !== Number(prize.rank_from)) {
+    return `${from} – ${ordinal(prize.rank_to)}`;
+  }
+  return from;
+}
 
 function coverUrl(media) {
-  const raw = media?.hero || media?.cover || media?.url || media?.path || null;
+  const raw = media?.card || media?.cover || media?.url || media?.path || null;
   return raw ? resolveMediaUrl(raw) : null;
 }
 
 /**
- * Contest page.
+ * A contest, presented the way the event page is.
  *
- * One component, two doors:
- *   - `sharedToken` present  → a visitor with a link and no account. Read-only,
- *     with a sign-in prompt where the Vote buttons would be.
- *   - otherwise              → signed-in view by slug, voting enabled.
+ * Same shell (paper background, pt-20, 560px column that becomes two columns on
+ * desktop), same hero treatment (poster, scrim, glass summary card), same
+ * MetaSection labels, same Hosted By block with the organiser as a link, and a
+ * sticky bottom action bar. A contest is a thing on Xilolo, so it should not
+ * look like a different product.
  */
 export default function ContestPage({ sharedToken = null }) {
   const { slug } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const navigate = useNavigate();
+
   const [contest, setContest] = useState(null);
+  const [board, setBoard] = useState(null);
+  const [myEntry, setMyEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [tab, setTab] = useState("leaderboard");
-  const [activeEntry, setActiveEntry] = useState(null);
+  const [voting, setVoting] = useState(null);
+  const [entering, setEntering] = useState(false);
 
   const isShared = Boolean(sharedToken);
 
   const load = useCallback(async () => {
-    setLoading(true);
     setError(null);
 
     try {
-      const data = isShared ? await getSharedContest(sharedToken) : await getContest(slug, token);
+      const data = isShared
+        ? await getSharedContest(sharedToken)
+        : await getContest(slug, token);
+
       setContest(data);
+      setBoard(data.leaderboard ?? null);
+      setMyEntry(data.my_entry ?? null);
     } catch (err) {
-      setError(err?.response?.status === 404 ? "This contest could not be found." : "Something went wrong loading this contest.");
+      setError(
+        err?.response?.status === 404
+          ? "This contest could not be found."
+          : "The contest could not be loaded right now."
+      );
     } finally {
       setLoading(false);
     }
@@ -59,202 +114,376 @@ export default function ContestPage({ sharedToken = null }) {
     load();
   }, [load]);
 
+  const share = async () => {
+    const url = contest?.share_token
+      ? `${window.location.origin}/v/${contest.share_token}`
+      : window.location.href;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      showSuccess("Link copied.");
+    } catch {
+      showError("Could not copy the link — long-press the address bar instead.");
+    }
+  };
+
+  const cover = contest ? coverUrl(contest.cover_media) : null;
+  const votingClosing = contest ? timeLeft(contest.voting_window?.closes_at) : null;
+  const entriesClosing = contest ? timeLeft(contest.entries_window?.closes_at) : null;
+  const votingOpen = Boolean(contest?.voting_window?.open);
+  const entriesOpen = Boolean(contest?.entries_window?.open);
+  const entries = board?.entries ?? [];
+  const leader = entries[0];
+  const canVote = votingOpen && Boolean(user) && !isShared;
+
+  const organiserHref = contest?.organiser?.id ? `/profile/${contest.organiser.id}` : null;
+
+  const statusLabel = votingOpen ? "Voting open" : entriesOpen ? "Entries open" : "Voting closed";
+
   if (loading) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans">
-        <Skeleton className="tw:h-[220px] tw:w-full" />
-        <Skeleton className="tw:mt-4 tw:h-8 tw:w-2/3" />
-        <Skeleton className="tw:mt-3 tw:h-4 tw:w-1/2" />
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-24 tw:pt-20 tw:font-sans">
+        <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
+          <Skeleton className="tw:h-[210px] tw:w-full tw:rounded-[24px]" />
+          <Skeleton className="tw:mt-4 tw:h-6 tw:w-2/3" />
+          <Skeleton className="tw:mt-3 tw:h-4 tw:w-1/2" />
+        </div>
       </div>
     );
   }
 
   if (error || !contest) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:pb-16 tw:pt-28 tw:text-center tw:font-sans">
-        <span className="tw:block tw:text-[17px] tw:font-semibold tw:text-ink">{error}</span>
-        <Button as={Link} to="/vote" variant="secondary" className="tw:mt-5">
-          Back to Vote
-        </Button>
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-24 tw:pt-20 tw:font-sans">
+        <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:py-16 tw:text-center">
+          <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-body!">{error}</span>
+          <Button as={Link} to="/vote" variant="secondary" className="tw:mt-4">
+            All contests
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const cover = coverUrl(contest.cover_media);
-  const entriesClosing = timeLeft(contest.entries_window?.closes_at);
-  const votingClosing = timeLeft(contest.voting_window?.closes_at);
-  const board = contest.leaderboard ?? { entries: [], counts_visible: false };
-  const canVote = Boolean(contest.voting_window?.open) && !isShared;
-  const myEntry = contest.my_entry;
-
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:min-h-screen tw:pb-24 tw:pt-24 tw:font-sans tw:sm:px-6">
-      {/* There was no way back to the list once you opened a contest. */}
-      <button
-        type="button"
-        onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/vote"))}
-        className="tw:mb-3 tw:-ml-1 tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-2 tw:py-1 tw:text-[13px] tw:font-medium tw:text-muted tw:transition-colors tw:hover:bg-inner tw:hover:text-ink"
-      >
-        <ChevronLeft className="tw:size-4" aria-hidden="true" />
-        All contests
-      </button>
+    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[150px] tw:pt-20 tw:font-sans tw:text-body">
+      {/* Top bar — identical anatomy to the event page's. */}
+      <div className="tw:border-b tw:border-hairline tw:bg-paper-raised tw:md:sticky tw:md:top-20">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-1.5 tw:px-2 tw:py-2 md:tw:max-w-[1040px]">
+          <button
+            type="button"
+            onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/vote"))}
+            aria-label="Go back"
+            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-transparent tw:text-body"
+          >
+            <ChevronLeft className="tw:size-5" aria-hidden="true" />
+          </button>
 
-      {cover ? (
-        <div className="tw:relative tw:aspect-[16/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-inner tw:md:aspect-[21/9]">
-          <img src={cover} alt="" className="tw:size-full tw:object-cover" />
-        </div>
-      ) : null}
-
-      <div className="tw:mt-4">
-        <h1 className="tw:m-0! tw:text-[26px]! tw:font-[800]! tw:leading-[1.1]! tw:tracking-[-0.02em]! tw:text-ink!">
-          {contest.title}
-        </h1>
-
-        <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-          <Chip>{contest.organiser?.name || "Organiser"}</Chip>
-          <Chip>{`${money(contest.vote_price, contest.currency)} per vote`}</Chip>
-          <Chip>{contest.is_refundable ? "Refundable" : "Non-refundable"}</Chip>
-          {contest.entries_window?.open ? <Chip>Entries open</Chip> : <Chip>Entries closed</Chip>}
-        </div>
-
-        <div className="tw:mt-3 tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-1">
-          <span className="tw:text-[13px] tw:text-muted">
-            {entriesClosing ? `Entries close in ${entriesClosing}` : "Entries closed"}
-          </span>
-          <span className="tw:text-[13px] tw:text-muted">
-            {votingClosing ? `Voting closes in ${votingClosing}` : "Voting closed"}
-          </span>
-          {board.counts_visible && board.total_votes !== null ? (
-            <span className="tw:text-[13px] tw:text-muted">
-              {formatCount(board.total_votes)} votes cast
+          <div className="tw:min-w-0 tw:flex-1">
+            <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1.2px] tw:text-muted!">
+              Contest
             </span>
+            <span className="tw:mt-0.5 tw:block tw:truncate tw:font-display tw:text-[16px] tw:font-bold tw:text-body!">
+              {contest.title}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={share}
+            aria-label="Share contest"
+            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-transparent tw:text-body"
+          >
+            <Share2 className="tw:size-5" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-8 md:tw:max-w-[1040px] md:tw:px-6">
+        {/* Hero: poster, scrim, glass summary — the event page's treatment. */}
+        <div className="tw:px-2 tw:pt-1.5">
+          <div className="tw:relative tw:h-[210px] tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-ink md:tw:h-[280px]">
+            {cover ? (
+              <img src={cover} alt="" className="tw:h-full tw:w-full tw:object-cover" />
+            ) : (
+              <div className="tw:h-full tw:w-full tw:bg-[linear-gradient(135deg,#1F2328_0%,#111316_100%)]" />
+            )}
+
+            <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(17,19,22,0.06)_0%,rgba(17,19,22,0.20)_42%,rgba(17,19,22,0.74)_100%)]" />
+
+            <div className="tw:absolute tw:bottom-3 tw:left-1.5 tw:right-1.5">
+              <div className="tw:rounded-[22px] tw:border tw:border-white/30 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] tw:p-3.5 tw:backdrop-blur-[10px]">
+                <div className="tw:line-clamp-2 tw:font-display tw:text-[22px] tw:font-bold tw:leading-tight tw:text-white">
+                  {contest.title}
+                </div>
+
+                <div className="tw:mt-2.5 tw:flex tw:gap-3">
+                  <SummaryPill label="Per vote" value={money(contest.vote_price, contest.currency)} />
+                  <SummaryPill
+                    label="Voting"
+                    value={votingClosing ? votingClosing : votingOpen ? "Open" : "Closed"}
+                  />
+                </div>
+
+                <div className="tw:mt-2.5 tw:flex tw:items-center tw:gap-2.5">
+                  <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#22C55E] tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-bold tw:text-white">
+                    <Wifi className="tw:size-3 tw:text-white" aria-hidden="true" />
+                    {statusLabel}
+                  </span>
+                  <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[11px] tw:font-semibold tw:text-white/85">
+                    {[
+                      `${formatCount(contest.entry_count ?? entries.length ?? 0)} contestants`,
+                      board?.counts_visible && board?.total_votes !== null
+                        ? `${formatCount(board.total_votes)} votes cast`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Two columns from md up, single column on phones — as the event page. */}
+        <div className="tw:md:columns-2 md:tw:gap-x-8">
+          {contest.prizes?.length ? (
+            <div className="tw:break-inside-avoid tw:px-2 tw:pt-5">
+              <MetaSection label="Prizes">
+                <div className="tw:flex tw:flex-col tw:gap-2">
+                  {contest.prizes.map((prize, index) => (
+                    <div
+                      key={`${prize.rank_from}-${index}`}
+                      className="tw:flex tw:items-baseline tw:justify-between tw:gap-3 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                    >
+                      <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
+                        {prizeRange(prize)}
+                        {prize.title ? (
+                          <span className="tw:ml-1.5 tw:font-medium tw:text-muted!">{prize.title}</span>
+                        ) : null}
+                      </span>
+                      {prize.amount !== null && prize.amount !== undefined ? (
+                        <span className="tw:shrink-0 tw:text-[13px] tw:font-bold tw:text-accent-deep!">
+                          {money(prize.amount, contest.currency)}
+                        </span>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </MetaSection>
+            </div>
+          ) : null}
+
+          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            <MetaSection label="Key dates">
+              <div className="tw:flex tw:flex-col tw:gap-1.5">
+                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                  <span className="tw:text-[13px] tw:text-muted!">Entries close</span>
+                  <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
+                    {contest.entries_window?.closes_at
+                      ? new Date(contest.entries_window.closes_at).toLocaleDateString(undefined, {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—"}
+                  </span>
+                </div>
+                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                  <span className="tw:text-[13px] tw:text-muted!">Voting closes</span>
+                  <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
+                    {contest.voting_window?.closes_at
+                      ? new Date(contest.voting_window.closes_at).toLocaleDateString(undefined, {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—"}
+                  </span>
+                </div>
+                {entriesClosing ? (
+                  <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted!">
+                    {entriesOpen ? `Entries close in ${entriesClosing}` : "Entries are closed"}
+                  </span>
+                ) : null}
+              </div>
+            </MetaSection>
+          </div>
+
+          {/* Hosted By — the organiser is a link here, exactly as on events. */}
+          {entriesOpen && user && !myEntry && !isShared ? (
+            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+              <MetaSection label="Take part">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+                  <span className="tw:block tw:text-[13px] tw:leading-relaxed tw:text-muted!">
+                    Entries are open. Send yours and the organiser will review it — approved
+                    entries appear on the leaderboard and can start collecting votes.
+                  </span>
+                  <Button size="sm" className="tw:mt-3" onClick={() => setEntering(true)}>
+                    Enter this contest
+                  </Button>
+                </div>
+              </MetaSection>
+            </div>
+          ) : null}
+
+          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            <MetaSection label="Hosted By">
+              <div className="tw:flex tw:items-center tw:gap-2">
+                {organiserHref ? (
+                  <Link
+                    to={organiserHref}
+                    className="tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-hairline tw:bg-paper-raised"
+                  >
+                    <span className="tw:text-[10px] tw:font-bold tw:text-muted!">
+                      {(contest.organiser?.name || "X").trim().charAt(0).toUpperCase()}
+                    </span>
+                  </Link>
+                ) : null}
+
+                {organiserHref ? (
+                  <Link to={organiserHref} className="tw:flex tw:min-w-0 tw:items-center tw:gap-1">
+                    <span className="tw:min-w-0 tw:truncate tw:text-sm tw:font-semibold tw:text-accent-deep!">
+                      {contest.organiser?.name}
+                    </span>
+                    <ChevronRight className="tw:size-3.5 tw:shrink-0 tw:text-accent-deep" aria-hidden="true" />
+                  </Link>
+                ) : (
+                  <span className="tw:text-sm tw:font-semibold tw:text-body!">
+                    {contest.organiser?.name || "Organiser"}
+                  </span>
+                )}
+              </div>
+
+              {organiserHref ? (
+                <Link
+                  to={organiserHref}
+                  className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+                >
+                  View organiser
+                </Link>
+              ) : null}
+            </MetaSection>
+          </div>
+
+          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            <MetaSection label="About this contest">
+              <div className="tw:whitespace-pre-line tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted!">
+                {contest.description || contest.subtitle || "The organiser has not added a description yet."}
+              </div>
+            </MetaSection>
+          </div>
+
+          {contest.rules ? (
+            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+              <MetaSection label="Rules">
+                <div className="tw:whitespace-pre-line tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted!">
+                  {contest.rules}
+                </div>
+              </MetaSection>
+            </div>
+          ) : null}
+
+          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            <MetaSection label="Leaderboard">
+              {isShared && !user ? (
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+                  <span className="tw:block tw:text-[13px] tw:text-muted!">
+                    Sign in to vote and to see where your contestant stands.
+                  </span>
+                  <Button as={Link} to="/auth/signin" size="sm" className="tw:mt-3">
+                    Sign in
+                  </Button>
+                </div>
+              ) : (
+                <Leaderboard
+                  board={board}
+                  canVote={canVote}
+                  onVote={(entry) => setVoting(entry)}
+                  emptyBody={
+                    entriesOpen
+                      ? "Entries approved by the organiser will appear here."
+                      : "No contestants took part in this contest."
+                  }
+                />
+              )}
+            </MetaSection>
+          </div>
+
+          {myEntry ? (
+            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+              <MetaSection label="Your entry">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+                  <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-body!">
+                    {myEntry.status === "approved"
+                      ? "You are in this contest"
+                      : myEntry.status === "pending"
+                        ? "Your entry is waiting for review"
+                        : myEntry.status === "rejected"
+                          ? "Your entry was not approved"
+                          : "You were disqualified"}
+                  </span>
+                  <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted!">
+                    {myEntry.status === "pending"
+                      ? "The organiser reviews every entry by hand. You will be notified by email."
+                      : myEntry.status === "rejected"
+                        ? myEntry.rejection_reason || "The organiser did not give a reason."
+                        : myEntry.status === "approved"
+                          ? "Your entry appears on the leaderboard once approved."
+                          : "Contact the organiser if you believe this is a mistake."}
+                  </span>
+                </div>
+              </MetaSection>
+            </div>
           ) : null}
         </div>
+      </div>
 
-        {isShared ? (
-          <div className="tw:mt-4 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
-            <span className="tw:block tw:text-[14px] tw:font-semibold tw:text-ink">
+      {/* Sticky action bar, mirroring the event page's bottom bar. */}
+      <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-40 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-3 tw:px-3 tw:py-3 md:tw:max-w-[1040px]">
+          <div className="tw:min-w-0 tw:flex-1">
+            <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1px] tw:text-muted!">
+              Per vote
+            </span>
+            <span className="tw:block tw:text-[16px] tw:font-bold tw:text-body!">
+              {money(contest.vote_price, contest.currency)}
+            </span>
+          </div>
+
+          {isShared && !user ? (
+            <Button as={Link} to="/auth/signin" size="md" className="tw:shrink-0">
               Sign in to vote
-            </span>
-            <span className="tw:mt-1 tw:block tw:text-[13px] tw:text-muted">
-              You can follow this contest without an account, but every vote is cast by a registered
-              member.
-            </span>
-            <Button as={Link} to="/auth/signin" className="tw:mt-3">
-              Sign in
             </Button>
-          </div>
-        ) : myEntry ? (
-          <div className="tw:mt-4 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
-            <span className="tw:block tw:text-[13px] tw:text-muted">Your entry</span>
-            <span className="tw:mt-0.5 tw:block tw:text-[14px] tw:font-semibold tw:text-ink">
-              {myEntry.status === "approved"
-                ? "Approved — you are in the running"
-                : myEntry.status === "pending"
-                  ? "Waiting for the organiser to review it"
-                  : myEntry.status === "rejected"
-                    ? "Not accepted for this contest"
-                    : "Disqualified"}
-            </span>
-            {myEntry.rejection_reason ? (
-              <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted">
-                Reason: {myEntry.rejection_reason}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
+          ) : (
+            <Button
+              size="md"
+              disabled={!canVote || !leader}
+              onClick={() => leader && setVoting(leader)}
+              className="tw:shrink-0"
+            >
+              {!votingOpen ? "Voting closed" : leader ? `Vote for ${leader.display_name}` : "No contestants yet"}
+            </Button>
+          )}
+        </div>
       </div>
 
-      <nav className="tw:mt-6 tw:flex tw:gap-2 tw:border-b tw:border-hairline tw:pb-2">
-        {TABS.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => setTab(item.key)}
-            className={`tw:rounded-pill tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium tw:transition-colors ${
-              tab === item.key
-                ? "tw:bg-ink tw:text-paper-raised"
-                : "tw:bg-transparent tw:text-muted tw:hover:bg-inner"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
+      <EntrySheet
+        open={entering}
+        onClose={() => setEntering(false)}
+        contest={contest}
+        onSubmitted={load}
+      />
 
-      <div className="tw:mt-4">
-        {tab === "leaderboard" ? (
-          <>
-            {!board.counts_visible ? (
-              <span className="tw:mb-3 tw:block tw:text-[12px] tw:text-muted">
-                The organiser has hidden vote counts. Positions and gaps are shown instead.
-              </span>
-            ) : null}
-
-            <Leaderboard
-              board={board}
-              canVote={canVote}
-              onVote={(entry) => setActiveEntry(entry)}
-              emptyBody="Entries approved by the organiser will appear here."
-            />
-          </>
-        ) : null}
-
-        {tab === "prizes" ? (
-          <div className="tw:flex tw:flex-col tw:gap-3">
-            {contest.prizes?.length ? (
-              contest.prizes.map((prize) => (
-                <div
-                  key={`${prize.rank_from}-${prize.rank_to}`}
-                  className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4"
-                >
-                  <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
-                    <span className="tw:text-[14px] tw:font-semibold tw:text-ink">
-                      {prize.rank_from === prize.rank_to
-                        ? `Position ${prize.rank_from}`
-                        : `Positions ${prize.rank_from}–${prize.rank_to}`}
-                    </span>
-                    {prize.amount !== null && prize.amount !== undefined ? (
-                      <span className="tw:text-[15px] tw:font-semibold tw:text-ink">
-                        {money(prize.amount, contest.currency)}
-                      </span>
-                    ) : null}
-                  </div>
-                  <span className="tw:mt-1 tw:block tw:text-[13px] tw:text-muted">{prize.title}</span>
-                  {prize.description ? (
-                    <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted">
-                      {prize.description}
-                    </span>
-                  ) : null}
-                </div>
-              ))
-            ) : (
-              <span className="tw:text-[13px] tw:text-muted">
-                {contest.prizes?.length === 0 ? "The organiser has not listed prizes yet." : ""}
-              </span>
-            )}
-          </div>
-        ) : null}
-
-        {tab === "rules" ? (
-          <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
-            <span className="tw:block tw:whitespace-pre-wrap tw:text-[13px] tw:leading-relaxed tw:text-ink">
-              {contest.rules || "The organiser has not added rules yet."}
-            </span>
-            <span className="tw:mt-3 tw:block tw:text-[12px] tw:text-muted">
-              You are paying for a vote, not for a chance to win. Winners are decided by the number
-              of votes cast, not by chance.
-            </span>
-          </div>
-        ) : null}
-      </div>
-
-      {!isShared ? (
+      {voting ? (
         <VoteSheet
-          open={Boolean(activeEntry)}
-          onClose={() => setActiveEntry(null)}
+          open={Boolean(voting)}
+          onClose={() => setVoting(null)}
           contest={contest}
-          entry={activeEntry}
+          entry={voting}
           token={token}
           onVoted={load}
         />

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ImagePlus } from "lucide-react";
 import { Button, Card, Field, Input } from "../../component/ui";
+import CoverPicker from "./components/CoverPicker";
 import { showError, showSuccess } from "../../component/ui/toast";
 import { createContest, publishContest, uploadContestCover } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
@@ -39,9 +39,13 @@ export default function CreateContest() {
   const [cover, setCover] = useState(null);
   const [coverUploading, setCoverUploading] = useState(false);
 
-  const pickCover = async (event) => {
-    const file = event.target.files?.[0];
+  const pickCover = async (file) => {
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showError("Covers must be an image — JPG, PNG or WebP.");
+      return;
+    }
 
     if (file.size > 5 * 1024 * 1024) {
       showError("Cover images must be 5MB or smaller.");
@@ -172,28 +176,12 @@ export default function CreateContest() {
       </div>
 
       <form onSubmit={submit} className="tw:flex tw:flex-col tw:gap-4">
-        <Field label="Cover image" hint="Shown on the contest card and page. JPG/PNG/WebP up to 5MB.">
-          <label className="tw:block tw:cursor-pointer">
-            <div className="tw:relative tw:aspect-[4/3] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-dashed tw:border-hairline tw:bg-paper-raised">
-              {cover?.url ? (
-                <img src={cover.url} alt="Contest cover" className="tw:size-full tw:object-cover" />
-              ) : (
-                <div className="tw:flex tw:size-full tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:text-muted">
-                  <ImagePlus className="tw:size-7" aria-hidden="true" />
-                  <span className="tw:text-[13px] tw:font-medium">
-                    {coverUploading ? "Uploading…" : "Add a cover image"}
-                  </span>
-                </div>
-              )}
-            </div>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={pickCover}
-              className="tw:hidden"
-            />
-          </label>
-        </Field>
+        <CoverPicker
+          cover={cover}
+          uploading={coverUploading}
+          onPick={pickCover}
+          onRemove={() => setCover(null)}
+        />
 
         <Field label="Contest title">
           <Input value={form.title} onChange={set("title")} required maxLength={120} placeholder="Face of Lagos" />
