@@ -59,7 +59,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (loading) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:py-6">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
         <Skeleton className="tw:h-[220px] tw:w-full" />
         <Skeleton className="tw:mt-4 tw:h-8 tw:w-2/3" />
         <Skeleton className="tw:mt-3 tw:h-4 tw:w-1/2" />
@@ -69,7 +69,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (error || !contest) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:py-16 tw:text-center">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:pb-16 tw:pt-28 tw:text-center tw:font-sans">
         <span className="tw:block tw:text-[17px] tw:font-semibold tw:text-ink">{error}</span>
         <Button as={Link} to="/vote" variant="secondary" className="tw:mt-5">
           Back to Vote
@@ -86,8 +86,8 @@ export default function ContestPage({ sharedToken = null }) {
   const myEntry = contest.my_entry;
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-20 tw:pt-4 sm:tw:px-6">
-      <div className="tw:relative tw:aspect-[21/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:bg-inner">
+    <div className="tw:mx-auto tw:w-full tw:max-w-[900px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans sm:tw:px-6">
+      <div className="tw:relative tw:aspect-[16/9] tw:w-full tw:overflow-hidden tw:rounded-card tw:border tw:border-hairline tw:bg-inner md:tw:aspect-[21/9]">
         {cover ? (
           <img src={cover} alt="" className="tw:size-full tw:object-cover" />
         ) : (

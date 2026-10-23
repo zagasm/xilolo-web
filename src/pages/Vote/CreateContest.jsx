@@ -99,7 +99,7 @@ export default function CreateContest() {
 
   if (created) {
     return (
-      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:py-10">
+      <div className="tw:mx-auto tw:w-full tw:max-w-[640px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
         <Card className="tw:p-5">
           <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
             Draft saved
@@ -131,7 +131,7 @@ export default function CreateContest() {
   }
 
   return (
-    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:pb-20 tw:pt-6">
+    <div className="tw:mx-auto tw:w-full tw:max-w-[720px] tw:px-4 tw:pb-24 tw:pt-24 tw:font-sans">
       <header className="tw:mb-5">
         <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-accent-deep">
           New contest
