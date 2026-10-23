@@ -10,6 +10,7 @@ import {
   PiProhibitInset,
   PiShieldCheck,
   PiShieldSlash,
+  PiTrophy,
   PiWallet,
 } from "react-icons/pi";
 import { showError, showSuccess } from "../ui/toast";
@@ -301,6 +302,15 @@ export default function AccountCenter({ user, onLogout, onDeactivate }) {
               iconComponent={PiMoney}
               label="Payouts"
               to="/account/payouts"
+            />
+          ) : null}
+          {/* Contests live in the account centre, next to Payouts: it is a
+              monitoring surface for organisers, not a public tab. */}
+          {isOrganizer ? (
+            <QuickActionCard
+              iconComponent={PiTrophy}
+              label="My Contests"
+              to="/account/contests"
             />
           ) : null}
           {securityItems.map((item) => (
