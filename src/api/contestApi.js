@@ -213,6 +213,22 @@ export async function submitEntry(slug, payload, token) {
   return unwrap(response);
 }
 
+/** Contestant photo — already cropped to a square in the browser. */
+export async function uploadEntryPhoto(slug, blob, token) {
+  const form = new FormData();
+  form.append("photo", blob, "contestant.jpg");
+
+  const response = await api.post(`/api/v1/contests/${slug}/entries/photo`, form, {
+    ...authHeaders(token),
+    headers: {
+      ...(authHeaders(token).headers || {}),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return unwrap(response);
+}
+
 /**
  * Delete a contest. Allowed only while it has taken no votes — the API refuses
  * the moment a single vote exists, because people paid into it.

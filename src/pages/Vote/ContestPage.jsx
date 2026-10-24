@@ -1,18 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Share2, Wifi } from "lucide-react";
-import { Button, Chip, Skeleton } from "../../component/ui";
-import { showSuccess, showError } from "../../component/ui/toast";
+import { ChevronLeft, ChevronRight, Search, Share2, Trophy, Wifi } from "lucide-react";
+import { Button, Chip, Input, Skeleton } from "../../component/ui";
+import { showError, showSuccess } from "../../component/ui/toast";
 import { getContest, getSharedContest } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
 import { formatCount } from "../../utils/countFormat";
 import { resolveMediaUrl } from "../../utils/media";
-import Leaderboard from "./components/Leaderboard";
-import VoteSheet from "./components/VoteSheet";
 import EntrySheet from "./components/EntrySheet";
+import VoteSheet from "./components/VoteSheet";
+import DeleteContestSheet from "./components/DeleteContestSheet";
 import { money, timeLeft } from "./components/ContestCard";
+import { friendlyError } from "../../lib/errors";
 
-/* ── The event detail page's small parts, reused so both surfaces match ───── */
+/* ── the event page's small parts, reused so both surfaces match ─────────── */
 
 function SectionLabel({ children }) {
   return (
@@ -54,14 +55,10 @@ function ordinal(n) {
 function prizeRange(prize) {
   const from = ordinal(prize.rank_from);
   const to = prize.rank_to ? ordinal(prize.rank_to) : null;
-
-  // "1st place", "2nd – 10th place". The label IS the meaning; printing a
-  // separate title like "winner" next to 1st place said the same thing twice.
   if (to && to !== from) return `${from} – ${to} place`;
   return `${from} place`;
 }
 
-/** Auto-generated titles ("Prize 1") are noise; only show a real one. */
 function prizeLabel(prize) {
   const title = (prize.title || "").trim();
   if (!title || /^Prize \d+$/i.test(title)) return null;
@@ -73,14 +70,85 @@ function coverUrl(media) {
   return raw ? resolveMediaUrl(raw) : null;
 }
 
+function photoUrl(entry) {
+  const raw = entry?.media?.photo?.url || entry?.media?.photo?.path || null;
+  return raw ? resolveMediaUrl(raw) : null;
+}
+
+/** Initials stand in for a photo, so two contestants with one name differ. */
+function Avatar({ entry, size = 44 }) {
+  const photo = photoUrl(entry);
+  const initials = (entry.display_name || "?")
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return (
+    <span
+      className="tw:flex tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-hairline tw:bg-accent/12"
+      style={{ width: size, height: size }}
+    >
+      {photo ? (
+        <img src={photo} alt="" className="tw:size-full tw:object-cover" />
+      ) : (
+        <span className="tw:text-[13px] tw:font-bold tw:text-accent-deep">{initials}</span>
+      )}
+    </span>
+  );
+}
+
+function ContestantRow({ entry, canVote, onVote }) {
+  return (
+    <div className="tw:flex tw:items-center tw:gap-3 tw:border-b tw:border-hairline tw:py-3 last:tw:border-b-0">
+      <span className="tw:w-5 tw:shrink-0 tw:text-center tw:text-[12px] tw:font-bold tw:text-muted!">
+        {entry.rank}
+      </span>
+
+      <Avatar entry={entry} />
+
+      <div className="tw:min-w-0 tw:flex-1">
+        <div className="tw:flex tw:items-center tw:gap-1.5">
+          <span className="tw:truncate tw:text-[14px] tw:font-semibold tw:text-ink!">
+            {entry.display_name}
+          </span>
+          {entry.entry_number ? (
+            <span className="tw:shrink-0 tw:text-[11px] tw:text-muted!">#{entry.entry_number}</span>
+          ) : null}
+        </div>
+        <span className="tw:block tw:truncate tw:text-[12px] tw:text-muted!">
+          {(() => {
+            const votes =
+              entry.votes !== null && entry.votes !== undefined
+                ? `${formatCount(entry.votes)} votes`
+                : null;
+            // "0 votes · No votes yet" says the same thing twice.
+            const status = entry.status_text === "No votes yet" ? null : entry.status_text;
+
+            return [votes, status].filter(Boolean).join(" · ") || "No votes yet";
+          })()}
+        </span>
+      </div>
+
+      {canVote ? (
+        <Button size="sm" variant="secondary" onClick={() => onVote(entry)} className="tw:shrink-0">
+          Vote
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
 /**
- * A contest, presented the way the event page is.
+ * Contest page.
  *
- * Same shell (paper background, pt-20, 560px column that becomes two columns on
- * desktop), same hero treatment (poster, scrim, glass summary card), same
- * MetaSection labels, same Hosted By block with the organiser as a link, and a
- * sticky bottom action bar. A contest is a thing on Xilolo, so it should not
- * look like a different product.
+ * Tabs first — Contestants, then About — because a contest IS its contestants;
+ * the story of the contest is secondary and lives behind the second tab. The
+ * active tab is marked with a slim rule that sits on the divider, so the line
+ * reads as one continuous rule with a highlighted segment rather than a
+ * separate pill.
  */
 export default function ContestPage({ sharedToken = null }) {
   const { slug } = useParams();
@@ -94,6 +162,9 @@ export default function ContestPage({ sharedToken = null }) {
   const [error, setError] = useState(null);
   const [voting, setVoting] = useState(null);
   const [entering, setEntering] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [tab, setTab] = useState("contestants");
+  const [query, setQuery] = useState("");
 
   const isShared = Boolean(sharedToken);
 
@@ -101,10 +172,7 @@ export default function ContestPage({ sharedToken = null }) {
     setError(null);
 
     try {
-      const data = isShared
-        ? await getSharedContest(sharedToken)
-        : await getContest(slug, token);
-
+      const data = isShared ? await getSharedContest(sharedToken) : await getContest(slug, token);
       setContest(data);
       setBoard(data.leaderboard ?? null);
       setMyEntry(data.my_entry ?? null);
@@ -112,7 +180,7 @@ export default function ContestPage({ sharedToken = null }) {
       setError(
         err?.response?.status === 404
           ? "This contest could not be found."
-          : "The contest could not be loaded right now."
+          : friendlyError(err, "The contest could not be loaded right now.")
       );
     } finally {
       setLoading(false);
@@ -136,26 +204,32 @@ export default function ContestPage({ sharedToken = null }) {
     }
   };
 
+  const entries = board?.entries ?? [];
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return entries;
+    return entries.filter((entry) =>
+      [entry.display_name, entry.share_slug].filter(Boolean).some((value) =>
+        String(value).toLowerCase().includes(needle)
+      )
+    );
+  }, [entries, query]);
+
   const cover = contest ? coverUrl(contest.cover_media) : null;
-  const votingClosing = contest ? timeLeft(contest.voting_window?.closes_at) : null;
-  const entriesClosing = contest ? timeLeft(contest.entries_window?.closes_at) : null;
   const votingOpen = Boolean(contest?.voting_window?.open);
   const entriesOpen = Boolean(contest?.entries_window?.open);
-  const entries = board?.entries ?? [];
-  const leader = entries[0];
+  const votingClosing = contest ? timeLeft(contest.voting_window?.closes_at) : null;
   const canVote = votingOpen && Boolean(user) && !isShared;
-
   const organiserHref = contest?.organiser?.id ? `/profile/${contest.organiser.id}` : null;
-
   const statusLabel = votingOpen ? "Voting open" : entriesOpen ? "Entries open" : "Voting closed";
 
   if (loading) {
     return (
-      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:md:pb-24 tw:font-sans">
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:font-sans tw:md:pb-24">
         <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4">
-          <Skeleton className="tw:h-[210px] tw:w-full tw:rounded-[24px]" />
-          <Skeleton className="tw:mt-4 tw:h-6 tw:w-2/3" />
-          <Skeleton className="tw:mt-3 tw:h-4 tw:w-1/2" />
+          <Skeleton className="tw:h-[200px] tw:w-full tw:rounded-[20px]" />
+          <Skeleton className="tw:mt-3 tw:h-9 tw:w-full" />
+          <Skeleton className="tw:mt-3 tw:h-16 tw:w-full" />
         </div>
       </div>
     );
@@ -163,7 +237,7 @@ export default function ContestPage({ sharedToken = null }) {
 
   if (error || !contest) {
     return (
-      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:md:pb-24 tw:font-sans">
+      <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-32 tw:pt-20 tw:font-sans tw:md:pb-24">
         <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:px-4 tw:py-16 tw:text-center">
           <span className="tw:block tw:text-[15px] tw:font-semibold tw:text-body!">{error}</span>
           <Button as={Link} to="/vote" variant="secondary" className="tw:mt-4">
@@ -175,10 +249,10 @@ export default function ContestPage({ sharedToken = null }) {
   }
 
   return (
-    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[250px] tw:pt-20 tw:font-sans tw:text-body tw:md:pb-[150px]">
-      {/* Top bar — identical anatomy to the event page's. */}
+    <div className="tw:min-h-screen tw:w-full tw:bg-paper tw:pb-[240px] tw:pt-20 tw:font-sans tw:text-body tw:md:pb-[150px]">
+      {/* top bar */}
       <div className="tw:border-b tw:border-hairline tw:bg-paper-raised tw:md:sticky tw:md:top-20">
-        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-1.5 tw:px-2 tw:py-2 md:tw:max-w-[1040px]">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-1.5 tw:px-2 tw:py-1.5 tw:md:max-w-[1040px]">
           <button
             type="button"
             onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/vote"))}
@@ -208,57 +282,115 @@ export default function ContestPage({ sharedToken = null }) {
         </div>
       </div>
 
-      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-8 md:tw:max-w-[1040px] md:tw:px-6">
-        {/* Hero: poster, scrim, glass summary — the event page's treatment. */}
-        <div className="tw:px-2 tw:pt-1.5">
-          <div className="tw:relative tw:h-[210px] tw:w-full tw:overflow-hidden tw:rounded-[24px] tw:bg-ink md:tw:h-[280px]">
-            {cover ? (
-              <img src={cover} alt="" className="tw:h-full tw:w-full tw:object-cover" />
-            ) : (
-              <div className="tw:h-full tw:w-full tw:bg-[linear-gradient(135deg,#1F2328_0%,#111316_100%)]" />
-            )}
+      <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-6 tw:md:max-w-[1040px] tw:md:px-6">
+        {/* hero — no padding above it, so it meets the bar instead of floating */}
+        <div className="tw:relative tw:h-[150px] tw:w-full tw:overflow-hidden tw:bg-ink tw:md:h-[240px] md:tw:rounded-b-[24px]">
+          {cover ? (
+            <img src={cover} alt="" className="tw:h-full tw:w-full tw:object-cover" />
+          ) : (
+            <div className="tw:h-full tw:w-full tw:bg-[linear-gradient(135deg,#1F2328_0%,#111316_100%)]" />
+          )}
 
-            <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(17,19,22,0.06)_0%,rgba(17,19,22,0.20)_42%,rgba(17,19,22,0.74)_100%)]" />
+          <div className="tw:absolute tw:inset-0 tw:bg-[linear-gradient(180deg,rgba(17,19,22,0.06)_0%,rgba(17,19,22,0.22)_45%,rgba(17,19,22,0.78)_100%)]" />
 
-            <div className="tw:absolute tw:bottom-3 tw:left-1.5 tw:right-1.5">
-              <div className="tw:rounded-[22px] tw:border tw:border-white/30 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] tw:p-3.5 tw:backdrop-blur-[10px]">
-                <div className="tw:line-clamp-2 tw:font-display tw:text-[22px] tw:font-bold tw:leading-tight tw:text-white">
-                  {contest.title}
-                </div>
+          <div className="tw:absolute tw:bottom-2.5 tw:left-2.5 tw:right-2.5">
+            <div className="tw:rounded-[18px] tw:border tw:border-white/30 tw:bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06))] tw:p-3 tw:backdrop-blur-[10px]">
+              <div className="tw:line-clamp-1 tw:font-display tw:text-[19px] tw:font-bold tw:leading-tight tw:text-white">
+                {contest.title}
+              </div>
 
-                <div className="tw:mt-2.5 tw:flex tw:gap-3">
-                  <SummaryPill label="Per vote" value={money(contest.vote_price, contest.currency)} />
-                  <SummaryPill
-                    label="Voting"
-                    value={votingClosing ? votingClosing : votingOpen ? "Open" : "Closed"}
-                  />
-                </div>
-
-                <div className="tw:mt-2.5 tw:flex tw:items-center tw:gap-2.5">
-                  <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-[#22C55E] tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-bold tw:text-white">
-                    <Wifi className="tw:size-3 tw:text-white" aria-hidden="true" />
-                    {statusLabel}
-                  </span>
-                  <span className="tw:min-w-0 tw:flex-1 tw:truncate tw:text-[11px] tw:font-semibold tw:text-white/85">
-                    {[
-                      `${formatCount(contest.entry_count ?? entries.length ?? 0)} contestants`,
-                      board?.counts_visible && board?.total_votes !== null
-                        ? `${formatCount(board.total_votes)} votes cast`
-                        : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </div>
+              <div className="tw:mt-2 tw:flex tw:items-center tw:gap-3">
+                <SummaryPill label="Per vote" value={money(contest.vote_price, contest.currency)} />
+                <SummaryPill label="Voting" value={votingClosing || (votingOpen ? "Open" : "Closed")} />
+                <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-full tw:bg-[#22C55E] tw:px-2 tw:py-1 tw:text-[10px] tw:font-bold tw:text-white">
+                  <Wifi className="tw:size-2.5 tw:text-white" aria-hidden="true" />
+                  {statusLabel}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Two columns from md up, single column on phones — as the event page. */}
-        <div className="tw:md:columns-2 md:tw:gap-x-8">
-          {contest.prizes?.length ? (
-            <div className="tw:break-inside-avoid tw:px-2 tw:pt-5">
+        {/* Tabs: slim rule on the divider, active segment highlighted. */}
+        <div className="tw:relative tw:border-b tw:border-hairline">
+          <div className="tw:flex">
+            {[
+              { key: "contestants", label: `Contestants${entries.length ? ` (${entries.length})` : ""}` },
+              { key: "about", label: "About the contest" },
+            ].map((item) => {
+              const active = tab === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTab(item.key)}
+                  className="tw:relative tw:flex-1 tw:px-3 tw:py-3 tw:text-center tw:text-[13px] tw:font-semibold"
+                  style={{ color: active ? "#111316" : "#6B7280" }}
+                >
+                  {item.label}
+                  {active ? (
+                    <span className="tw:absolute tw:inset-x-0 tw:-bottom-px tw:h-[2px] tw:bg-accent" />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {tab === "contestants" ? (
+          <div className="tw:px-4 tw:pt-3 tw:md:px-0">
+            {entries.length === 0 ? (
+              <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:text-center">
+                <Trophy className="tw:mx-auto tw:size-8 tw:text-faint" aria-hidden="true" />
+                <span className="tw:mt-2 tw:block tw:text-[14px] tw:font-semibold tw:text-body!">
+                  No contestants yet
+                </span>
+                <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted!">
+                  {entriesOpen
+                    ? "Entries are open — approved contestants appear here."
+                    : "Nobody entered this contest."}
+                </span>
+              </div>
+            ) : (
+              <>
+                {/* Search, so a voter with a name in mind does not scroll. */}
+                <div className="tw:relative tw:mt-1">
+                  <Search
+                    className="tw:pointer-events-none tw:absolute tw:left-3 tw:top-1/2 tw:size-4 tw:-translate-y-1/2 tw:text-muted"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    id="contestant-search"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search a contestant"
+                    aria-label="Search contestants"
+                    className="tw:pl-9! tw:text-[14px]"
+                  />
+                </div>
+
+                <div className="tw:mt-1">
+                  {filtered.length === 0 ? (
+                    <span className="tw:block tw:py-6 tw:text-center tw:text-[13px] tw:text-muted!">
+                      No contestant matches “{query}”.
+                    </span>
+                  ) : (
+                    filtered.map((entry) => (
+                      <ContestantRow
+                        key={entry.entry_id}
+                        entry={entry}
+                        canVote={canVote}
+                        onVote={(picked) => setVoting(picked)}
+                      />
+                    ))
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="tw:flex tw:flex-col tw:gap-6 tw:px-4 tw:pt-4 tw:md:px-0">
+            {contest.prizes?.length ? (
               <MetaSection label="Prizes">
                 <div className="tw:flex tw:flex-col tw:gap-2">
                   {contest.prizes.map((prize, index) => (
@@ -283,17 +415,15 @@ export default function ContestPage({ sharedToken = null }) {
                   ))}
                 </div>
               </MetaSection>
-            </div>
-          ) : null}
+            ) : null}
 
-          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
             <MetaSection label="Key dates">
               <div className="tw:flex tw:flex-col tw:gap-1.5">
                 <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
                   <span className="tw:text-[13px] tw:text-muted!">Entries close</span>
                   <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
                     {contest.entries_window?.closes_at
-                      ? new Date(contest.entries_window.closes_at).toLocaleDateString(undefined, {
+                      ? new Date(contest.entries_window.closes_at).toLocaleString(undefined, {
                           day: "numeric",
                           month: "short",
                           hour: "2-digit",
@@ -306,7 +436,7 @@ export default function ContestPage({ sharedToken = null }) {
                   <span className="tw:text-[13px] tw:text-muted!">Voting closes</span>
                   <span className="tw:text-[13px] tw:font-semibold tw:text-body!">
                     {contest.voting_window?.closes_at
-                      ? new Date(contest.voting_window.closes_at).toLocaleDateString(undefined, {
+                      ? new Date(contest.voting_window.closes_at).toLocaleString(undefined, {
                           day: "numeric",
                           month: "short",
                           hour: "2-digit",
@@ -315,48 +445,16 @@ export default function ContestPage({ sharedToken = null }) {
                       : "—"}
                   </span>
                 </div>
-                {entriesClosing ? (
-                  <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted!">
-                    {entriesOpen ? `Entries close in ${entriesClosing}` : "Entries are closed"}
-                  </span>
-                ) : null}
               </div>
             </MetaSection>
-          </div>
 
-          {/* Hosted By — the organiser is a link here, exactly as on events. */}
-          {entriesOpen && user && !myEntry && !isShared ? (
-            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
-              <MetaSection label="Take part">
-                <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
-                  <span className="tw:block tw:text-[13px] tw:leading-relaxed tw:text-muted!">
-                    Entries are open. Send yours and the organiser will review it — approved
-                    entries appear on the leaderboard and can start collecting votes.
-                  </span>
-                  <Button size="sm" className="tw:mt-3" onClick={() => setEntering(true)}>
-                    Enter this contest
-                  </Button>
-                </div>
-              </MetaSection>
-            </div>
-          ) : null}
-
-          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
             <MetaSection label="Hosted By">
               <div className="tw:flex tw:items-center tw:gap-2">
                 {organiserHref ? (
                   <Link
                     to={organiserHref}
-                    className="tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-hairline tw:bg-paper-raised"
+                    className="tw:flex tw:min-w-0 tw:items-center tw:gap-1"
                   >
-                    <span className="tw:text-[10px] tw:font-bold tw:text-muted!">
-                      {(contest.organiser?.name || "X").trim().charAt(0).toUpperCase()}
-                    </span>
-                  </Link>
-                ) : null}
-
-                {organiserHref ? (
-                  <Link to={organiserHref} className="tw:flex tw:min-w-0 tw:items-center tw:gap-1">
                     <span className="tw:min-w-0 tw:truncate tw:text-sm tw:font-semibold tw:text-accent-deep!">
                       {contest.organiser?.name}
                     </span>
@@ -368,64 +466,38 @@ export default function ContestPage({ sharedToken = null }) {
                   </span>
                 )}
               </div>
-
-              {organiserHref ? (
-                <Link
-                  to={organiserHref}
-                  className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-xl tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
-                >
-                  View organiser
-                </Link>
-              ) : null}
             </MetaSection>
-          </div>
 
-          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
             <MetaSection label="About this contest">
               <div className="tw:whitespace-pre-line tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted!">
-                {contest.description || contest.subtitle || "The organiser has not added a description yet."}
+                {contest.description ||
+                  contest.subtitle ||
+                  "The organiser has not added a description yet."}
               </div>
             </MetaSection>
-          </div>
 
-          {contest.rules ? (
-            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            {contest.rules ? (
               <MetaSection label="Rules">
                 <div className="tw:whitespace-pre-line tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted!">
                   {contest.rules}
                 </div>
               </MetaSection>
-            </div>
-          ) : null}
+            ) : null}
 
-          <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
-            <MetaSection label="Leaderboard">
-              {isShared && !user ? (
+            {entriesOpen && user && !myEntry && !isShared ? (
+              <MetaSection label="Take part">
                 <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
-                  <span className="tw:block tw:text-[13px] tw:text-muted!">
-                    Sign in to vote and to see where your contestant stands.
+                  <span className="tw:block tw:text-[13px] tw:leading-relaxed tw:text-muted!">
+                    Entries are open. Send yours and the organiser will review it.
                   </span>
-                  <Button as={Link} to="/auth/signin" size="sm" className="tw:mt-3">
-                    Sign in
+                  <Button size="sm" className="tw:mt-3" onClick={() => setEntering(true)}>
+                    Enter this contest
                   </Button>
                 </div>
-              ) : (
-                <Leaderboard
-                  board={board}
-                  canVote={canVote}
-                  onVote={(entry) => setVoting(entry)}
-                  emptyBody={
-                    entriesOpen
-                      ? "Entries approved by the organiser will appear here."
-                      : "No contestants took part in this contest."
-                  }
-                />
-              )}
-            </MetaSection>
-          </div>
+              </MetaSection>
+            ) : null}
 
-          {myEntry ? (
-            <div className="tw:break-inside-avoid tw:px-2 tw:pt-[22px]">
+            {myEntry ? (
               <MetaSection label="Your entry">
                 <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
                   <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-body!">
@@ -438,24 +510,45 @@ export default function ContestPage({ sharedToken = null }) {
                           : "You were disqualified"}
                   </span>
                   <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted!">
-                    {myEntry.status === "pending"
-                      ? "The organiser reviews every entry by hand. You will be notified by email."
-                      : myEntry.status === "rejected"
-                        ? myEntry.rejection_reason || "The organiser did not give a reason."
-                        : myEntry.status === "approved"
-                          ? "Your entry appears on the leaderboard once approved."
-                          : "Contact the organiser if you believe this is a mistake."}
+                    {myEntry.status === "rejected"
+                      ? myEntry.rejection_reason || "The organiser did not give a reason."
+                      : myEntry.status === "pending"
+                        ? "The organiser reviews every entry by hand."
+                        : "Contact the organiser if you believe this is a mistake."}
                   </span>
                 </div>
               </MetaSection>
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+
+            {/* Owner-only: remove a contest nobody has voted in. */}
+            {contest.can_delete ? (
+              <MetaSection label="Danger zone">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+                  <span className="tw:block tw:text-[12px] tw:text-muted!">
+                    Nobody has voted in this contest, so it can be deleted. Once the first vote is
+                    paid, it can only be cancelled.
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="tw:mt-3"
+                    onClick={() => setDeleting(true)}
+                  >
+                    Delete this contest
+                  </Button>
+                </div>
+              </MetaSection>
+            ) : null}
+          </div>
+        )}
       </div>
 
-      {/* Sticky action bar, mirroring the event page's bottom bar. */}
-      <div className="tw:fixed tw:inset-x-0 tw:bottom-[72px] tw:z-40 tw:md:bottom-0 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur">
-        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-3 tw:px-3 tw:py-3 md:tw:max-w-[1040px]">
+      {/* Action bar only where it adds something: the About tab and the empty
+          state. On the contestants list every row already carries its own Vote
+          button, and the bar was covering the second contestant on a phone. */}
+      {tab === "about" || entries.length === 0 ? (
+      <div className="tw:fixed tw:inset-x-0 tw:bottom-[72px] tw:z-40 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur tw:md:bottom-0">
+        <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-3 tw:px-3 tw:py-2.5 tw:md:max-w-[1040px]">
           <div className="tw:min-w-0 tw:flex-1">
             <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1px] tw:text-muted!">
               Per vote
@@ -469,24 +562,39 @@ export default function ContestPage({ sharedToken = null }) {
             <Button as={Link} to="/auth/signin" size="md" className="tw:shrink-0">
               Sign in to vote
             </Button>
+          ) : entriesOpen && !myEntry ? (
+            <Button size="md" className="tw:shrink-0" onClick={() => setEntering(true)}>
+              Enter contest
+            </Button>
           ) : (
             <Button
               size="md"
-              disabled={!canVote || !leader}
-              onClick={() => leader && setVoting(leader)}
               className="tw:shrink-0"
+              disabled={!votingOpen || entries.length === 0}
+              onClick={() => {
+                setTab("contestants");
+                document.getElementById("contestant-search")?.focus();
+              }}
             >
-              {!votingOpen ? "Voting closed" : leader ? `Vote for ${leader.display_name}` : "No contestants yet"}
+              {!votingOpen ? "Voting closed" : entries.length === 0 ? "No contestants" : "Choose a contestant"}
             </Button>
           )}
         </div>
       </div>
+      ) : null}
 
       <EntrySheet
         open={entering}
         onClose={() => setEntering(false)}
         contest={contest}
         onSubmitted={load}
+      />
+
+      <DeleteContestSheet
+        contest={{ id: contest.id, title: contest.title }}
+        open={deleting}
+        onClose={() => setDeleting(false)}
+        onDeleted={() => navigate("/account/contests")}
       />
 
       {voting ? (

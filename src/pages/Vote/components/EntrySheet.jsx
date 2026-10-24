@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { Camera, Loader2 } from "lucide-react";
 import { Button, Field, Input, Modal } from "../../../component/ui";
 import { showError, showSuccess } from "../../../component/ui/toast";
-import { submitEntry } from "../../../api/contestApi";
+import { submitEntry, uploadEntryPhoto } from "../../../api/contestApi";
+import ImageCropper from "./ImageCropper";
 import { friendlyError } from "../../../lib/errors";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -21,6 +23,23 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
   const [answers, setAnswers] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  // Two contestants can share a name; a face settles it.
+  const [photo, setPhoto] = useState(null);
+  const [pendingPhoto, setPendingPhoto] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInput = useRef(null);
+
+  const uploadPhoto = async (blob) => {
+    setUploadingPhoto(true);
+    try {
+      const uploaded = await uploadEntryPhoto(contest.slug, blob, token);
+      setPhoto(uploaded);
+    } catch (err) {
+      showError(friendlyError(err, "That photo could not be uploaded."));
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const fields = Array.isArray(contest?.entry_fields) ? contest.entry_fields : [];
 
@@ -39,6 +58,7 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
           bio: form.bio.trim() || null,
           location: form.location.trim() || null,
           answers,
+          media: photo ? { photo: { path: photo.path, url: photo.url } } : null,
         },
         token
       );
@@ -59,6 +79,44 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
         <span className="tw:text-[12px] tw:leading-relaxed tw:text-muted!">
           The organiser reviews every entry by hand. Nothing is public until they approve it.
         </span>
+
+        <div className="tw:flex tw:items-center tw:gap-3">
+          <button
+            type="button"
+            onClick={() => photoInput.current?.click()}
+            className="tw:relative tw:flex tw:size-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-hairline tw:bg-paper"
+            aria-label="Add your photo"
+          >
+            {photo?.url ? (
+              <img src={photo.url} alt="" className="tw:size-full tw:object-cover" />
+            ) : uploadingPhoto ? (
+              <Loader2 className="tw:size-5 tw:animate-spin tw:text-muted" aria-hidden="true" />
+            ) : (
+              <Camera className="tw:size-5 tw:text-muted" aria-hidden="true" />
+            )}
+          </button>
+
+          <div className="tw:min-w-0">
+            <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-ink">
+              {photo?.url ? "Photo added" : "Add a photo"}
+            </span>
+            <span className="tw:block tw:text-[12px] tw:text-muted">
+              Optional, but voters use it to tell contestants apart.
+            </span>
+          </div>
+
+          <input
+            ref={photoInput}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="tw:hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) setPendingPhoto(file);
+              event.target.value = "";
+            }}
+          />
+        </div>
 
         <Field label="Name on the entry">
           <Input
@@ -172,6 +230,18 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
           Send my entry
         </Button>
       </form>
+
+      <ImageCropper
+        file={pendingPhoto}
+        ratio={1}
+        open={Boolean(pendingPhoto)}
+        title="Crop your photo"
+        onCancel={() => setPendingPhoto(null)}
+        onCrop={(blob) => {
+          setPendingPhoto(null);
+          uploadPhoto(blob);
+        }}
+      />
     </Modal>
   );
 }
