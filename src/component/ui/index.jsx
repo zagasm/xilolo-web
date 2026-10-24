@@ -292,16 +292,20 @@ export function EmptyState({ icon: Icon, title, body, action }) {
 export function Modal({ open, onClose, title, children, className = "" }) {
   if (!open) return null;
   return (
-    <div className="tw:fixed tw:inset-0 tw:z-50 tw:flex tw:items-end tw:justify-center tw:sm:items-center">
+    /* z-[1000]: the mobile bottom nav sits at z-999, so a z-50 sheet rendered
+       UNDER it and the submit button was unreachable on a phone. */
+    <div className="tw:fixed tw:inset-0 tw:z-[1000] tw:flex tw:items-end tw:justify-center tw:sm:items-center">
       <div className="tw:absolute tw:inset-0 tw:bg-ink/48" onClick={onClose} aria-hidden="true" />
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`tw:relative tw:w-full tw:max-w-md tw:rounded-t-sheet tw:bg-paper-raised tw:p-6 tw:shadow-[0_8px_24px_rgba(17,19,22,0.12)] tw:sm:rounded-sheet ${className}`}
+        className={`tw:relative tw:flex tw:max-h-[92vh] tw:w-full tw:max-w-md tw:flex-col tw:overflow-hidden tw:rounded-t-sheet tw:bg-paper-raised tw:p-6 tw:pb-[calc(24px+env(safe-area-inset-bottom))] tw:shadow-[0_8px_24px_rgba(17,19,22,0.12)] tw:sm:rounded-sheet ${className}`}
       >
-        {title ? <h3 className="tw:mb-3 tw:text-lg! tw:font-bold!">{title}</h3> : null}
-        {children}
+        {title ? <h3 className="tw:mb-3 tw:shrink-0 tw:text-lg! tw:font-bold!">{title}</h3> : null}
+        {/* Long forms scroll inside the sheet; the action button can always be
+            reached without fighting the keyboard or the nav. */}
+        <div className="tw:-mx-1 tw:min-h-0 tw:flex-1 tw:overflow-y-auto tw:px-1">{children}</div>
       </div>
     </div>
   );
