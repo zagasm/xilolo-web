@@ -238,6 +238,19 @@ export async function deleteContest(id, token) {
   return unwrap(response);
 }
 
+/**
+ * Disqualify everyone below a line — `mode: "rank"` (places >= value) or
+ * `mode: "votes"` (fewer than value votes). Needs the organiser's second factor.
+ */
+export async function disqualifyBelow(id, payload, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/disqualify-below`,
+    payload,
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
 export async function getContestEarnings(id, token) {
   const response = await api.get(
     `/api/v1/organiser/contests/${id}/earnings`,
