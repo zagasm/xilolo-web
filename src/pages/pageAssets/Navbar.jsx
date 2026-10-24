@@ -490,7 +490,7 @@ export default function Navbar() {
             type="button"
             onClick={() => setIsSearchOpen(true)}
             aria-label="Search"
-            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white/90 tw:text-slate-500 tw:transition-colors tw:hover:text-slate-800 lg:tw:hidden"
+            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white/90 tw:text-slate-500 tw:transition-colors tw:hover:text-slate-800 tw:lg:hidden"
           >
             <Search className="tw:size-4" />
           </button>
