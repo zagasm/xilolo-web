@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import ImageCropper from "./ImageCropper";
 
 /**
  * Cover picker.
@@ -12,14 +13,21 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 export default function CoverPicker({ cover, uploading, onPick, onRemove }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
+  const [pending, setPending] = useState(null);
 
   const openPicker = () => inputRef.current?.click();
+
+  // Every cover goes through the 21:9 cropper: a portrait phone shot would
+  // otherwise be centre-cropped by CSS with no say from the organiser.
+  const accept = (file) => {
+    if (!file) return;
+    setPending(file);
+  };
 
   const handleDrop = (event) => {
     event.preventDefault();
     setDragging(false);
-    const file = event.dataTransfer?.files?.[0];
-    if (file) onPick(file);
+    accept(event.dataTransfer?.files?.[0]);
   };
 
   return (
@@ -93,13 +101,25 @@ export default function CoverPicker({ cover, uploading, onPick, onRemove }) {
           type="file"
           accept="image/jpeg,image/png,image/webp"
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            if (file) onPick(file);
+            accept(event.target.files?.[0]);
             event.target.value = "";
           }}
           className="tw:hidden"
         />
       </div>
+
+      <ImageCropper
+        file={pending}
+        ratio={21 / 9}
+        open={Boolean(pending)}
+        title="Crop your cover"
+        onCancel={() => setPending(null)}
+        onCrop={(blob) => {
+          setPending(null);
+          onPick(blob);
+        }}
+      />
+
     </div>
   );
 }

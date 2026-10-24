@@ -213,12 +213,41 @@ export async function submitEntry(slug, payload, token) {
   return unwrap(response);
 }
 
+/** Contestant photo — already cropped to a square in the browser. */
+export async function uploadEntryPhoto(slug, blob, token) {
+  const form = new FormData();
+  form.append("photo", blob, "contestant.jpg");
+
+  const response = await api.post(`/api/v1/contests/${slug}/entries/photo`, form, {
+    ...authHeaders(token),
+    headers: {
+      ...(authHeaders(token).headers || {}),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return unwrap(response);
+}
+
 /**
  * Delete a contest. Allowed only while it has taken no votes — the API refuses
  * the moment a single vote exists, because people paid into it.
  */
 export async function deleteContest(id, token) {
   const response = await api.delete(`/api/v1/organiser/contests/${id}`, authHeaders(token));
+  return unwrap(response);
+}
+
+/**
+ * Disqualify everyone below a line — `mode: "rank"` (places >= value) or
+ * `mode: "votes"` (fewer than value votes). Needs the organiser's second factor.
+ */
+export async function disqualifyBelow(id, payload, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/disqualify-below`,
+    payload,
+    authHeaders(token)
+  );
   return unwrap(response);
 }
 

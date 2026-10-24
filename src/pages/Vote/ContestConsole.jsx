@@ -14,6 +14,8 @@ import { showError, showSuccess } from "../../component/ui/toast";
 import {
   approveEntry,
   declineEntry,
+  disqualifyBelow,
+  disqualifyEntry,
   extendVoting,
   getContestDashboard,
   getOrganiserEntries,
@@ -64,6 +66,16 @@ export default function ContestConsole() {
   const [busy, setBusy] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [cutOpen, setCutOpen] = useState(false);
+  const [cutForm, setCutForm] = useState({
+    mode: "entry",
+    entryId: "",
+    value: "",
+    reason: "",
+    password: "",
+    code: "",
+  });
+  const [disqualifying, setDisqualifying] = useState(null);
   const [extendOpen, setExtendOpen] = useState(false);
   const [extendForm, setExtendForm] = useState({ voting_close_at: "", reason: "" });
 
@@ -139,6 +151,51 @@ export default function ContestConsole() {
       const errors = err?.response?.data?.errors;
       const first = errors ? Object.values(errors)[0]?.[0] : null;
       showError(friendlyError(err, "That did not go through. Please try again."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitCut = async (event) => {
+    event.preventDefault();
+    setBusy(true);
+
+    try {
+      if (cutForm.mode === "entry") {
+        await disqualifyEntry(
+          id,
+          cutForm.entryId,
+          {
+            reason: cutForm.reason,
+            password: cutForm.password || undefined,
+            code: cutForm.code || undefined,
+          },
+          token
+        );
+        showSuccess("Contestant disqualified and notified.");
+      } else {
+        const result = await disqualifyBelow(
+          id,
+          {
+            mode: cutForm.mode,
+            value: Number(cutForm.value),
+            reason: cutForm.reason,
+            password: cutForm.password || undefined,
+            code: cutForm.code || undefined,
+          },
+          token
+        );
+
+        showSuccess(
+          `${result.count} contestant${result.count === 1 ? "" : "s"} disqualified and notified.`
+        );
+      }
+
+      setCutOpen(false);
+      setCutForm({ mode: "rank", value: "", reason: "", password: "", code: "" });
+      await load();
+    } catch (err) {
+      showError(friendlyError(err, "That change did not go through."));
     } finally {
       setBusy(false);
     }
@@ -239,6 +296,9 @@ export default function ContestConsole() {
 
             <Button size="sm" variant="secondary" onClick={() => setExtendOpen(true)}>
               Extend voting
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setCutOpen(true)}>
+              Disqualify
             </Button>
             {/* Only shown while the contest has taken no votes — the API refuses
                 the request once money is involved. */}
@@ -416,6 +476,100 @@ export default function ContestConsole() {
 
           <Button type="submit" variant="danger" loading={busy}>
             Decline entry
+          </Button>
+        </form>
+      </Modal>
+
+      {/* Disqualification: one contestant, or everyone below a line. Every
+          affected person is emailed and notified with this reason. */}
+      <Modal open={cutOpen} onClose={() => setCutOpen(false)} title="Disqualify contestants">
+        <form onSubmit={submitCut} className="tw:flex tw:flex-col tw:gap-3">
+          <span className="tw:text-[12px] tw:leading-relaxed tw:text-muted!">
+            Votes cast for a disqualified entry stop counting. This cannot be undone, and each
+            contestant is told why.
+          </span>
+
+          <Field label="Who">
+            <select
+              value={cutForm.mode}
+              onChange={(event) =>
+                setCutForm((prev) => ({ ...prev, mode: event.target.value }))
+              }
+              className="tw:h-12 tw:w-full tw:rounded-control tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:text-[15px] tw:text-ink tw:outline-none"
+            >
+              <option value="entry">One contestant</option>
+              <option value="rank">Everyone from a position down</option>
+              <option value="votes">Everyone under a number of votes</option>
+            </select>
+          </Field>
+
+          {cutForm.mode === "entry" ? (
+            <Field label="Contestant">
+              <select
+                required
+                value={cutForm.entryId}
+                onChange={(event) =>
+                  setCutForm((prev) => ({ ...prev, entryId: event.target.value }))
+                }
+                className="tw:h-12 tw:w-full tw:rounded-control tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:text-[15px] tw:text-ink tw:outline-none"
+              >
+                <option value="">Choose…</option>
+                {(dashboard?.top_entries || []).map((entry) => (
+                  <option key={entry.id} value={entry.id}>
+                    {entry.display_name} · {entry.votes} votes
+                  </option>
+                ))}
+              </select>
+            </Field>
+          ) : (
+            <Field
+              label={cutForm.mode === "rank" ? "From this position down" : "Under this many votes"}
+              hint={
+                cutForm.mode === "rank"
+                  ? "3 means 3rd place and everyone below it."
+                  : "100 means anyone with fewer than 100 votes."
+              }
+            >
+              <Input
+                type="number"
+                min={1}
+                required
+                value={cutForm.value}
+                onChange={(event) => setCutForm((prev) => ({ ...prev, value: event.target.value }))}
+              />
+            </Field>
+          )}
+
+          <Field label="Reason (they see this)">
+            <textarea
+              required
+              minLength={20}
+              rows={3}
+              value={cutForm.reason}
+              onChange={(event) => setCutForm((prev) => ({ ...prev, reason: event.target.value }))}
+              className="tw:w-full tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-3 tw:text-[14px] tw:text-ink tw:outline-none"
+            />
+          </Field>
+
+          <Field label="Your password" hint="Or your 6-digit authenticator code if 2FA is on.">
+            <Input
+              type="password"
+              value={cutForm.password}
+              onChange={(event) => setCutForm((prev) => ({ ...prev, password: event.target.value }))}
+            />
+          </Field>
+
+          <Field label="2FA code (only if enabled)">
+            <Input
+              inputMode="numeric"
+              maxLength={6}
+              value={cutForm.code}
+              onChange={(event) => setCutForm((prev) => ({ ...prev, code: event.target.value }))}
+            />
+          </Field>
+
+          <Button type="submit" variant="danger" loading={busy}>
+            Disqualify
           </Button>
         </form>
       </Modal>

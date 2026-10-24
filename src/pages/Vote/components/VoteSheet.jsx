@@ -73,6 +73,11 @@ export default function VoteSheet({ open, onClose, contest, entry, token, onVote
 
   const shortfall = Number(quote?.topup_needed || 0);
 
+  // What the wallet can actually pay for at this price — offered as a way
+  // forward instead of a dead end.
+  const maxAffordable =
+    quote?.unit_price > 0 ? Math.floor(Number(quote.wallet_balance || 0) / quote.unit_price) : 0;
+
   const submit = async () => {
     setSubmitting(true);
     setError(null);
@@ -185,16 +190,32 @@ export default function VoteSheet({ open, onClose, contest, entry, token, onVote
             </div>
 
             {shortfall > 0 ? (
-              <div className="tw:mt-2 tw:flex tw:items-center tw:justify-between tw:gap-3">
+              <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
                 <span className="tw:text-[12px] tw:text-danger">
                   {money(shortfall, quote?.currency)} short in your wallet
                 </span>
-                <Link
-                  to="/profile"
-                  className="tw:text-[12px] tw:font-semibold tw:text-accent-deep tw:no-underline"
-                >
-                  Add money
-                </Link>
+
+                <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+                  {/* Was /profile, which needs an id — it landed on an unstyled
+                      error page and read as a white screen. This is the wallet. */}
+                  <Link
+                    to="/account/wallet"
+                    onClick={onClose}
+                    className="tw:text-[12px] tw:font-semibold tw:text-accent-deep tw:no-underline"
+                  >
+                    Add money
+                  </Link>
+
+                  {maxAffordable >= 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => setQuantity(maxAffordable)}
+                      className="tw:text-[12px] tw:font-semibold tw:text-ink tw:underline"
+                    >
+                      Vote {maxAffordable} instead
+                    </button>
+                  ) : null}
+                </div>
               </div>
             ) : null}
           </div>
