@@ -24,7 +24,7 @@ export function Error404() {
           The link may be old, or the page may have moved. Nothing is broken on your account.
         </p>
 
-        <div className="tw:mt-6 tw:flex tw:flex-col tw:gap-2 sm:tw:flex-row sm:tw:justify-center">
+        <div className="tw:mt-6 tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:justify-center">
           <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
             Go back
           </Button>

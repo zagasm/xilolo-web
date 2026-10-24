@@ -105,7 +105,7 @@ export default function VoteHome() {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search contests, organisers or contestants"
+              placeholder="Search contests"
               aria-label="Search contests"
               className="tw:h-[52px] tw:w-full tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:pl-[44px] tw:pr-[44px] tw:text-[15px] tw:font-medium tw:text-ink tw:outline-none tw:placeholder:text-muted tw:focus:border-accent/60 tw:focus:ring-2 tw:focus:ring-accent/20 [&::-webkit-search-cancel-button]:tw:hidden"
             />

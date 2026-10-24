@@ -284,7 +284,7 @@ export default function ContestPage({ sharedToken = null }) {
 
       <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:pb-6 tw:md:max-w-[1040px] tw:md:px-6">
         {/* hero — no padding above it, so it meets the bar instead of floating */}
-        <div className="tw:relative tw:h-[150px] tw:w-full tw:overflow-hidden tw:bg-ink tw:md:h-[240px] md:tw:rounded-b-[24px]">
+        <div className="tw:relative tw:h-[150px] tw:w-full tw:overflow-hidden tw:bg-ink tw:md:h-[240px] tw:md:rounded-b-[24px]">
           {cover ? (
             <img src={cover} alt="" className="tw:h-full tw:w-full tw:object-cover" />
           ) : (
