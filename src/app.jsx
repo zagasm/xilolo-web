@@ -137,6 +137,7 @@ const FundWalletPage = lazy(() => import("./pages/Account/FundWallet/index.jsx")
 const EventEditPage = lazy(() => import("./pages/event/EventEditPage.jsx"));
 // import DisableRightClick from "./component/DisableRightClick.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
+import OpenInAppBanner from "./component/OpenInAppBanner";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 /* lazily loaded — keeps this page out of the first-load bundle */
 const EventStreamControlPage = lazy(() => import("./pages/event/EventStreamControlPage.jsx"));
@@ -555,6 +556,11 @@ export function App() {
       <ScrollToTop />
       <SEO {...pageMetadata} url={canonicalUrl} />
       {/* <DisableRightClick /> */}
+      {/* Mobile web visitors on an app-openable page get a way into the app.
+          Verified App Links handle this when everything is in place; this covers
+          the cases where they don't (in-app browsers, installs from outside the
+          stores, iOS cache). */}
+      <OpenInAppBanner />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         <Route path="/maintenance" element={<MaintenancePage />} />
