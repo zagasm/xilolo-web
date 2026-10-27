@@ -5,7 +5,14 @@
       {
         "appID": "38943VJXHS.com.zagasmstudio.app",
         "paths": [
-          "/event/*"
+          "/event/*",
+          "/events/*",
+          "/vote/*",
+          "/contests/*",
+          "/users/*",
+          "/organisers/*",
+          "/payment/*",
+          "/paystack/*"
         ]
       }
     ]
