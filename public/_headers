@@ -2,6 +2,13 @@
 # Apple's Universal Links validator requires a JSON response, not octet-stream.
 /.well-known/apple-app-site-association
   Content-Type: application/json
+  # Bunny defaults to 30 days for stored files. Apple re-reads this when it
+  # likes, so a wrong path list would otherwise stick for weeks after a fix.
+  Cache-Control: public, max-age=300
+
+/.well-known/assetlinks.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=300
 
 /apple-app-site-association
   Content-Type: application/json
