@@ -264,7 +264,10 @@ function StatCard({ icon: Icon, title, value, onClick }) {
   );
 
   const shell =
-    "tw:flex tw:min-h-[90px] tw:w-full tw:flex-col tw:items-stretch tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-[13px] tw:text-left";
+    // `!` because these tiles are <button>s and the legacy `button{border-radius:0}`
+    // reset outranks @layer utilities — without it the two tiles render square
+    // beside rounded cards (spotted on the profile screen, 2026-10-29).
+    "tw:flex tw:min-h-[90px] tw:w-full tw:flex-col tw:items-stretch tw:rounded-[20px]! tw:border tw:border-hairline tw:bg-paper-raised tw:p-[13px] tw:text-left";
 
   if (!onClick) {
     return <div className={shell}>{inner}</div>;
@@ -510,7 +513,7 @@ export default function ProfileHeader({
             type="button"
             disabled={followLoading}
             onClick={onToggleFollow}
-            className="tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-full tw:bg-accent tw:text-[13px] tw:font-medium tw:text-white tw:disabled:opacity-60"
+            className="tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-full! tw:bg-accent tw:text-[13px] tw:font-medium tw:text-white tw:disabled:opacity-60"
           >
             {followLoading
               ? "Please wait..."
@@ -597,7 +600,7 @@ export default function ProfileHeader({
           type="button"
           disabled={followLoading}
           onClick={onToggleFollow}
-          className="tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-full tw:bg-accent tw:text-[13px] tw:font-medium tw:text-white tw:disabled:opacity-60"
+          className="tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-full! tw:bg-accent tw:text-[13px] tw:font-medium tw:text-white tw:disabled:opacity-60"
         >
           {followLoading
             ? "Please wait..."

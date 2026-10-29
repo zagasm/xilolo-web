@@ -259,7 +259,7 @@ function OrganiserCard({
               e.stopPropagation();
               if (!isOwnProfile) onToggleFollow(followUserId);
             }}
-            className={`tw:inline-flex tw:h-[38px] tw:items-center tw:justify-center tw:rounded-xl tw:border tw:px-3.5 tw:text-xs tw:font-bold tw:transition-colors ${buttonTone}`}
+            className={`tw:inline-flex tw:h-[38px] tw:items-center tw:justify-center tw:rounded-xl! tw:border tw:px-3.5 tw:text-xs tw:font-bold tw:transition-colors ${buttonTone}`}
           >
             <span>{label}</span>
           </button>

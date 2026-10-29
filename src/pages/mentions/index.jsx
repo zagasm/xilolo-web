@@ -204,7 +204,7 @@ export default function TaggedMentionsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => handleChangeStatus(tab.id)}
-                  className={`tw:relative tw:flex tw:items-center tw:gap-1.5 tw:rounded-full tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition-all ${
+                  className={`tw:relative tw:flex tw:items-center tw:gap-1.5 tw:rounded-full! tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:transition-all ${
                     isActive
                       ? "tw:bg-primary tw:text-white tw:shadow-sm"
                       : "tw:text-gray-600 tw:hover:text-gray-900"

@@ -99,7 +99,7 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
           <button
             type="button"
             onClick={() => photoInput.current?.click()}
-            className="tw:relative tw:flex tw:size-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:border tw:border-hairline tw:bg-paper"
+            className="tw:relative tw:flex tw:size-16 tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full! tw:border tw:border-hairline tw:bg-paper"
             aria-label="Add your photo"
           >
             {photo?.url ? (
@@ -194,7 +194,7 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
                           chosen ? current.filter((item) => item !== option) : [...current, option]
                         );
                       }}
-                      className={`tw:rounded-pill tw:border tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium ${
+                      className={`tw:rounded-pill! tw:border tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium ${
                         chosen
                           ? "tw:border-accent tw:bg-accent/12 tw:text-accent-deep"
                           : "tw:border-hairline tw:bg-paper-raised tw:text-body"

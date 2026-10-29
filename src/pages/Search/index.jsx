@@ -148,7 +148,7 @@ function CompactEventRow({ event, index = null, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
+      className="tw:flex tw:w-full tw:items-start tw:gap-3 tw:rounded-3xl! tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
     >
       
 
@@ -202,7 +202,7 @@ function SearchSuggestionEventRow({ event, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:items-stretch tw:gap-3 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_24px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)]"
+      className="tw:flex tw:w-full tw:items-stretch tw:gap-3 tw:rounded-3xl! tw:border tw:border-slate-200 tw:bg-white tw:p-3 tw:text-left tw:shadow-[0_10px_24px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_14px_30px_rgba(15,23,42,0.08)]"
     >
       <div className="tw:w-1 tw:shrink-0 tw:rounded-full tw:bg-[#00FFD1]" />
 
@@ -263,7 +263,7 @@ function PersonRow({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl tw:transition tw:hover:bg-zinc-50 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.06)]"
+      className="tw:w-full tw:flex tw:items-center tw:gap-3 tw:py-3 tw:px-1 tw:rounded-2xl! tw:transition tw:hover:bg-zinc-50 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.06)]"
     >
       <div className="tw:w-14 tw:h-14 tw:rounded-full tw:overflow-hidden tw:shrink-0 tw:bg-lightPurple tw:flex tw:items-center tw:justify-center tw:font-semibold tw:border tw:border-neon">
         {avatarUrl && !avatarFailed ? (
@@ -309,7 +309,7 @@ function PersonSliderCard({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-3xl tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
+      className="tw:flex tw:w-full tw:flex-col tw:items-center tw:gap-2 tw:rounded-3xl! tw:border tw:border-slate-200 tw:bg-white tw:px-3 tw:py-4 tw:text-center tw:shadow-[0_10px_26px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:bg-slate-50 tw:hover:shadow-[0_14px_34px_rgba(15,23,42,0.08),0_0_18px_rgba(0,245,255,0.08)]"
     >
       <div className="tw:flex tw:h-16 tw:w-16 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple">
         {avatarUrl && !avatarFailed ? (
@@ -554,7 +554,7 @@ export default function SearchPage() {
           <button
             type="button"
             onClick={handleBack}
-            className="tw:flex tw:items-center tw:justify-center tw:w-9 tw:h-9 tw:rounded-full tw:hover:bg-zinc-100 tw:transition-colors"
+            className="tw:flex tw:items-center tw:justify-center tw:w-9 tw:h-9 tw:rounded-full! tw:hover:bg-zinc-100 tw:transition-colors"
           >
             <ArrowLeft className="tw:w-5 tw:h-5 tw:text-black" />
           </button>
@@ -581,7 +581,7 @@ export default function SearchPage() {
               <button
                 type="button"
                 aria-label="Search filters"
-                className="tw:ml-2 tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:text-zinc-500 tw:transition-colors tw:hover:bg-white/60"
+                className="tw:ml-2 tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full! tw:text-zinc-500 tw:transition-colors tw:hover:bg-white/60"
               >
                 <SlidersHorizontal className="tw:h-4 tw:w-4" />
               </button>
@@ -589,7 +589,7 @@ export default function SearchPage() {
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="tw:flex tw:items-center tw:justify-center tw:w-7 tw:h-7 tw:rounded-full tw:hover:bg-white/60 tw:transition-colors"
+                  className="tw:flex tw:items-center tw:justify-center tw:w-7 tw:h-7 tw:rounded-full! tw:hover:bg-white/60 tw:transition-colors"
                 >
                   <X className="tw:w-4 tw:h-4 tw:text-zinc-500" />
                 </button>

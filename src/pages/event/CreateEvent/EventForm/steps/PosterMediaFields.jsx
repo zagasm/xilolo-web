@@ -368,7 +368,7 @@ export default function PosterMediaFields({
                           thumbnailIndex
                         )
                       }
-                      className="tw:rounded-full tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-body tw:hover:border-accent"
+                      className="tw:rounded-full! tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-body tw:hover:border-accent"
                       style={{ borderRadius: 16 }}
                     >
                       Recrop
@@ -376,7 +376,7 @@ export default function PosterMediaFields({
                     <button
                       type="button"
                       onClick={() => removePosterImageAt(thumbnailIndex)}
-                      className="tw:rounded-full tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
+                      className="tw:rounded-full! tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
                       style={{ borderRadius: 16 }}
                     >
                       Remove
@@ -423,7 +423,7 @@ export default function PosterMediaFields({
                             prev.filter((_, itemIndex) => itemIndex !== index)
                           )
                         }
-                        className="tw:absolute tw:right-1 tw:top-1 tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:border tw:bg-white"
+                        className="tw:absolute tw:right-1 tw:top-1 tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:bg-white"
                         aria-label="Remove media"
                       >
                         ✕
@@ -518,7 +518,7 @@ export default function PosterMediaFields({
               <button
                 type="button"
                 onClick={closeCropDialog}
-                className="tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:py-2 tw:text-[12px] tw:font-semibold tw:text-body"
+                className="tw:rounded-full! tw:border tw:border-hairline tw:px-4 tw:py-2 tw:text-[12px] tw:font-semibold tw:text-body"
                 style={{ fontSize: 12 }}
               >
                 Cancel
@@ -527,7 +527,7 @@ export default function PosterMediaFields({
                 type="button"
                 onClick={commitCrop}
                 disabled={!completedCrop?.width || !completedCrop?.height}
-                className="tw:rounded-full tw:bg-accent tw:px-4 tw:py-2 tw:text-[12px] tw:font-bold tw:text-white tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                className="tw:rounded-full! tw:bg-accent tw:px-4 tw:py-2 tw:text-[12px] tw:font-bold tw:text-white tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 style={{ fontSize: 12 }}
               >
                 Save poster

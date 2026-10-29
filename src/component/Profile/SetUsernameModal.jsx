@@ -289,7 +289,7 @@ export default function SetUsernameModal({
                       style={{ borderRadius: 20 }}
                       type="button"
                       onClick={onClose}
-                      className="tw:inline-flex tw:h-11 tw:px-4 tw:items-center tw:justify-center tw:rounded-xl tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-800 tw:font-medium tw:transition"
+                      className="tw:inline-flex tw:h-11 tw:px-4 tw:items-center tw:justify-center tw:rounded-xl! tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-800 tw:font-medium tw:transition"
                     >
                       Cancel
                     </button>
@@ -297,7 +297,7 @@ export default function SetUsernameModal({
                       style={{ borderRadius: 20 }}
                       type="submit"
                       disabled={!canSubmit}
-                      className="tw:inline-flex tw:h-11 tw:px-5 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary tw:hover:bg-primary/90 tw:text-white tw:font-medium tw:transition tw:disabled:opacity-60"
+                      className="tw:inline-flex tw:h-11 tw:px-5 tw:items-center tw:justify-center tw:rounded-xl! tw:bg-primary tw:hover:bg-primary/90 tw:text-white tw:font-medium tw:transition tw:disabled:opacity-60"
                     >
                       {saving ? "Updating..." : "Update Username"}
                     </button>

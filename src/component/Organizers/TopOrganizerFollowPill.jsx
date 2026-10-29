@@ -45,7 +45,7 @@ export default function TopOrganizerFollowPill({
         e.stopPropagation();
         if (!isOwnProfile && !isLoading) onToggle?.();
       }}
-      className={`tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:font-bold tw:leading-none tw:transition-colors ${border ? "tw:border-[1.5px]" : ""} ${geometry} ${tone}`}
+      className={`tw:inline-flex tw:items-center tw:justify-center tw:rounded-full! tw:font-bold tw:leading-none tw:transition-colors ${border ? "tw:border-[1.5px]" : ""} ${geometry} ${tone}`}
     >
       {isLoading ? (
         <span

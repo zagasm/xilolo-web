@@ -449,7 +449,7 @@ export default function HlsVideoPlayer({
             <button
               type="button"
               onClick={retryNow}
-              className="tw:pointer-events-auto tw:mt-1 tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-gray-900"
+              className="tw:pointer-events-auto tw:mt-1 tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-white tw:px-4 tw:text-xs tw:font-semibold tw:text-gray-900"
             >
               <RefreshCw className="tw:h-3.5 tw:w-3.5" />
               Try again

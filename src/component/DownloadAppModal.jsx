@@ -53,7 +53,7 @@ const DownloadAppModal = ({
                     <button
                       type="button"
                       onClick={onClose}
-                      className="tw:rounded-full tw:p-2 tw:text-gray-500 tw:transition tw:hover:bg-gray-100 tw:hover:text-gray-800 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
+                      className="tw:rounded-full! tw:p-2 tw:text-gray-500 tw:transition tw:hover:bg-gray-100 tw:hover:text-gray-800 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
                     >
                       <X className="tw:size-5" />
                     </button>
@@ -72,7 +72,7 @@ const DownloadAppModal = ({
                         }}
                         type="button"
                         onClick={onAppStoreDownload}
-                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:via-primarySecond tw:to-[#3a3a3a] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-black/20 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#cfc4b8]"
+                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl! tw:bg-linear-to-r tw:from-primary tw:via-primarySecond tw:to-[#3a3a3a] tw:px-5 tw:py-4 tw:text-white tw:shadow-xl tw:transition tw:hover:shadow-black/20 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#cfc4b8]"
                       >
                         <span className="tw:flex tw:items-center tw:gap-3">
                           <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-white/15 tw:ring-1 tw:ring-white/30">
@@ -102,7 +102,7 @@ const DownloadAppModal = ({
                         }}
                         type="button"
                         onClick={onApkDownload}
-                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-[#cfc4b8] tw:hover:shadow-black/5 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
+                        className="tw:flex tw:w-full tw:items-center tw:justify-between tw:rounded-2xl! tw:border tw:border-[#ddd4ca] tw:bg-white tw:px-5 tw:py-4 tw:text-gray-800 tw:shadow-lg tw:transition tw:hover:border-[#cfc4b8] tw:hover:shadow-black/5 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-[#ddd4ca]"
                       >
                         <span className="tw:flex tw:items-center tw:gap-3">
                           <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl tw:bg-lightPurple tw:text-primary">

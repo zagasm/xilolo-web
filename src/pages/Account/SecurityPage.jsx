@@ -179,7 +179,7 @@ export default function SecurityPage() {
             type="button"
             onClick={() => navigate(-1)}
             aria-label="Go back"
-            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/40 tw:hover:bg-gray-50 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)]"
+            className="tw:mb-4 tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-gray-200 tw:bg-white tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/40 tw:hover:bg-gray-50 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)]"
           >
             <ChevronLeft className="tw:h-5 tw:w-5" />
           </button>
@@ -223,7 +223,7 @@ export default function SecurityPage() {
                 type="button"
                 onClick={startSetup}
                 disabled={working}
-                className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:opacity-60"
+                className="tw:rounded-full! tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:opacity-60"
               >
                 {working ? "Starting..." : "Enable 2FA"}
               </button>
@@ -281,7 +281,7 @@ export default function SecurityPage() {
                   }}
                   type="submit"
                   disabled={!/^\d{6}$/.test(confirmCode) || working}
-                  className="tw:rounded-full tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:bg-gray-300"
+                  className="tw:rounded-full! tw:bg-black tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:bg-gray-300"
                 >
                   {working ? "Confirming..." : "Confirm setup"}
                 </button>
@@ -291,7 +291,7 @@ export default function SecurityPage() {
                   }}
                   type="button"
                   onClick={() => setSetup(null)}
-                  className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-gray-900"
+                  className="tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-gray-900"
                 >
                   Cancel
                 </button>
@@ -321,7 +321,7 @@ export default function SecurityPage() {
                 <button
                   type="submit"
                   disabled={working || (disableCode && !/^\d{6}$/.test(disableCode))}
-                  className="tw:rounded-xl tw:bg-red-600 tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
+                  className="tw:rounded-xl! tw:bg-red-600 tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
                 >
                   {working ? "Disabling..." : "Disable"}
                 </button>
@@ -350,7 +350,7 @@ export default function SecurityPage() {
                 setDeleteError(null);
                 setDeleteOpen(true);
               }}
-              className="tw:mt-4 tw:rounded-full tw:border tw:border-red-200 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-red-700"
+              className="tw:mt-4 tw:rounded-full! tw:border tw:border-red-200 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-red-700"
             >
               Delete my account
             </button>
@@ -396,14 +396,14 @@ export default function SecurityPage() {
                 <button
                   type="submit"
                   disabled={working || !deleteForm.password}
-                  className="tw:rounded-full tw:bg-red-600 tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
+                  className="tw:rounded-full! tw:bg-red-600 tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
                 >
                   {working ? "Deleting..." : "Delete for good"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setDeleteOpen(false)}
-                  className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-gray-900"
+                  className="tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-gray-900"
                 >
                   Keep my account
                 </button>

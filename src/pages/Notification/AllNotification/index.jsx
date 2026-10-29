@@ -55,7 +55,7 @@ function AllNotification() {
                 borderRadius: 16
               }}
               type="button"
-              className="tw:rounded-full tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:border-neon/40 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.08)] tw:disabled:opacity-60"
+              className="tw:rounded-full! tw:border tw:border-slate-200 tw:bg-[#ffffff] tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-slate-700 tw:transition tw:hover:border-neon/40 tw:hover:shadow-[0_0_18px_rgba(0,245,255,0.08)] tw:disabled:opacity-60"
               onClick={() => markAllAsRead({ toast: true })}
               disabled={unreadCount === 0 || loading}
             >
@@ -70,7 +70,7 @@ function AllNotification() {
               }}
               type="button"
               onClick={() => setFilter("all")}
-              className={`tw:rounded-full tw:border tw:px-4 tw:py-2 tw:text-sm tw:font-medium ${filter === "all"
+              className={`tw:rounded-full! tw:border tw:px-4 tw:py-2 tw:text-sm tw:font-medium ${filter === "all"
                 ? "tw:border-slate-900 tw:bg-slate-900 tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]"
                 : "tw:border-slate-200 tw:bg-white tw:text-slate-600"
                 }`}
@@ -83,7 +83,7 @@ function AllNotification() {
               }}
               type="button"
               onClick={() => setFilter("unread")}
-              className={`tw:rounded-full tw:border tw:px-4 tw:py-2 tw:text-sm tw:font-medium ${filter === "unread"
+              className={`tw:rounded-full! tw:border tw:px-4 tw:py-2 tw:text-sm tw:font-medium ${filter === "unread"
                 ? "tw:border-slate-900 tw:bg-slate-900 tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]"
                 : "tw:border-slate-200 tw:bg-white tw:text-slate-600"
                 }`}

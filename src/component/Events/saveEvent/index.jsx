@@ -139,7 +139,7 @@ export default function SaveEventTemplate() {
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
                 className={[
-                  "tw:px-4 tw:py-2 tw:rounded-full tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150",
+                  "tw:px-4 tw:py-2 tw:rounded-full! tw:text-sm tw:font-medium tw:whitespace-nowrap tw:transition tw:duration-150",
                   active
                     ? "tw:bg-lightPurple tw:text-gray-900 tw:shadow-sm"
                     : "tw:text-gray-500 tw:hover:text-gray-900",

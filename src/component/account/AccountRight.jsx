@@ -292,7 +292,7 @@ const AccountRight = ({ onLogout, onDeactivate }) => {
         <button
           style={{ borderRadius: 24 }}
           onClick={onLogout}
-          className="tw:flex tw:w-full tw:text-center tw:items-center tw:gap-2 tw:bg-white tw:px-8 tw:py-3 tw:rounded-full tw:shadow-sm tw:hover:shadow-md tw:transition-all"
+          className="tw:flex tw:w-full tw:text-center tw:items-center tw:gap-2 tw:bg-white tw:px-8 tw:py-3 tw:rounded-full! tw:shadow-sm tw:hover:shadow-md tw:transition-all"
         >
           <LogOut className="tw:w-5 tw:h-5 tw:text-red-600" />
           <span className="tw:text-[15px] tw:font-bold tw:text-red-600">

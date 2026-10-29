@@ -152,7 +152,7 @@ function OrganisersIFollow() {
                 borderRadius: "50%",
               }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-8 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-8 tw:rounded-full! tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -250,7 +250,7 @@ function OrganiserCard({ organiser, onUnfollow, isUnfollowing }) {
           event.stopPropagation();
           onUnfollow?.();
         }}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:tw:hover:bg-gray-50 tw:tw:disabled:opacity-60 tw:tw:disabled:cursor-not-allowed tw:transition"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px]! tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:tw:hover:bg-gray-50 tw:tw:disabled:opacity-60 tw:tw:disabled:cursor-not-allowed tw:transition"
       >
         <img src="/images/user-x.svg" />
         <span>{isUnfollowing ? "Unfollowing…" : "Unfollow"}</span>

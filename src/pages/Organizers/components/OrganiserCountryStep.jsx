@@ -87,7 +87,7 @@ export default function OrganiserCountryStep({
           type="button"
           onClick={onContinue}
           disabled={!selectedCountry || countriesLoading}
-          className="tw:inline-flex tw:items-center tw:justify-center tw:px-5 tw:py-2.5 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:shadow-sm tw:transition tw:hover:bg-primary/90 tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
+          className="tw:inline-flex tw:items-center tw:justify-center tw:px-5 tw:py-2.5 tw:rounded-xl! tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:shadow-sm tw:transition tw:hover:bg-primary/90 tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
         >
           Continue
         </button>

@@ -280,7 +280,7 @@ export default function AccountPayoutHistory() {
           <button
             type="button"
             onClick={() => fetchHistory(meta.current_page || 1)}
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full! tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:hover:shadow-md"
           >
             <RefreshCw className="tw:h-4 tw:w-4" />
             Refresh
@@ -345,7 +345,7 @@ export default function AccountPayoutHistory() {
                   key={payout?.id}
                   type="button"
                   onClick={() => setSelectedPayout(payout)}
-                  className="tw:w-full tw:rounded-3xl tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition tw:hover:shadow-md"
+                  className="tw:w-full tw:rounded-3xl! tw:bg-white tw:p-4 tw:text-left tw:shadow-sm tw:transition tw:hover:shadow-md"
                 >
                   <div className="tw:flex tw:flex-col tw:gap-4 tw:md:flex-row tw:md:items-center tw:md:justify-between">
                     <div className="tw:min-w-0">
@@ -396,7 +396,7 @@ export default function AccountPayoutHistory() {
               type="button"
               disabled={meta.current_page <= 1 || loading}
               onClick={() => fetchHistory(meta.current_page - 1)}
-              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:rounded-full! tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             >
               Previous
             </button>
@@ -407,7 +407,7 @@ export default function AccountPayoutHistory() {
               type="button"
               disabled={meta.current_page >= meta.last_page || loading}
               onClick={() => fetchHistory(meta.current_page + 1)}
-              className="tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:rounded-full! tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
             >
               Next
             </button>

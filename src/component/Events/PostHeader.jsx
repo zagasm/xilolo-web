@@ -60,7 +60,7 @@ export default function PosterHeader({
       <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:gap-2">
         <button
           type="button"
-          className="tw:h-10 tw:w-10 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:shadow"
+          className="tw:h-10 tw:w-10 tw:rounded-full! tw:bg-white tw:flex tw:items-center tw:justify-center tw:shadow"
           onClick={handleShare}
           aria-label="Share"
         >
@@ -81,7 +81,7 @@ export default function PosterHeader({
         </button>
         <button
           type="button"
-          className="tw:h-10 tw:w-10 tw:rounded-full tw:bg-white tw:flex tw:items-center tw:justify-center tw:shadow"
+          className="tw:h-10 tw:w-10 tw:rounded-full! tw:bg-white tw:flex tw:items-center tw:justify-center tw:shadow"
           onClick={toggleSave}
           aria-label="Save"
           title={isSaved ? "Saved" : "Save"}

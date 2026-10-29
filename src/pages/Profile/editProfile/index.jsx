@@ -331,7 +331,7 @@ function EditProfile() {
           type="button"
           onClick={handleUpdateProfile}
           disabled={updating}
-          className="tw:w-full tw:rounded-full tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary tw:hover:bg-primarySecond tw:transition tw:disabled:opacity-60"
+          className="tw:w-full tw:rounded-full! tw:h-11 tw:text-sm tw:font-medium tw:text-white tw:bg-primary tw:hover:bg-primarySecond tw:transition tw:disabled:opacity-60"
         >
           {updating ? "Updating..." : "Update Information"}
         </button>

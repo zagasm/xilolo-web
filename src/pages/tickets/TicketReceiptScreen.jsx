@@ -371,7 +371,7 @@ export default function TicketReceiptScreen({
         type="button"
         onClick={() => navigate("/tickets")}
         aria-label="Back to tickets"
-        className="tw:-ml-1 tw:flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-body tw:transition-colors tw:hover:bg-chip"
+        className="tw:-ml-1 tw:flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:text-body tw:transition-colors tw:hover:bg-chip"
       >
         <ArrowLeft className="tw:size-5" aria-hidden="true" />
       </button>
@@ -558,7 +558,7 @@ export default function TicketReceiptScreen({
             <button
               type="button"
               onClick={() => navigate(`/event/view/${event.id}`)}
-              className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-ink tw:bg-ink tw:text-sm tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-ink-raised"
+              className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full! tw:border tw:border-ink tw:bg-ink tw:text-sm tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-ink-raised"
             >
               <ExternalLink className="tw:size-[18px]" aria-hidden="true" />
               View Event
@@ -573,7 +573,7 @@ export default function TicketReceiptScreen({
             <button
               type="button"
               onClick={() => navigate(`/event/view/${event.id}`)}
-              className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:bg-danger tw:text-sm tw:font-semibold tw:text-white tw:transition-colors"
+              className="tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full! tw:bg-danger tw:text-sm tw:font-semibold tw:text-white tw:transition-colors"
             >
               <Play className="tw:size-5" aria-hidden="true" />
               Join live stream
@@ -588,7 +588,7 @@ export default function TicketReceiptScreen({
             type="button"
             onClick={handlePrintableTicket}
             disabled={!ticket.ticket_id || downloading}
-            className={`${PILL_PRIMARY} tw:rounded-xl tw:disabled:bg-accent tw:disabled:text-white/80`}
+            className={`${PILL_PRIMARY} tw:rounded-xl! tw:disabled:bg-accent tw:disabled:text-white/80`}
           >
             {downloading ? (
               <Loader2 className="tw:size-5 tw:animate-spin" aria-hidden="true" />

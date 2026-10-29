@@ -197,7 +197,7 @@ export default function YouMayAlsoLike({
             type="button"
             onClick={() => sliderInstanceRef.current?.prev()}
             disabled={!canScrollPrev}
-            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
             aria-label="Show previous events"
           >
             <ArrowLeft className="tw:h-4 tw:w-4" />
@@ -206,7 +206,7 @@ export default function YouMayAlsoLike({
             type="button"
             onClick={() => sliderInstanceRef.current?.next()}
             disabled={!canScrollNext}
-            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
+            className="tw:inline-flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-slate-200 tw:bg-white tw:text-slate-700 tw:shadow-sm tw:hover:bg-slate-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-40"
             aria-label="Show more events"
           >
             <ArrowRight className="tw:h-4 tw:w-4" />
@@ -235,7 +235,7 @@ export default function YouMayAlsoLike({
               key={index}
               type="button"
               onClick={() => sliderInstanceRef.current?.moveToIdx(index)}
-              className={`tw:h-2.5 tw:rounded-full tw:transition-all ${
+              className={`tw:h-2.5 tw:rounded-full! tw:transition-all ${
                 index === selectedIndex
                   ? "tw:w-8 tw:bg-primary"
                   : "tw:w-2.5 tw:bg-slate-300 tw:hover:bg-slate-400"

@@ -60,7 +60,7 @@ export default function ObsInstructionsModal({ open, onClose, payload, onProceed
                       <div className="tw:text-gray-500">SRT URL</div>
                       <div className="tw:font-medium tw:break-all">{url || "—"}</div>
                     </div>
-                    <button onClick={() => copy(url, "SRT URL copied")} className="tw:rounded-xl tw:p-2 tw:hover:bg-white/60" title="Copy URL">
+                    <button onClick={() => copy(url, "SRT URL copied")} className="tw:rounded-xl! tw:p-2 tw:hover:bg-white/60" title="Copy URL">
                       <Copy className="tw:size-5" />
                     </button>
                   </div>
@@ -70,7 +70,7 @@ export default function ObsInstructionsModal({ open, onClose, payload, onProceed
                       <div className="tw:text-gray-500">Port</div>
                       <div className="tw:font-medium">{port ?? "—"}</div>
                     </div>
-                    <button onClick={() => copy(port, "Port copied")} className="tw:rounded-xl tw:p-2 tw:hover:bg-white/60" title="Copy Port">
+                    <button onClick={() => copy(port, "Port copied")} className="tw:rounded-xl! tw:p-2 tw:hover:bg-white/60" title="Copy Port">
                       <Copy className="tw:size-5" />
                     </button>
                   </div>
@@ -88,10 +88,10 @@ export default function ObsInstructionsModal({ open, onClose, payload, onProceed
 
               {/* sticky footer actions */}
               <div className="tw:p-4 tw:border-t tw:border-gray-100 tw:flex tw:items-center tw:justify-center tw:gap-3">
-                <button onClick={onClose} className="tw:px-5 tw:py-3 tw:rounded-2xl tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-700 tw:font-medium">
+                <button onClick={onClose} className="tw:px-5 tw:py-3 tw:rounded-2xl! tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-700 tw:font-medium">
                   Cancel
                 </button>
-                <button onClick={onProceed} className="tw:px-5 tw:py-3 tw:rounded-2xl tw:bg-primary tw:hover:bg-primary/90 tw:text-white tw:font-medium tw:shadow-sm">
+                <button onClick={onProceed} className="tw:px-5 tw:py-3 tw:rounded-2xl! tw:bg-primary tw:hover:bg-primary/90 tw:text-white tw:font-medium tw:shadow-sm">
                   Proceed
                 </button>
               </div>

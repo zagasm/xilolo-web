@@ -113,7 +113,7 @@ export function OrganiserVerificationSuccessDialog({
                     style={{ borderRadius: 14, fontSize: 12 }}
                     type="button"
                     onClick={onViewProfile}
-                    className="tw:w-full tw:rounded-2xl tw:border tw:border-gray-200 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-gray-50 tw:sm:w-auto"
+                    className="tw:w-full tw:rounded-2xl! tw:border tw:border-gray-200 tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-gray-50 tw:sm:w-auto"
                   >
                     View profile
                   </button>
@@ -121,7 +121,7 @@ export function OrganiserVerificationSuccessDialog({
                     style={{ borderRadius: 14, fontSize: 12 }}
                     type="button"
                     onClick={onCreateEvent}
-                    className="tw:w-full tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition tw:hover:shadow-md tw:sm:w-auto"
+                    className="tw:w-full tw:rounded-2xl! tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition tw:hover:shadow-md tw:sm:w-auto"
                   >
                     Create an event
                   </button>
@@ -169,7 +169,7 @@ export function OrganiserDiditInfoDialog({
               type="button"
               disabled={diditStarting}
               onClick={onClose}
-              className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:disabled:opacity-50"
+              className="tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-300 tw:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:disabled:opacity-50"
             >
               Cancel
             </button>
@@ -180,7 +180,7 @@ export function OrganiserDiditInfoDialog({
               type="button"
               disabled={diditStarting}
               onClick={onContinue}
-              className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:disabled:opacity-50"
+              className="tw:px-4 tw:py-2 tw:rounded-xl! tw:bg-primary tw:text-white tw:text-sm tw:font-semibold tw:disabled:opacity-50"
             >
               {diditStarting ? "Starting..." : "Continue"}
             </button>
@@ -240,14 +240,14 @@ export function OrganiserNameMismatchDialog({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:w-full tw:sm:w-auto tw:rounded-xl tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50 tw:transition"
+                    className="tw:w-full tw:sm:w-auto tw:rounded-xl! tw:border tw:border-gray-200 tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50 tw:transition"
                   >
                     Close
                   </button>
                   <button
                     type="button"
                     onClick={onEditProfile}
-                    className="tw:w-full tw:sm:w-auto tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:hover:shadow-md tw:transition"
+                    className="tw:w-full tw:sm:w-auto tw:rounded-xl! tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:hover:shadow-md tw:transition"
                   >
                     Edit profile
                   </button>
@@ -322,7 +322,7 @@ export function OrganiserProfilePhotoRequiredDialog({
                   }}
                     type="button"
                     onClick={onEditProfile}
-                    className="tw:w-full tw:rounded-2xl tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition tw:hover:shadow-md tw:sm:w-auto"
+                    className="tw:w-full tw:rounded-2xl! tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-sm tw:transition tw:hover:shadow-md tw:sm:w-auto"
                   >
                     Update profile picture
                   </button>

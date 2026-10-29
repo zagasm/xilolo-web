@@ -403,7 +403,7 @@ export default function SupportChatPage() {
                   setMobileDrawerOpen(false);
                 }}
                 className={[
-                  "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-card tw:border tw:px-4 tw:py-3 tw:text-left tw:transition-colors",
+                  "tw:flex tw:min-h-16 tw:w-full tw:flex-col tw:gap-1 tw:rounded-card! tw:border tw:px-4 tw:py-3 tw:text-left tw:transition-colors",
                   active
                     ? "tw:border-accent tw:bg-paper-raised"
                     : "tw:border-hairline tw:bg-paper-raised tw:hover:border-accent/40",
@@ -484,7 +484,7 @@ export default function SupportChatPage() {
                 <button
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="tw:grid tw:size-11 tw:shrink-0 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
+                  className="tw:grid tw:size-11 tw:shrink-0 tw:place-items-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
                   aria-label="Close support history"
                 >
                   <X size={18} aria-hidden="true" />
@@ -521,7 +521,7 @@ export default function SupportChatPage() {
               type="button"
               onClick={createConversation}
               disabled={!hasAccess || creating}
-              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="Start new support chat"
             >
               {creating ? (
@@ -534,7 +534,7 @@ export default function SupportChatPage() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip"
               aria-label="Close support chat"
             >
               <ChevronLeft size={18} aria-hidden="true" />
@@ -574,7 +574,7 @@ export default function SupportChatPage() {
               type="button"
               onClick={createConversation}
               disabled={!hasAccess || creating}
-              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:grid tw:size-11 tw:place-items-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-accent-deep tw:transition-colors tw:hover:bg-chip tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="New support chat"
             >
               {creating ? (
@@ -727,7 +727,7 @@ export default function SupportChatPage() {
             <button
               type="submit"
               disabled={!input.trim() || !hasAccess || sending || isClosed}
-              className="tw:grid tw:size-12 tw:shrink-0 tw:place-items-center tw:rounded-pill tw:bg-accent tw:text-ink tw:transition-colors tw:hover:bg-ink tw:hover:text-paper-raised tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:grid tw:size-12 tw:shrink-0 tw:place-items-center tw:rounded-pill! tw:bg-accent tw:text-ink tw:transition-colors tw:hover:bg-ink tw:hover:text-paper-raised tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="Send message"
             >
               {sending ? (

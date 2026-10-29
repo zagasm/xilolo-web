@@ -15,7 +15,12 @@ import { forwardRef } from "react";
 /* ── Button ───────────────────────────────────────────────────────────────── */
 const buttonBase =
   "tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:font-semibold " +
-  "tw:rounded-pill tw:transition-colors tw:duration-150 tw:select-none " +
+  // `!` is load-bearing: legacy main.min.css ships an unlayered
+  // `button { border-radius: 0 }` (Bootstrap reboot), and unlayered rules beat
+  // Tailwind's @layer utilities no matter the specificity — so every real
+  // <button> in the app rendered with square corners while <a>-as-button looked
+  // right. See xilolo-web-development/references/legacy-css-cascade-and-parity.md
+  "tw:rounded-pill! tw:transition-colors tw:duration-150 tw:select-none " +
   "tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent " +
   "tw:focus-visible:ring-offset-2 tw:disabled:cursor-not-allowed";
 

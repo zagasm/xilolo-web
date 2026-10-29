@@ -154,7 +154,7 @@ function NavbarEventSuggestionRow({ event, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:flex tw:w-full tw:items-stretch tw:gap-3 tw:rounded-[24px] tw:border tw:border-slate-200 tw:bg-white/95 tw:p-3 tw:text-left tw:shadow-[0_10px_24px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]"
+      className="tw:flex tw:w-full tw:items-stretch tw:gap-3 tw:rounded-[24px]! tw:border tw:border-slate-200 tw:bg-white/95 tw:p-3 tw:text-left tw:shadow-[0_10px_24px_rgba(15,23,42,0.04)] tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_14px_28px_rgba(15,23,42,0.08)]"
     >
       <div className="tw:w-1 tw:shrink-0 tw:rounded-full tw:bg-neon" />
 
@@ -490,7 +490,7 @@ export default function Navbar() {
             type="button"
             onClick={() => setIsSearchOpen(true)}
             aria-label="Search"
-            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-200 tw:bg-white/90 tw:text-slate-500 tw:transition-colors tw:hover:text-slate-800 tw:lg:hidden"
+            className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-gray-200 tw:bg-white/90 tw:text-slate-500 tw:transition-colors tw:hover:text-slate-800 tw:lg:hidden"
           >
             <Search className="tw:size-4" />
           </button>
@@ -713,7 +713,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={closeSearchOverlay}
-                  className="tw:flex tw:h-10 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-white tw:text-slate-500 tw:shadow-[0_10px_24px_rgba(15,23,42,0.08)] tw:transition tw:hover:text-primary"
+                  className="tw:flex tw:h-10 tw:w-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:bg-white tw:text-slate-500 tw:shadow-[0_10px_24px_rgba(15,23,42,0.08)] tw:transition tw:hover:text-primary"
                   aria-label="Close search"
                 >
                   <X className="tw:h-5 tw:w-5" />
@@ -744,7 +744,7 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => setDesktopSearch("")}
-                      className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:text-slate-400 tw:transition tw:hover:bg-slate-100 tw:hover:text-primary"
+                      className="tw:flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full! tw:text-slate-400 tw:transition tw:hover:bg-slate-100 tw:hover:text-primary"
                       aria-label="Clear search"
                     >
                       <X className="tw:h-4 tw:w-4" />
@@ -779,7 +779,7 @@ export default function Navbar() {
                           : "/search"
                       )
                     }
-                    className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:bg-primary tw:px-3.5 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_12px_28px_rgba(5,5,5,0.16)] tw:transition tw:hover:bg-primarySecond"
+                    className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full! tw:bg-primary tw:px-3.5 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:shadow-[0_12px_28px_rgba(5,5,5,0.16)] tw:transition tw:hover:bg-primarySecond"
                   >
                     View all
                     <ArrowUpRight className="tw:h-3.5 tw:w-3.5" />

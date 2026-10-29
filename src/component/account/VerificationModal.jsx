@@ -199,7 +199,7 @@ export default function VerificationModal({
                           borderRadius: 8,
                         }}
                         onClick={closeModal}
-                        className="tw:flex-1 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50"
+                        className="tw:flex-1 tw:rounded-xl! tw:border tw:border-gray-200 tw:bg-white tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50"
                       >
                         Skip for now
                       </button>
@@ -209,7 +209,7 @@ export default function VerificationModal({
                         }}
                         onClick={handleRequestCode}
                         disabled={isLoading}
-                        className="tw:flex-1 tw:rounded-xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
+                        className="tw:flex-1 tw:rounded-xl! tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
                       >
                         {isLoading ? (
                           <Loader2 className="tw:animate-spin tw:w-5 tw:h-5" />
@@ -264,21 +264,21 @@ export default function VerificationModal({
                       </span> */}
                     </div>
 
-                    {/* <button className="tw:w-full tw:mt-2 tw:py-3 tw:bg-gray-100 tw:rounded-xl tw:text-[14px] tw:font-medium tw:text-gray-600 tw:hover:bg-gray-200">
+                    {/* <button className="tw:w-full tw:mt-2 tw:py-3 tw:bg-gray-100 tw:rounded-xl! tw:text-[14px] tw:font-medium tw:text-gray-600 tw:hover:bg-gray-200">
                       Use Phone instead
                     </button> */}
 
                     <div className="tw:mt-4 tw:flex tw:gap-3 tw:w-full">
                       <button
                         onClick={closeModal}
-                        className="tw:flex-1 tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50"
+                        className="tw:flex-1 tw:rounded-xl! tw:border tw:border-gray-200 tw:bg-white tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:bg-gray-50"
                       >
                         Skip for now
                       </button>
                       <button
                         onClick={() => handleVerify({ force: true })}
                         disabled={isLoading}
-                        className="tw:flex-1 tw:rounded-xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
+                        className="tw:flex-1 tw:rounded-xl! tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primary/80 tw:flex tw:items-center tw:justify-center"
                       >
                         {isLoading ? (
                           <Loader2 className="tw:animate-spin tw:w-5 tw:h-5" />

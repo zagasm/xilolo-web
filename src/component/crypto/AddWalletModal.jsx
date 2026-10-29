@@ -136,7 +136,7 @@ export default function AddWalletModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce] tw:transition"
+                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full! tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce] tw:transition"
                   >
                     <span className="tw:text-lg tw:leading-none">×</span>
                   </button>
@@ -234,7 +234,7 @@ export default function AddWalletModal({
                               key={net}
                               onClick={() => setSelectedNetwork(net)}
                               className={[
-                                "tw:px-3 tw:py-1.5 tw:rounded-full tw:text-[11px] tw:uppercase tw:tracking-wide tw:border tw:transition tw:flex tw:items-center tw:gap-1.5",
+                                "tw:px-3 tw:py-1.5 tw:rounded-full! tw:text-[11px] tw:uppercase tw:tracking-wide tw:border tw:transition tw:flex tw:items-center tw:gap-1.5",
                                 active
                                   ? "tw:border-primary tw:bg-lightPurple tw:text-primary"
                                   : "tw:border-[#ded6cd] tw:bg-[#e5e4e2] tw:text-[#625c55] tw:hover:border-[#c8beb2]",
@@ -287,7 +287,7 @@ export default function AddWalletModal({
                               type="button"
                               onClick={() => setNetworkType(type)}
                               className={[
-                                "tw:flex-1 tw:px-3 tw:py-2 tw:rounded-2xl tw:text-[11px] tw:uppercase tw:tracking-wide tw:border tw:transition",
+                                "tw:flex-1 tw:px-3 tw:py-2 tw:rounded-2xl! tw:text-[11px] tw:uppercase tw:tracking-wide tw:border tw:transition",
                                 active
                                   ? "tw:border-primary tw:bg-lightPurple tw:text-primary"
                                   : "tw:border-[#E2E8F0] tw:bg-[#F8FAFC] tw:text-[#64748B] tw:hover:border-primary/60",
@@ -355,7 +355,7 @@ export default function AddWalletModal({
                         type="button"
                         onClick={handleClose}
                         disabled={submitting}
-                        className="tw:h-10 tw:px-4 tw:rounded-2xl tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition tw:disabled:opacity-50"
+                        className="tw:h-10 tw:px-4 tw:rounded-2xl! tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition tw:disabled:opacity-50"
                       >
                         <span>Cancel</span>
                       </button>
@@ -365,7 +365,7 @@ export default function AddWalletModal({
                         }}
                         type="submit"
                         disabled={submitting}
-                        className="tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 tw:disabled:opacity-60 tw:disabled:hover:scale-100"
+                        className="tw:h-10 tw:px-5 tw:rounded-2xl! tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:gap-2 tw:disabled:opacity-60 tw:disabled:hover:scale-100"
                       >
                         {submitting && (
                           <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />

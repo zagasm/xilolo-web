@@ -312,7 +312,7 @@ export default function Nav({ defaultExploreOpen = false, defaultDrawerOpen = fa
                       onClick={() => setAccountOpen((v) => !v)}
                       aria-haspopup="menu"
                       aria-expanded={accountOpen}
-                      className="tw:flex tw:items-center tw:gap-2 tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:py-1 tw:pl-1 tw:pr-2.5 tw:transition-colors tw:hover:border-accent/40 tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:focus-visible:ring-offset-2"
+                      className="tw:flex tw:items-center tw:gap-2 tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:py-1 tw:pl-1 tw:pr-2.5 tw:transition-colors tw:hover:border-accent/40 tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:focus-visible:ring-offset-2"
                     >
                       {avatarUrl ? (
                         <img src={avatarUrl} alt="" className="tw:size-8 tw:rounded-pill tw:object-cover" />
@@ -392,7 +392,7 @@ export default function Nav({ defaultExploreOpen = false, defaultDrawerOpen = fa
                 onClick={() => setMenuOpen(true)}
                 aria-label="Open navigation menu"
                 aria-expanded={menuOpen}
-                className="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:transition-colors tw:hover:border-accent/40 tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:md:hidden"
+                className="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:transition-colors tw:hover:border-accent/40 tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:md:hidden"
               >
                 <Menu className="tw:size-5" />
               </button>
@@ -431,7 +431,7 @@ export default function Nav({ defaultExploreOpen = false, defaultDrawerOpen = fa
                     type="button"
                     onClick={() => setMenuOpen(false)}
                     aria-label="Close navigation menu"
-                    className="tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill tw:border tw:border-hairline tw:text-ink"
+                    className="tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill! tw:border tw:border-hairline tw:text-ink"
                   >
                     <X className="tw:size-4" />
                   </button>

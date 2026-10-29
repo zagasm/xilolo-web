@@ -398,7 +398,7 @@ function DetailCard({
             style={{ borderRadius: 20, fontSize: 12 }}
             type="button"
             onClick={() => onCopy?.(value, label)}
-            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
+            className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
             aria-label={`Copy ${label}`}
           >
             <Copy className="tw:h-4 tw:w-4" />
@@ -461,7 +461,7 @@ function ActionButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={cx(
-        "tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:disabled:cursor-not-allowed tw:disabled:opacity-60",
+        "tw:inline-flex tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:disabled:cursor-not-allowed tw:disabled:opacity-60",
         className,
       )}
     >
@@ -544,7 +544,7 @@ function CheckinAccessPanel({
             <button
               type="button"
               onClick={() => onCopy(generatedCode, "Check-in Code")}
-              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white"
+              className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white"
             >
               <Copy className="tw:h-4 tw:w-4" />
               {copiedLabel === "Check-in Code" ? "Copied" : "Copy"}
@@ -629,7 +629,7 @@ function CheckinAccessPanel({
                 type="button"
                 onClick={() => onRevoke(activeAccess)}
                 disabled={pendingAction === "checkin-revoke"}
-                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 tw:disabled:opacity-60"
+                className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-red-200 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-700 tw:hover:bg-red-50 tw:disabled:opacity-60"
               >
                 {pendingAction === "checkin-revoke" ? (
                   <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
@@ -1086,7 +1086,7 @@ export default function EventStreamControlPage() {
               <button
                 type="button"
                 onClick={() => loadEventDetails()}
-                className="tw:rounded-2xl tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white"
+                className="tw:rounded-2xl! tw:bg-primary tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white"
               >
                 Try again
               </button>
@@ -1300,7 +1300,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpServer, "RTMP Server")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
                                 aria-label="Copy RTMP Server"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1323,7 +1323,7 @@ export default function EventStreamControlPage() {
                                 style={{ borderRadius: 20, fontSize: 12 }}
                                 type="button"
                                 onClick={() => handleCopy(rtmpKey, "Stream Key")}
-                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
+                                className="tw:inline-flex tw:h-10 tw:min-w-[88px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-[#ded6cd] tw:px-3 tw:text-primary tw:hover:bg-white"
                                 aria-label="Copy Stream Key"
                               >
                                 <Copy className="tw:h-4 tw:w-4" />
@@ -1510,7 +1510,7 @@ export default function EventStreamControlPage() {
                           aria-checked={selected}
                           onClick={() => setStreamProvider(provider.id)}
                           className={cx(
-                            "tw:rounded-3xl tw:border tw:p-4 tw:text-left tw:transition-colors tw:duration-200 tw:cursor-pointer",
+                            "tw:rounded-3xl! tw:border tw:p-4 tw:text-left tw:transition-colors tw:duration-200 tw:cursor-pointer",
                             selected
                               ? "tw:border-[#16909C] tw:bg-[#16909C]/5"
                               : "tw:border-[#ded6cd] tw:bg-white tw:hover:border-gray-400",

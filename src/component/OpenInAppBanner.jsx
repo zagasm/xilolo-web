@@ -21,6 +21,17 @@ const APP_STORE = "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
  */
 const APP_PREFIXES = ["/vote/", "/event/", "/events/", "/users/", "/organisers/"];
 
+/**
+ * The mobile tab bar is `position: fixed; bottom: 0; z-999` (MobileNav.jsx).
+ * The banner used to be `bottom: 0; z-60` too, so the bar painted straight over
+ * its lower half — "Open in the Xilolo app" was half-swallowed and the Open
+ * button sat behind the tabs. It now docks *above* the bar, measured rather than
+ * hardcoded: the tab bar's own height (56px today) plus whatever height a page
+ * owns at the bottom (the event page's ticket bar, the contest page's vote bar),
+ * so the two never overlap on the pages where both exist.
+ */
+const NAV_FALLBACK = 56;
+
 function isAppRoute(pathname) {
   if (pathname === "/vote") return false;
   return APP_PREFIXES.some(
@@ -39,14 +50,64 @@ function platform() {
 export default function OpenInAppBanner() {
   const { pathname, search } = useLocation();
   const [dismissed, setDismissed] = useState(false);
+  const [dockOffset, setDockOffset] = useState(NAV_FALLBACK);
 
   const device = useMemo(platform, []);
-  const eligible = isAppRoute(pathname) && device !== "other";
+  // The /dev/* previews are DEV-only shells that render the real Navbar (and so
+  // the real mobile tab bar) without an account. Letting this bar mount there
+  // keeps the banner-vs-tab-bar stack measurable at 390px — it 404s in prod.
+  const devPreview = import.meta.env.DEV && pathname.startsWith("/dev/");
+  const eligible = (isAppRoute(pathname) || devPreview) && device !== "other";
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setDismissed(window.sessionStorage.getItem("xilolo:open-in-app") === "1");
   }, [pathname]);
+
+  // How much of the viewport bottom is already occupied: the tab bar, plus a
+  // page-owned bar sitting on top of it. Both are marked with data attributes so
+  // nothing here hardcodes a bar that a designer may resize tomorrow.
+  useEffect(() => {
+    if (!eligible) return;
+
+    const measure = () => {
+      const nav = document.querySelector("[data-mobile-nav]");
+      const navH = nav ? nav.getBoundingClientRect().height || NAV_FALLBACK : NAV_FALLBACK;
+
+      let pageDock = 0;
+      document.querySelectorAll("[data-bottom-dock]").forEach((el) => {
+        const box = el.getBoundingClientRect();
+        if (box.height > 0) {
+          pageDock = Math.max(pageDock, window.innerHeight - box.top - navH);
+        }
+      });
+
+      setDockOffset(Math.round(navH + Math.max(0, pageDock)));
+    };
+
+    measure();
+    // Bars mount after their data arrives, and the contest bar only exists on
+    // some tabs, so watch the DOM instead of measuring once on mount.
+    let pending = 0;
+    const debounced = () => {
+      window.clearTimeout(pending);
+      pending = window.setTimeout(measure, 200);
+    };
+    const observer = new MutationObserver(debounced);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timers = [300, 1200].map((ms) => window.setTimeout(measure, ms));
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+
+    return () => {
+      observer.disconnect();
+      timers.forEach((t) => window.clearTimeout(t));
+      window.clearTimeout(pending);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
+  }, [eligible, pathname]);
 
   if (!eligible || dismissed) return null;
 
@@ -79,7 +140,10 @@ export default function OpenInAppBanner() {
   };
 
   return (
-    <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-[60] tw:px-3 tw:pb-[max(12px,env(safe-area-inset-bottom))]">
+    <div
+      style={{ "--xilolo-app-banner-dock": `${dockOffset}px` }}
+      className="tw:fixed tw:inset-x-0 tw:bottom-[var(--xilolo-app-banner-dock)] tw:z-[60] tw:px-3 tw:pb-[max(12px,env(safe-area-inset-bottom))] tw:md:bottom-0"
+    >
       <div className="tw:mx-auto tw:flex tw:max-w-md tw:items-center tw:gap-3 tw:rounded-2xl tw:border tw:border-hairline tw:bg-paper-raised tw:p-3 tw:shadow-lg">
         <span className="tw:flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-accent/12 tw:text-accent">
           <svg viewBox="0 0 24 24" className="tw:size-[18px]" aria-hidden="true">
@@ -111,7 +175,7 @@ export default function OpenInAppBanner() {
           type="button"
           onClick={close}
           aria-label="Dismiss"
-          className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full tw:text-muted"
+          className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full! tw:text-muted"
         >
           <X className="tw:size-3.5" aria-hidden="true" />
         </button>

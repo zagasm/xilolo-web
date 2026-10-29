@@ -185,7 +185,7 @@ export default function PlanCard({
           type="button"
           onClick={onSubscribe}
           disabled={selecting}
-          className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-2xl tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-sm tw:font-medium tw:text-white tw:flex tw:items-center tw:justify-center tw:gap-2 tw:shadow-[0_16px_40px_rgba(0,0,0,0.24)] tw:hover:brightness-110 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
+          className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-2xl! tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-sm tw:font-medium tw:text-white tw:flex tw:items-center tw:justify-center tw:gap-2 tw:shadow-[0_16px_40px_rgba(0,0,0,0.24)] tw:hover:brightness-110 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
         >
           {selecting ? (
             <>

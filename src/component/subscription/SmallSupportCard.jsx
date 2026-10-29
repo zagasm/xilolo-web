@@ -12,7 +12,7 @@ export default function SmallSupportCard() {
       </span>
       <button
         type="button"
-        className="tw:self-start tw:mt-1 tw:px-3 tw:py-1.5 tw:rounded-full tw:bg-white tw:border tw:border-slate-200 tw:text-[11px] tw:text-slate-700 tw:hover:border-primary tw:hover:text-primary tw:hover:bg-primary/5 tw:transition"
+        className="tw:self-start tw:mt-1 tw:px-3 tw:py-1.5 tw:rounded-full! tw:bg-white tw:border tw:border-slate-200 tw:text-[11px] tw:text-slate-700 tw:hover:border-primary tw:hover:text-primary tw:hover:bg-primary/5 tw:transition"
         onClick={() => {
           window.location.href = "/contact"; // adjust route
         }}

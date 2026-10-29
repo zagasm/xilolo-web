@@ -83,7 +83,7 @@ export default function Remarks({ eventId, remarks = [], onAppend }) {
                 style={{
                   borderRadius: 20,
                 }}
-                className="tw:px-5 tw:h-10 tw:bg-primary tw:text-white tw:rounded-full tw:disabled:opacity-50"
+                className="tw:px-5 tw:h-10 tw:bg-primary tw:text-white tw:rounded-full! tw:disabled:opacity-50"
                 disabled={!text.trim() || busy}
                 onClick={submitRemark}
               >

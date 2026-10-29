@@ -302,7 +302,7 @@ export default function FundWalletModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:text-gray-500 tw:hover:bg-gray-200"
+                    className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full! tw:bg-gray-100 tw:text-gray-500 tw:hover:bg-gray-200"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -430,7 +430,7 @@ export default function FundWalletModal({
                       <button
                         type="button"
                         onClick={handleClose}
-                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
+                        className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                         style={{ borderRadius: 16 }}
                       >
                         Cancel
@@ -444,7 +444,7 @@ export default function FundWalletModal({
                           !selectableMethods.length ||
                           !reviewData?.authorization_url
                         }
-                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                         style={{ borderRadius: 16 }}
                       >
                         Proceed to payment

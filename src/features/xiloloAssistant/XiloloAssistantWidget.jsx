@@ -154,7 +154,7 @@ function ConversationMenuItem({
                     onDelete();
                   }}
                   className={[
-                    "tw:flex tw:w-full tw:items-center tw:gap-2 tw:rounded-xl tw:px-3 tw:py-2 tw:text-left tw:text-sm tw:font-bold tw:text-red-600",
+                    "tw:flex tw:w-full tw:items-center tw:gap-2 tw:rounded-xl! tw:px-3 tw:py-2 tw:text-left tw:text-sm tw:font-bold tw:text-red-600",
                     menuActive ? "tw:bg-red-50" : "",
                   ].join(" ")}
                 >
@@ -662,7 +662,7 @@ export default function XiloloAssistantWidget() {
                   type="button"
                   onClick={startNewAiConversation}
                   disabled={!hasAccess || isSending}
-                  className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/75 tw:px-4 tw:text-sm tw:font-black tw:text-primary tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                  className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full! tw:bg-white/75 tw:px-4 tw:text-sm tw:font-black tw:text-primary tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 >
                   <Plus size={16} />
                   New chat
@@ -672,7 +672,7 @@ export default function XiloloAssistantWidget() {
                   style={{ borderRadius: 36 }}
                   type="button"
                   onClick={() => setMobileDrawerOpen(false)}
-                  className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/75 tw:text-primary"
+                  className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full! tw:bg-white/75 tw:text-primary"
                   aria-label="Close recent chats"
                 >
                   <X size={18} />
@@ -736,7 +736,7 @@ export default function XiloloAssistantWidget() {
                 type="button"
                 onClick={startNewAiConversation}
                 disabled={!hasAccess || isSending}
-                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full! tw:text-primary tw:transition tw:hover:bg-white/70 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 aria-label="Start new AI conversation"
               >
                 <Plus size={17} />
@@ -749,7 +749,7 @@ export default function XiloloAssistantWidget() {
                 type="button"
                 onClick={resetAiConversation}
                 disabled={!aiConversationId || isSending}
-                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70 tw:disabled:cursor-not-allowed tw:disabled:opacity-35"
+                className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full! tw:text-primary tw:transition tw:hover:bg-white/70 tw:disabled:cursor-not-allowed tw:disabled:opacity-35"
                 aria-label="Delete current conversation"
               >
                 <Trash2 size={16} />
@@ -762,7 +762,7 @@ export default function XiloloAssistantWidget() {
             }}
               type="button"
               onClick={() => window.history.back()}
-              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full tw:text-primary tw:transition tw:hover:bg-white/70"
+              className="tw:grid tw:h-8 tw:w-8 tw:place-items-center tw:rounded-full! tw:text-primary tw:transition tw:hover:bg-white/70"
               aria-label="Close Xilolo AI"
             >
               <ChevronLeft size={18} />
@@ -837,7 +837,7 @@ export default function XiloloAssistantWidget() {
               style={{ borderRadius: 36 }}
               type="button"
               onClick={() => setMobileDrawerOpen(true)}
-              className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full tw:bg-white/80 tw:px-4 tw:text-sm tw:font-black tw:text-primary"
+              className="tw:inline-flex tw:h-10 tw:items-center tw:gap-2 tw:rounded-full! tw:bg-white/80 tw:px-4 tw:text-sm tw:font-black tw:text-primary"
             >
               <MessageCircle size={17} />
               Recent
@@ -848,7 +848,7 @@ export default function XiloloAssistantWidget() {
               type="button"
               onClick={startNewAiConversation}
               disabled={!hasAccess || isSending}
-              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:bg-white/80 tw:text-primary tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+              className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full! tw:bg-white/80 tw:text-primary tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
               aria-label="New chat"
             >
               <Plus size={18} />
@@ -877,7 +877,7 @@ export default function XiloloAssistantWidget() {
                 }}
                   type="button"
                   onClick={startNewAiConversation}
-                  className="tw:flex tw:h-12 tw:items-center tw:justify-center tw:gap-2 tw:rounded-[20px] tw:bg-primary tw:px-4 tw:text-sm tw:font-black tw:text-white"
+                  className="tw:flex tw:h-12 tw:items-center tw:justify-center tw:gap-2 tw:rounded-[20px]! tw:bg-primary tw:px-4 tw:text-sm tw:font-black tw:text-white"
                 >
                   <Plus size={17} />
                   Start new conversation
@@ -975,7 +975,7 @@ export default function XiloloAssistantWidget() {
                             type="button"
                             onClick={() => handleSuggestedPrompt(prompt)}
                             disabled={isSending}
-                            className="tw:flex tw:items-center tw:gap-2 tw:rounded-[18px] tw:bg-white/65 tw:px-3 tw:py-2.5 tw:text-left tw:text-xs tw:font-bold tw:text-primary tw:transition tw:hover:bg-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-sm"
+                            className="tw:flex tw:items-center tw:gap-2 tw:rounded-[18px]! tw:bg-white/65 tw:px-3 tw:py-2.5 tw:text-left tw:text-xs tw:font-bold tw:text-primary tw:transition tw:hover:bg-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-sm"
                           >
                             <MessageCircle size={16} className="tw:shrink-0" />
                             {prompt}
@@ -1007,7 +1007,7 @@ export default function XiloloAssistantWidget() {
                   type="button"
                   onClick={acceptConsent}
                   disabled={isSending}
-                  className="tw:rounded-full tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-black tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                  className="tw:rounded-full! tw:border-0 tw:bg-primary tw:px-3 tw:py-1.5 tw:text-xs tw:font-black tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                 >
                   Accept
                 </button>
@@ -1033,7 +1033,7 @@ export default function XiloloAssistantWidget() {
                 borderRadius: 36
               }}
                 type="button"
-                className="tw:grid tw:h-10 tw:w-9 tw:place-items-center tw:rounded-full tw:bg-transparent tw:text-primary tw:transition tw:hover:bg-white/65 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                className="tw:grid tw:h-10 tw:w-9 tw:place-items-center tw:rounded-full! tw:bg-transparent tw:text-primary tw:transition tw:hover:bg-white/65 tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={!hasAccess || isSending || isUploadingImage}
                 aria-label="Attach event poster"
@@ -1067,7 +1067,7 @@ export default function XiloloAssistantWidget() {
               }}
                 type="submit"
                 disabled={!input.trim() || !hasAccess || isSending}
-                className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full tw:border-0 tw:bg-primary tw:text-white tw:transition tw:hover:bg-black tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
+                className="tw:grid tw:h-10 tw:w-10 tw:place-items-center tw:rounded-full! tw:border-0 tw:bg-primary tw:text-white tw:transition tw:hover:bg-black tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
                 aria-label="Send message"
               >
                 {isSending ? (

@@ -120,7 +120,7 @@ export default function AccessTypeModal({ open, onClose, event, onConfirm }) {
                         key={opt.id}
                         type="button"
                         onClick={() => setSelected(opt.id)}
-                        className={`tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-3.5 tw:py-3 tw:flex tw:items-center tw:gap-3 tw:transition tw:duration-150 ${
+                        className={`tw:w-full tw:text-left tw:rounded-2xl! tw:border tw:px-3.5 tw:py-3 tw:flex tw:items-center tw:gap-3 tw:transition tw:duration-150 ${
                           isActive
                             ? "tw:border-primary tw:bg-primary/5 tw:ring-1 tw:ring-primary/40"
                             : "tw:border-gray-200 tw:bg-white tw:hover:border-gray-300 tw:hover:bg-gray-50"
@@ -163,7 +163,7 @@ export default function AccessTypeModal({ open, onClose, event, onConfirm }) {
                     type="button"
                     onClick={onClose}
                     disabled={submitting}
-                    className="tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:px-3.5 tw:text-xs tw:font-medium tw:text-gray-700 tw:bg-gray-50 tw:rounded-full tw:hover:bg-gray-100"
+                    className="tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:px-3.5 tw:text-xs tw:font-medium tw:text-gray-700 tw:bg-gray-50 tw:rounded-full! tw:hover:bg-gray-100"
                   >
                     Cancel
                   </button>
@@ -171,7 +171,7 @@ export default function AccessTypeModal({ open, onClose, event, onConfirm }) {
                     type="button"
                     onClick={handleConfirmClick}
                     disabled={!selected || submitting}
-                    className={`tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:px-4 tw:text-xs tw:font-semibold tw:rounded-full tw:text-white ${
+                    className={`tw:inline-flex tw:h-9 tw:items-center tw:justify-center tw:px-4 tw:text-xs tw:font-semibold tw:rounded-full! tw:text-white ${
                       submitting
                         ? "tw:bg-primary/60 tw:cursor-wait"
                         : "tw:bg-primary tw:hover:bg-primarySecond"

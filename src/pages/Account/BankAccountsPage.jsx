@@ -169,13 +169,13 @@ function AddAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) {
         </div>
       </DialogContent>
       <DialogActions sx={{ padding: "0 24px 24px" }}>
-        <button type="button" onClick={onClose} disabled={isAdding} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">Cancel</button>
+        <button type="button" onClick={onClose} disabled={isAdding} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl! tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">Cancel</button>
         <button
           type="button"
           disabled={!canSubmit}
           onClick={() => onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })}
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+          className="tw:h-11 tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
         >
           {isAdding ? "Saving..." : "Add account"}
         </button>
@@ -201,8 +201,8 @@ function DeleteAccountDialog({ open, onClose, account, disableDelete, onConfirm 
         )}
       </DialogContent>
       <DialogActions sx={{ padding: "0 24px 24px" }}>
-        <button type="button" onClick={onClose} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">Cancel</button>
-        <button type="button" disabled={disableDelete} onClick={onConfirm} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl tw:bg-red-600 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60">Delete</button>
+        <button type="button" onClick={onClose} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl! tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">Cancel</button>
+        <button type="button" disabled={disableDelete} onClick={onConfirm} style={{ borderRadius: 16 }} className="tw:h-11 tw:rounded-2xl! tw:bg-red-600 tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60">Delete</button>
       </DialogActions>
     </Dialog>
   );
@@ -336,11 +336,11 @@ export default function BankAccountsPage() {
               </div>
 
               <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                {/* <button type="button" onClick={refreshData} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-[#f5f6fb] tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">
+                {/* <button type="button" onClick={refreshData} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-[#f5f6fb] tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800">
                   <RefreshCw className="tw:h-4 tw:w-4" />
                   Refresh
                 </button> */}
-                <button type="button" onClick={() => setAddOpen(true)} style={{ borderRadius: 20, fontSize: 12 }} className="tw:inline-flex tw:py-2 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]">
+                <button type="button" onClick={() => setAddOpen(true)} style={{ borderRadius: 20, fontSize: 12 }} className="tw:inline-flex tw:py-2 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-primary tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)]">
                   <Plus className="tw:h-4 tw:w-4" />
                   Add account
                 </button>
@@ -415,7 +415,7 @@ export default function BankAccountsPage() {
                         </div>
                         <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                           {!account.is_default && (
-                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60">
+                            <button type="button" onClick={() => handleSetDefault(account.id)} disabled={isDefaulting} style={{ borderRadius: 16 }} className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-white tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:border-neon/30 tw:hover:shadow-[0_0_14px_rgba(0,245,255,0.08)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60">
                               {isDefaulting ? <CircularProgress size={16} /> : <Star className="tw:h-4 tw:w-4" />}
                               Set default
                             </button>
@@ -425,7 +425,7 @@ export default function BankAccountsPage() {
                             onClick={() => (canDeleteMore ? setDeleteTarget(account) : showError("You must keep at least one bank account on your profile."))}
                             disabled={isDeleting}
                             style={{ borderRadius: 16 }}
-                            className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-red-50 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-600 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                            className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-red-50 tw:px-4 tw:text-sm tw:font-semibold tw:text-red-600 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                           >
                             {isDeleting ? <CircularProgress size={16} color="inherit" /> : <Trash2 className="tw:h-4 tw:w-4" />}
                             Delete

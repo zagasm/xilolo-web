@@ -253,7 +253,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type = "email" }) => 
             }}
             type="button"
             onClick={skipProcess}
-            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl tw:py-3 tw:hover:opacity-80"
+            className="tw:flex-1 tw:text-sm tw:font-semibold tw:text-neutral-900 tw:bg-gray-100 tw:rounded-2xl! tw:py-3 tw:hover:opacity-80"
           >
             Skip for now
           </button>
@@ -264,7 +264,7 @@ const SignUpCodecomponent = ({ Otpcode, token, userupdate, type = "email" }) => 
             type="button"
             onClick={() => handleFinish({ force: true })}
             disabled={!isComplete || isLoading}
-            className={`tw:flex-1 tw:w-full tw:rounded-2xl tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:duration-200 ${
+            className={`tw:flex-1 tw:w-full tw:rounded-2xl! tw:py-3 tw:text-sm tw:font-semibold tw:transition tw:duration-200 ${
               isComplete && !isLoading
                 ? "tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:text-white"
                 : "tw:bg-gray-200 tw:text-gray-500"

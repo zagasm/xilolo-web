@@ -117,7 +117,7 @@ export default function VerifyWalletModal({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce] tw:transition"
+                    className="tw:shrink-0 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full! tw:bg-lightPurple tw:text-primary tw:hover:bg-[#e2d9ce] tw:transition"
                   >
                     <span className="tw:text-lg tw:leading-none">×</span>
                   </button>
@@ -158,7 +158,7 @@ export default function VerifyWalletModal({
                       style={{
                         borderRadius: 16,
                       }}
-                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-4 tw:rounded-2xl tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition tw:disabled:opacity-60"
+                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-4 tw:rounded-2xl! tw:text-xs tw:font-medium tw:border tw:border-[#E2E8F0] tw:text-[#0F172A] tw:bg-white tw:hover:bg-[#F9FAFB] tw:transition tw:disabled:opacity-60"
                     >
                       <span>Skip for now</span>
                     </button>
@@ -169,7 +169,7 @@ export default function VerifyWalletModal({
                       style={{
                         borderRadius: 16,
                       }}
-                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 tw:disabled:opacity-60 tw:disabled:hover:scale-100"
+                      className="tw:w-full tw:sm:w-auto tw:h-10 tw:px-5 tw:rounded-2xl! tw:text-xs tw:font-semibold tw:text-white tw:bg-[linear-gradient(135deg,#050505,#2b2b2b)] tw:shadow-[0_12px_35px_rgba(0,0,0,0.24)] tw:hover:scale-[1.01] tw:transition tw:flex tw:items-center tw:justify-center tw:gap-2 tw:disabled:opacity-60 tw:disabled:hover:scale-100"
                     >
                       {submitting && (
                         <span className="tw:inline-block tw:h-3 tw:w-3 tw:rounded-full tw:border tw:border-white/40 tw:border-t-transparent tw:animate-spin" />

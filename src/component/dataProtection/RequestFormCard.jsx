@@ -56,7 +56,7 @@ export default function RequestFormCard() {
             borderRadius: 20,
           }}
           disabled={submitting}
-          className="tw:h-12 tw:px-5 tw:rounded-xl tw:bg-primary tw:text-white tw:font-medium tw:transition tw:hover:opacity-90 tw:disabled:opacity-60"
+          className="tw:h-12 tw:px-5 tw:rounded-xl! tw:bg-primary tw:text-white tw:font-medium tw:transition tw:hover:opacity-90 tw:disabled:opacity-60"
         >
           {submitting ? "Requesting…" : "Request Account Information"}
         </button>

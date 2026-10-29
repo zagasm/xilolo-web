@@ -875,7 +875,7 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={handleDownloadManual}
-              className="tw:mt-2.5 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+              className="tw:mt-2.5 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg! tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
             >
               Download manual
             </button>
@@ -903,7 +903,7 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={() => navigate(`/event/vod/${event.id}`)}
-              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg! tw:border-0 tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
             >
               <Video className="tw:h-4 tw:w-4" />
               <span>Watch replay</span>
@@ -970,7 +970,7 @@ export default function ViewEvent() {
             <button
               type="button"
               onClick={() => setReplayUploadOpen(true)}
-              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border tw:border-accent tw:bg-paper-raised tw:text-[13px] tw:font-bold tw:text-accent-deep tw:hover:bg-accent-soft"
+              className="tw:mt-3 tw:flex tw:h-11 tw:w-full tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg! tw:border tw:border-accent tw:bg-paper-raised tw:text-[13px] tw:font-bold tw:text-accent-deep tw:hover:bg-accent-soft"
             >
               <Upload className="tw:h-4 tw:w-4" />
               <span>Upload replay video</span>
@@ -1001,7 +1001,7 @@ export default function ViewEvent() {
             type="button"
             onClick={() => navigate(`/event/vod/${event.id}`)}
             disabled={!vodIsReady || (!canWatchVod && !event?.hasPaid)}
-            className={`tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg tw:border-0 tw:text-[13px] tw:font-bold tw:text-white ${
+            className={`tw:mt-3 tw:flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-lg! tw:border-0 tw:text-[13px] tw:font-bold tw:text-white ${
               !vodIsReady || (!canWatchVod && !event?.hasPaid)
                 ? "tw:cursor-not-allowed tw:bg-[#2F2F2F]"
                 : "tw:cursor-pointer tw:bg-[#16909C] tw:hover:bg-[#06707D]"

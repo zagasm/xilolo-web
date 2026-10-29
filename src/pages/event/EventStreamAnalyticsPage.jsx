@@ -247,7 +247,7 @@ function TopViewers({ viewers, meta, loading, onPage }) {
             type="button"
             disabled={loading || page <= 1}
             onClick={() => onPage(page - 1)}
-            className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-50"
+            className="tw:rounded-full! tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-50"
           >
             Previous
           </button>
@@ -258,7 +258,7 @@ function TopViewers({ viewers, meta, loading, onPage }) {
             type="button"
             disabled={loading || page >= lastPage}
             onClick={() => onPage(page + 1)}
-            className="tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-50"
+            className="tw:rounded-full! tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-50"
           >
             Next
           </button>
@@ -562,7 +562,7 @@ export default function EventStreamAnalyticsPage() {
                   type="button"
                   onClick={() => navigate(-1)}
                   aria-label="Go back"
-                  className="tw:mt-1 tw:flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee]"
+                  className="tw:mt-1 tw:flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-[#ded6cd] tw:bg-white tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee]"
                 >
                   <ArrowLeft className="tw:h-4 tw:w-4" />
                 </button>
@@ -600,7 +600,7 @@ export default function EventStreamAnalyticsPage() {
                   type="button"
                   onClick={() => loadDashboard({ background: true })}
                   disabled={refreshing}
-                  className="tw:inline-flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:bg-accent tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-60"
+                  className="tw:inline-flex tw:h-11 tw:shrink-0 tw:items-center tw:justify-center tw:gap-2 tw:rounded-full! tw:bg-accent tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-60"
                 >
                   {refreshing ? (
                     <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />

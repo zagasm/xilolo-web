@@ -139,7 +139,7 @@ function MentionCard({ item, onAccept, onReject, isProcessing }) {
               type="button"
               disabled={isProcessing}
               onClick={() => onReject && onReject(item)}
-              className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:flex-none tw:sm:w-auto"
+              className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-3 tw:py-2 tw:text-xs tw:font-medium tw:text-gray-700 tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:flex-none tw:sm:w-auto"
             >
               {isProcessing ? "Processing…" : "Reject"}
             </button>
@@ -150,7 +150,7 @@ function MentionCard({ item, onAccept, onReject, isProcessing }) {
               type="button"
               disabled={isProcessing}
               onClick={() => onAccept && onAccept(item)}
-              className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:flex-none tw:sm:w-auto"
+              className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full! tw:bg-primary tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:flex-none tw:sm:w-auto"
             >
               {isProcessing ? "Processing…" : "Accept"}
             </button>

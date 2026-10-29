@@ -154,7 +154,7 @@ export default function DeactivateAccountModal({ open, onClose, onSuccess }) {
                       borderRadius: 16,
                     }}
                     type="button"
-                    className="tw:inline-flex tw:justify-center tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-gray-700 tw:hover:bg-gray-50"
+                    className="tw:inline-flex tw:justify-center tw:rounded-xl! tw:border tw:border-gray-300 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-gray-700 tw:hover:bg-gray-50"
                     onClick={handleClose}
                     disabled={isSubmitting}
                   >
@@ -165,7 +165,7 @@ export default function DeactivateAccountModal({ open, onClose, onSuccess }) {
                       borderRadius: 16,
                     }}
                     type="button"
-                    className="tw:inline-flex tw:justify-center tw:rounded-xl tw:bg-red-500 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-red-600 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
+                    className="tw:inline-flex tw:justify-center tw:rounded-xl! tw:bg-red-500 tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:text-white tw:hover:bg-red-600 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed"
                     onClick={handleDeactivate}
                     disabled={isSubmitting}
                   >

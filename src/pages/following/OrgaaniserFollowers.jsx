@@ -153,7 +153,7 @@ function OrganiserFollowers() {
               type="button"
               style={{ borderRadius: "50%" }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full! tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -264,7 +264,7 @@ function OrganiserCard({
           onToggleFollow?.(organiser);
         }}
         className={[
-          "tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:text-[11px] tw:font-semibold tw:transition",
+          "tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:px-3 tw:py-2.5 tw:rounded-[18px]! tw:text-[11px] tw:font-semibold tw:transition",
           isFollowing
             ? "tw:bg-white tw:border tw:border-gray-200 tw:text-gray-800"
             : "tw:bg-primary tw:text-white tw:border tw:border-primary",

@@ -273,6 +273,18 @@ export default function ContestPage({ sharedToken = null }) {
   const entriesOpen = Boolean(contest?.entries_window?.open);
   const votingClosing = contest ? timeLeft(contest.voting_window?.closes_at) : null;
   const canVote = votingOpen && Boolean(user) && !isShared;
+  // "Request to be a contestant" has to be reachable from the Contestants tab —
+  // the tab you land on. The app keeps its entry bar outside the tab switch
+  // (contest_detail_screen.dart: `bottomNavigationBar: _actionBar(...)`), so the
+  // button is on screen whichever tab is open; the web only rendered it on
+  // About, which hid entering behind a tab a visitor had no reason to open.
+  const canEnter = entriesOpen && Boolean(user) && !myEntry && !isShared;
+  const entriesCloseShort = contest?.entries_window?.closes_at
+    ? new Date(contest.entries_window.closes_at).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+      })
+    : null;
   const organiserHref = contest?.organiser?.id ? `/profile/${contest.organiser.id}` : null;
   // "Voting ongoing", never "voting live" — live means a stream is running.
   const status = contestStatus(contest);
@@ -315,7 +327,7 @@ export default function ContestPage({ sharedToken = null }) {
             type="button"
             onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/vote"))}
             aria-label="Go back"
-            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-transparent tw:text-body"
+            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:bg-transparent tw:text-body"
           >
             <ChevronLeft className="tw:size-5" aria-hidden="true" />
           </button>
@@ -333,7 +345,7 @@ export default function ContestPage({ sharedToken = null }) {
             type="button"
             onClick={share}
             aria-label="Share contest"
-            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-transparent tw:text-body"
+            className="tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:bg-transparent tw:text-body"
           >
             <Share2 className="tw:size-5" aria-hidden="true" />
           </button>
@@ -600,11 +612,9 @@ export default function ContestPage({ sharedToken = null }) {
               <MetaSection label="Take part">
                 <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
                   <span className="tw:block tw:text-[13px] tw:leading-relaxed tw:text-muted!">
-                    Entries are open. Send yours and the organiser will review it.
+                    Entries are open{entriesCloseShort ? ` until ${entriesCloseShort}` : ""}. Send
+                    yours and the organiser will review it. You can enter from either tab.
                   </span>
-                  <Button size="sm" className="tw:mt-3" onClick={() => setEntering(true)}>
-                    Enter this contest
-                  </Button>
                 </div>
               </MetaSection>
             ) : null}
@@ -655,28 +665,41 @@ export default function ContestPage({ sharedToken = null }) {
         )}
       </div>
 
-      {/* Action bar only where it adds something: the About tab and the empty
-          state. On the contestants list every row already carries its own Vote
-          button, and the bar was covering the second contestant on a phone. */}
-      {tab === "about" || entries.length === 0 ? (
-      <div className="tw:fixed tw:inset-x-0 tw:bottom-[72px] tw:z-40 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur tw:md:bottom-0">
+      {/* The entry bar rides along on BOTH tabs while entering is still
+          possible, so "request to be a contestant" is never a tab away. When it
+          is not possible (closed, already entered, sharing link) the bar goes
+          back to being About-only: on the contestants list every row already
+          carries its own Vote button, and a duplicated vote CTA there is noise. */}
+      {canEnter || tab === "about" || entries.length === 0 ? (
+      <div
+        data-bottom-dock
+        className="tw:fixed tw:inset-x-0 tw:bottom-[72px] tw:z-40 tw:border-t tw:border-hairline tw:bg-paper-raised/95 tw:backdrop-blur tw:md:bottom-0"
+      >
         <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[560px] tw:items-center tw:gap-3 tw:px-3 tw:py-2.5 tw:md:max-w-[1040px]">
           <div className="tw:min-w-0 tw:flex-1">
             <span className="tw:block tw:text-[10px] tw:font-bold tw:uppercase tw:tracking-[1px] tw:text-muted!">
-              Per vote
+              {canEnter ? "Entry" : "Per vote"}
             </span>
             <span className="tw:block tw:text-[16px] tw:font-bold tw:text-body!">
-              {money(contest.vote_price, contest.currency)}
+              {canEnter
+                ? entriesCloseShort
+                  ? `Open until ${entriesCloseShort}`
+                  : "Entries open"
+                : money(contest.vote_price, contest.currency)}
             </span>
           </div>
 
-          {isShared && !user ? (
+          {canEnter ? (
+            <Button size="md" className="tw:shrink-0" onClick={() => setEntering(true)}>
+              Enter contest
+            </Button>
+          ) : isShared && !user ? (
             <Button as={Link} to="/auth/signin" size="md" className="tw:shrink-0">
               Sign in to vote
             </Button>
           ) : entriesOpen && !myEntry ? (
-            <Button size="md" className="tw:shrink-0" onClick={() => setEntering(true)}>
-              Enter contest
+            <Button as={Link} to="/auth/signin" size="md" className="tw:shrink-0">
+              Sign in to enter
             </Button>
           ) : (
             <Button

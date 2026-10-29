@@ -282,7 +282,7 @@ export default function EventCard({
                         e.stopPropagation();
                         navigate(`/event/edit/${event.id}`);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""
                         }`}
                     >
                       <Pencil className="tw:h-4 tw:w-4" />
@@ -294,7 +294,7 @@ export default function EventCard({
                 {event?.checkin_available || ["physical", "both"].includes(event?.attendance_type) ? (
                   <Menu.Item>
                     {({ active }) => (
-                      <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/event/checkin/${event.id}`); }} className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); navigate(`/event/checkin/${event.id}`); }} className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}>
                         <QrCode className="tw:h-4 tw:w-4" />
                         <span>Manage Check-In</span>
                       </button>
@@ -311,7 +311,7 @@ export default function EventCard({
                           e.stopPropagation();
                           navigate(`/event/analytics/${event.id}`);
                         }}
-                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}
+                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm tw:text-slate-700 ${active ? "tw:bg-slate-100" : ""}`}
                       >
                         <BarChart3 className="tw:h-4 tw:w-4" />
                         <span>Stream Analytics</span>
@@ -329,7 +329,7 @@ export default function EventCard({
                         if (disabled) return;
                         setOpenReschedule(true);
                       }}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
                         ? "tw:cursor-not-allowed tw:text-slate-400"
                         : active
                           ? "tw:bg-slate-100 tw:text-slate-700"
@@ -352,7 +352,7 @@ export default function EventCard({
                           if (disabled) return;
                           setOpenReplayUpload(true);
                         }}
-                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
+                        className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${disabled
                           ? "tw:cursor-not-allowed tw:text-slate-400"
                           : active
                             ? "tw:bg-slate-100 tw:text-slate-700"
@@ -377,7 +377,7 @@ export default function EventCard({
                         setOpenDelete(true);
                       }}
                       disabled={hasTicketSales}
-                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
+                      className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:px-3 tw:py-2.5 tw:text-left tw:text-sm ${
                         hasTicketSales
                           ? "tw:cursor-not-allowed tw:text-slate-400"
                           : `tw:text-red-600 ${active ? "tw:bg-red-50" : ""}`
@@ -431,7 +431,7 @@ export default function EventCard({
                 e.stopPropagation();
                 toggleSave();
               }}
-              className={`tw:shrink-0 tw:rounded-xl tw:p-2 tw:transition ${
+              className={`tw:shrink-0 tw:rounded-xl! tw:p-2 tw:transition ${
                 isSaved ? "tw:text-accent-deep" : "tw:text-muted"
               }`}
               aria-label="Save"
@@ -509,7 +509,7 @@ export default function EventCard({
               goToStreamControl();
             }}
             disabled={startingStream}
-            className="tw:mt-auto tw:inline-flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[10px] tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:disabled:opacity-60"
+            className="tw:mt-auto tw:inline-flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[10px]! tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:disabled:opacity-60"
           >
             <span>
               {startingStream
@@ -533,7 +533,7 @@ export default function EventCard({
               e.stopPropagation();
               goToEvent();
             }}
-            className={`tw:mt-4 tw:inline-flex tw:h-[42px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[12px] tw:px-4 tw:text-[14px] tw:font-semibold tw:text-white ${
+            className={`tw:mt-4 tw:inline-flex tw:h-[42px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-[12px]! tw:px-4 tw:text-[14px] tw:font-semibold tw:text-white ${
               normalizedStatus === "live" ? "tw:bg-danger" : "tw:bg-accent"
             }`}
           >

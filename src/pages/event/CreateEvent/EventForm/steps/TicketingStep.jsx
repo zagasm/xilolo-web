@@ -258,7 +258,7 @@ function VideoUploadSuccessModal({ open, fileName, onClose }) {
               style={{ borderRadius: 36, fontSize: 12 }}
                 type="button"
                 onClick={onClose}
-                className="tw:mt-6 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
+                className="tw:mt-6 tw:inline-flex tw:h-11 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
               >
                 Continue
               </button>
@@ -392,7 +392,7 @@ function ManualTile({ title, subtitle, actionLabel, onPick, onClear, accept }) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="tw:rounded-full tw:border tw:border-accent tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-bold tw:text-accent-deep"
+          className="tw:rounded-full! tw:border tw:border-accent tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-bold tw:text-accent-deep"
         >
           {actionLabel}
         </button>
@@ -400,7 +400,7 @@ function ManualTile({ title, subtitle, actionLabel, onPick, onClear, accept }) {
           <button
             type="button"
             onClick={onClear}
-            className="tw:rounded-full tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-muted"
+            className="tw:rounded-full! tw:border tw:border-hairline tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-muted"
           >
             Clear
           </button>
@@ -743,7 +743,7 @@ export default function TicketingStep({
             <button
               type="button"
               onClick={() => vodInputRef.current?.click()}
-              className="tw:mt-3 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-[12px] tw:border tw:border-dashed tw:border-hairline tw:px-4 tw:py-3 tw:text-left tw:transition tw:hover:border-accent"
+              className="tw:mt-3 tw:flex tw:min-h-[104px] tw:w-full tw:flex-col tw:justify-center tw:rounded-[12px]! tw:border tw:border-dashed tw:border-hairline tw:px-4 tw:py-3 tw:text-left tw:transition tw:hover:border-accent"
             >
               <span className="tw:block tw:text-[14px] tw:font-semibold tw:text-body">
                 {vodFile?.name || "Choose VOD video"}
@@ -786,7 +786,7 @@ export default function TicketingStep({
                     <button
                       type="button"
                       onClick={onCancelVodUpload}
-                      className="tw:shrink-0 tw:rounded-full tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
+                      className="tw:shrink-0 tw:rounded-full! tw:border tw:border-danger tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-danger"
                     >
                       Cancel
                     </button>
