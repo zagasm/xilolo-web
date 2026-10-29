@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { Gavel, Lock, Trophy, TrendingUp } from "lucide-react";
 import {
   Button,
   Card,
@@ -7,17 +8,20 @@ import {
   Field,
   Input,
   Modal,
-  SectionHeading,
   Skeleton,
 } from "../../component/ui";
 import { showError, showSuccess } from "../../component/ui/toast";
 import {
   approveEntry,
+  bulkApproveEntries,
+  closeContestEntries,
+  closeContestVoting,
   declineEntry,
   disqualifyBelow,
   disqualifyEntry,
   extendVoting,
   getContestDashboard,
+  getContestVoteTrend,
   getOrganiserEntries,
   publishContest,
 } from "../../api/contestApi";
@@ -58,6 +62,12 @@ export default function ContestConsole() {
 
   const [dashboard, setDashboard] = useState(null);
   const [pending, setPending] = useState([]);
+  // The queue only ever held PENDING entries, so approving someone removed them
+  // from the console along with every control over them (app commit 0d6b072).
+  const [approved, setApproved] = useState([]);
+  // Who is out, so a removal is never invisible (app commits 184c664 / d866a9c).
+  const [disqualified, setDisqualified] = useState([]);
+  const [trend, setTrend] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -83,12 +93,20 @@ export default function ContestConsole() {
     setError(null);
 
     try {
-      const [board, queue] = await Promise.all([
+      // Four independent reads: one slow list must not blank the console, so
+      // each auxiliary list degrades to [] on its own.
+      const [board, queue, running, out, series] = await Promise.all([
         getContestDashboard(id, token),
         getOrganiserEntries(id, "pending", token),
+        getOrganiserEntries(id, "approved", token).catch(() => []),
+        getOrganiserEntries(id, "disqualified", token).catch(() => []),
+        getContestVoteTrend(id, token, 30).catch(() => []),
       ]);
       setDashboard(board);
       setPending(queue || []);
+      setApproved(running || []);
+      setDisqualified(out || []);
+      setTrend(series || []);
     } catch (err) {
       setError(
         err?.response?.status === 404
@@ -114,6 +132,57 @@ export default function ContestConsole() {
     const left = timeLeft(contest.voting_window?.closes_at);
     return left ? `Voting closes in ${left}` : "Voting open";
   }, [contest]);
+
+  /**
+   * Ranked, not approval order. A list in approval order answered "who
+   * entered", never "who is winning" — the question an organiser opens the
+   * console with (app commit 6a49d19).
+   */
+  const ranked = useMemo(
+    () => [...approved].sort((a, b) => Number(b.votes || 0) - Number(a.votes || 0)),
+    [approved]
+  );
+  const leaderVotes = ranked.length ? Number(ranked[0].votes || 0) : 0;
+
+  const trendTotals = useMemo(() => {
+    const votes = trend.map((row) => Number(row.votes || 0));
+    const max = votes.reduce((best, value) => Math.max(best, value), 0);
+    const total = votes.reduce((sum, value) => sum + value, 0);
+    return { votes, max, total, bestIndex: max > 0 ? votes.indexOf(max) : -1 };
+  }, [trend]);
+
+  const approveAll = async () => {
+    if (!pending.length) return;
+    setBusy(true);
+    try {
+      const count = await bulkApproveEntries(id, pending.map((entry) => entry.id), token);
+      showSuccess(`${count} ${count === 1 ? "entry" : "entries"} approved.`);
+      await load();
+    } catch (err) {
+      showError(friendlyError(err, "Those entries could not be approved."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Lifecycle: end entries, or end voting. Both are on the page, not in a "…". */
+  const runLifecycle = async (action, success) => {
+    setBusy(true);
+    try {
+      await action();
+      showSuccess(success);
+      await load();
+    } catch (err) {
+      showError(friendlyError(err, "That change did not go through."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const openDisqualify = (entry) => {
+    setCutForm({ mode: "entry", entryId: entry.id, value: "", reason: "", password: "", code: "" });
+    setCutOpen(true);
+  };
 
   const approve = async (entry) => {
     setBusy(true);
@@ -332,106 +401,288 @@ export default function ContestConsole() {
           />
         </div>
 
-        <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-2">
-          <section>
-            <SectionHeading
-              eyebrow="Moderation"
-              title={pending.length ? `${pending.length} waiting` : "Nothing waiting"}
-            />
+        {/* Who is leading, and by how much. The first question an organiser
+            opens the console with, answered at the top (app commit 6a49d19). */}
+        {ranked.length > 0 ? (
+          <div className="tw:mt-3 tw:flex tw:items-center tw:gap-2 tw:rounded-[14px] tw:border tw:border-accent/25 tw:bg-accent-soft tw:px-[13px] tw:py-[11px]">
+            <Trophy className="tw:size-4 tw:shrink-0 tw:text-accent" aria-hidden="true" />
+            <span className="tw:min-w-0 tw:text-[12.5px] tw:text-muted-strong!">
+              Leading:{" "}
+              <span className="tw:font-bold tw:text-ink!">{ranked[0].display_name}</span>
+              {ranked.length > 1
+                ? ` · ${ranked[0].votes} votes, ${leaderVotes - Number(ranked[1].votes || 0)} ahead`
+                : ` · ${ranked[0].votes} votes`}
+            </span>
+          </div>
+        ) : null}
 
-            <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-3">
-              {pending.length === 0 ? (
-                <Card className="tw:p-4">
-                  <span className="tw:text-[13px] tw:text-muted">
-                    Every entry has been reviewed. New ones will appear here.
+        {/* Votes per day — bars, not a table of numbers (app commit df4c6c9). */}
+        {trend.length > 0 ? (
+          <Card className="tw:mt-3 tw:p-[14px]">
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <TrendingUp className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+              <span className="tw:text-[13px] tw:font-semibold tw:text-ink">Votes per day</span>
+              <span className="tw:ml-auto tw:text-[11px] tw:font-semibold tw:text-muted">
+                {trendTotals.total} total
+              </span>
+            </div>
+
+            <div className="tw:mt-3 tw:flex tw:h-16 tw:items-end tw:gap-[1.5px]">
+              {trendTotals.votes.map((count, index) => {
+                const height =
+                  trendTotals.max === 0 ? 3 : Math.min(64, Math.max(3, (count / trendTotals.max) * 64));
+
+                return (
+                  <div
+                    key={trend[index]?.day || index}
+                    title={`${trend[index]?.day || ""} · ${count} votes`}
+                    className={`tw:min-h-[3px] tw:flex-1 tw:rounded-[3px] ${
+                      count === 0
+                        ? "tw:bg-hairline"
+                        : index === trendTotals.bestIndex
+                          ? "tw:bg-accent"
+                          : "tw:bg-accent/45"
+                    }`}
+                    style={{ height }}
+                  />
+                );
+              })}
+            </div>
+
+            <div className="tw:mt-1.5 tw:flex tw:items-center tw:gap-2">
+              <span className="tw:text-[9.5px] tw:text-faint">
+                {String(trend[0]?.day || "").slice(5)}
+              </span>
+              {trendTotals.bestIndex >= 0 ? (
+                <span className="tw:mx-auto tw:text-[9.5px] tw:font-semibold tw:text-muted">
+                  Best: {String(trend[trendTotals.bestIndex]?.day || "").slice(5)} ·{" "}
+                  {trendTotals.max} votes
+                </span>
+              ) : null}
+              <span className="tw:text-[9.5px] tw:text-faint">
+                {String(trend[trend.length - 1]?.day || "").slice(5)}
+              </span>
+            </div>
+          </Card>
+        ) : null}
+
+        {/* Lifecycle belongs on the page: ending entries and ending voting are
+            the two decisions an organiser comes here to make. */}
+        {contest.status !== "voting_closed" && contest.status !== "settled" ? (
+          <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-2">
+            {contest.status === "entries_open" ? (
+              <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3.5 tw:py-3">
+                <Lock className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+                <div className="tw:min-w-0 tw:flex-1">
+                  <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-ink">
+                    Close entries
                   </span>
+                  <span className="tw:block tw:text-[11px] tw:text-muted">
+                    Stops new contestants and fixes the field. Voting continues.
+                  </span>
+                </div>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="tw:shrink-0"
+                  loading={busy}
+                  onClick={() => runLifecycle(() => closeContestEntries(id, token), "Entries closed.")}
+                >
+                  Close
+                </Button>
+              </div>
+            ) : null}
+
+            <div className="tw:flex tw:items-center tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3.5 tw:py-3">
+              <Lock className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+              <div className="tw:min-w-0 tw:flex-1">
+                <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-ink">
+                  Close voting
+                </span>
+                <span className="tw:block tw:text-[11px] tw:text-muted">
+                  Ends the contest now. Votes stop and the ranking is final.
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="tw:shrink-0"
+                loading={busy}
+                onClick={() => {
+                  if (window.confirm("Close voting now? Nobody can vote after this.")) {
+                    runLifecycle(() => closeContestVoting(id, token), "Voting closed.");
+                  }
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        <section className="tw:mt-8">
+          <div className="tw:flex tw:items-center tw:gap-2">
+            <span className="tw:text-[15px] tw:font-semibold tw:text-ink">Needs review</span>
+            {pending.length > 0 ? (
+              <span className="tw:rounded-pill tw:bg-accent tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-white">
+                {pending.length}
+              </span>
+            ) : null}
+            {pending.length > 1 ? (
+              <button
+                type="button"
+                onClick={approveAll}
+                disabled={busy}
+                className="tw:ml-auto tw:border-0 tw:bg-transparent tw:text-[12.5px] tw:font-semibold tw:text-accent-deep tw:disabled:opacity-60"
+              >
+                Approve all
+              </button>
+            ) : null}
+          </div>
+
+          <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-3">
+            {pending.length === 0 ? (
+              <Card className="tw:p-4">
+                <span className="tw:text-[13px] tw:text-muted">
+                  Nothing waiting — every entry has been reviewed.
+                </span>
+              </Card>
+            ) : (
+              pending.map((entry) => (
+                <Card key={entry.id} className="tw:p-4">
+                  <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
+                    <div className="tw:min-w-0">
+                      <span className="tw:block tw:truncate tw:text-[14px] tw:font-semibold tw:text-ink">
+                        {entry.display_name}
+                      </span>
+                      <span className="tw:block tw:text-[12px] tw:text-muted">
+                        Entry #{entry.entry_number}
+                        {entry.location ? ` · ${entry.location}` : ""}
+                      </span>
+                      {entry.bio ? (
+                        <span className="tw:mt-1 tw:block tw:line-clamp-2 tw:text-[12px] tw:text-muted">
+                          {entry.bio}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2">
+                      <Button size="sm" loading={busy} onClick={() => approve(entry)}>
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setDeclining(entry);
+                          setDeclineForm({ reason: "", password: "", code: "" });
+                        }}
+                      >
+                        Decline
+                      </Button>
+                    </div>
+                  </div>
                 </Card>
-              ) : (
-                pending.map((entry) => (
-                  <Card key={entry.id} className="tw:p-4">
-                    <div className="tw:flex tw:items-start tw:justify-between tw:gap-3">
-                      <div className="tw:min-w-0">
-                        <span className="tw:block tw:truncate tw:text-[14px] tw:font-semibold tw:text-ink">
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* The people actually in the running, in rank order, each with the
+            control that used to vanish on approval (app commit 0d6b072). */}
+        {ranked.length > 0 ? (
+          <section className="tw:mt-8">
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <span className="tw:text-[15px] tw:font-semibold tw:text-ink">In the running</span>
+              <span className="tw:rounded-pill tw:bg-inner tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-muted">
+                {ranked.length}
+              </span>
+            </div>
+
+            <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
+              {ranked.map((entry, index) => {
+                const votes = Number(entry.votes || 0);
+
+                return (
+                  <div
+                    key={entry.id}
+                    className={`tw:flex tw:items-center tw:gap-3 tw:rounded-[14px] tw:border tw:bg-paper-raised tw:px-3 tw:py-2.5 ${
+                      index === 0 ? "tw:border-accent/45" : "tw:border-hairline"
+                    }`}
+                  >
+                    <span
+                      className={`tw:w-6 tw:shrink-0 tw:text-[12px] tw:font-bold ${
+                        index === 0 ? "tw:text-accent" : "tw:text-ink-muted"
+                      }`}
+                    >
+                      #{index + 1}
+                    </span>
+
+                    <div className="tw:min-w-0 tw:flex-1">
+                      <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-1.5">
+                        <span className="tw:min-w-0 tw:truncate tw:text-[13px] tw:font-semibold tw:text-ink">
                           {entry.display_name}
                         </span>
-                        <span className="tw:block tw:text-[12px] tw:text-muted">
-                          Entry #{entry.entry_number}
-                          {entry.location ? ` · ${entry.location}` : ""}
-                        </span>
-                        {entry.bio ? (
-                          <span className="tw:mt-1 tw:block tw:line-clamp-2 tw:text-[12px] tw:text-muted">
-                            {entry.bio}
+                        {index === 0 ? (
+                          <span className="tw:shrink-0 tw:rounded-pill tw:bg-accent tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-white">
+                            Leading
                           </span>
                         ) : null}
                       </div>
-
-                      <div className="tw:flex tw:shrink-0 tw:flex-col tw:gap-2">
-                        <Button size="sm" loading={busy} onClick={() => approve(entry)}>
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setDeclining(entry);
-                            setDeclineForm({ reason: "", password: "", code: "" });
-                          }}
-                        >
-                          Decline
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </section>
-
-          <section>
-            <SectionHeading eyebrow="Standings" title="Top five" />
-            <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2">
-              {(dashboard.top_entries || []).length === 0 ? (
-                <Card className="tw:p-4">
-                  <span className="tw:text-[13px] tw:text-muted">No approved contestants yet.</span>
-                </Card>
-              ) : (
-                dashboard.top_entries.map((entry, index) => (
-                  <Card key={entry.id} className="tw:flex tw:items-center tw:justify-between tw:p-3">
-                    <div className="tw:flex tw:items-center tw:gap-3">
-                      <span className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-inner tw:text-[12px] tw:font-semibold tw:text-muted-strong">
-                        {index + 1}
-                      </span>
-                      <span className="tw:text-[13px] tw:font-medium tw:text-ink">
-                        {entry.display_name}
+                      <span className="tw:block tw:text-[11px] tw:text-ink-muted">
+                        {index === 0
+                          ? `${votes} ${votes === 1 ? "vote" : "votes"}`
+                          : `${votes} ${votes === 1 ? "vote" : "votes"} · ${leaderVotes - votes} behind`}
                       </span>
                     </div>
-                    <span className="tw:text-[13px] tw:font-semibold tw:text-ink">
-                      {entry.votes} votes
-                    </span>
-                  </Card>
-                ))
-              )}
-            </div>
 
-            <SectionHeading eyebrow="Last 7 days" title="Vote flow" className="tw:mt-6" />
-            <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-1">
-              {(dashboard.votes?.last_7_days || []).length === 0 ? (
-                <Card className="tw:p-4">
-                  <span className="tw:text-[13px] tw:text-muted">No votes in the last week.</span>
-                </Card>
-              ) : (
-                dashboard.votes.last_7_days.map((day) => (
-                  <div key={day.day} className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-1">
-                    <span className="tw:text-[12px] tw:text-muted">{day.day}</span>
-                    <span className="tw:text-[12px] tw:font-medium tw:text-ink">
-                      {day.votes} votes · {money(day.earned, "NGN")}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => openDisqualify(entry)}
+                      className="tw:shrink-0 tw:border-0 tw:bg-transparent tw:text-[11.5px] tw:font-semibold tw:text-danger"
+                    >
+                      Disqualify
+                    </button>
                   </div>
-                ))
-              )}
+                );
+              })}
             </div>
           </section>
-        </div>
+        ) : null}
+
+        {/* Who is out: faded, below the queue. History to consult, not work to
+            do — but an organiser must be able to see it without asking. */}
+        {disqualified.length > 0 ? (
+          <section className="tw:mt-6 tw:opacity-62">
+            <div className="tw:flex tw:items-center tw:gap-2">
+              <Gavel className="tw:size-3.5 tw:text-muted" aria-hidden="true" />
+              <span className="tw:text-[13px] tw:font-semibold tw:text-muted-strong">
+                Disqualified
+              </span>
+              <span className="tw:rounded-pill tw:bg-inner tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-muted">
+                {disqualified.length}
+              </span>
+            </div>
+
+            <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
+              {disqualified.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                >
+                  <span className="tw:block tw:truncate tw:text-[12.5px] tw:font-semibold tw:text-muted-strong">
+                    {entry.display_name}
+                  </span>
+                  {String(entry.reason || "").trim() ? (
+                    <span className="tw:mt-0.5 tw:block tw:line-clamp-2 tw:text-[11px] tw:text-muted">
+                      {entry.reason}
+                    </span>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       {/* Decline: reason + second factor. */}
@@ -514,7 +765,7 @@ export default function ContestConsole() {
                 className="tw:h-12 tw:w-full tw:rounded-control tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:text-[15px] tw:text-ink tw:outline-none"
               >
                 <option value="">Choose…</option>
-                {(dashboard?.top_entries || []).map((entry) => (
+                {ranked.map((entry) => (
                   <option key={entry.id} value={entry.id}>
                     {entry.display_name} · {entry.votes} votes
                   </option>

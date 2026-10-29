@@ -13,7 +13,7 @@ function resolvePayload(response) {
 
 export default function SecurityPage() {
   const navigate = useNavigate();
-  const { token, setAuth } = useAuth();
+  const { token, setAuth, logout } = useAuth();
   const setAuthRef = useRef(setAuth);
   const [status, setStatus] = useState(null);
   const [setup, setSetup] = useState(null);
@@ -21,6 +21,14 @@ export default function SecurityPage() {
   const [disableCode, setDisableCode] = useState("");
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
+
+  // Account deletion. Both app stores require an in-app path to delete an
+  // account, and the backend route (DELETE /api/v1/user/delete) already exists
+  // with a password confirmation — the app added it under Security (commit
+  // 1bdbc41) rather than beside Sign out, where a thumb finds it first.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteForm, setDeleteForm] = useState({ password: "", reason: "" });
+  const [deleteError, setDeleteError] = useState(null);
 
   const twoFactorEnabled = useMemo(
     () => Boolean(status?.two_factor_enabled ?? status?.enabled),
@@ -126,6 +134,34 @@ export default function SecurityPage() {
       showError(
         err?.response?.data?.message ||
         "Unable to disable two-factor authentication."
+      );
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const deleteAccount = async (event) => {
+    event.preventDefault();
+    if (working || !deleteForm.password) return;
+
+    setWorking(true);
+    setDeleteError(null);
+    try {
+      await api.delete("/api/v1/user/delete", {
+        ...authHeaders(token),
+        data: {
+          password: deleteForm.password,
+          ...(deleteForm.reason.trim() ? { reason: deleteForm.reason.trim() } : {}),
+        },
+      });
+
+      showSuccess("Your account has been deleted.");
+      logout();
+      navigate("/");
+    } catch (err) {
+      const payload = err?.response?.data;
+      setDeleteError(
+        payload?.message || "Your account could not be deleted. Please try again."
       );
     } finally {
       setWorking(false);
@@ -292,6 +328,88 @@ export default function SecurityPage() {
               </div>
             </form>
           ) : null}
+        </section>
+
+        {/* Deliberately quiet and one level down: reachable in-app, but not
+            beside Sign out where a thumb can find it. */}
+        <section className="tw:mt-4 tw:rounded-3xl tw:border tw:border-gray-200 tw:bg-gray-50 tw:p-5">
+          <span className="tw:block tw:text-lg tw:font-semibold tw:text-gray-900">
+            Delete account
+          </span>
+          <span className="tw:mt-1 tw:block tw:text-sm tw:text-gray-600">
+            This removes your profile, tickets, contests and payouts for good. It cannot be
+            undone. If a payout is still on the way or a report is open, the account can only be
+            deactivated — support will help.
+          </span>
+
+          {!deleteOpen ? (
+            <button
+              type="button"
+              onClick={() => {
+                setDeleteForm({ password: "", reason: "" });
+                setDeleteError(null);
+                setDeleteOpen(true);
+              }}
+              className="tw:mt-4 tw:rounded-full tw:border tw:border-red-200 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-red-700"
+            >
+              Delete my account
+            </button>
+          ) : (
+            <form onSubmit={deleteAccount} className="tw:mt-4 tw:rounded-2xl tw:border tw:border-red-200 tw:bg-white tw:p-4">
+              <label className="tw:block">
+                <span className="tw:block tw:text-sm tw:font-medium tw:text-gray-900">
+                  Confirm with your password
+                </span>
+                <input
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={deleteForm.password}
+                  onChange={(event) =>
+                    setDeleteForm((prev) => ({ ...prev, password: event.target.value }))
+                  }
+                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm tw:focus:border-neon tw:focus:outline-none"
+                />
+              </label>
+
+              <label className="tw:mt-3 tw:block">
+                <span className="tw:block tw:text-sm tw:font-medium tw:text-gray-900">
+                  Reason (optional)
+                </span>
+                <input
+                  value={deleteForm.reason}
+                  maxLength={500}
+                  onChange={(event) =>
+                    setDeleteForm((prev) => ({ ...prev, reason: event.target.value }))
+                  }
+                  className="tw:mt-2 tw:w-full tw:rounded-xl tw:border tw:border-gray-300 tw:px-4 tw:py-3 tw:text-sm tw:focus:border-neon tw:focus:outline-none"
+                />
+              </label>
+
+              {deleteError ? (
+                <span className="tw:mt-3 tw:block tw:rounded-xl tw:bg-red-50 tw:p-3 tw:text-sm tw:text-red-700">
+                  {deleteError}
+                </span>
+              ) : null}
+
+              <div className="tw:mt-4 tw:flex tw:flex-wrap tw:gap-2">
+                <button
+                  type="submit"
+                  disabled={working || !deleteForm.password}
+                  className="tw:rounded-full tw:bg-red-600 tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:opacity-60"
+                >
+                  {working ? "Deleting..." : "Delete for good"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteOpen(false)}
+                  className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-gray-900"
+                >
+                  Keep my account
+                </button>
+              </div>
+            </form>
+          )}
         </section>
       </div>
     </div>

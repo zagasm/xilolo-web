@@ -5,8 +5,33 @@ import { Trophy } from "lucide-react";
 import { listMyContests } from "../../api/contestApi";
 import { useAuth } from "../auth/AuthContext";
 import { HOME_CONTAINER } from "../Home/index.jsx";
+import { resolveMediaUrl } from "../../utils/media";
 import { money, timeLeft } from "./components/ContestCard";
 import DeleteContestSheet from "./components/DeleteContestSheet";
+
+function coverUrl(media) {
+  const raw = media?.card || media?.thumb || media?.cover || media?.url || media?.path || null;
+  return raw ? resolveMediaUrl(raw) : null;
+}
+
+/**
+ * The cover is what an organiser recognises their own contest by — a title
+ * alone makes a list of contests read like a list of documents
+ * (organiser_contests_screen.dart:176-198: a 54px, r12 thumbnail).
+ */
+function ContestThumb({ contest }) {
+  const cover = coverUrl(contest.cover_media);
+
+  return (
+    <span className="tw:flex tw:size-[54px] tw:shrink-0 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-[12px] tw:bg-inner">
+      {cover ? (
+        <img src={cover} alt="" loading="lazy" className="tw:size-full tw:object-cover" />
+      ) : (
+        <Trophy className="tw:size-4 tw:text-ink-muted" aria-hidden="true" />
+      )}
+    </span>
+  );
+}
 
 const STATUS_LABEL = {
   draft: "Draft",
@@ -97,9 +122,16 @@ export default function MyContests() {
         ) : (
           <div className="tw:flex tw:flex-col tw:gap-3">
             {contests.map((contest) => (
-              <Card key={contest.id} className="tw:p-4">
+              <Card
+                key={contest.id}
+                className={`tw:p-3.5 ${
+                  Number(contest.entries?.pending || 0) > 0 ? "tw:border-accent/40" : ""
+                }`}
+              >
                 <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-                  <div className="tw:min-w-0">
+                  <div className="tw:flex tw:min-w-0 tw:items-start tw:gap-3">
+                    <ContestThumb contest={contest} />
+                    <div className="tw:min-w-0">
                     <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                       <span className="tw:truncate tw:text-[15px] tw:font-semibold tw:text-ink">
                         {contest.title}
@@ -119,7 +151,8 @@ export default function MyContests() {
                         .filter(Boolean)
                         .join(" · ")}
                     </span>
-                  </div>
+                    </div>
+                    </div>
 
                   <div className="tw:flex tw:shrink-0 tw:items-center tw:gap-2">
                     <Button
