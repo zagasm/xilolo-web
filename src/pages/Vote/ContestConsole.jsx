@@ -31,6 +31,19 @@ import { money, timeLeft } from "./components/ContestCard";
 import DeleteContestSheet from "./components/DeleteContestSheet";
 import { friendlyError } from "../../lib/errors";
 
+/**
+ * The organiser entries endpoint sends `votes_count` (and `rejection_reason`),
+ * not `votes`/`reason` — OrganiserContestController::entries. Tolerate both so
+ * one payload rename cannot silently zero the console.
+ */
+function votesOf(entry) {
+  return Number(entry?.votes_count ?? entry?.votes ?? 0);
+}
+
+function reasonOf(entry) {
+  return String(entry?.rejection_reason ?? entry?.reason ?? "").trim();
+}
+
 function Stat({ label, value, hint }) {
   return (
     <Card className="tw:p-4">
@@ -139,10 +152,10 @@ export default function ContestConsole() {
    * console with (app commit 6a49d19).
    */
   const ranked = useMemo(
-    () => [...approved].sort((a, b) => Number(b.votes || 0) - Number(a.votes || 0)),
+    () => [...approved].sort((a, b) => votesOf(b) - votesOf(a)),
     [approved]
   );
-  const leaderVotes = ranked.length ? Number(ranked[0].votes || 0) : 0;
+  const leaderVotes = ranked.length ? votesOf(ranked[0]) : 0;
 
   const trendTotals = useMemo(() => {
     const votes = trend.map((row) => Number(row.votes || 0));
@@ -410,8 +423,8 @@ export default function ContestConsole() {
               Leading:{" "}
               <span className="tw:font-bold tw:text-ink!">{ranked[0].display_name}</span>
               {ranked.length > 1
-                ? ` · ${ranked[0].votes} votes, ${leaderVotes - Number(ranked[1].votes || 0)} ahead`
-                : ` · ${ranked[0].votes} votes`}
+                ? ` · ${leaderVotes} votes, ${leaderVotes - votesOf(ranked[1])} ahead`
+                : ` · ${leaderVotes} votes`}
             </span>
           </div>
         ) : null}
@@ -601,7 +614,7 @@ export default function ContestConsole() {
 
             <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
               {ranked.map((entry, index) => {
-                const votes = Number(entry.votes || 0);
+                const votes = votesOf(entry);
 
                 return (
                   <div
@@ -673,9 +686,9 @@ export default function ContestConsole() {
                   <span className="tw:block tw:truncate tw:text-[12.5px] tw:font-semibold tw:text-muted-strong">
                     {entry.display_name}
                   </span>
-                  {String(entry.reason || "").trim() ? (
+                  {reasonOf(entry) ? (
                     <span className="tw:mt-0.5 tw:block tw:line-clamp-2 tw:text-[11px] tw:text-muted">
-                      {entry.reason}
+                      {reasonOf(entry)}
                     </span>
                   ) : null}
                 </div>
@@ -767,7 +780,7 @@ export default function ContestConsole() {
                 <option value="">Choose…</option>
                 {ranked.map((entry) => (
                   <option key={entry.id} value={entry.id}>
-                    {entry.display_name} · {entry.votes} votes
+                    {entry.display_name} · {votesOf(entry)} votes
                   </option>
                 ))}
               </select>
