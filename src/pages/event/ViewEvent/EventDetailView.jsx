@@ -341,11 +341,14 @@ export function bottomBarState(v) {
     };
   }
 
-  // :5567-5582 — access confirmed, button is inert in the app
+  // :5567-5582 — access confirmed, button is inert in the app. The label says
+  // what happened ("Ticket bought"), not what the viewer is allowed to do: a
+  // payment that completes without a visible receipt reads as a failed payment
+  // (app commit bdf5b4a).
   if (hasPaid) {
     return {
-      statusLabel: "Ticket access confirmed",
-      action: { label: canBuyManualOnly ? primaryCtaLabel : "Ticket Access Confirmed", tone: "inert", onClick: onPrimaryAction },
+      statusLabel: "Ticket bought",
+      action: { label: canBuyManualOnly ? primaryCtaLabel : "Ticket bought", tone: "inert", onClick: onPrimaryAction },
       secondary: canBuyManualOnly ? null : null,
     };
   }
@@ -520,6 +523,26 @@ export default function EventDetailView({ v }) {
                   </span>
                   {v.hostHasActiveSubscription && <SubscriptionBadge className="tw:size-3" />}
                 </Link>
+
+                {/* Follow sits beside the host's name, not a tap away: the
+                    decision to follow is made while reading who is hosting
+                    (app commit 8b90503, chip sized by bedc5ee — 24pt, 10pt). */}
+                {!v.isOwnerEvent && event.hostId ? (
+                  <button
+                    type="button"
+                    onClick={v.onToggleFollow}
+                    disabled={v.followLoading}
+                    className={`tw:ml-1 tw:inline-flex tw:h-6 tw:shrink-0 tw:items-center tw:rounded-pill tw:border-0 tw:px-2 tw:text-[10px] tw:font-bold tw:tracking-[0.1px] ${
+                      v.followLoading
+                        ? "tw:bg-inner tw:text-muted"
+                        : v.isFollowing
+                          ? "tw:bg-inner tw:text-muted-strong"
+                          : "tw:bg-accent tw:text-white"
+                    }`}
+                  >
+                    {v.followLoading ? "…" : v.isFollowing ? "Following" : "Follow"}
+                  </button>
+                ) : null}
               </div>
 
               {v.hostAbout && (
@@ -529,20 +552,6 @@ export default function EventDetailView({ v }) {
               )}
 
               <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row">
-                <button
-                  type="button"
-                  onClick={v.onToggleFollow}
-                  disabled={v.followLoading || !event.hostId}
-                  className={`tw:flex tw:h-11 tw:flex-1 tw:items-center tw:justify-center tw:rounded-xl tw:text-[13px] tw:font-bold ${
-                    v.followLoading
-                      ? "tw:cursor-not-allowed tw:border tw:border-hairline tw:bg-paper-raised tw:text-muted"
-                      : v.isFollowing
-                        ? "tw:cursor-pointer tw:border tw:border-accent tw:bg-paper-raised tw:text-accent-deep"
-                        : "tw:cursor-pointer tw:border tw:border-transparent tw:bg-ink tw:text-white"
-                  }`}
-                >
-                  {v.followLoading ? "Updating..." : v.isFollowing ? "Following" : "Follow Organizer"}
-                </button>
                 <Link
                   to={v.profileHref}
                   className="tw:flex tw:h-11 tw:flex-1 tw:items-center tw:justify-center tw:rounded-xl tw:bg-[#16909C] tw:text-[13px] tw:font-bold tw:text-white tw:hover:bg-[#06707D]"

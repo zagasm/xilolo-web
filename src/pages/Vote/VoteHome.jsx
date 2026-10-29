@@ -166,6 +166,13 @@ export default function VoteHome() {
                 ? "Try a contestant's name, the organiser, or a shorter word."
                 : "New contests appear here as soon as organisers open them. Check back soon."
             }
+            action={
+              !query && isOrganiser ? (
+                <Button as={Link} to="/organiser/contests/new" size="md">
+                  Host your first contest
+                </Button>
+              ) : null
+            }
           />
         ) : (
           <div className="tw:flex tw:flex-col tw:gap-8">
@@ -178,7 +185,7 @@ export default function VoteHome() {
                 <div className="tw:mt-4">
                   <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
                     {featured.map((contest) => (
-                      <ContestCard key={contest.slug} contest={contest} />
+                      <ContestCard key={contest.slug} contest={contest} token={token} />
                     ))}
                   </div>
                 </div>
@@ -194,7 +201,7 @@ export default function VoteHome() {
                 <div className={showTrending ? "tw:mt-4" : ""}>
                   <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
                     {(showTrending ? rest : contests).map((contest) => (
-                      <ContestCard key={contest.slug} contest={contest} />
+                      <ContestCard key={contest.slug} contest={contest} token={token} />
                     ))}
                   </div>
                 </div>

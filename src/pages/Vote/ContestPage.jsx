@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Search, Share2, Trophy, Wifi } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Share2, Trophy, UserX, Wifi } from "lucide-react";
 import { Button, Chip, Input, Skeleton } from "../../component/ui";
 import { showError, showSuccess } from "../../component/ui/toast";
 import { getContest, getSharedContest } from "../../api/contestApi";
@@ -10,7 +10,8 @@ import { resolveMediaUrl } from "../../utils/media";
 import EntrySheet from "./components/EntrySheet";
 import VoteSheet from "./components/VoteSheet";
 import DeleteContestSheet from "./components/DeleteContestSheet";
-import { money, timeLeft } from "./components/ContestCard";
+import { contestStatus, money, timeLeft } from "./components/ContestCard";
+import { shareContest } from "./contestShare";
 import { friendlyError } from "../../lib/errors";
 
 /* ── the event page's small parts, reused so both surfaces match ─────────── */
@@ -100,7 +101,7 @@ function Avatar({ entry, size = 44 }) {
   );
 }
 
-function ContestantRow({ entry, canVote, onVote }) {
+function ContestantRow({ entry, canVote, onVote, leaderVotes = 0 }) {
   return (
     <div className="tw:flex tw:items-center tw:gap-3 tw:border-b tw:border-hairline tw:py-3 last:tw:border-b-0">
       <span className="tw:w-5 tw:shrink-0 tw:text-center tw:text-[12px] tw:font-bold tw:text-muted!">
@@ -130,6 +131,21 @@ function ContestantRow({ entry, canVote, onVote }) {
             return [votes, status].filter(Boolean).join(" · ") || "No votes yet";
           })()}
         </span>
+
+        {/* A race reads as a distance, not two numbers to compare — the bar is
+            relative to the leader, exactly as the app draws it. */}
+        {leaderVotes > 0 && entry.votes !== null && entry.votes !== undefined ? (
+          <div className="tw:mt-1.5 tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-pill tw:bg-hairline">
+            <div
+              className={`tw:h-full tw:rounded-pill ${
+                Number(entry.rank) === 1 ? "tw:bg-accent" : "tw:bg-accent/55"
+              }`}
+              style={{
+                width: `${Math.max(2, Math.min(100, (Number(entry.votes) / leaderVotes) * 100))}%`,
+              }}
+            />
+          </div>
+        ) : null}
       </div>
 
       {canVote ? (
@@ -191,20 +207,48 @@ export default function ContestPage({ sharedToken = null }) {
     load();
   }, [load]);
 
+  /**
+   * The app shares through the system share sheet rather than only copying
+   * (contest_share_helper.dart, commit fd9b1bc): sending a contest to WhatsApp
+   * is the whole point of the link. The web keeps its unguessable /v/{token}
+   * link, because contest reads otherwise need an account.
+   */
   const share = async () => {
-    const url = contest?.share_token
-      ? `${window.location.origin}/v/${contest.share_token}`
-      : window.location.href;
-
     try {
-      await navigator.clipboard.writeText(url);
-      showSuccess("Link copied.");
+      const result = await shareContest({
+        title: contest?.title,
+        slug: contest?.slug,
+        shareToken: contest?.share_token,
+        token,
+      });
+
+      if (result === "copied") showSuccess("Link copied.");
+      if (result === "none") showError("This contest has no link yet.");
     } catch {
-      showError("Could not copy the link — long-press the address bar instead.");
+      showError("Could not share the link — long-press the address bar instead.");
     }
   };
 
   const entries = board?.entries ?? [];
+
+  // Who is out, and why. Disqualified and rejected entries are kept separate
+  // from the ranking by the API (ContestLeaderboardService::excludedEntries) so
+  // nothing here can be counted — but a removal must stay visible, or an
+  // organiser could delete a contestant and nobody could tell it happened.
+  const excluded = board?.excluded ?? [];
+  const excludedReason = (entry) => {
+    const state = String(entry.status || "").toLowerCase();
+    const why =
+      state === "disqualified"
+        ? "Disqualified"
+        : state === "rejected"
+          ? "Not admitted"
+          : "Out of the contest";
+
+    return entry.votes === null || entry.votes === undefined
+      ? why
+      : `${why} · ${entry.votes} ${entry.votes === 1 ? "vote" : "votes"} void`;
+  };
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     if (!needle) return entries;
@@ -215,13 +259,27 @@ export default function ContestPage({ sharedToken = null }) {
     );
   }, [entries, query]);
 
+  // The leader's count sets the scale for every progress bar.
+  const leaderVotes = entries.reduce(
+    (best, entry) =>
+      entry.votes !== null && entry.votes !== undefined
+        ? Math.max(best, Number(entry.votes))
+        : best,
+    0
+  );
+
   const cover = contest ? coverUrl(contest.cover_media) : null;
   const votingOpen = Boolean(contest?.voting_window?.open);
   const entriesOpen = Boolean(contest?.entries_window?.open);
   const votingClosing = contest ? timeLeft(contest.voting_window?.closes_at) : null;
   const canVote = votingOpen && Boolean(user) && !isShared;
   const organiserHref = contest?.organiser?.id ? `/profile/${contest.organiser.id}` : null;
-  const statusLabel = votingOpen ? "Voting open" : entriesOpen ? "Entries open" : "Voting closed";
+  // "Voting ongoing", never "voting live" — live means a stream is running.
+  const status = contestStatus(contest);
+  const statusColour =
+    { success: "#22C55E", warning: "#B45309", danger: "#B3261E", accent: "#16909C" }[
+      status.tone
+    ] || "#16909C";
 
   if (loading) {
     return (
@@ -302,9 +360,12 @@ export default function ContestPage({ sharedToken = null }) {
               <div className="tw:mt-2 tw:flex tw:items-center tw:gap-3">
                 <SummaryPill label="Per vote" value={money(contest.vote_price, contest.currency)} />
                 <SummaryPill label="Voting" value={votingClosing || (votingOpen ? "Open" : "Closed")} />
-                <span className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-full tw:bg-[#22C55E] tw:px-2 tw:py-1 tw:text-[10px] tw:font-bold tw:text-white">
+                <span
+                  className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-full tw:px-2 tw:py-1 tw:text-[10px] tw:font-bold tw:text-white"
+                  style={{ backgroundColor: statusColour }}
+                >
                   <Wifi className="tw:size-2.5 tw:text-white" aria-hidden="true" />
-                  {statusLabel}
+                  {status.label}
                 </span>
               </div>
             </div>
@@ -380,11 +441,46 @@ export default function ContestPage({ sharedToken = null }) {
                         key={entry.entry_id}
                         entry={entry}
                         canVote={canVote}
+                        leaderVotes={leaderVotes}
                         onVote={(picked) => setVoting(picked)}
                       />
                     ))
                   )}
                 </div>
+
+                {/* Who is out: faded, at the bottom, never counted. */}
+                {excluded.length > 0 ? (
+                  <div className="tw:mt-6 tw:opacity-55">
+                    <div className="tw:flex tw:items-center tw:gap-2">
+                      <UserX className="tw:size-3.5 tw:text-muted!" aria-hidden="true" />
+                      <span className="tw:text-[13px] tw:font-semibold tw:text-muted-strong!">
+                        Didn&apos;t make it
+                      </span>
+                      <span className="tw:rounded-pill tw:bg-inner tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-muted!">
+                        {excluded.length}
+                      </span>
+                    </div>
+
+                    <div className="tw:mt-2">
+                      {excluded.map((entry) => (
+                        <div
+                          key={entry.entry_id}
+                          className="tw:flex tw:items-center tw:gap-3 tw:py-2"
+                        >
+                          <Avatar entry={entry} size={32} />
+                          <div className="tw:min-w-0 tw:flex-1">
+                            <span className="tw:block tw:truncate tw:text-[13px] tw:font-semibold tw:text-muted-strong!">
+                              {entry.display_name}
+                            </span>
+                            <span className="tw:block tw:truncate tw:text-[11px] tw:text-muted!">
+                              {excludedReason(entry)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </>
             )}
           </div>

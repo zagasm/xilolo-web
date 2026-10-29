@@ -1163,7 +1163,7 @@ export default function ViewEvent() {
             String(event?.description || "").trim() ||
             "This event does not have a published description yet.",
           accessLabel: hasPaid
-            ? "Ticket secured"
+            ? "Ticket bought"
             : manualHasAccess
               ? "Manual unlocked"
               : isLiveNow

@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Search,
   Ticket,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 import {
@@ -310,7 +311,12 @@ function WithdrawDialog({
   submitting,
 }) {
   const symbol = resolveCurrencySymbol(balance);
-  const availableBalance = Number(balance?.available_balance ?? 0);
+  // Cleared money only. `withdrawable_payout` is what PayoutWalletService says
+  // has actually cleared; `potential_payout` is still coming in and must never
+  // be withdrawable (app commit 86bdf44).
+  const availableBalance = Number(
+    balance?.withdrawable_payout ?? balance?.available_balance ?? 0
+  );
   const hasAccounts = accounts.length > 0;
   const hasCryptoWallets = cryptoWallets.length > 0;
   const hasAvailableBalance = availableBalance > 0;
@@ -870,7 +876,9 @@ export default function AccountPayouts() {
   };
 
   const handleWithdraw = async () => {
-    const availableBalance = Number(balance?.available_balance ?? 0);
+    const availableBalance = Number(
+      balance?.withdrawable_payout ?? balance?.available_balance ?? 0
+    );
 
     if (!Number.isFinite(availableBalance) || availableBalance <= 0) {
       showError("You need an available balance before requesting a withdrawal.");
@@ -1010,10 +1018,21 @@ export default function AccountPayouts() {
             <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-2">
               <StatCard
                 icon={Wallet}
-                label="Available balance"
-                value={formatMoney(balance?.available_balance ?? 0, balanceSymbol)}
-                hint="Amount available for payout"
+                label="Withdrawable"
+                value={formatMoney(
+                  balance?.withdrawable_payout ?? balance?.available_balance ?? 0,
+                  balanceSymbol
+                )}
+                hint="Ready to withdraw"
               />
+              {balance?.potential_payout !== null && balance?.potential_payout !== undefined ? (
+                <StatCard
+                  icon={TrendingUp}
+                  label="Potential payout"
+                  value={formatMoney(balance.potential_payout, balanceSymbol)}
+                  hint="Still coming in. It moves to withdrawable when the show ends or voting closes."
+                />
+              ) : null}
               {/* <StatCard
                 icon={TrendingUp}
                 label="Ticket sales"

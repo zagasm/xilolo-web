@@ -181,6 +181,51 @@ export async function getContestDashboard(id, token) {
   return unwrap(response);
 }
 
+/**
+ * Votes per day for the console chart. Mirrors the app's
+ * `OrganiserContestService.voteTrend` (organiser_contest_service.dart:128).
+ * The API returns a dense series — every day in the window, zeros included.
+ */
+export async function getContestVoteTrend(id, token, days = 30) {
+  const response = await api.get(`/api/v1/organiser/contests/${id}/vote-trend`, {
+    ...authHeaders(token),
+    params: { days },
+  });
+  const data = unwrap(response) ?? {};
+  return Array.isArray(data.series) ? data.series : [];
+}
+
+/** End entries now. The lifecycle action, not a deadline edit. */
+export async function closeContestEntries(id, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/close-entries`,
+    {},
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
+/** End voting now. Irreversible — prizes are settled after this. */
+export async function closeContestVoting(id, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/close-voting`,
+    {},
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
+/** Approve a queue in one go. Approval is cheap and reversible on purpose. */
+export async function bulkApproveEntries(id, entryIds, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/entries/bulk-approve`,
+    { entry_ids: entryIds },
+    authHeaders(token)
+  );
+  const data = unwrap(response) ?? {};
+  return Number(data.approved || 0);
+}
+
 /** Forward-only: the API refuses a close time earlier than the current one. */
 export async function extendVoting(id, votingCloseAt, reason, token) {
   const response = await api.post(

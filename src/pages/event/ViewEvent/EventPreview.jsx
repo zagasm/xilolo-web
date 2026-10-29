@@ -88,7 +88,7 @@ export default function EventPreview() {
       accessLabel: ownerView
         ? "You are hosting this event"
         : paidLive || bought
-          ? "Ticket secured"
+          ? "Ticket bought"
           : "Upcoming",
       statusLabel: paidLive ? "Live" : "Upcoming",
       hostName: "Adaeze Okonkwo",
