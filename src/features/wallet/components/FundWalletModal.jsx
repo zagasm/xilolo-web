@@ -384,10 +384,25 @@ export default function FundWalletModal({
                           <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
                             <span>Total charged</span>
                             <span className="tw:font-semibold tw:text-gray-900">
-                              {reviewData.currency}{" "}
-                              {Number(
-                                reviewData.total_charge_amount || 0
-                              ).toLocaleString()}
+                              {String(
+                                reviewData.gateway_charge_currency ||
+                                  reviewData.currency
+                              ).toUpperCase() ===
+                              String(reviewData.currency).toUpperCase() ? (
+                                <>
+                                  {reviewData.currency}{" "}
+                                  {Number(
+                                    reviewData.total_charge_amount || 0
+                                  ).toLocaleString()}
+                                </>
+                              ) : (
+                                <>
+                                  {reviewData.gateway_charge_currency}{" "}
+                                  {Number(
+                                    reviewData.gateway_charge_amount || 0
+                                  ).toLocaleString()}
+                                </>
+                              )}
                             </span>
                           </div>
                         </div>

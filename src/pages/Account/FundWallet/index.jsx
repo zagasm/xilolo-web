@@ -134,8 +134,19 @@ export default function FundWalletPage() {
               </span>
             </div>
             <span className="tw:text-[13px] tw:text-gray-500">
-              {provider === "cryptomus" ? "Cryptomus crypto payments include a 2% gateway fee paid by you." : "Provider fees are previewed before checkout."}
+              {selectableMethods.find((item) => item.value === provider)?.raw
+                ?.metadata?.fee_note ||
+                "Provider fees are previewed before checkout."}
             </span>
+            {String(
+              selectableMethods.find((item) => item.value === provider)?.raw
+                ?.metadata?.currencies?.[0] || ""
+            ).toUpperCase() === "USD" && (
+              <span className="tw:text-[13px] tw:text-amber-600">
+                Your card is charged in USD at checkout; the amount you enter
+                here is the naira credit you receive.
+              </span>
+            )}
           </div>
 
           <button
