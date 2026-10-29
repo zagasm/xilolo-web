@@ -98,7 +98,7 @@ export default function OrganiserBankAccountStep({
             borderRadius: 12
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
           onClick={onChangeMethod}
         >
           <span>Change method</span>
@@ -108,7 +108,7 @@ export default function OrganiserBankAccountStep({
             borderRadius: 12
           }}
           type="button"
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm tw:hover:shadow-md tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2 tw:rounded-xl! tw:bg-primary tw:text-white tw:text-xs tw:md:text-sm tw:font-semibold tw:shadow-sm tw:hover:shadow-md tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:transition"
           disabled={
             !selectedBank ||
             accountNumber.length !== 10 ||

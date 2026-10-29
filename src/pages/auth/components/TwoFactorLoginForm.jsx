@@ -212,7 +212,7 @@ export default function TwoFactorLoginForm({
           }}
           type="submit"
           disabled={!isComplete || isSubmitting}
-          className="tw:w-full tw:rounded-lg tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-gray-300"
+          className="tw:w-full tw:rounded-lg! tw:bg-black tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:bg-gray-300"
         >
           {isSubmitting ? "Verifying..." : "Verify and sign in"}
         </button>
@@ -224,7 +224,7 @@ export default function TwoFactorLoginForm({
           }}
           type="button"
           onClick={onCancel}
-          className="tw:mt-3 tw:w-full tw:rounded-lg tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900"
+          className="tw:mt-3 tw:w-full tw:rounded-lg! tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900"
         >
           Back to sign in
         </button>

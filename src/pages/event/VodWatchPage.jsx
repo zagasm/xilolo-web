@@ -123,7 +123,7 @@ export default function VodWatchPage() {
           <button
             type="button"
             onClick={loadVod}
-            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white"
+            className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full! tw:bg-primary tw:px-5 tw:py-2.5 tw:text-sm tw:font-semibold tw:text-white"
           >
             <RefreshCcw className="tw:h-4 tw:w-4" />
             Retry

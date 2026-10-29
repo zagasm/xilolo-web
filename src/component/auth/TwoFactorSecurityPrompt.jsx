@@ -67,7 +67,7 @@ export default function TwoFactorSecurityPrompt() {
                     type="button"
                     aria-label="Dismiss security prompt"
                     onClick={dismiss}
-                    className="tw:rounded-full tw:p-1.5 tw:text-gray-500 tw:hover:bg-gray-100"
+                    className="tw:rounded-full! tw:p-1.5 tw:text-gray-500 tw:hover:bg-gray-100"
                   >
                     <X className="tw:h-4 tw:w-4" />
                   </button>
@@ -98,7 +98,7 @@ export default function TwoFactorSecurityPrompt() {
                     }}
                     type="button"
                     onClick={dismiss}
-                    className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900"
+                    className="tw:inline-flex tw:flex-1 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-5 tw:py-3 tw:text-sm tw:font-semibold tw:text-gray-900"
                   >
                     Remind me later
                   </button>

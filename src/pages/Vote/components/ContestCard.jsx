@@ -163,7 +163,7 @@ export default function ContestCard({ contest, token = null }) {
             type="button"
             onClick={onShare}
             aria-label={`Share ${contest.title}`}
-            className="tw:ml-auto tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-black/40 tw:text-white tw:backdrop-blur-[2px] tw:transition-colors tw:hover:bg-black/60"
+            className="tw:ml-auto tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:border-0 tw:bg-black/40 tw:text-white tw:backdrop-blur-[2px] tw:transition-colors tw:hover:bg-black/60"
           >
             <Share2 className="tw:size-[15px]" aria-hidden="true" />
           </button>

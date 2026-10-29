@@ -137,7 +137,7 @@ function ProfileErrorState({ message, onBack }) {
       <button
         type="button"
         onClick={onBack}
-        className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:bg-accent tw:px-6 tw:text-[14px] tw:font-semibold tw:text-white"
+        className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full! tw:bg-accent tw:px-6 tw:text-[14px] tw:font-semibold tw:text-white"
       >
         Go Back
       </button>
@@ -212,7 +212,7 @@ export function ProfileScreenView({
       onClick={onShare}
       disabled={shareLoading}
       aria-label="Share profile"
-      className="tw:ml-auto tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-chip tw:text-body tw:disabled:opacity-60"
+      className="tw:ml-auto tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full! tw:bg-chip tw:text-body tw:disabled:opacity-60"
     >
       <Share2 className="tw:size-5" />
     </button>
@@ -234,7 +234,7 @@ export function ProfileScreenView({
             type="button"
             onClick={goBack}
             aria-label="Go back"
-            className={`tw:flex tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-body ${
+            className={`tw:flex tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:text-body ${
               isOwnProfile
                 ? "tw:size-[42px] tw:border tw:border-hairline tw:bg-paper-raised"
                 : "tw:size-10 tw:bg-chip"
@@ -465,7 +465,7 @@ export function ProfileScreenView({
                   <button
                     type="button"
                     onClick={() => navigate("/")}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:text-[12px] tw:font-medium tw:text-body"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-hairline tw:px-4 tw:text-[12px] tw:font-medium tw:text-body"
                   >
                     Go to home
                   </button>

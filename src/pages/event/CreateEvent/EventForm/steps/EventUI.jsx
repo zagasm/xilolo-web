@@ -125,7 +125,7 @@ export function EventSwitch({ checked, onChange, label, disabled = false }) {
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
-      className={`tw:relative tw:inline-flex tw:h-6 tw:w-11 tw:shrink-0 tw:items-center tw:rounded-full tw:border tw:transition-colors ${
+      className={`tw:relative tw:inline-flex tw:h-6 tw:w-11 tw:shrink-0 tw:items-center tw:rounded-full! tw:border tw:transition-colors ${
         checked ? "tw:border-accent tw:bg-accent" : "tw:border-hairline tw:bg-inner"
       } ${disabled ? "tw:opacity-50" : ""}`}
     >
@@ -160,7 +160,7 @@ export function OptionCard({ selected, title, subtitle, icon: Icon, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-0 tw:rounded-[14px] tw:border tw:p-[11px] tw:text-left tw:transition ${
+      className={`tw:flex tw:w-full tw:flex-col tw:items-start tw:gap-0 tw:rounded-[14px]! tw:border tw:p-[11px] tw:text-left tw:transition ${
         selected ? "tw:border-accent tw:bg-accent-soft" : "tw:border-hairline tw:bg-inner"
       }`}
     >
@@ -180,7 +180,7 @@ export function Chip({ label, selected, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-[10px] tw:border tw:px-2.5 tw:py-2.5 tw:text-[13px] tw:transition ${
+      className={`tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-[10px]! tw:border tw:px-2.5 tw:py-2.5 tw:text-[13px] tw:transition ${
         selected
           ? "tw:border-accent tw:bg-accent-soft tw:font-bold tw:text-accent-deep"
           : "tw:border-hairline tw:bg-inner tw:font-medium tw:text-muted"
@@ -244,7 +244,7 @@ export function StepHeader({ step, totalSteps, stepLabels, onBack, backLabel = "
             type="button"
             onClick={onBack}
             aria-label={backLabel}
-            className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-[14px] tw:border tw:border-hairline tw:bg-inner tw:p-[11px] tw:text-body tw:transition tw:hover:border-accent"
+            className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-[14px]! tw:border tw:border-hairline tw:bg-inner tw:p-[11px] tw:text-body tw:transition tw:hover:border-accent"
           >
             <ArrowLeft className="tw:size-[18px]" aria-hidden="true" />
           </button>
@@ -332,7 +332,7 @@ export function StepCtaButton({ children, disabled = false, type = "submit", onC
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className="tw:inline-flex tw:min-h-[50px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:bg-accent tw:px-5 tw:text-[15px] tw:font-bold tw:text-white tw:transition tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+      className="tw:inline-flex tw:min-h-[50px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full! tw:bg-accent tw:px-5 tw:text-[15px] tw:font-bold tw:text-white tw:transition tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
     >
       {children}
     </button>

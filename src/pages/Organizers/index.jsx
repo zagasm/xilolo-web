@@ -63,7 +63,7 @@ function TopOrganizersHeader({ onBack }) {
         type="button"
         onClick={onBack}
         aria-label="Back to home"
-        className="tw:mb-1 tw:-ml-1 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-full tw:text-body tw:transition-colors tw:hover:bg-chip"
+        className="tw:mb-1 tw:-ml-1 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-full! tw:text-body tw:transition-colors tw:hover:bg-chip"
       >
         <ArrowLeft className="tw:size-6" aria-hidden="true" />
       </button>

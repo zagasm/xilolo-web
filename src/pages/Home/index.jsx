@@ -288,7 +288,7 @@ export function TabPill({ label, selected, onClick, showLiveDot = false, count =
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`tw:inline-flex tw:h-[38px] tw:items-center tw:gap-1.5 tw:rounded-pill tw:px-[18px] tw:text-sm tw:font-semibold tw:transition-colors ${
+      className={`tw:inline-flex tw:h-[38px] tw:items-center tw:gap-1.5 tw:rounded-pill! tw:px-[18px] tw:text-sm tw:font-semibold tw:transition-colors ${
         selected
           ? "tw:bg-ink tw:text-paper tw:hover:bg-ink-raised"
           : "tw:border tw:border-hairline tw:bg-paper-raised tw:text-body tw:hover:bg-chip tw:hover:text-body"
@@ -579,7 +579,7 @@ export function LiveFeedCard({ event, onMore }) {
           type="button"
           onClick={onMore}
           aria-label="Event options"
-          className="tw:absolute tw:right-2.5 tw:top-2.5 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill tw:bg-black/50 tw:text-paper-raised tw:transition-colors tw:hover:bg-black/75"
+          className="tw:absolute tw:right-2.5 tw:top-2.5 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-pill! tw:bg-black/50 tw:text-paper-raised tw:transition-colors tw:hover:bg-black/75"
         >
           <MoreHorizontal className="tw:size-5" aria-hidden="true" />
         </button>

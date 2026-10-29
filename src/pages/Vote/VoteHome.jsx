@@ -114,7 +114,7 @@ export default function VoteHome() {
                 type="button"
                 onClick={() => setQuery("")}
                 aria-label="Clear search"
-                className="tw:absolute tw:right-3 tw:top-1/2 tw:flex tw:size-7 tw:-translate-y-1/2 tw:items-center tw:justify-center tw:rounded-full tw:bg-inner tw:text-muted tw:transition-colors tw:hover:text-ink"
+                className="tw:absolute tw:right-3 tw:top-1/2 tw:flex tw:size-7 tw:-translate-y-1/2 tw:items-center tw:justify-center tw:rounded-full! tw:bg-inner tw:text-muted tw:transition-colors tw:hover:text-ink"
               >
                 <X className="tw:size-4" aria-hidden="true" />
               </button>

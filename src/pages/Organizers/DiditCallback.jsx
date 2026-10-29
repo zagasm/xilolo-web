@@ -143,7 +143,7 @@ export default function DiditCallback() {
               <button
                 type="button"
                 onClick={() => navigate("/become-an-organiser")}
-                className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold"
+                className="tw:px-4 tw:py-2 tw:rounded-xl! tw:bg-primary tw:text-white tw:text-sm tw:font-semibold"
               >
                 Back to verification
               </button>
@@ -162,7 +162,7 @@ export default function DiditCallback() {
                       : "/become-an-organiser",
                   )
                 }
-                className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:text-sm tw:font-semibold"
+                className="tw:px-4 tw:py-2 tw:rounded-xl! tw:bg-primary tw:text-white tw:text-sm tw:font-semibold"
               >
                 {sessionData?.local_kyc_status === "verified"
                   ? "Create an event"

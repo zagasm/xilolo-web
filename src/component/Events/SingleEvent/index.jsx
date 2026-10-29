@@ -345,7 +345,7 @@ export function EventCard({
           style={{ borderRadius: "50%" }}
           type="button"
           onClick={onMore}
-          className="tw:absolute tw:right-3 tw:top-3 tw:z-40 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-full tw:bg-black/35 tw:text-white tw:backdrop-blur"
+          className="tw:absolute tw:right-3 tw:top-3 tw:z-40 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-full! tw:bg-black/35 tw:text-white tw:backdrop-blur"
         >
           <Ellipsis className="tw:h-4 tw:w-4" />
         </button>
@@ -402,7 +402,7 @@ export function EventCard({
             <button
               type="button"
               onClick={goToHostProfile}
-              className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl tw:bg-[#f5f5f5] tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:text-black"
+              className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:rounded-xl! tw:bg-[#f5f5f5] tw:px-3 tw:py-2 tw:text-left tw:text-xs tw:font-medium tw:text-black"
             >
               <span className="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-full tw:bg-lightPurple tw:text-[11px] tw:font-semibold tw:text-primary">
                 {event?.hostImage ? (
@@ -438,7 +438,7 @@ export function EventCard({
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-black tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md"
+                className="tw:w-full tw:rounded-2xl! tw:bg-black tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md"
               >
                 You're hosting this event
               </button>
@@ -448,7 +448,7 @@ export function EventCard({
               type="button"
               style={{ borderRadius: 8 }}
               disabled
-              className="tw:mt-auto tw:w-full tw:cursor-not-allowed tw:rounded-2xl tw:bg-primary/30 tw:py-3 tw:text-sm tw:font-semibold tw:text-white"
+              className="tw:mt-auto tw:w-full tw:cursor-not-allowed tw:rounded-2xl! tw:bg-primary/30 tw:py-3 tw:text-sm tw:font-semibold tw:text-white"
             >
               You have paid for this event.
             </button>
@@ -457,7 +457,7 @@ export function EventCard({
               type="button"
               style={{ borderRadius: 8 }}
               disabled
-              className="tw:mt-auto tw:w-full tw:cursor-not-allowed tw:rounded-2xl tw:bg-zinc-200 tw:py-3 tw:text-sm tw:font-semibold tw:text-zinc-600"
+              className="tw:mt-auto tw:w-full tw:cursor-not-allowed tw:rounded-2xl! tw:bg-zinc-200 tw:py-3 tw:text-sm tw:font-semibold tw:text-zinc-600"
             >
               Event ended
             </button>
@@ -469,7 +469,7 @@ export function EventCard({
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-red-500 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md"
+                className="tw:w-full tw:rounded-2xl! tw:bg-red-500 tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md"
               >
                 Join event now
               </button>
@@ -482,7 +482,7 @@ export function EventCard({
               <button
                 type="button"
                 style={{ borderRadius: 8 }}
-                className="tw:w-full tw:rounded-2xl tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md tw:hover:bg-primarySecond"
+                className="tw:w-full tw:rounded-2xl! tw:bg-primary tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:shadow-md tw:hover:bg-primarySecond"
               >
                 {ticketLabel}
               </button>

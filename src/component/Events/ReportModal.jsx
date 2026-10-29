@@ -92,13 +92,13 @@ export default function ReportModal({ open, onClose, onSubmit }) {
 
               <div className="tw:flex tw:justify-end tw:gap-3">
                 <button
-                  className="tw:px-4 tw:h-10 tw:rounded-full tw:bg-gray-100"
+                  className="tw:px-4 tw:h-10 tw:rounded-full! tw:bg-gray-100"
                   onClick={onClose}
                 >
                   Cancel
                 </button>
                 <button
-                  className="tw:px-5 tw:h-10 tw:rounded-full tw:bg-primary tw:text-white tw:disabled:opacity-50"
+                  className="tw:px-5 tw:h-10 tw:rounded-full! tw:bg-primary tw:text-white tw:disabled:opacity-50"
                   disabled={!finalReason}
                   onClick={() => onSubmit(finalReason)}
                 >

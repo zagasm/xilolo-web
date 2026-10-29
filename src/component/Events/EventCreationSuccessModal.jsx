@@ -89,7 +89,7 @@ export default function EventCreationSuccessModal({
                     style={{ fontSize: 13 }}
                     type="button"
                     onClick={handleView}
-                    className="tw:w-full tw:rounded-full tw:bg-accent tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-white tw:transition tw:duration-150 tw:hover:brightness-95"
+                    className="tw:w-full tw:rounded-full! tw:bg-accent tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-white tw:transition tw:duration-150 tw:hover:brightness-95"
                   >
                     {copy.cta}
                   </button>
@@ -98,7 +98,7 @@ export default function EventCreationSuccessModal({
                     style={{ fontSize: 13 }}
                     type="button"
                     onClick={onClose}
-                    className="tw:w-full tw:rounded-full tw:border tw:border-hairline tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-body tw:transition tw:duration-150 tw:hover:border-accent"
+                    className="tw:w-full tw:rounded-full! tw:border tw:border-hairline tw:px-4 tw:py-3 tw:text-[13px] tw:font-bold tw:text-body tw:transition tw:duration-150 tw:hover:border-accent"
                   >
                     Later
                   </button>

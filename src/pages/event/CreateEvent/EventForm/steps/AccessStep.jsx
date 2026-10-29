@@ -72,7 +72,7 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
           }}
           type="button"
           onClick={onBack}
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:hover:bg-gray-50"
+          className="tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-200 tw:hover:bg-gray-50"
         >
           Back
         </button>
@@ -81,7 +81,7 @@ export default function AccessStep({ defaultValues = {}, onBack, onNext }) {
             borderRadius: 20,
           }}
           type="submit"
-          className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
+          className="tw:px-4 tw:py-2 tw:rounded-xl! tw:bg-primary tw:text-white tw:hover:bg-primarySecond"
         >
           Next
         </button>

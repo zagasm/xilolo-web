@@ -339,7 +339,7 @@ export default function CreateContest() {
                       <button
                         type="button"
                         onClick={() => setPrizes((prev) => prev.filter((_, i) => i !== index))}
-                        className="tw:rounded-full tw:px-2 tw:py-1 tw:text-[12px] tw:font-medium tw:text-muted tw:hover:text-danger"
+                        className="tw:rounded-full! tw:px-2 tw:py-1 tw:text-[12px] tw:font-medium tw:text-muted tw:hover:text-danger"
                       >
                         Remove
                       </button>

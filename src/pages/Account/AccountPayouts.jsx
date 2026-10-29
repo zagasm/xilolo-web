@@ -230,7 +230,7 @@ function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) 
           onClick={onClose}
           disabled={isAdding}
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800"
+          className="tw:h-11 tw:rounded-2xl! tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-semibold tw:text-gray-800"
         >
           Cancel
         </button>
@@ -241,7 +241,7 @@ function AddBankAccountDialog({ open, onClose, banks, banksLoading, onSubmit }) 
             onSubmit({ bankCode: selectedBank.code, accountNumber, setAsDefault })
           }
           style={{ borderRadius: 16 }}
-          className="tw:h-11 tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+          className="tw:h-11 tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
         >
           {isAdding ? "Saving..." : "Add account"}
         </button>
@@ -383,7 +383,7 @@ function WithdrawDialog({
                       type="button"
                       onClick={() => onSelectPayoutMethod("bank")}
                       className={cx(
-                        "tw:rounded-[12px] tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
+                        "tw:rounded-[12px]! tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
                         payoutMethod === "bank"
                           ? "tw:border-accent tw:bg-accent/10 tw:text-accent-deep"
                           : "tw:border-hairline tw:bg-paper-raised tw:text-muted"
@@ -395,7 +395,7 @@ function WithdrawDialog({
                       type="button"
                       onClick={() => onSelectPayoutMethod("crypto")}
                       className={cx(
-                        "tw:rounded-[12px] tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
+                        "tw:rounded-[12px]! tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
                         payoutMethod === "crypto"
                           ? "tw:border-accent tw:bg-accent/10 tw:text-accent-deep"
                           : "tw:border-hairline tw:bg-paper-raised tw:text-muted"
@@ -420,7 +420,7 @@ function WithdrawDialog({
                           }}
                           type="button"
                           onClick={onAddCryptoWallet}
-                          className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
+                          className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl! tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
                         >
                           <Plus className="tw:h-4 tw:w-4" />
                           Add crypto wallet
@@ -431,7 +431,7 @@ function WithdrawDialog({
                         <button
                           type="button"
                           onClick={onAddCryptoWallet}
-                          className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
+                          className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl! tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
                         >
                           <Plus className="tw:h-4 tw:w-4" />
                           Add another wallet
@@ -500,7 +500,7 @@ function WithdrawDialog({
                       <button
                         type="button"
                         onClick={onAddBankAccount}
-                        className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
+                        className="tw:mt-3 tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl! tw:bg-primary tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-white"
                       >
                         <Plus className="tw:h-4 tw:w-4" />
                         Add bank account
@@ -511,7 +511,7 @@ function WithdrawDialog({
                       <button
                         type="button"
                         onClick={onAddBankAccount}
-                        className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
+                        className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-2xl! tw:bg-gray-100 tw:px-3 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-800"
                       >
                         <Plus className="tw:h-4 tw:w-4" />
                         Add another account
@@ -573,7 +573,7 @@ function WithdrawDialog({
                     onClick={onClose}
                     disabled={submitting}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-4 tw:text-[13px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:border-accent/50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px]! tw:border tw:border-hairline tw:bg-paper-raised tw:px-4 tw:text-[13px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:border-accent/50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     Cancel
                   </button>
@@ -582,7 +582,7 @@ function WithdrawDialog({
                     onClick={onSubmit}
                     disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px] tw:border-0 tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-accent-deep tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px]! tw:border-0 tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-accent-deep tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     {submitting ? "Submitting..." : "Submit withdrawal"}
                   </button>
@@ -1182,7 +1182,7 @@ export default function AccountPayouts() {
             onClick={() =>
               canWithdrawNow ? setWithdrawOpen(true) : navigate("/account/bank-accounts")
             }
-            className="tw:mt-4 tw:h-12 tw:w-full tw:rounded-[16px] tw:border-0 tw:bg-accent tw:text-[13px] tw:font-bold tw:text-white tw:transition-colors tw:hover:bg-accent-deep"
+            className="tw:mt-4 tw:h-12 tw:w-full tw:rounded-[16px]! tw:border-0 tw:bg-accent tw:text-[13px] tw:font-bold tw:text-white tw:transition-colors tw:hover:bg-accent-deep"
           >
             {withdrawLabel}
           </button>

@@ -96,7 +96,7 @@ function AttendanceSelector({ value, onChange }) {
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-[12px] tw:border tw:py-2.5 tw:text-[13px] tw:font-semibold tw:transition ${
+              className={`tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-[12px]! tw:border tw:py-2.5 tw:text-[13px] tw:font-semibold tw:transition ${
                 selected
                   ? "tw:border-[1.5px] tw:border-accent tw:bg-accent-soft tw:text-accent-deep"
                   : "tw:border-hairline tw:bg-inner tw:text-muted"

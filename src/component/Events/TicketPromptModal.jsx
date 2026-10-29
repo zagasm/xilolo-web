@@ -180,7 +180,7 @@ export default function TicketPromptModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="tw:rounded-full tw:p-1.5 tw:transition tw:duration-150 tw:hover:bg-gray-100"
+                  className="tw:rounded-full! tw:p-1.5 tw:transition tw:duration-150 tw:hover:bg-gray-100"
                 >
                   <X className="tw:h-4 tw:w-4 tw:text-gray-500" />
                 </button>
@@ -246,7 +246,7 @@ export default function TicketPromptModal({
                             <button
                               type="button"
                               onClick={onDownloadManual}
-                              className="tw:mt-2 tw:w-full tw:rounded-[16px] tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
+                              className="tw:mt-2 tw:w-full tw:rounded-[16px]! tw:border tw:border-primary/20 tw:bg-primary/5 tw:py-2 tw:text-sm tw:font-semibold tw:text-primary tw:hover:bg-primary/10"
                             >
                               Download manual
                             </button>
@@ -272,7 +272,7 @@ export default function TicketPromptModal({
                               key={option.value}
                               type="button"
                               onClick={() => setSelectedPurchaseType(option.value)}
-                              className={`tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${selected
+                              className={`tw:rounded-2xl! tw:border tw:px-3 tw:py-2 tw:text-left tw:transition ${selected
                                 ? "tw:border-primary tw:bg-primary/5"
                                 : "tw:border-gray-200 tw:bg-white tw:hover:border-primary/30"
                                 }`}
@@ -342,7 +342,7 @@ export default function TicketPromptModal({
                         type="button"
                         onClick={() => onBuy(selectedOption.value, normalizedQuantity)}
                         disabled={buying}
-                        className="tw:w-full tw:rounded-[16px] tw:bg-primary tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
+                        className="tw:w-full tw:rounded-[16px]! tw:bg-primary tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 hover:brightness-90 tw:disabled:cursor-not-allowed tw:disabled:opacity-70"
                       >
                         {buying
                           ? "Processing purchase..."
@@ -362,8 +362,8 @@ export default function TicketPromptModal({
                         onClick={liveAction.onClick}
                         className={
                           liveAction.tone === "live"
-                            ? "tw:w-full tw:rounded-[16px] tw:bg-red-500 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-red-600"
-                            : "tw:w-full tw:rounded-[16px] tw:bg-accent tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-accent-deep"
+                            ? "tw:w-full tw:rounded-[16px]! tw:bg-red-500 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-red-600"
+                            : "tw:w-full tw:rounded-[16px]! tw:bg-accent tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:bg-accent-deep"
                         }
                       >
                         {liveAction.label}
@@ -376,7 +376,7 @@ export default function TicketPromptModal({
                       }}
                       type="button"
                       onClick={onClose}
-                      className="tw:w-full tw:rounded-[16px] tw:border tw:border-gray-200 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"
+                      className="tw:w-full tw:rounded-[16px]! tw:border tw:border-gray-200 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-700 tw:transition tw:duration-150 tw:hover:bg-gray-100"
                     >
                       Maybe later
                     </button>

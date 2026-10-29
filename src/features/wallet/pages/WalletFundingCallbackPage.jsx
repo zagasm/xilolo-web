@@ -289,7 +289,7 @@ export default function WalletFundingCallbackPage() {
               <button
                 type="button"
                 onClick={handleVerify}
-                className="tw:mt-8 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
+                className="tw:mt-8 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                 style={{ borderRadius: 16 }}
               >
                 Retry verification
@@ -318,14 +318,14 @@ export default function WalletFundingCallbackPage() {
                   type="button"
                   onClick={() => handleVerify({ force: true })}
                   disabled={verifyFunding.isPending}
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   style={{ borderRadius: 16 }}
                 >
                   {verifyFunding.isPending ? "Checking..." : "Check status"}
                 </button>
                 <button
                   onClick={() => navigate("/account/wallet")}
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-gray-100 tw:px-5 tw:text-sm tw:font-semibold tw:text-gray-800 tw:hover:bg-gray-200"
                   style={{ borderRadius: 16 }}
                 >
                   View wallet
@@ -364,7 +364,7 @@ export default function WalletFundingCallbackPage() {
                       type="button"
                       onClick={handleManualPurchase}
                       disabled={purchaseState.status === "loading"}
-                      className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                      className="tw:mt-4 tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                       style={{ borderRadius: 16 }}
                     >
                       {purchaseState.status === "loading"
@@ -378,7 +378,7 @@ export default function WalletFundingCallbackPage() {
               <div className="tw:mt-8 tw:grid tw:grid-cols-1 tw:gap-3 tw:sm:grid-cols-2">
                 <button
                   onClick={() => navigate("/account/wallet")}
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
+                  className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-primarySecond"
                   style={{ borderRadius: 16 }}
                 >
                   View wallet

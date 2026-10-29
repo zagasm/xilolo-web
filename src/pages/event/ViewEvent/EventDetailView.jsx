@@ -209,7 +209,7 @@ function EventTopBar({ v }) {
           type="button"
           onClick={v.onBack}
           aria-label="Go back"
-          className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent"
+          className="tw:flex tw:h-11 tw:w-11 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full! tw:border-0 tw:bg-transparent"
         >
           <ChevronLeft className="tw:h-5 tw:w-5 tw:text-body" />
         </button>
@@ -225,7 +225,7 @@ function EventTopBar({ v }) {
           type="button"
           onClick={v.onShare}
           aria-label="Share event"
-          className="tw:flex tw:h-12 tw:w-12 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent"
+          className="tw:flex tw:h-12 tw:w-12 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full! tw:border-0 tw:bg-transparent"
         >
           <Share2 className="tw:h-5 tw:w-5 tw:text-body" />
         </button>
@@ -244,7 +244,7 @@ export function EventStateScaffold({ title = "Event details", message, isOffline
         <button
           type="button"
           onClick={onRetry}
-          className="tw:mt-4 tw:flex tw:h-12 tw:w-[180px] tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-[#16909C] tw:font-display tw:text-sm tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
+          className="tw:mt-4 tw:flex tw:h-12 tw:w-[180px] tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg! tw:border-0 tw:bg-[#16909C] tw:font-display tw:text-sm tw:font-bold tw:text-white tw:hover:bg-[#06707D]"
         >
           {isOffline ? "Try again" : "Retry"}
         </button>
@@ -410,7 +410,10 @@ function EventBottomBar({ v }) {
   const bar = bottomBarState(v);
   if (!bar) return null;
   return (
-    <div className="tw:fixed tw:inset-x-0 tw:bottom-[56px] tw:z-40 tw:px-3 tw:pb-3 tw:md:bottom-0">
+    <div
+      data-bottom-dock
+      className="tw:fixed tw:inset-x-0 tw:bottom-[56px] tw:z-40 tw:px-3 tw:pb-3 tw:md:bottom-0"
+    >
       <div className="tw:mx-auto tw:w-full tw:max-w-[560px] tw:md:max-w-[1040px] tw:md:px-6">
         <div className="tw:flex tw:items-stretch tw:gap-3 tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-2.5 tw:shadow-[0_10px_30px_rgba(17,19,22,0.12)]">
           <div className="tw:flex tw:w-[44%] tw:flex-col tw:justify-center tw:gap-1.5 tw:px-1">
@@ -426,7 +429,7 @@ function EventBottomBar({ v }) {
               <button
                 type="button"
                 onClick={bar.secondary.onClick}
-                className="tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-lg tw:border tw:border-accent tw:bg-paper-raised tw:px-3 tw:text-[12px] tw:font-bold tw:text-accent-deep tw:hover:bg-accent-soft"
+                className="tw:flex tw:h-10 tw:w-full tw:items-center tw:justify-center tw:rounded-lg! tw:border tw:border-accent tw:bg-paper-raised tw:px-3 tw:text-[12px] tw:font-bold tw:text-accent-deep tw:hover:bg-accent-soft"
               >
                 {bar.secondary.label}
               </button>
@@ -532,7 +535,7 @@ export default function EventDetailView({ v }) {
                     type="button"
                     onClick={v.onToggleFollow}
                     disabled={v.followLoading}
-                    className={`tw:ml-1 tw:inline-flex tw:h-6 tw:shrink-0 tw:items-center tw:rounded-pill tw:border-0 tw:px-2 tw:text-[10px] tw:font-bold tw:tracking-[0.1px] ${
+                    className={`tw:ml-1 tw:inline-flex tw:h-6 tw:shrink-0 tw:items-center tw:rounded-pill! tw:border-0 tw:px-2 tw:text-[10px] tw:font-bold tw:tracking-[0.1px] ${
                       v.followLoading
                         ? "tw:bg-inner tw:text-muted"
                         : v.isFollowing

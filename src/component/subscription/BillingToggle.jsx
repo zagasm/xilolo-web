@@ -9,7 +9,7 @@ export default function BillingToggle({ value, onChange }) {
       <button
         type="button"
         onClick={() => onChange("monthly")}
-        className={`tw:relative tw:z-1 tw:px-4 tw:py-1.5 tw:rounded-full tw:flex tw:items-center tw:gap-1 ${
+        className={`tw:relative tw:z-1 tw:px-4 tw:py-1.5 tw:rounded-full! tw:flex tw:items-center tw:gap-1 ${
           isMonthly ? "tw:text-white" : "tw:text-slate-500"
         }`}
       >
@@ -19,7 +19,7 @@ export default function BillingToggle({ value, onChange }) {
       <button
         type="button"
         onClick={() => onChange("yearly")}
-        className={`tw:relative tw:z-1 tw:px-4 tw:py-1.5 tw:rounded-full tw:flex tw:items-center tw:gap-1 ${
+        className={`tw:relative tw:z-1 tw:px-4 tw:py-1.5 tw:rounded-full! tw:flex tw:items-center tw:gap-1 ${
           isYearly ? "tw:text-white" : "tw:text-slate-500"
         }`}
       >

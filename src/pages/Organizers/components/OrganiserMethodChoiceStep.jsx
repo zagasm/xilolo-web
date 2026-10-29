@@ -38,7 +38,7 @@ export default function OrganiserMethodChoiceStep({
             }}
             type="button"
             onClick={onSelectBvn}
-            className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${verificationMethod === "bvn"
+            className={`tw:group tw:w-full tw:text-left tw:rounded-2xl! tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${verificationMethod === "bvn"
               ? "tw:border-primary tw:bg-lightPurple/40 tw:ring-2 tw:ring-primary/20"
               : "tw:border-gray-200 tw:hover:border-gray-300"
               }`}
@@ -65,7 +65,7 @@ export default function OrganiserMethodChoiceStep({
           }}
           type="button"
           onClick={onSelectDidit}
-          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${verificationMethod === "didit"
+          className={`tw:group tw:w-full tw:text-left tw:rounded-2xl! tw:border tw:px-4 tw:py-4 tw:transition tw:duration-150 tw:bg-white tw:shadow-sm tw:hover:shadow-md ${verificationMethod === "didit"
             ? "tw:border-primary tw:bg-lightPurple/40 tw:ring-2 tw:ring-primary/20"
             : "tw:border-gray-200 tw:hover:border-gray-300"
             }`}
@@ -93,7 +93,7 @@ export default function OrganiserMethodChoiceStep({
           }}
           type="button"
           onClick={onChangeCountry}
-          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
+          className="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-300 tw:text-xs tw:md:text-sm tw:font-medium tw:bg-white tw:hover:bg-gray-50 tw:transition"
         >
           Change country
         </button>

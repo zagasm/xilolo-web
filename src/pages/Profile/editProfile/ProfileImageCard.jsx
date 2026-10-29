@@ -161,7 +161,7 @@ export default function ProfileImageCard({
             }}
             type="button"
             onClick={openPreview}
-            className="tw:relative tw:w-28 tw:h-28 tw:md:w-32 tw:md:h-32 tw:rounded-full tw:overflow-hidden tw:bg-gray-100 tw:border tw:border-gray-200 tw:shadow-sm"
+            className="tw:relative tw:w-28 tw:h-28 tw:md:w-32 tw:md:h-32 tw:rounded-full! tw:overflow-hidden tw:bg-gray-100 tw:border tw:border-gray-200 tw:shadow-sm"
             aria-label="Preview profile image"
           >
             {hasImage ? (
@@ -200,7 +200,7 @@ export default function ProfileImageCard({
             }}
             type="button"
             onClick={pickFile}
-            className="tw:mt-8 tw:inline-flex tw:items-center tw:justify-center tw:px-4 tw:py-2.5 tw:rounded-full tw:bg-black tw:text-xs tw:font-medium tw:text-white tw:hover:bg-gray-900 tw:transition"
+            className="tw:mt-8 tw:inline-flex tw:items-center tw:justify-center tw:px-4 tw:py-2.5 tw:rounded-full! tw:bg-black tw:text-xs tw:font-medium tw:text-white tw:hover:bg-gray-900 tw:transition"
           >
             Upload new photo
           </button>
@@ -253,7 +253,7 @@ export default function ProfileImageCard({
                     }}
                     type="button"
                     onClick={pickFile}
-                    className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-xl tw:bg-black tw:text-white tw:text-sm tw:font-semibold"
+                    className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-xl! tw:bg-black tw:text-white tw:text-sm tw:font-semibold"
                   >
                     Choose new photo
                   </button>
@@ -264,7 +264,7 @@ export default function ProfileImageCard({
                     }}
                     type="button"
                     onClick={closeAll}
-                    className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-xl tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
+                    className="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-xl! tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
                   >
                     Cancel
                   </button>
@@ -346,7 +346,7 @@ export default function ProfileImageCard({
                 }}
                 type="button"
                 onClick={pickFile}
-                className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
+                className="tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
               >
                 Choose another
               </button>
@@ -359,7 +359,7 @@ export default function ProfileImageCard({
                   }}
                   type="button"
                   onClick={closeAll}
-                  className="tw:px-4 tw:py-2 tw:rounded-xl tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
+                  className="tw:px-4 tw:py-2 tw:rounded-xl! tw:border tw:border-gray-200 tw:text-sm tw:text-gray-700 tw:hover:bg-gray-50"
                 >
                   Cancel
                 </button>
@@ -371,7 +371,7 @@ export default function ProfileImageCard({
                   type="button"
                   onClick={saveCropped}
                   disabled={!completedCrop?.width || !completedCrop?.height}
-                  className="tw:px-4 tw:py-2 tw:rounded-xl tw:bg-black tw:text-white tw:text-sm tw:font-semibold tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
+                  className="tw:px-4 tw:py-2 tw:rounded-xl! tw:bg-black tw:text-white tw:text-sm tw:font-semibold tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
                 >
                   Save photo
                 </button>

@@ -88,7 +88,7 @@ export default function FundWalletPage() {
               key={item.id}
               type="button"
               onClick={() => setProvider(item.value)}
-              className={`tw:w-full tw:rounded-2xl tw:border tw:px-4 tw:py-3 tw:text-left tw:transition tw:duration-150 ${
+              className={`tw:w-full tw:rounded-2xl! tw:border tw:px-4 tw:py-3 tw:text-left tw:transition tw:duration-150 ${
                 provider === item.value
                   ? "tw:border-primary tw:bg-primary/5"
                   : "tw:border-gray-200 tw:bg-gray-50"
@@ -145,7 +145,7 @@ export default function FundWalletPage() {
             }}
             type="submit"
             disabled={loading || methodsLoading || !provider}
-            className="tw:w-full tw:rounded-[20px] tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:opacity-90 tw:disabled:opacity-60"
+            className="tw:w-full tw:rounded-[20px]! tw:bg-linear-to-r tw:from-primary tw:to-primarySecond tw:py-3 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:duration-150 tw:hover:opacity-90 tw:disabled:opacity-60"
           >
             {loading ? "Processing…" : "Fund wallet"}
           </button>

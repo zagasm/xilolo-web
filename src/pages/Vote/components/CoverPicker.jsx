@@ -56,7 +56,7 @@ export default function CoverPicker({ cover, uploading, onPick, onRemove }) {
               <button
                 type="button"
                 onClick={openPicker}
-                className="tw:rounded-pill tw:bg-paper-raised/95 tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:bg-paper-raised"
+                className="tw:rounded-pill! tw:bg-paper-raised/95 tw:px-3 tw:py-1.5 tw:text-[12px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:bg-paper-raised"
               >
                 Replace
               </button>
@@ -64,7 +64,7 @@ export default function CoverPicker({ cover, uploading, onPick, onRemove }) {
                 type="button"
                 onClick={onRemove}
                 aria-label="Remove cover"
-                className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-paper-raised/95 tw:text-ink tw:transition-colors tw:hover:bg-paper-raised"
+                className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full! tw:bg-paper-raised/95 tw:text-ink tw:transition-colors tw:hover:bg-paper-raised"
               >
                 <X className="tw:size-3.5" aria-hidden="true" />
               </button>

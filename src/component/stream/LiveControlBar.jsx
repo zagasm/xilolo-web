@@ -62,7 +62,7 @@ export default function LiveControlBar({
         <button
           type="button"
           onClick={onJumpToChat}
-          className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:border-gray-400"
+          className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:border-gray-400"
         >
           <MessageCircle className="tw:h-4 tw:w-4" />
           Chat
@@ -71,7 +71,7 @@ export default function LiveControlBar({
         <button
           type="button"
           onClick={onOpenAnalytics}
-          className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:border-gray-400"
+          className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:border tw:border-[#ded6cd] tw:bg-white tw:px-3 tw:text-sm tw:font-semibold tw:text-gray-700 tw:hover:border-gray-400"
         >
           <BarChart3 className="tw:h-4 tw:w-4" />
           Analytics
@@ -82,7 +82,7 @@ export default function LiveControlBar({
             type="button"
             onClick={onTogglePause}
             disabled={pendingAction === "pause"}
-            className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-accent tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-accent-deep tw:disabled:opacity-60"
+            className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-accent tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-accent-deep tw:disabled:opacity-60"
           >
             {pendingAction === "pause" ? (
               <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" />
@@ -100,7 +100,7 @@ export default function LiveControlBar({
             type="button"
             onClick={onEnd}
             disabled={pendingAction === "end"}
-            className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl tw:bg-gray-900 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-black tw:disabled:opacity-60"
+            className="tw:inline-flex tw:h-10 tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-gray-900 tw:px-4 tw:text-sm tw:font-semibold tw:text-white tw:hover:bg-black tw:disabled:opacity-60"
           >
             <Square className="tw:h-4 tw:w-4" />
             End stream

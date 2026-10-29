@@ -163,7 +163,7 @@ function BlockedUsersPage() {
               type="button"
               onClick={() => handlePageChange(meta.current_page - 1)}
               disabled={meta.current_page <= 1 || networkBusy}
-              className="tw:px-3 tw:py-1.5 tw:text-xs tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:disabled:opacity-40 tw:disabled:cursor-not-allowed"
+              className="tw:px-3 tw:py-1.5 tw:text-xs tw:rounded-full! tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:disabled:opacity-40 tw:disabled:cursor-not-allowed"
             >
               Prev
             </button>
@@ -174,7 +174,7 @@ function BlockedUsersPage() {
               type="button"
               onClick={() => handlePageChange(meta.current_page + 1)}
               disabled={meta.current_page >= meta.last_page || networkBusy}
-              className="tw:px-3 tw:py-1.5 tw:text-xs tw:rounded-full tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:disabled:opacity-40 tw:disabled:cursor-not-allowed"
+              className="tw:px-3 tw:py-1.5 tw:text-xs tw:rounded-full! tw:border tw:border-gray-200 tw:bg-white tw:text-gray-700 tw:disabled:opacity-40 tw:disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -194,7 +194,7 @@ function BlockedUsersPage() {
               type="button"
               style={{ borderRadius: "50%" }}
               onClick={() => navigate(-1)}
-              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:hover:bg-gray-50 tw:transition"
+              className="tw:inline-flex tw:items-center tw:justify-center tw:size-10 tw:rounded-full! tw:bg-white tw:border tw:border-gray-200 tw:text-sm tw:font-medium tw:hover:bg-gray-50 tw:transition"
             >
               <ChevronLeft className="tw:w-5 tw:h-5 tw:text-gray-500" />
             </button>
@@ -263,7 +263,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
         }}
         type="button"
         onClick={() => navigate(`/profile/${id}`)}
-        className="tw:block tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px] tw:mb-3 tw:bg-gray-100"
+        className="tw:block tw:relative tw:overflow-hidden tw:w-full tw:h-[148px] tw:rounded-[18px]! tw:mb-3 tw:bg-gray-100"
       >
         {profileUrl ? (
           <img
@@ -313,7 +313,7 @@ function BlockedUserCard({ user, onUnblock, isUnblocking }) {
         type="button"
         disabled={isUnblocking}
         onClick={onUnblock}
-        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px] tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
+        className="tw:mt-auto tw:w-full tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:px-3 tw:py-2.5 tw:rounded-[18px]! tw:bg-white tw:border tw:border-gray-200 tw:text-xs tw:font-medium tw:text-gray-800 tw:hover:bg-gray-50 tw:disabled:opacity-60 tw:disabled:cursor-not-allowed tw:transition"
       >
         <span>{isUnblocking ? "Unblocking…" : "Unblock"}</span>
       </button>

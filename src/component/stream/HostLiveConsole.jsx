@@ -238,7 +238,7 @@ function LivePreviewCard({
               onClick={() => setTheatre((value) => !value)}
               aria-label={theatre ? "Exit expanded preview" : "Expand preview"}
               title={theatre ? "Exit expanded preview (Esc)" : "Expand preview"}
-              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee]"
+              className="tw:inline-flex tw:h-9 tw:w-9 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-[#ded6cd] tw:bg-white tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee]"
             >
               {theatre ? (
                 <Minimize2 className="tw:h-4 tw:w-4" />
@@ -368,7 +368,7 @@ function LiveStatsStrip({
             onClick={onLike}
             disabled={likesBusy}
             aria-label="Add a like to this event"
-            className="tw:inline-flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-center tw:gap-1 tw:rounded-full tw:border tw:border-[#ded6cd] tw:px-3 tw:text-[11px] tw:font-semibold tw:text-gray-600 tw:transition tw:hover:border-accent tw:hover:text-accent-deep tw:disabled:opacity-60"
+            className="tw:inline-flex tw:h-9 tw:shrink-0 tw:items-center tw:justify-center tw:gap-1 tw:rounded-full! tw:border tw:border-[#ded6cd] tw:px-3 tw:text-[11px] tw:font-semibold tw:text-gray-600 tw:transition tw:hover:border-accent tw:hover:text-accent-deep tw:disabled:opacity-60"
           >
             {likesBusy ? (
               <LoaderCircle className="tw:h-3.5 tw:w-3.5 tw:animate-spin" />
@@ -459,7 +459,7 @@ function ViewersPanel({ open, onClose, viewerCount, viewers, loading, errorText,
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="tw:inline-flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-[#ded6cd] tw:text-gray-600 tw:hover:border-gray-400"
+            className="tw:inline-flex tw:h-9 tw:w-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:border tw:border-[#ded6cd] tw:text-gray-600 tw:hover:border-gray-400"
           >
             <X className="tw:h-4 tw:w-4" />
           </button>
@@ -691,7 +691,7 @@ function GuestsPanel({ eventId, token, refreshSignal, fixtureRows }) {
                     type="button"
                     disabled={busy}
                     onClick={() => answer(request, true)}
-                    className="tw:flex-1 tw:rounded-full tw:bg-accent tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-60"
+                    className="tw:flex-1 tw:rounded-full! tw:bg-accent tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-60"
                   >
                     Accept
                   </button>
@@ -699,7 +699,7 @@ function GuestsPanel({ eventId, token, refreshSignal, fixtureRows }) {
                     type="button"
                     disabled={busy}
                     onClick={() => answer(request, false)}
-                    className="tw:flex-1 tw:rounded-full tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-60"
+                    className="tw:flex-1 tw:rounded-full! tw:border tw:border-[#ded6cd] tw:bg-white tw:px-4 tw:py-2 tw:text-xs tw:font-semibold tw:text-gray-700 tw:transition tw:hover:bg-[#f4f1ee] tw:disabled:opacity-60"
                   >
                     Decline
                   </button>
@@ -742,7 +742,7 @@ function GuestsPanel({ eventId, token, refreshSignal, fixtureRows }) {
                   type="button"
                   disabled={busyId === guest.id}
                   onClick={() => remove(guest)}
-                  className="tw:shrink-0 tw:rounded-full tw:border tw:border-red-200 tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 tw:transition tw:hover:bg-red-50 tw:disabled:opacity-60"
+                  className="tw:shrink-0 tw:rounded-full! tw:border tw:border-red-200 tw:bg-white tw:px-3 tw:py-1.5 tw:text-xs tw:font-semibold tw:text-red-600 tw:transition tw:hover:bg-red-50 tw:disabled:opacity-60"
                 >
                   Remove
                 </button>
@@ -993,7 +993,7 @@ function LiveChatPanel({
           <button
             type="button"
             onClick={onJumpToLatest}
-            className="tw:absolute tw:bottom-2 tw:left-1/2 tw:-translate-x-1/2 tw:rounded-full tw:bg-gray-900 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:shadow-lg"
+            className="tw:absolute tw:bottom-2 tw:left-1/2 tw:-translate-x-1/2 tw:rounded-full! tw:bg-gray-900 tw:px-3 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white tw:shadow-lg"
           >
             New comments ↓
           </button>
@@ -1039,7 +1039,7 @@ function LiveChatPanel({
           onClick={submit}
           disabled={sending || !draft.trim()}
           aria-label="Send reply"
-          className="tw:inline-flex tw:h-12 tw:w-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-accent tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-50"
+          className="tw:inline-flex tw:h-12 tw:w-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full! tw:bg-accent tw:text-white tw:transition tw:hover:bg-accent-deep tw:disabled:opacity-50"
         >
           {sending ? (
             <LoaderCircle className="tw:h-5 tw:w-5 tw:animate-spin" />

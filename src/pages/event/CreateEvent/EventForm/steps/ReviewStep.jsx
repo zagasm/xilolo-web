@@ -43,7 +43,7 @@ function EditChip({ onClick, label = "Edit" }) {
     <button
       type="button"
       onClick={onClick}
-      className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-[9px] tw:bg-accent-soft tw:px-2.5 tw:py-1.5 tw:text-[11.5px] tw:font-semibold tw:text-accent-deep"
+      className="tw:inline-flex tw:shrink-0 tw:items-center tw:gap-1 tw:rounded-[9px]! tw:bg-accent-soft tw:px-2.5 tw:py-1.5 tw:text-[11.5px] tw:font-semibold tw:text-accent-deep"
     >
       <Pencil className="tw:size-[13px]" aria-hidden="true" />
       {label}
@@ -244,7 +244,7 @@ function ErrorModal({ open, errors, onClose, onGoToStep }) {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:rounded-full tw:bg-accent tw:px-4 tw:py-2 tw:text-[13px] tw:font-bold tw:text-white"
+                    className="tw:rounded-full! tw:bg-accent tw:px-4 tw:py-2 tw:text-[13px] tw:font-bold tw:text-white"
                   >
                     Close
                   </button>
@@ -364,7 +364,7 @@ export default function ReviewStep({
           type="button"
           onClick={onBack}
           aria-label="Back"
-          className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-[14px] tw:border tw:border-hairline tw:bg-inner tw:p-[11px] tw:text-body tw:transition tw:hover:border-accent"
+          className="tw:inline-flex tw:items-center tw:justify-center tw:rounded-[14px]! tw:border tw:border-hairline tw:bg-inner tw:p-[11px] tw:text-body tw:transition tw:hover:border-accent"
         >
           <ChevronLeft className="tw:size-[18px]" aria-hidden="true" />
         </button>
@@ -537,7 +537,7 @@ export default function ReviewStep({
           type="button"
           onClick={onPublish}
           disabled={isSubmitting}
-          className="tw:inline-flex tw:min-h-[50px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:bg-accent tw:px-5 tw:text-[15px] tw:font-bold tw:text-white tw:transition tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+          className="tw:inline-flex tw:min-h-[50px] tw:w-full tw:items-center tw:justify-center tw:gap-2 tw:rounded-full! tw:bg-accent tw:px-5 tw:text-[15px] tw:font-bold tw:text-white tw:transition tw:hover:brightness-95 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
         >
           {isSubmitting
             ? "Submitting..."

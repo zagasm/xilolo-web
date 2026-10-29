@@ -103,7 +103,10 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-3 tw:z-999 tw:block">
+    <div
+      data-mobile-nav
+      className="tw:fixed tw:md:hidden tw:bottom-0 tw:left-0 tw:right-0 tw:bg-white tw:border-t tw:border-gray-200 tw:py-3 tw:z-999 tw:block"
+    >
       <div className="tw:flex tw:items-center tw:justify-between tw:px-4">
         {navItems.map((item) => {
           const active =

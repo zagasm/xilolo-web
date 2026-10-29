@@ -104,7 +104,7 @@ export default function StreamingPage() {
                 borderRadius: 20
             }}
               onClick={() => navigate(-1)}
-              className=" tw:w-full tw:px-5 tw:py-3 tw:rounded-2xl tw:bg-primary tw:hover:bg-primary/80 tw:duration-300 tw:transition-all text-white tw:font-medium"
+              className=" tw:w-full tw:px-5 tw:py-3 tw:rounded-2xl! tw:bg-primary tw:hover:bg-primary/80 tw:duration-300 tw:transition-all text-white tw:font-medium"
             >
               Close
             </button>

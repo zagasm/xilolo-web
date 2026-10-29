@@ -78,7 +78,7 @@ export default function ZagasmLanding() {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className="tw:fixed tw:bottom-6 tw:right-6 tw:z-50 tw:flex tw:size-11 tw:items-center tw:justify-center tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:transition-colors tw:hover:bg-accent tw:hover:text-ink tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:focus-visible:ring-offset-2"
+          className="tw:fixed tw:bottom-6 tw:right-6 tw:z-50 tw:flex tw:size-11 tw:items-center tw:justify-center tw:rounded-pill! tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:transition-colors tw:hover:bg-accent tw:hover:text-ink tw:focus-visible:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent tw:focus-visible:ring-offset-2"
         >
           <span className="tw:-mt-px tw:text-lg" aria-hidden="true">
             ↑

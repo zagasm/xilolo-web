@@ -160,7 +160,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-black/5 tw:text-gray-700 tw:hover:bg-black/10 tw:sm:h-8 tw:sm:w-8"
+                    className="tw:flex tw:h-7 tw:w-7 tw:items-center tw:justify-center tw:rounded-full! tw:bg-black/5 tw:text-gray-700 tw:hover:bg-black/10 tw:sm:h-8 tw:sm:w-8"
                     aria-label="Close"
                   >
                     ×
@@ -203,7 +203,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                           type="button"
                           onClick={handleViewOrganiserProfile}
                           disabled={!organiserProfileId}
-                          className="tw:shrink-0 tw:rounded-full tw:disabled:cursor-default"
+                          className="tw:shrink-0 tw:rounded-full! tw:disabled:cursor-default"
                           aria-label="View organiser profile"
                         >
                           <img
@@ -285,7 +285,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                       type="button"
                       onClick={handleDownloadPdf}
                       disabled={!ticket?.ticket_id || isDownloading}
-                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
+                      className="tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                     >
                       {isDownloading ? "Downloading..." : "Download PDF"}
                     </button>
@@ -294,7 +294,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                       type="button"
                       onClick={handleViewEvent}
                       disabled={!event?.id}
-                      className="tw:rounded-full tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
+                      className="tw:rounded-full! tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-gray-800 tw:transition-colors tw:hover:bg-gray-50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                     >
                       View Event Details
                     </button>
@@ -304,7 +304,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                         type="button"
                         onClick={handleWatchVod}
                         disabled={!event?.id}
-                        className="tw:rounded-full tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-slate-800 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
+                        className="tw:rounded-full! tw:bg-slate-900 tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-slate-800 tw:disabled:cursor-not-allowed tw:disabled:opacity-60 tw:sm:text-xs"
                       >
                         Watch video
                       </button>
@@ -313,7 +313,7 @@ export default function TicketReceiptModal({ open, onClose, ticket }) {
                     <button
                       type="button"
                       onClick={onClose}
-                      className="tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:sm:text-xs"
+                      className="tw:rounded-full! tw:bg-primary tw:px-4 tw:py-2 tw:text-[11px] tw:font-semibold tw:text-white tw:hover:bg-primarySecond tw:sm:text-xs"
                     >
                       Done
                     </button>

@@ -36,7 +36,7 @@ export default function LiveAppDownloadModal({ open, onClose }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="tw:absolute tw:right-4 tw:top-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-500"
+                  className="tw:absolute tw:right-4 tw:top-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-full! tw:bg-gray-100 tw:hover:bg-gray-200 tw:text-gray-500"
                 >
                   <X className="tw:w-4 tw:h-4" />
                 </button>

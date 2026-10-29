@@ -130,7 +130,7 @@ export default function SavedEventCard({
             e.stopPropagation();
             onToggleSave?.(id);
           }}
-          className="tw:absolute tw:right-3 tw:top-3 tw:size-9 tw:rounded-full tw:bg-black/40 tw:flex tw:items-center tw:justify-center tw:backdrop-blur tw:border tw:border-white/40"
+          className="tw:absolute tw:right-3 tw:top-3 tw:size-9 tw:rounded-full! tw:bg-black/40 tw:flex tw:items-center tw:justify-center tw:backdrop-blur tw:border tw:border-white/40"
           aria-label="Toggle saved"
         >
           <img src={heart_icon} alt="saved" className="tw:w-5 tw:h-5" />
@@ -189,7 +189,7 @@ export default function SavedEventCard({
           if (!disabled) onPrimaryAction?.(event);
         }}
         className={[
-          "tw:mt-3 tw:w-full tw:h-12 tw:rounded-[18px] tw:text-[14px] tw:font-semibold tw:flex tw:items-center tw:justify-center tw:gap-2 tw:transition tw:duration-150",
+          "tw:mt-3 tw:w-full tw:h-12 tw:rounded-[18px]! tw:text-[14px] tw:font-semibold tw:flex tw:items-center tw:justify-center tw:gap-2 tw:transition tw:duration-150",
           variant === "upcoming" &&
             "tw:bg-primary tw:text-white tw:hover:opacity-90",
           variant === "live" &&

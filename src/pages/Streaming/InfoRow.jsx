@@ -22,7 +22,7 @@ export default function InfoRow({ label, value, copyLabel }) {
       </div>
       <button
         onClick={copy}
-        className="tw:rounded-xl tw:p-2 tw:hover:bg-lightPurple/60"
+        className="tw:rounded-xl! tw:p-2 tw:hover:bg-lightPurple/60"
         title="Copy"
       >
         <Copy className="tw:size-5" />

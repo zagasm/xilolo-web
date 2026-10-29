@@ -158,7 +158,7 @@ export default function VoteSheet({ open, onClose, contest, entry, token, onVote
                 key={n}
                 type="button"
                 onClick={() => setQuantity(n)}
-                className={`tw:rounded-pill tw:border tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium tw:transition-colors ${
+                className={`tw:rounded-pill! tw:border tw:px-3 tw:py-1.5 tw:text-[13px] tw:font-medium tw:transition-colors ${
                   quantity === n
                     ? "tw:border-accent tw:bg-accent tw:text-ink"
                     : "tw:border-hairline tw:bg-paper-raised tw:text-ink tw:hover:bg-inner"

@@ -67,10 +67,10 @@ export default function EventCheckinControlPage() {
             <span className="tw:block tw:mt-2 tw:text-2xl tw:font-semibold tw:text-gray-900">{stats?.event_title || "Event check-in"}</span>
           </div>
           <div className="tw:flex tw:flex-wrap tw:gap-2">
-            <button style={{ borderRadius: 36, fontSize: 12 }} className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:text-white" onClick={() => perform("generate", api.post(`/api/v1/events/${eventId}/checkin-access`, {}, authHeaders(token)))} disabled={!!pending}>
+            <button style={{ borderRadius: 36, fontSize: 12 }} className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl! tw:bg-primary tw:px-4 tw:py-2.5 tw:text-sm tw:text-white" onClick={() => perform("generate", api.post(`/api/v1/events/${eventId}/checkin-access`, {}, authHeaders(token)))} disabled={!!pending}>
               {pending === "generate" ? <LoaderCircle className="tw:h-4 tw:w-4 tw:animate-spin" /> : <QrCode className="tw:h-4 tw:w-4" />} Generate code
             </button>
-            {activeAccess ? <button style={{ borderRadius: 36, fontSize: 12 }} className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2.5 tw:text-sm" onClick={() => perform("rotate", api.post(`/api/v1/events/${eventId}/checkin-access/${activeAccess.id}/rotate`, {}, authHeaders(token)))} disabled={!!pending}><RotateCcw className="tw:h-4 tw:w-4" /> Rotate</button> : null}
+            {activeAccess ? <button style={{ borderRadius: 36, fontSize: 12 }} className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-xl! tw:border tw:border-gray-300 tw:bg-white tw:px-4 tw:py-2.5 tw:text-sm" onClick={() => perform("rotate", api.post(`/api/v1/events/${eventId}/checkin-access/${activeAccess.id}/rotate`, {}, authHeaders(token)))} disabled={!!pending}><RotateCcw className="tw:h-4 tw:w-4" /> Rotate</button> : null}
           </div>
         </div>
 

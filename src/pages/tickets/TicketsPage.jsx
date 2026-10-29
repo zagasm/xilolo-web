@@ -98,7 +98,7 @@ export function TicketFilterPills({ tabs = TABS, value, onChange }) {
             role="tab"
             aria-selected={selected}
             onClick={() => onChange(tab.key)}
-            className={`tw:mx-0.5 tw:flex-1 tw:rounded-full tw:px-2.5 tw:py-[11px] tw:text-center tw:text-xs tw:transition-colors tw:duration-150 tw:ease-out ${
+            className={`tw:mx-0.5 tw:flex-1 tw:rounded-full! tw:px-2.5 tw:py-[11px] tw:text-center tw:text-xs tw:transition-colors tw:duration-150 tw:ease-out ${
               selected
                 ? "tw:bg-accent tw:font-bold tw:text-paper-raised tw:shadow-[0_4px_14px] tw:shadow-accent/25"
                 : "tw:font-medium tw:text-muted tw:hover:text-body"

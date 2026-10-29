@@ -48,7 +48,7 @@ export default function OrganizerCard({
             borderRadius: 20
           }}
             onClick={toggleFollow}
-            className="tw:px-6 tw:h-10 tw:bg-primary tw:text-white tw:rounded-full"
+            className="tw:px-6 tw:h-10 tw:bg-primary tw:text-white tw:rounded-full!"
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </button>
