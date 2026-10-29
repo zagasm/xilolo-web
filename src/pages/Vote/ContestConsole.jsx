@@ -431,7 +431,7 @@ export default function ContestConsole() {
 
         {/* Votes per day — bars, not a table of numbers (app commit df4c6c9). */}
         {trend.length > 0 ? (
-          <Card className="tw:mt-3 tw:p-[14px]">
+          <Card className="tw:mt-3 tw:rounded-[16px] tw:p-[14px]">
             <div className="tw:flex tw:items-center tw:gap-2">
               <TrendingUp className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
               <span className="tw:text-[13px] tw:font-semibold tw:text-ink">Votes per day</span>

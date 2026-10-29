@@ -135,9 +135,11 @@ function ContestantRow({ entry, canVote, onVote, leaderVotes = 0 }) {
         {/* A race reads as a distance, not two numbers to compare — the bar is
             relative to the leader, exactly as the app draws it. */}
         {leaderVotes > 0 && entry.votes !== null && entry.votes !== undefined ? (
-          <div className="tw:mt-1.5 tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-pill tw:bg-inner">
+          <div className="tw:mt-1.5 tw:h-1 tw:w-full tw:overflow-hidden tw:rounded-pill tw:bg-hairline">
             <div
-              className="tw:h-full tw:rounded-pill tw:bg-accent"
+              className={`tw:h-full tw:rounded-pill ${
+                Number(entry.rank) === 1 ? "tw:bg-accent" : "tw:bg-accent/55"
+              }`}
               style={{
                 width: `${Math.max(2, Math.min(100, (Number(entry.votes) / leaderVotes) * 100))}%`,
               }}

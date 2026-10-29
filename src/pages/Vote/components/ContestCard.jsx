@@ -166,7 +166,7 @@ export default function ContestCard({ contest, token = null }) {
       </div>
 
       <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-1.5 tw:p-3.5">
-        <h3 className="tw:m-0! tw:line-clamp-2 tw:min-h-[38px] tw:text-[15.5px]! tw:font-semibold! tw:leading-[1.3]! tw:text-ink!">
+        <h3 className="tw:m-0! tw:line-clamp-2 tw:min-h-[42px] tw:text-[15.5px]! tw:font-semibold! tw:leading-[1.3]! tw:text-ink!">
           {contest.title}
         </h3>
 
