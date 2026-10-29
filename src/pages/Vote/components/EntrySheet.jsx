@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, ShieldCheck } from "lucide-react";
 import { Button, Field, Input, Modal } from "../../../component/ui";
 import { showError, showSuccess } from "../../../component/ui/toast";
 import { submitEntry, uploadEntryPhoto } from "../../../api/contestApi";
@@ -27,7 +27,14 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
   const [photo, setPhoto] = useState(null);
   const [pendingPhoto, setPendingPhoto] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const photoInput = useRef(null);
+
+  /* The organiser's terms, when they wrote any. The API refuses the entry
+     without `accept_terms` (ContestEntryController:107-112), so this is the
+     difference between an entry that can be sent and one that cannot. */
+  const terms = (contest?.terms || "").trim();
+  const hasTerms = terms.length > 0;
 
   const uploadPhoto = async (blob) => {
     setUploadingPhoto(true);
@@ -47,6 +54,13 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
 
   const submit = async (event) => {
     event.preventDefault();
+
+    // An agreement has to be given, not assumed.
+    if (hasTerms && !acceptedTerms) {
+      setError("Tick the box to accept the organiser's terms before you enter.");
+      return;
+    }
+
     setBusy(true);
     setError(null);
 
@@ -59,6 +73,7 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
           location: form.location.trim() || null,
           answers,
           media: photo ? { photo: { path: photo.path, url: photo.url } } : null,
+          ...(hasTerms ? { accept_terms: true } : {}),
         },
         token
       );
@@ -220,13 +235,49 @@ export default function EntrySheet({ open, onClose, contest, onSubmitted }) {
           </Field>
         ))}
 
+        {hasTerms ? (
+          <div
+            className={`tw:rounded-[14px] tw:border tw:bg-paper tw:p-3.5 ${
+              acceptedTerms ? "tw:border-accent/40" : "tw:border-hairline"
+            }`}
+          >
+            <span className="tw:flex tw:items-center tw:gap-1.5 tw:text-[12px] tw:font-bold tw:text-ink">
+              <ShieldCheck className="tw:size-3.5 tw:text-accent-deep" aria-hidden="true" />
+              Organiser&apos;s terms
+            </span>
+            <div className="tw:mt-2 tw:max-h-32 tw:overflow-y-auto tw:whitespace-pre-line tw:pr-1 tw:text-[12px] tw:leading-[1.55] tw:text-muted!">
+              {terms}
+            </div>
+
+            <label className="tw:mt-3 tw:flex tw:cursor-pointer tw:items-start tw:gap-2">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(event) => {
+                  setAcceptedTerms(event.target.checked);
+                  if (event.target.checked) setError(null);
+                }}
+                className="tw:mt-0.5 tw:size-4 tw:shrink-0 tw:accent-[#16909C]"
+              />
+              <span className="tw:text-[12px] tw:font-semibold tw:text-ink">
+                I have read and accept these terms
+              </span>
+            </label>
+          </div>
+        ) : null}
+
         {error ? (
           <span className="tw:block tw:rounded-card tw:bg-danger/8 tw:p-3 tw:text-[12px] tw:text-danger">
             {error}
           </span>
         ) : null}
 
-        <Button type="submit" loading={busy} className="tw:mt-1">
+        <Button
+          type="submit"
+          loading={busy}
+          disabled={hasTerms && !acceptedTerms}
+          className="tw:mt-1"
+        >
           Send my entry
         </Button>
       </form>

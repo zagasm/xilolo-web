@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Dialog, Transition } from "@headlessui/react";
 import {
@@ -354,28 +354,28 @@ function WithdrawDialog({
               leaveFrom="tw:opacity-100 tw:sm:scale-100"
               leaveTo="tw:opacity-0 tw:translate-y-2 tw:sm:translate-y-0 tw:sm:scale-95"
             >
-              <Dialog.Panel className="tw:w-full tw:max-w-xl tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-white tw:p-5 tw:shadow-[0_24px_64px_rgba(15,23,42,0.18)] tw:sm:p-6">
-                <span className="tw:text-xl tw:font-semibold tw:text-gray-900">
+              <Dialog.Panel className="tw:w-full tw:max-w-lg tw:rounded-[20px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-5">
+                <span className="tw:text-[18px] tw:font-bold tw:text-ink">
                   Request Payout
                 </span>
-                <p className="tw:mt-1 tw:text-xs tw:text-gray-500">
+                <p className="tw:mt-1 tw:text-[12px] tw:text-muted">
                   Choose where to receive your available balance.
                 </p>
 
-                <div className="tw:mt-5 tw:rounded-2xl tw:border tw:border-neon/10 tw:bg-[#f8fafc] tw:p-4 tw:shadow-[0_0_16px_rgba(0,245,255,0.04)]">
-                  <div className="tw:text-xs tw:text-gray-500">
+                <div className="tw:mt-5 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-inner/60 tw:p-4">
+                  <div className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.06em] tw:text-muted">
                     Amount to be withdrawn
                   </div>
-                  <div className="tw:mt-1 tw:text-lg tw:font-semibold tw:text-gray-900">
+                  <div className="tw:mt-1 tw:text-[22px] tw:font-bold tw:text-ink tw:tabular-nums">
                     {formatMoney(availableBalance, symbol)}
                   </div>
-                  <p className="tw:mt-2 tw:text-xs tw:text-gray-500">
-                    This withdrawal request will submit your full available balance.
+                  <p className="tw:mt-2 tw:text-[11.5px] tw:text-muted">
+                    This withdrawal request will submit your full withdrawable balance.
                   </p>
                 </div>
 
                 <div className="tw:mt-4">
-                  <label className="tw:mb-2 tw:block tw:text-sm tw:font-medium tw:text-gray-700">
+                  <label className="tw:mb-2 tw:block tw:text-[12px] tw:font-semibold tw:text-ink">
                     Payout method
                   </label>
                   <div className="tw:mb-4 tw:grid tw:grid-cols-2 tw:gap-2">
@@ -383,10 +383,10 @@ function WithdrawDialog({
                       type="button"
                       onClick={() => onSelectPayoutMethod("bank")}
                       className={cx(
-                        "tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-sm tw:font-semibold",
+                        "tw:rounded-[12px] tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
                         payoutMethod === "bank"
-                          ? "tw:border-primary tw:bg-primary/5 tw:text-primary"
-                          : "tw:border-gray-200 tw:bg-white tw:text-gray-700"
+                          ? "tw:border-accent tw:bg-accent/10 tw:text-accent-deep"
+                          : "tw:border-hairline tw:bg-paper-raised tw:text-muted"
                       )}
                     >
                       Bank account
@@ -395,10 +395,10 @@ function WithdrawDialog({
                       type="button"
                       onClick={() => onSelectPayoutMethod("crypto")}
                       className={cx(
-                        "tw:rounded-2xl tw:border tw:px-3 tw:py-2 tw:text-sm tw:font-semibold",
+                        "tw:rounded-[12px] tw:border tw:px-3 tw:py-2 tw:text-[13px] tw:font-semibold",
                         payoutMethod === "crypto"
-                          ? "tw:border-primary tw:bg-primary/5 tw:text-primary"
-                          : "tw:border-gray-200 tw:bg-white tw:text-gray-700"
+                          ? "tw:border-accent tw:bg-accent/10 tw:text-accent-deep"
+                          : "tw:border-hairline tw:bg-paper-raised tw:text-muted"
                       )}
                     >
                       Crypto wallet
@@ -573,7 +573,7 @@ function WithdrawDialog({
                     onClick={onClose}
                     disabled={submitting}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-gray-100 tw:px-4 tw:text-sm tw:font-medium tw:text-gray-800 tw:transition tw:hover:bg-gray-200 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-4 tw:text-[13px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:border-accent/50 tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     Cancel
                   </button>
@@ -582,7 +582,7 @@ function WithdrawDialog({
                     onClick={onSubmit}
                     disabled={submitting || !canSubmit}
                     style={{ borderRadius: 20, fontSize: 12 }}
-                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-2xl tw:bg-primary tw:px-4 tw:text-sm tw:font-medium tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                    className="tw:inline-flex tw:h-11 tw:items-center tw:justify-center tw:rounded-[12px] tw:border-0 tw:bg-accent tw:px-4 tw:text-[13px] tw:font-semibold tw:text-white tw:transition-colors tw:hover:bg-accent-deep tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                   >
                     {submitting ? "Submitting..." : "Submit withdrawal"}
                   </button>
@@ -596,6 +596,139 @@ function WithdrawDialog({
   );
 }
 
+/* ── the app's payout dashboard, in the app's own measurements ────────────
+   organiser_payout_dashboard.dart: _BalanceSummaryCard (202-343) and
+   _PayoutStatusCard (388-483). The balance card is a dark gradient because the
+   number is the one thing the organiser came for; everything else stays on the
+   paper surface. */
+
+function BalanceHero({ balance, symbol }) {
+  if (!balance) {
+    return (
+      <div className="tw:rounded-[18px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-5 tw:text-[13px] tw:text-muted">
+        Payout balance will appear here.
+      </div>
+    );
+  }
+
+  const hasSplit =
+    balance.withdrawable_payout !== null &&
+    balance.withdrawable_payout !== undefined &&
+    balance.potential_payout !== null &&
+    balance.potential_payout !== undefined;
+
+  // The backend calls it withdrawal_pending; the app parses pending_payouts.
+  // Read both so the "on the way" pill cannot silently disappear.
+  const pending = Number(balance.pending_payouts ?? balance.withdrawal_pending ?? 0);
+
+  return (
+    <div className="tw:rounded-[24px] tw:bg-[linear-gradient(135deg,#111827_0%,#1F2937_100%)] tw:p-5">
+      {hasSplit ? (
+        <>
+          {/* Two numbers, because they answer two questions: "what can I take
+              out today" and "what is still coming in". */}
+          <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-white/70">
+            Withdrawable
+          </span>
+          <span className="tw:mt-1.5 tw:block tw:text-[30px] tw:font-bold tw:leading-none tw:text-white tw:tabular-nums">
+            {formatMoney(balance.withdrawable_payout, symbol)}
+          </span>
+          <span className="tw:mt-1 tw:block tw:text-[10.5px] tw:text-white/55">
+            Ready to withdraw
+          </span>
+
+          <div className="tw:mt-3.5 tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-[14px] tw:bg-white/[0.07] tw:px-3 tw:py-2.5">
+            <span className="tw:min-w-0 tw:truncate tw:text-[11.5px] tw:font-semibold tw:text-white/70">
+              Potential payout
+            </span>
+            <span className="tw:shrink-0 tw:text-[15px] tw:font-bold tw:text-white/90 tw:tabular-nums">
+              {formatMoney(balance.potential_payout, symbol)}
+            </span>
+          </div>
+          <span className="tw:mt-1 tw:block tw:text-[9.5px] tw:leading-[1.4] tw:text-white/50">
+            Still coming in. It moves to withdrawable when the show ends or voting closes.
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-white/70">
+            Available Balance
+          </span>
+          <span className="tw:mt-2 tw:block tw:text-[30px] tw:font-bold tw:leading-none tw:text-white tw:tabular-nums">
+            {formatMoney(balance.available_balance ?? 0, symbol)}
+          </span>
+        </>
+      )}
+
+      {/* "On the way" and "Potential" read alike; only one of them is money the
+          organiser has already asked for. */}
+      {pending > 0 ? (
+        <>
+          <span className="tw:mt-3.5 tw:inline-flex tw:rounded-pill tw:bg-white/[0.09] tw:px-2.5 tw:py-1.5 tw:text-[11px] tw:font-semibold tw:text-white/80">
+            {formatMoney(pending, symbol)} on the way
+          </span>
+          <span className="tw:mt-1 tw:block tw:text-[9.5px] tw:leading-[1.4] tw:text-white/50">
+            Requested. It clears once the payout is paid out.
+          </span>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function StatusChip({ label, ready }) {
+  return (
+    <span
+      className={`tw:inline-flex tw:items-center tw:gap-1 tw:rounded-pill tw:border tw:px-[9px] tw:py-[5px] tw:text-[11px] tw:font-bold ${
+        ready
+          ? "tw:border-[#15803D]/30 tw:bg-[#15803D]/12 tw:text-[#15803D]"
+          : "tw:border-[#B45309]/30 tw:bg-[#B45309]/12 tw:text-[#B45309]"
+      }`}
+    >
+      {label}
+    </span>
+  );
+}
+
+function SectionHead({ title, actionLabel, onAction, to }) {
+  return (
+    <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+      <span className="tw:text-[15px] tw:font-semibold tw:text-ink">{title}</span>
+      {actionLabel ? (
+        to ? (
+          <Link
+            to={to}
+            className="tw:text-[12.5px] tw:font-semibold tw:text-accent-deep tw:no-underline"
+          >
+            {actionLabel}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={onAction}
+            className="tw:border-0 tw:bg-transparent tw:text-[12.5px] tw:font-semibold tw:text-accent-deep"
+          >
+            {actionLabel}
+          </button>
+        )
+      ) : null}
+    </div>
+  );
+}
+
+function EmptyRow({ children }) {
+  return (
+    <div className="tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-4 tw:text-[13px] tw:text-muted">
+      {children}
+    </div>
+  );
+}
+
+function maskAccount(account) {
+  const digits = String(account?.account_number ?? "").replace(/\D/g, "");
+  return digits.length >= 4 ? `•••• ${digits.slice(-4)}` : "";
+}
+
 export default function AccountPayouts() {
   const dispatch = useDispatch();
   const { user, token } = useAuth();
@@ -605,6 +738,7 @@ export default function AccountPayouts() {
   const [ticketSales, setTicketSales] = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [cryptoWallets, setCryptoWallets] = useState([]);
+  const [history, setHistory] = useState([]);
   const [banks, setBanks] = useState([]);
   const [cryptoOptions, setCryptoOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -655,6 +789,15 @@ export default function AccountPayouts() {
     return res?.data?.banks || [];
   };
 
+  // Last three, for the dashboard preview the app shows under the sections.
+  const fetchHistoryPreview = async () => {
+    const res = await api.get("/api/v1/organiser/payouts/history", {
+      ...authHeaders(token),
+      params: { per_page: 3, page: 1 },
+    });
+    return normalizeCollection(res).slice(0, 3);
+  };
+
   const fetchCryptoWallets = async () => {
     const res = await api.get("/api/v1/crypto-wallets", authHeaders(token));
     return normalizeCollection(res).filter(
@@ -678,18 +821,21 @@ export default function AccountPayouts() {
         ticketSalesResult,
         bankAccountsResult,
         cryptoWalletsResult,
+        historyResult,
       ] =
         await Promise.all([
           fetchBalance(),
           fetchTicketSales(),
           fetchBankAccounts(),
           fetchCryptoWallets(),
+          fetchHistoryPreview().catch(() => []),
         ]);
 
       setBalance(balanceResult);
       setTicketSales(ticketSalesResult);
       setBankAccounts(bankAccountsResult);
       setCryptoWallets(cryptoWalletsResult);
+      setHistory(historyResult);
     } catch (error) {
       console.error(error);
       setSectionError("Could not load payout information right now. Please try again.");
@@ -774,7 +920,41 @@ export default function AccountPayouts() {
     });
   }, [cryptoWallets]);
 
+  const navigate = useNavigate();
   const balanceSymbol = resolveCurrencySymbol(balance);
+
+  /* The app's gating (organiser_payout_provider.dart:100-137): cleared money
+     against the minimum, plus somewhere verified for it to go. */
+  const withdrawable = Number(
+    balance?.withdrawable_payout ?? balance?.available_balance ?? 0
+  );
+  const minimumWithdrawal = Number(balance?.minimum_withdrawal_amount ?? 10000);
+  const hasVerifiedBank = bankAccounts.some(
+    (account) =>
+      account?.is_verified ||
+      account?.verified_at ||
+      String(account?.status || "").toLowerCase() === "verified"
+  );
+  const hasVerifiedWallet = cryptoWallets.length > 0;
+  const hasWithdrawableBalance = withdrawable >= minimumWithdrawal;
+  const canWithdrawNow = hasWithdrawableBalance && (hasVerifiedBank || hasVerifiedWallet);
+
+  const withdrawMessage =
+    balance == null
+      ? "Loading payout balance"
+      : !hasWithdrawableBalance
+        ? "Your available balance is below the minimum withdrawal amount"
+        : canWithdrawNow
+          ? "Choose where the money goes: a bank account, or a crypto wallet."
+          : !hasVerifiedBank && !hasVerifiedWallet
+            ? "Add a verified bank account or crypto wallet before you can withdraw"
+            : "Complete payout setup before you can withdraw";
+
+  const withdrawLabel = canWithdrawNow
+    ? "Withdraw available balance"
+    : !bankAccounts.length
+      ? "Add Bank Account"
+      : "Manage Payout Setup";
 
   const filteredTicketSales = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -950,206 +1130,237 @@ export default function AccountPayouts() {
 
   return (
     <>
-      <div className="tw:mx-auto tw:max-w-6xl tw:px-4 tw:pb-24 tw:pt-24 tw:sm:px-6 tw:md:pt-32 tw:lg:px-8">
-        <div className="tw:mb-4 tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-          <div className="tw:flex tw:items-center tw:gap-3">
-            <Link
-              to="/account/payouts"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-gray-900"
-            >
-              <ArrowLeft className="tw:h-4 tw:w-4" />
-              Back
-            </Link>
-            <div>
-              <div className="tw:text-lg tw:font-bold tw:text-gray-900 tw:md:text-2xl">
-                Request Payout
-              </div>
-              <div className="tw:text-sm tw:text-gray-500">
-                Review your balance and submit a payout request.
-              </div>
-            </div>
-          </div>
-
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-            <Link
-              to="/account/payouts/history"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
-            >
-              <History className="tw:h-4 tw:w-4" />
-              Withdrawal history
-            </Link>
-            <button
-              type="button"
-              onClick={() => setWithdrawOpen(true)}
-              style={{ borderRadius: 12 }}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-primary tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-white tw:shadow-[0_10px_24px_rgba(0,0,0,0.14),0_0_14px_rgba(0,245,255,0.12)] tw:hover:bg-primarySecond"
-            >
-              <Landmark className="tw:h-4 tw:w-4" />
-              Withdraw
-            </button>
-            <Link
-              to="/account/crypto-wallet"
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
-            >
-              <Coins className="tw:h-4 tw:w-4" />
-              Crypto wallets
-            </Link>
-            <button
-              type="button"
-              onClick={loadPage}
-              className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-4 tw:py-2 tw:text-sm tw:font-semibold tw:text-gray-900 tw:shadow-sm tw:transition tw:hover:shadow-[0_0_16px_rgba(0,245,255,0.08)]"
-            >
-              <RefreshCw className="tw:h-4 tw:w-4" />
-              Refresh
-            </button>
-          </div>
+      <div className="tw:mx-auto tw:w-full tw:max-w-[860px] tw:px-4 tw:pb-24 tw:pt-24 tw:sm:px-6 tw:md:pt-28">
+        <div className="tw:pb-5">
+          <Link
+            to="/account"
+            className="tw:text-[12px] tw:font-medium tw:text-accent-deep tw:no-underline"
+          >
+            ← Account
+          </Link>
+          <h1 className="tw:m-0! tw:mt-1! tw:text-[24px]! tw:font-[800]! tw:leading-[1.05]! tw:tracking-[-0.02em]! tw:text-ink!">
+            Payout Dashboard
+          </h1>
+          <span className="tw:mt-1 tw:block tw:text-[13px] tw:font-medium tw:text-muted">
+            What has cleared, what is still coming in, and where the money goes.
+          </span>
         </div>
 
         {sectionError ? (
-          <div className="tw:mb-4 tw:rounded-2xl tw:border tw:border-red-200 tw:bg-red-50 tw:p-3 tw:text-sm tw:text-red-700">
+          <div className="tw:mb-4 tw:rounded-[14px] tw:border tw:border-danger/30 tw:bg-danger/10 tw:p-3 tw:text-[13px] tw:text-danger">
             {sectionError}
           </div>
         ) : null}
 
-        <section className="tw:mb-4">
-          {loading ? (
-            <StatsSkeleton cards={3} />
-          ) : (
-            <div className="tw:grid tw:grid-cols-1 tw:gap-3 tw:md:grid-cols-2">
-              <StatCard
-                icon={Wallet}
-                label="Withdrawable"
-                value={formatMoney(
-                  balance?.withdrawable_payout ?? balance?.available_balance ?? 0,
-                  balanceSymbol
-                )}
-                hint="Ready to withdraw"
-              />
-              {balance?.potential_payout !== null && balance?.potential_payout !== undefined ? (
-                <StatCard
-                  icon={TrendingUp}
-                  label="Potential payout"
-                  value={formatMoney(balance.potential_payout, balanceSymbol)}
-                  hint="Still coming in. It moves to withdrawable when the show ends or voting closes."
-                />
-              ) : null}
-              {/* <StatCard
-                icon={TrendingUp}
-                label="Ticket sales"
-                value={formatMoney(balance?.total_ticket_sales ?? 0, balanceSymbol)}
-                hint="Total processed ticket sales"
-              /> */}
-              <StatCard
-                icon={Ticket}
-                label="Tickets sold"
-                value={ticketSalesTotals.ticketsSold.toLocaleString()}
-                hint={`${filteredTicketSales.length.toLocaleString()} event records`}
-              />
-            </div>
-          )}
-        </section>
+        {/* The balance first, and the withdraw action right under the number it
+            acts on — not buried under three sections of history. */}
+        {loading && !balance ? (
+          <div className="tw:h-[152px] tw:animate-pulse tw:rounded-[24px] tw:bg-inner" />
+        ) : (
+          <BalanceHero balance={balance} symbol={balanceSymbol} />
+        )}
 
-        <section className="tw:rounded-3xl tw:bg-white tw:p-4 tw:shadow-[0_14px_36px_rgba(15,23,42,0.06),0_0_18px_rgba(0,245,255,0.04)]">
-          <div className="tw:flex tw:flex-col tw:gap-3 tw:md:flex-row tw:md:items-center tw:md:justify-between">
-            <div>
-              <div className="tw:text-lg tw:font-semibold tw:text-gray-900">
-                Ticket sales
-              </div>
-              <div className="tw:text-sm tw:text-gray-500">
-                Simple event sales view for payout tracking.
-              </div>
-            </div>
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-              <div className="tw:flex tw:flex-1 tw:items-center tw:gap-2 tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:transition focus-within:tw:shadow-[0_0_0_4px_rgba(0,245,255,0.08)] tw:md:min-w-[280px]">
-                <Search className="tw:h-4 tw:w-4 tw:text-gray-400" />
-                <input
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search by title, date, status..."
-                  className="tw:w-full tw:bg-transparent tw:text-sm tw:text-gray-800 tw:outline-none"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}
-                className="tw:rounded-2xl tw:bg-gray-50 tw:px-3 tw:py-2 tw:text-sm tw:text-gray-800 tw:outline-none tw:focus:shadow-[0_0_0_4px_rgba(0,245,255,0.08)]"
-              >
-                <option value="all">All statuses</option>
-                <option value="draft">Draft</option>
-                <option value="live">Live</option>
-                <option value="ended">Ended</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
+        <section className="tw:mt-3 tw:rounded-[18px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+          <span className="tw:block tw:text-[16px] tw:font-bold tw:text-ink">Withdraw</span>
+          <span className="tw:mt-2 tw:block tw:text-[13px] tw:leading-relaxed tw:text-muted">
+            {withdrawMessage}
+          </span>
+
+          <div className="tw:mt-3.5 tw:flex tw:flex-wrap tw:gap-2">
+            <StatusChip
+              label={hasVerifiedBank ? "Bank account ready" : "Bank not ready"}
+              ready={hasVerifiedBank}
+            />
+            <StatusChip
+              label={hasVerifiedWallet ? "Crypto ready" : "Crypto wallet coming soon"}
+              ready={hasVerifiedWallet}
+            />
           </div>
 
-          <div className="tw:mt-4">
-            {ticketSalesLoading ? (
-              <ListSkeleton rows={4} />
-            ) : filteredTicketSales.length === 0 ? (
-              <div className="tw:rounded-3xl tw:border tw:border-dashed tw:border-gray-200 tw:bg-[#fcfcfe] tw:p-6 tw:text-sm tw:text-gray-500">
-                No ticket sales yet.
-              </div>
-            ) : (
-              <div className="tw:space-y-3">
-                {filteredTicketSales.map((item, index) => (
-                  <div
-                    key={item?.id || item?.event_id || `${getTicketSaleTitle(item)}-${index}`}
-                    className="tw:rounded-3xl tw:border tw:border-gray-100 tw:bg-[#fcfcfe] tw:p-4 tw:shadow-[0_10px_26px_rgba(15,23,42,0.04),0_0_14px_rgba(0,245,255,0.04)]"
-                  >
-                    <div className="tw:flex tw:flex-col tw:gap-4 tw:lg:flex-row tw:lg:items-start tw:lg:justify-between">
-                      <div className="tw:min-w-0">
-                        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                          <span className="tw:font-semibold tw:text-gray-900">
-                            {getTicketSaleTitle(item)}
-                          </span>
-                          <span className="tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:py-1 tw:text-xs tw:text-gray-700 tw:capitalize">
-                            {getTicketSaleStatus(item)}
-                          </span>
-                        </div>
-                        <div className="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:text-sm tw:text-gray-600">
-                          <span className="tw:flex tw:items-center tw:gap-1">
-                            <CalendarDays className="tw:h-4 tw:w-4 tw:text-gray-400" />
-                            {formatDate(getTicketSaleDate(item))}
-                          </span>
-                          <span className="tw:flex tw:items-center tw:gap-1">
-                            <Ticket className="tw:h-4 tw:w-4 tw:text-gray-400" />
-                            {getTicketsSold(item).toLocaleString()} sold
-                          </span>
-                        </div>
-                      </div>
+          <button
+            type="button"
+            onClick={() =>
+              canWithdrawNow ? setWithdrawOpen(true) : navigate("/account/bank-accounts")
+            }
+            className="tw:mt-4 tw:h-12 tw:w-full tw:rounded-[16px] tw:border-0 tw:bg-accent tw:text-[13px] tw:font-bold tw:text-white tw:transition-colors tw:hover:bg-accent-deep"
+          >
+            {withdrawLabel}
+          </button>
+        </section>
 
-                      <div className="tw:grid tw:grid-cols-1 tw:gap-2 tw:lg:min-w-[180px]">
-                        {/* <div className="tw:rounded-2xl tw:bg-white tw:px-3 tw:py-2">
-                          <div className="tw:text-[11px] tw:text-gray-500">Ticket sales</div>
-                          <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                            {formatMoney(item?.total_ticket_sales ?? 0, balanceSymbol)}
-                          </div>
-                        </div> */}
-                        <div className="tw:rounded-2xl tw:bg-white tw:px-3 tw:py-2">
-                          <div className="tw:text-[11px] tw:text-gray-500">Tickets sold</div>
-                          <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                            {getTicketsSold(item).toLocaleString()}
-                          </div>
-                        </div>
-                      </div>
+        <section className="tw:mt-6">
+          <SectionHead title="Bank Accounts" actionLabel="Manage" to="/account/bank-accounts" />
+          <div className="tw:mt-2.5 tw:flex tw:flex-col tw:gap-2">
+            {bankAccounts.length === 0 ? (
+              <EmptyRow>No bank account yet. Add one before you withdraw.</EmptyRow>
+            ) : (
+              bankAccounts.map((account, index) => {
+                const verified =
+                  account?.is_verified ||
+                  account?.verified_at ||
+                  String(account?.status || "").toLowerCase() === "verified";
+
+                return (
+                  <div
+                    key={account?.id || account?.bank_id || `bank-${index}`}
+                    className="tw:flex tw:items-center tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                  >
+                    <Landmark className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+                    <div className="tw:min-w-0 tw:flex-1">
+                      <span className="tw:block tw:truncate tw:text-[13px] tw:font-semibold tw:text-ink">
+                        {getBankDisplayName(account)}
+                        {maskAccount(account) ? ` · ${maskAccount(account)}` : ""}
+                      </span>
+                      <span className="tw:block tw:truncate tw:text-[11px] tw:text-muted">
+                        {account?.account_name || "Account name unavailable"}
+                      </span>
                     </div>
+                    {account?.is_default ? (
+                      <span className="tw:shrink-0 tw:rounded-pill tw:bg-inner tw:px-[9px] tw:py-[3px] tw:text-[10px] tw:font-bold tw:text-muted">
+                        Default
+                      </span>
+                    ) : null}
+                    <StatusChip
+                      label={verified ? "Verified" : "Unverified"}
+                      ready={Boolean(verified)}
+                    />
                   </div>
-                ))}
-              </div>
+                );
+              })
             )}
           </div>
         </section>
 
-        {!bankAccounts.length ? (
-          <div className="tw:mt-4 tw:rounded-3xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-4 tw:text-sm tw:text-amber-800">
-            No saved bank account found. Add one from{" "}
-            <Link to="/account/bank-accounts" className="tw:font-semibold tw:underline">
-              My bank accounts
-            </Link>{" "}
-            before requesting a withdrawal.
+        <section className="tw:mt-6">
+          <SectionHead
+            title="Crypto Wallets"
+            actionLabel="Withdraw"
+            onAction={() => setWithdrawOpen(true)}
+          />
+          <div className="tw:mt-2.5 tw:flex tw:flex-col tw:gap-2">
+            {cryptoWallets.length === 0 ? (
+              <EmptyRow>
+                No verified crypto wallet yet.{" "}
+                <Link to="/account/crypto-wallet" className="tw:font-semibold tw:text-accent-deep">
+                  Manage wallets
+                </Link>
+              </EmptyRow>
+            ) : (
+              cryptoWallets.map((wallet, index) => (
+                <div
+                  key={wallet?.id || `wallet-${index}`}
+                  className="tw:flex tw:items-center tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                >
+                  <Coins className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+                  <div className="tw:min-w-0 tw:flex-1">
+                    <span className="tw:block tw:text-[13px] tw:font-semibold tw:uppercase tw:text-ink">
+                      {String(wallet?.currency || "Crypto")}
+                    </span>
+                    <span className="tw:block tw:truncate tw:text-[11px] tw:text-muted">
+                      {wallet?.address
+                        ? `${String(wallet.address).slice(0, 8)}…${String(wallet.address).slice(-6)}`
+                        : "Address unavailable"}
+                    </span>
+                  </div>
+                  <StatusChip label="Verified" ready />
+                </div>
+              ))
+            )}
           </div>
-        ) : null}
+        </section>
+
+        <section className="tw:mt-6">
+          <SectionHead
+            title="Payout History"
+            actionLabel={history.length ? "View all" : null}
+            to="/account/payouts/history"
+          />
+          <div className="tw:mt-2.5 tw:flex tw:flex-col tw:gap-2">
+            {history.length === 0 ? (
+              <EmptyRow>No payout has been requested yet.</EmptyRow>
+            ) : (
+              history.map((payout, index) => (
+                <div
+                  key={payout?.id || payout?.reference || `payout-${index}`}
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                >
+                  <div className="tw:min-w-0">
+                    <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-ink tw:tabular-nums">
+                      {formatMoney(payout?.amount ?? 0, balanceSymbol)}
+                    </span>
+                    <span className="tw:block tw:text-[11px] tw:text-muted tw:capitalize">
+                      {String(payout?.status || "pending").replace(/_/g, " ")}
+                      {payout?.created_at ? ` · ${formatDate(payout.created_at)}` : ""}
+                    </span>
+                  </div>
+                  <Link
+                    to="/account/payouts/history"
+                    className="tw:shrink-0 tw:text-[12px] tw:font-semibold tw:text-accent-deep tw:no-underline"
+                  >
+                    Details
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="tw:mt-6">
+          <SectionHead title="Ticket sales" />
+          <span className="tw:mt-1 tw:block tw:text-[12px] tw:text-muted">
+            Per event, for payout tracking.
+          </span>
+
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row">
+            <div className="tw:flex tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2">
+              <Search className="tw:size-4 tw:shrink-0 tw:text-muted" aria-hidden="true" />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search by title, date, status..."
+                className="tw:w-full tw:border-0 tw:bg-transparent tw:text-[13px] tw:text-ink tw:outline-none tw:placeholder:text-muted"
+              />
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="tw:rounded-[12px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2 tw:text-[13px] tw:text-ink tw:outline-none"
+            >
+              <option value="all">All statuses</option>
+              <option value="draft">Draft</option>
+              <option value="live">Live</option>
+              <option value="ended">Ended</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div className="tw:mt-3 tw:flex tw:flex-col tw:gap-2">
+            {ticketSalesLoading ? (
+              <div className="tw:h-[68px] tw:animate-pulse tw:rounded-[14px] tw:bg-inner" />
+            ) : filteredTicketSales.length === 0 ? (
+              <EmptyRow>No ticket sales yet.</EmptyRow>
+            ) : (
+              filteredTicketSales.map((item, index) => (
+                <div
+                  key={item?.id || item?.event_id || `${getTicketSaleTitle(item)}-${index}`}
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-2.5"
+                >
+                  <div className="tw:min-w-0">
+                    <span className="tw:block tw:truncate tw:text-[13px] tw:font-semibold tw:text-ink">
+                      {getTicketSaleTitle(item)}
+                    </span>
+                    <span className="tw:block tw:truncate tw:text-[11px] tw:text-muted tw:capitalize">
+                      {formatDate(getTicketSaleDate(item))} · {getTicketSaleStatus(item)}
+                    </span>
+                  </div>
+                  <span className="tw:shrink-0 tw:text-[12.5px] tw:font-semibold tw:text-ink tw:tabular-nums">
+                    {getTicketsSold(item).toLocaleString()} sold
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
       </div>
 
       <WithdrawDialog

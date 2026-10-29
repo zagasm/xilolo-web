@@ -130,16 +130,21 @@ export default function ContestCard({ contest, token = null }) {
       to={`/vote/${contest.slug}`}
       className="tw:group tw:flex tw:h-full tw:flex-col tw:overflow-hidden tw:rounded-[18px] tw:border tw:border-hairline tw:bg-paper-raised tw:text-ink tw:no-underline tw:transition-colors tw:hover:border-accent/50"
     >
-      <div className="tw:relative tw:aspect-[4/3] tw:w-full tw:overflow-hidden tw:bg-inner">
+      {/* The whole poster, not a crop of it — covers arrive at every ratio
+          (21:9 banners, 4:5 flyers, collages), so the frame follows the image
+          instead of forcing it into a box. Nothing is cut, nothing is stretched,
+          and the inner fill makes any letterbox read as a frame. Same rule as
+          contest_card.dart:52-70. */}
+      <div className="tw:relative tw:w-full tw:overflow-hidden tw:bg-inner">
         {cover ? (
           <img
             src={cover}
             alt=""
             loading="lazy"
-            className="tw:size-full tw:object-cover tw:transition-transform tw:duration-500 tw:group-hover:scale-[1.03]"
+            className="tw:block tw:max-h-[420px] tw:w-full tw:object-contain tw:transition-transform tw:duration-500 tw:group-hover:scale-[1.01]"
           />
         ) : (
-          <div className="tw:flex tw:size-full tw:items-center tw:justify-center tw:bg-[linear-gradient(135deg,rgba(22,144,156,0.22),rgba(22,144,156,0.06))]">
+          <div className="tw:flex tw:h-[180px] tw:w-full tw:items-center tw:justify-center tw:bg-[linear-gradient(135deg,rgba(22,144,156,0.22),rgba(22,144,156,0.06))]">
             <span className="tw:text-[44px] tw:font-[800] tw:leading-none tw:text-[#16909C]">
               {initial}
             </span>
