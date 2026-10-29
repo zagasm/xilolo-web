@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ShieldCheck } from "lucide-react";
 import { Button, Card, Field, Input } from "../../component/ui";
 import CoverPicker from "./components/CoverPicker";
 import { showError, showSuccess } from "../../component/ui/toast";
@@ -32,6 +33,7 @@ export default function CreateContest() {
     subtitle: "",
     description: "",
     rules: "",
+    terms: "",
     vote_price: "",
     vote_visibility: "everyone",
     is_refundable: false,
@@ -115,6 +117,7 @@ export default function CreateContest() {
         subtitle: form.subtitle.trim() || null,
         description: form.description.trim() || null,
         rules: form.rules.trim() || null,
+        terms: form.terms.trim() || null,
         vote_price: Number(form.vote_price),
         vote_visibility: form.vote_visibility,
         is_refundable: form.is_refundable,
@@ -240,6 +243,29 @@ export default function CreateContest() {
             className="tw:w-full tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-3 tw:text-[14px] tw:text-ink tw:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent"
           />
         </Field>
+
+        {/* Rules say how the contest is judged; terms are what a contestant
+            AGREES to. The API refuses an entry without the tick once these are
+            written (ContestEntryController:107-112), so this field is what
+            makes the agreement possible at all. */}
+        <Field
+          label="Terms and conditions"
+          hint="Optional. What a contestant is agreeing to when they enter (ownership of the media, rights, prizes, conduct)."
+        >
+          <textarea
+            value={form.terms}
+            onChange={set("terms")}
+            rows={5}
+            maxLength={20000}
+            className="tw:w-full tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-3 tw:text-[14px] tw:text-ink tw:outline-none tw:focus-visible:ring-2 tw:focus-visible:ring-accent"
+          />
+        </Field>
+
+        <span className="tw:flex tw:items-start tw:gap-1.5 tw:text-[11px] tw:leading-[1.4] tw:text-ink-muted">
+          <ShieldCheck className="tw:mt-0.5 tw:size-3.5 tw:shrink-0" aria-hidden="true" />
+          If you write terms here, nobody can enter without ticking that they accept them — and we
+          record when they did.
+        </span>
 
         <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2">
           <Field label="Price per vote" hint="Minimum ₦100. Locked once the first vote is cast.">

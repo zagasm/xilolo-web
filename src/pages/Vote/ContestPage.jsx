@@ -580,6 +580,22 @@ export default function ContestPage({ sharedToken = null }) {
               </MetaSection>
             ) : null}
 
+            {/* Rules say how it is judged; terms are what you agree to. Shown
+                here so the tick in the entry sheet is not the first sight of
+                them. */}
+            {contest.terms ? (
+              <MetaSection label="Terms and conditions">
+                <div className="tw:rounded-[14px] tw:border tw:border-hairline tw:bg-paper-raised tw:p-3.5">
+                  <div className="tw:max-h-56 tw:overflow-y-auto tw:whitespace-pre-line tw:pr-1 tw:text-[13px] tw:leading-[1.6] tw:font-medium tw:text-muted!">
+                    {contest.terms}
+                  </div>
+                  <span className="tw:mt-2 tw:block tw:text-[11px] tw:text-ink-muted">
+                    You accept these when you enter. We record the time you did.
+                  </span>
+                </div>
+              </MetaSection>
+            ) : null}
+
             {entriesOpen && user && !myEntry && !isShared ? (
               <MetaSection label="Take part">
                 <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
