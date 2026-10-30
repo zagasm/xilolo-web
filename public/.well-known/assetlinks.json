@@ -1,12 +1,15 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.zagasmstudio.app",
       "sha256_cert_fingerprints": [
         "79:CA:8A:EB:6C:6A:93:04:91:B5:0A:5D:D3:04:F0:04:30:F4:1B:49:5A:14:5E:C4:D8:F5",
-        "CD:3E:84:42:AD:18:47:2A:E1:54:21:F4:FE:B9:17:EF:DF:22:E2:D0:A4:25:9D:BF:12:6B:9E:1D:63:B7:7E:E5"
+        "CD:3E:84:42:AD:18:47:2A:E1:54:21:F4:FE:B9:17:EF:DF:22:E2:D0:A4:25:9D:BF:12:6B:9E:1D:63:B7:7E:E5",
+        "A4:5B:0E:12:D2:A0:75:31:83:6E:80:62:F0:1B:D5:CD:B4:41:A1:EB:FE:7E:DA:CE:B9:07:75:3D:01:A4:6A:57"
       ]
     }
   }
