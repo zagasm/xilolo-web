@@ -6,14 +6,27 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { CircularProgress, MenuItem, TextField } from "@mui/material";
+import { CircularProgress, TextField } from "@mui/material";
 import { X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { showError } from "../../../component/ui/toast";
-import { initializeWalletFunding as initializeWalletFundingRequest } from "../../../api/walletApi";
+import {
+  getWalletFundingQuote,
+  initializeWalletFunding as initializeWalletFundingRequest,
+} from "../../../api/walletApi";
 import { useWalletPaymentMethods } from "../hooks/useWalletPaymentMethods";
 import { useAuth } from "../../../pages/auth/AuthContext";
-import { getDefaultWalletProvider, getApiErrorMessage } from "../walletUtils";
+import {
+  getDefaultWalletProvider,
+  getApiErrorMessage,
+  groupWalletPaymentMethods,
+} from "../walletUtils";
+import {
+  formatForeign,
+  formatNaira,
+  getGroupAccent,
+  getGroupIcon,
+} from "../paymentMethodPresentation";
 import {
   selectPendingWalletPurchase,
   setLastFundingContext,
@@ -44,6 +57,7 @@ export default function FundWalletModal({
   const [reviewData, setReviewData] = useState(null);
   const [formError, setFormError] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const latestPreviewRequestRef = useRef(0);
   const previewInFlightKeyRef = useRef("");
   const previewResolvedKeyRef = useRef("");
@@ -58,6 +72,11 @@ export default function FundWalletModal({
   const selectableMethods = useMemo(
     () => methods.filter((method) => !method.disabled),
     [methods]
+  );
+
+  const methodGroups = useMemo(
+    () => groupWalletPaymentMethods(selectableMethods),
+    [selectableMethods]
   );
 
   const currentInputPreviewKey = useMemo(() => {
@@ -79,6 +98,7 @@ export default function FundWalletModal({
       setReviewData(null);
       setFormError("");
       setPreviewLoading(false);
+      setSubmitting(false);
       previewInFlightKeyRef.current = "";
       previewResolvedKeyRef.current = "";
       return;
@@ -89,6 +109,7 @@ export default function FundWalletModal({
     setReviewData(null);
     setFormError("");
     setPreviewLoading(false);
+    setSubmitting(false);
     previewInFlightKeyRef.current = "";
     previewResolvedKeyRef.current = "";
   }, [open, prefilledAmount]);
@@ -176,7 +197,9 @@ export default function FundWalletModal({
 
     (async () => {
       try {
-        const payload = await initializeWalletFundingRequest(
+        // Priced, not created: the quote endpoint returns the same numbers `initialize`
+        // would charge without minting a funding row or a vendor checkout session.
+        const quote = await getWalletFundingQuote(
           {
             provider: debouncedProvider,
             amount: numericAmount,
@@ -191,17 +214,18 @@ export default function FundWalletModal({
         previewResolvedKeyRef.current = previewKey;
         previewInFlightKeyRef.current = "";
         setPreviewLoading(false);
-        dispatch(
-          setLastFundingContext({
-            reference: payload?.reference || "",
-            provider: payload?.provider || debouncedProvider,
-            requestedCreditAmount:
-              payload?.requested_credit_amount ?? numericAmount,
-            source,
-            pendingPurchase,
-          })
-        );
-        setReviewData(payload);
+        setReviewData({
+          provider: quote?.provider || debouncedProvider,
+          currency: quote?.currency || "NGN",
+          requested_credit_amount: quote?.wallet_credit_amount ?? numericAmount,
+          bonus_amount: quote?.bonus_amount ?? 0,
+          bonus_percent: quote?.bonus_percent ?? 0,
+          fee_amount: quote?.fee_amount ?? 0,
+          total_charge_amount: quote?.total_charge_amount ?? numericAmount,
+          gateway_charge_currency: quote?.charge_currency || quote?.currency || "NGN",
+          gateway_charge_amount: quote?.charge_amount ?? numericAmount,
+          fx_rate: quote?.fx_rate ?? null,
+        });
       } catch (error) {
         if (cancelled || latestPreviewRequestRef.current !== currentRequestId) {
           return;
@@ -233,7 +257,7 @@ export default function FundWalletModal({
     token,
   ]);
 
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     const numericAmount = normalizeAmountInput(amount);
 
     if (!provider) {
@@ -246,12 +270,58 @@ export default function FundWalletModal({
       return;
     }
 
-    if (!reviewData?.authorization_url) {
-      setFormError("Funding review is still loading. Please wait a moment.");
-      return;
-    }
+    if (submitting) return;
 
-    window.location.href = reviewData.authorization_url;
+    setFormError("");
+    setSubmitting(true);
+
+    try {
+      // Only now do we create the funding row and the vendor checkout.
+      const payload = await initializeWalletFundingRequest(
+        { provider, amount: numericAmount },
+        token
+      );
+
+      if (!payload?.authorization_url) {
+        setFormError("Unable to start this payment. Please pick another method.");
+        setSubmitting(false);
+        return;
+      }
+
+      dispatch(
+        setLastFundingContext({
+          reference: payload?.reference || "",
+          provider: payload?.provider || provider,
+          requestedCreditAmount:
+            payload?.requested_credit_amount ?? numericAmount,
+          source,
+          pendingPurchase,
+        })
+      );
+
+      try {
+        window.sessionStorage.setItem(
+          "xilolo:pending-wallet-funding",
+          JSON.stringify({
+            reference: payload.reference,
+            provider: payload.provider || provider,
+            amount: numericAmount,
+          })
+        );
+      } catch (_error) {
+        // Storage blocked: the vendor still returns a reference for most rails.
+      }
+
+      window.location.href = payload.authorization_url;
+    } catch (error) {
+      const message = getApiErrorMessage(
+        error,
+        "Unable to initialize wallet funding."
+      );
+      setFormError(message);
+      showError(message);
+      setSubmitting(false);
+    }
   };
 
   const selectedMethod = selectableMethods.find((method) => method.value === provider);
@@ -309,25 +379,74 @@ export default function FundWalletModal({
                 </div>
 
                 <div className="tw:mt-6 tw:flex tw:flex-col tw:gap-4">
-                    <TextField
-                      select
-                      label="Payment method"
-                      value={provider}
-                      onChange={(event) => setProvider(event.target.value)}
-                      fullWidth
-                      disabled={methodsLoading}
-                      helperText={
-                        methodsError
-                          ? "Could not load payment methods."
-                          : "Select a provider to preview the charge."
-                      }
-                    >
-                      {selectableMethods.map((method) => (
-                        <MenuItem key={method.value} value={method.value}>
-                          {method.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
+                    <div className="tw:flex tw:flex-col tw:gap-2">
+                      <span className="tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.18em] tw:text-muted">
+                        How do you want to pay?
+                      </span>
+
+                      {methodGroups.map((group) => {
+                        const GroupIcon = getGroupIcon(group.icon);
+                        const accent = getGroupAccent(group.accent);
+
+                        return (
+                          <div key={group.code} className="tw:flex tw:flex-col tw:gap-2">
+                            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
+                              <GroupIcon className={`tw:h-3.5 tw:w-3.5 ${accent.text}`} />
+                              <span className="tw:text-[12px] tw:font-semibold tw:text-muted-strong">
+                                {group.label}
+                              </span>
+                            </div>
+
+                            {group.methods.map((method) => {
+                              const active = provider === method.value;
+
+                              return (
+                                <button
+                                  key={method.value}
+                                  type="button"
+                                  onClick={() => setProvider(method.value)}
+                                  aria-pressed={active}
+                                  className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:border tw:px-3.5 tw:py-2.5 tw:text-left tw:transition ${
+                                    active
+                                      ? accent.selected
+                                      : "tw:border-hairline tw:bg-white tw:hover:bg-paper"
+                                  }`}
+                                  style={{ borderRadius: 14 }}
+                                >
+                                  <span
+                                    className={`tw:flex tw:h-4 tw:w-4 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border-2 ${
+                                      active
+                                        ? `tw:border-transparent ${accent.dot}`
+                                        : "tw:border-faint"
+                                    }`}
+                                  >
+                                    {active ? (
+                                      <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-white" />
+                                    ) : null}
+                                  </span>
+                                  <span className="tw:min-w-0 tw:flex-1">
+                                    <span className="tw:block tw:text-[13.5px] tw:font-semibold tw:text-ink">
+                                      {method.label}
+                                    </span>
+                                    <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[12px] tw:text-muted">
+                                      {method.metadata?.fee_note ||
+                                        method.metadata?.description ||
+                                        "Secure checkout."}
+                                    </span>
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+
+                      {methodsError ? (
+                        <span className="tw:text-[12px] tw:text-danger">
+                          Could not load payment methods.
+                        </span>
+                      ) : null}
+                    </div>
 
                     <TextField
                       label="Amount"
@@ -365,20 +484,31 @@ export default function FundWalletModal({
                           Review funding charge
                         </div>
                         <div className="tw:mt-4 tw:space-y-3 tw:text-sm">
+                          {Number(reviewData.bonus_amount || 0) > 0 ? (
+                            <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
+                              <span>
+                                Bonus credit
+                                {reviewData.bonus_percent ? (
+                                  <span className="tw:ml-1 tw:text-[11px] tw:font-semibold tw:text-amber-700">
+                                    {reviewData.bonus_percent}%
+                                  </span>
+                                ) : null}
+                              </span>
+                              <span className="tw:font-semibold tw:text-emerald-600">
+                                +{Number(reviewData.bonus_amount || 0).toLocaleString()}
+                              </span>
+                            </div>
+                          ) : null}
                           <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
-                            <span>Wallet credit amount</span>
+                            <span>Wallet credit</span>
                             <span className="tw:font-semibold tw:text-gray-900">
-                              {reviewData.currency}{" "}
-                              {Number(
-                                reviewData.requested_credit_amount || 0
-                              ).toLocaleString()}
+                              {formatNaira(reviewData.requested_credit_amount || 0)}
                             </span>
                           </div>
                           <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
                             <span>Gateway fee</span>
                             <span className="tw:font-semibold tw:text-gray-900">
-                              {reviewData.currency}{" "}
-                              {Number(reviewData.fee_amount || 0).toLocaleString()}
+                              {formatNaira(reviewData.fee_amount || 0)}
                             </span>
                           </div>
                           <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
@@ -389,19 +519,12 @@ export default function FundWalletModal({
                                   reviewData.currency
                               ).toUpperCase() ===
                               String(reviewData.currency).toUpperCase() ? (
-                                <>
-                                  {reviewData.currency}{" "}
-                                  {Number(
-                                    reviewData.total_charge_amount || 0
-                                  ).toLocaleString()}
-                                </>
+                                formatNaira(reviewData.total_charge_amount || 0)
                               ) : (
-                                <>
-                                  {reviewData.gateway_charge_currency}{" "}
-                                  {Number(
-                                    reviewData.gateway_charge_amount || 0
-                                  ).toLocaleString()}
-                                </>
+                                formatForeign(
+                                  reviewData.gateway_charge_amount || 0,
+                                  reviewData.gateway_charge_currency
+                                )
                               )}
                             </span>
                           </div>
@@ -455,14 +578,22 @@ export default function FundWalletModal({
                         onClick={handleProceedToPayment}
                         disabled={
                           previewLoading ||
+                          submitting ||
                           methodsLoading ||
                           !selectableMethods.length ||
-                          !reviewData?.authorization_url
+                          !provider
                         }
-                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
+                        className="tw:inline-flex tw:h-11 tw:min-w-[148px] tw:items-center tw:justify-center tw:gap-2 tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:disabled:cursor-not-allowed tw:disabled:opacity-60"
                         style={{ borderRadius: 16 }}
                       >
-                        Proceed to payment
+                        {submitting ? (
+                          <>
+                            <CircularProgress size={14} color="inherit" />
+                            Starting…
+                          </>
+                        ) : (
+                          "Proceed to payment"
+                        )}
                       </button>
                     </div>
                     

@@ -161,10 +161,63 @@ export function normalizePaymentMethods(payload) {
         value: String(value),
         label: item?.label || item?.title || item?.name || prettifyProviderLabel(value),
         disabled: item?.enabled === false || item?.is_enabled === false,
+        group: item?.group ?? null,
+        metadata: item?.metadata ?? {},
         raw: item,
       };
     })
     .filter(Boolean);
+}
+
+/**
+ * Group payment methods into the "doors" the backend described.
+ *
+ * The API ships each method with a `group` block (code, label, description, icon,
+ * sort_order, metadata). Nothing here knows what Paystack or Bachs are: add a rail or a whole
+ * new door in the database and this renders it. Methods without a group fall into a trailing
+ * "Other ways to pay" section instead of disappearing.
+ */
+const FALLBACK_GROUP = {
+  code: "other",
+  label: "Other ways to pay",
+  description: "",
+  icon: "wallet",
+  sort_order: Number.MAX_SAFE_INTEGER,
+  metadata: {},
+};
+
+export function groupWalletPaymentMethods(methods = []) {
+  const groups = new Map();
+
+  methods
+    .filter((method) => !method.disabled)
+    .forEach((method) => {
+      const group = method.group || FALLBACK_GROUP;
+      const code = group.code || FALLBACK_GROUP.code;
+
+      if (!groups.has(code)) {
+        groups.set(code, {
+          code,
+          label: group.label || prettifyProviderLabel(code),
+          description: group.description || "",
+          icon: group.icon || "wallet",
+          badge: group.metadata?.badge || "",
+          accent: group.metadata?.accent || "primary",
+          sortOrder:
+            Number.isFinite(Number(group.sort_order)) && group.sort_order !== null
+              ? Number(group.sort_order)
+              : FALLBACK_GROUP.sort_order,
+          methods: [],
+        });
+      }
+
+      groups.get(code).methods.push(method);
+    });
+
+  return Array.from(groups.values()).sort((a, b) => {
+    if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+    return a.label.localeCompare(b.label);
+  });
 }
 
 export function getDefaultWalletProvider(methods = []) {
