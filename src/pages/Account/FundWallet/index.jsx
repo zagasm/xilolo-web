@@ -9,6 +9,7 @@ import { useWalletCurrencies } from "../../../features/wallet/hooks/useWalletCur
 import {
   getApiErrorMessage,
   getDefaultWalletProvider,
+  getFundingErrorMessage,
   getWalletBalanceAmount,
   groupWalletPaymentMethods,
 } from "../../../features/wallet/walletUtils";
@@ -67,6 +68,22 @@ export default function FundWalletPage() {
   useEffect(() => {
     if (!currency && currencyData?.default) setCurrency(currencyData.default);
   }, [currency, currencyData?.default]);
+
+  // The hosted checkout is a different origin (~0.5s of DNS + TLS alone). Warm it while the
+  // payer is still choosing, so pressing Continue is not the moment the network starts.
+  useEffect(() => {
+    const hints = ["https://checkout.bachs.io"];
+    const added = hints.map((href) => {
+      const link = document.createElement("link");
+      link.rel = "preconnect";
+      link.href = href;
+      link.crossOrigin = "anonymous";
+      document.head.appendChild(link);
+      return link;
+    });
+
+    return () => added.forEach((link) => link.remove());
+  }, []);
 
   // Switching currency must carry the *value*, not the digits: ₦5,000 stays worth $3.65.
   // Rates come from the API array, so the client does one division and no FX of its own.
@@ -157,7 +174,7 @@ export default function FundWalletPage() {
 
       showError("Unable to start this payment. Try another method.");
     } catch (error) {
-      showError(getApiErrorMessage(error, "Failed to start wallet funding."));
+      showError(getFundingErrorMessage(error, "Failed to start wallet funding."));
     } finally {
       setSubmitting(false);
     }
@@ -229,6 +246,10 @@ export default function FundWalletPage() {
                   aria-label={`Amount to add in ${activeCurrency.code}`}
                   className="tw:w-full tw:border-0 tw:bg-transparent tw:p-0 tw:text-[34px] tw:font-semibold tw:tabular-nums tw:tracking-[-0.02em] tw:text-ink tw:outline-none tw:placeholder:text-faint tw:focus:outline-none tw:md:text-[40px]"
                 />
+                {/* Never let "1000" be ambiguous: the unit is printed next to it. */}
+                <span className="tw:ml-1 tw:shrink-0 tw:rounded-full tw:bg-chip tw:px-2.5 tw:py-1 tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-muted-strong">
+                  {activeCurrency.code}
+                </span>
               </div>
 
               {activeCurrency.code !== baseCurrency && quoteReady ? (
@@ -320,6 +341,12 @@ export default function FundWalletPage() {
                             </span>
                             <span className="tw:mt-0.5 tw:line-clamp-2 tw:block tw:text-[12.5px] tw:text-muted">
                               {note}
+                              {floor > 100 ? (
+                                <span className="tw:text-muted-strong">
+                                  {" "}
+                                  · Min {formatNaira(floor)}
+                                </span>
+                              ) : null}
                             </span>
                           </span>
 
@@ -349,14 +376,19 @@ export default function FundWalletPage() {
                 You&apos;ll pay
               </span>
 
-              <div className="tw:mt-1 tw:text-[30px] tw:font-semibold tw:tabular-nums tw:tracking-[-0.02em] tw:text-ink">
-                {quoteLoading && !quoteReady ? (
-                  <span className="tw:inline-block tw:h-7 tw:w-28 tw:animate-pulse tw:rounded tw:bg-chip" />
-                ) : chargedInForeign ? (
-                  formatForeign(quote.charge_amount, chargeCurrency)
-                ) : (
-                  money(quoteReady ? quote.total_charge_amount : numericAmount || 0, baseCurrency, "₦")
-                )}
+              <div className="tw:mt-1 tw:flex tw:items-baseline tw:gap-1.5">
+                <span className="tw:text-[30px] tw:font-semibold tw:tabular-nums tw:tracking-[-0.02em] tw:text-ink">
+                  {quoteLoading && !quoteReady ? (
+                    <span className="tw:inline-block tw:h-7 tw:w-28 tw:animate-pulse tw:rounded tw:bg-chip" />
+                  ) : chargedInForeign ? (
+                    formatForeign(quote.charge_amount, chargeCurrency)
+                  ) : (
+                    money(quoteReady ? quote.total_charge_amount : numericAmount || 0, baseCurrency, "₦")
+                  )}
+                </span>
+                <span className="tw:text-[11px] tw:font-semibold tw:tracking-[0.06em] tw:text-muted">
+                  {chargedInForeign ? chargeCurrency : baseCurrency}
+                </span>
               </div>
 
               <p className="tw:mt-1.5! tw:text-[12.5px] tw:leading-snug tw:text-muted">
@@ -387,7 +419,7 @@ export default function FundWalletPage() {
                 {submitting ? (
                   <>
                     <Loader2 className="tw:h-4 tw:w-4 tw:animate-spin" />
-                    Starting…
+                    Opening secure checkout…
                   </>
                 ) : (
                   <>Continue with {selectedMethod?.label || "payment"}</>
@@ -401,7 +433,7 @@ export default function FundWalletPage() {
 
               {quoteError && !belowFloor ? (
                 <p className="tw:mt-2! tw:text-[12px] tw:text-danger">
-                  {getApiErrorMessage(quoteError, "Could not price this amount.")}
+                  {getFundingErrorMessage(quoteError, "Could not price this amount.")}
                 </p>
               ) : null}
             </div>

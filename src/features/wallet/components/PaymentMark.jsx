@@ -28,6 +28,18 @@ const TILES = {
       </svg>
     ),
   },
+  auto: {
+    bg: "#E7F4F5",
+    render: () => (
+      <svg viewBox="0 0 24 24" className="tw:h-5 tw:w-5" aria-hidden="true">
+        <path
+          d="M12 3.4l1.5 4.4 4.4 1.5-4.4 1.5L12 15.2l-1.5-4.4L6.1 9.3l4.4-1.5L12 3.4Z"
+          fill="#06707D"
+        />
+        <path d="M17.8 14.6l.9 2.4 2.4.9-2.4.9-.9 2.4-.9-2.4-2.4-.9 2.4-.9.9-2.4Z" fill="#16909C" />
+      </svg>
+    ),
+  },
   usdt: {
     bg: "#26A17B",
     render: () => (
