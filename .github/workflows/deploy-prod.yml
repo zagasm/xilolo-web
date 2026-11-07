@@ -194,79 +194,90 @@ jobs:
           }
           EOF
 
-      - name: Remove old files from Bunny Storage root
+      # A deploy is only safe if a half-finished one cannot be served. That means:
+      #   1. hashed assets first (nobody points at them yet), the HTML shell last;
+      #   2. every upload retried, because one connection reset must not kill the run;
+      #   3. old files pruned only AFTER the new build is fully in place;
+      #   4. the shell cached briefly, the hashed assets cached forever;
+      #   5. the result verified file by file, so a partial upload fails the job loudly.
+      - name: Upload build to Bunny Storage (assets first, index.html last)
         shell: bash
+        env:
+          CURL_RETRY: "--retry 5 --retry-delay 3 --retry-all-errors --connect-timeout 15 --max-time 300"
         run: |
           set -euo pipefail
 
           STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+          BASE="https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}"
 
-          echo "Listing existing root objects in Bunny Storage..."
+          put() {
+            local file="$1" rel="$2" cache="$3" content_type
 
-          EXISTING_ITEMS=$(curl --silent --show-error \
-            --request GET \
-            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/" \
-            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
-            || echo "[]")
-
-          if [ -z "$EXISTING_ITEMS" ] || [ "$EXISTING_ITEMS" = "null" ]; then
-            echo "No existing items found or failed to fetch. Skipping cleanup."
-            exit 0
-          fi
-
-          echo "$EXISTING_ITEMS" | jq -c '.[]?' | while read -r item; do
-            OBJECT_NAME=$(echo "$item" | jq -r '.ObjectName')
-            IS_DIR=$(echo "$item" | jq -r '.IsDirectory')
-
-            if [ -z "$OBJECT_NAME" ] || [ "$OBJECT_NAME" = "null" ]; then
-              continue
-            fi
-
-            if [ "$IS_DIR" = "true" ]; then
-              echo "Skipping directory: $OBJECT_NAME"
-              continue
-            fi
-
-            echo "Deleting file: $OBJECT_NAME"
-
-            curl --silent --show-error \
-              --request DELETE \
-              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${OBJECT_NAME}" \
-              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
-              || echo "Failed to delete $OBJECT_NAME (skipping)"
-          done
-
-          echo "Cleanup complete."
-
-      - name: Upload build files to Bunny Storage
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
-
-          echo "Uploading files from $BUILD_DIR to https://$STORAGE_HOST/$BUNNY_STORAGE_ZONE/"
-
-          find "$BUILD_DIR" -type f | while read -r file; do
-            rel_path="${file#"$BUILD_DIR"/}"
-            # Apple's Universal Links validator requires the association file
-            # to be served as application/json. The AASA has no file extension,
-            # so force the content type instead of relying on `file` detection
-            # (which varies by runner and previously shipped octet-stream).
-            if [[ "$rel_path" == ".well-known/apple-app-site-association" || "$rel_path" == "apple-app-site-association" ]]; then
+            if [[ "$rel" == ".well-known/apple-app-site-association" || "$rel" == "apple-app-site-association" ]]; then
+              # Apple's validator requires application/json for the extension-less AASA.
               content_type="application/json"
             else
               content_type="$(file --brief --mime-type "$file")"
             fi
 
-            echo "Uploading: $rel_path"
-            curl --fail --silent --show-error \
+            echo "Uploading: $rel"
+            # shellcheck disable=SC2086
+            curl --fail --silent --show-error $CURL_RETRY \
               --request PUT \
-              --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${rel_path}" \
+              --url "${BASE}/${rel}" \
               --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
               --header "Content-Type: ${content_type}" \
+              --header "Cache-Control: ${cache}" \
               --upload-file "$file"
+          }
+
+          echo "1/3 hashed assets (immutable, safe to appear before the shell points at them)"
+          find "$BUILD_DIR/assets" -type f -print0 | while IFS= read -r -d '' file; do
+            put "$file" "${file#"$BUILD_DIR"/}" "public, max-age=31536000, immutable"
           done
+
+          echo "2/3 static root files (never index.html)"
+          find "$BUILD_DIR" -type f ! -path "*/assets/*" ! -name "index.html" -print0 | while IFS= read -r -d '' file; do
+            put "$file" "${file#"$BUILD_DIR"/}" "public, max-age=3600"
+          done
+
+          echo "3/3 index.html (last, and never cached: it is the pointer to everything above)"
+          put "$BUILD_DIR/index.html" "index.html" "no-cache, must-revalidate"
+
+      - name: Verify every built file is actually in storage
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+          BASE="https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}"
+
+          # Ask the object store, not the CDN: the SPA fallback answers unknown paths with
+          # index.html and a 200, which would make a missing chunk look perfectly healthy.
+          missing=0
+          checked=0
+
+          while IFS= read -r file; do
+            rel="${file#"$BUILD_DIR"/}"
+            code=$(curl --silent --output /dev/null --write-out '%{http_code}' \
+              --retry 3 --retry-delay 2 --retry-all-errors --max-time 30 \
+              --range 0-0 \
+              --url "${BASE}/${rel}" \
+              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}")
+
+            if [ "$code" != "206" ] && [ "$code" != "200" ]; then
+              echo "MISSING ($code): $rel"
+              missing=$((missing + 1))
+            fi
+            checked=$((checked + 1))
+          done < <(find "$BUILD_DIR" -type f)
+
+          echo "Checked ${checked} files, ${missing} missing."
+
+          if [ "$missing" -gt 0 ]; then
+            echo "::error::${missing} of ${checked} files are not in storage. index.html was not switched over, so the old site is still being served."
+            exit 1
+          fi
 
       - name: Purge Bunny CDN cache
         shell: bash
@@ -274,6 +285,7 @@ jobs:
           set -euo pipefail
 
           curl --fail --silent --show-error \
+            --retry 5 --retry-delay 3 --retry-all-errors \
             --request POST \
             --url "https://api.bunny.net/pullzone/${BUNNY_PULL_ZONE_ID}/purgeCache" \
             --header "AccessKey: ${BUNNY_API_KEY}" \
@@ -281,6 +293,42 @@ jobs:
             --data '{}'
 
           echo "Bunny CDN cache purged."
+
+      - name: Prune files that are no longer part of the build
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          STORAGE_HOST="${BUNNY_STORAGE_REGION}.storage.bunnycdn.com"
+
+          # Runs after the new build is verified, so a failure here leaves a working site.
+          EXISTING=$(curl --silent --show-error --retry 3 --retry-all-errors \
+            --request GET \
+            --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/" \
+            --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+            || echo "[]")
+
+          if [ -z "$EXISTING" ] || [ "$EXISTING" = "null" ]; then
+            echo "No listing available. Skipping prune."
+            exit 0
+          fi
+
+          echo "$EXISTING" | jq -r '.[]? | select(.IsDirectory == false) | .ObjectName' | while read -r name; do
+            [ -z "$name" ] && continue
+            # Never delete the shell here: it is the pointer to the files just verified.
+            [ "$name" = "index.html" ] && continue
+
+            if [ ! -f "$BUILD_DIR/$name" ]; then
+              echo "Pruning: $name"
+              curl --silent --show-error --retry 3 --retry-all-errors \
+                --request DELETE \
+                --url "https://${STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${name}" \
+                --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
+                || echo "Could not prune $name (skipping)"
+            fi
+          done
+
+          echo "Prune complete."
 
       - name: Deployment complete
         run: echo "Production deployment complete."
