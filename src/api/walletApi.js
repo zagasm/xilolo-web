@@ -27,6 +27,15 @@ export async function getWalletPaymentMethods(token) {
   return unwrap(response);
 }
 
+export async function getWalletCurrencies(token) {
+  const response = await api.get(
+    "/api/v1/user-wallet/currencies",
+    authHeaders(token)
+  );
+
+  return unwrap(response);
+}
+
 export async function getWalletFundingQuote(payload, token) {
   const response = await api.post(
     "/api/v1/user-wallet/fundings/quote",
