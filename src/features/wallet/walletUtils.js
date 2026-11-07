@@ -14,6 +14,49 @@ export function getApiErrorCode(error) {
   );
 }
 
+const FUNDING_ERROR_COPY = {
+  MINIMUM_FUNDING_AMOUNT_NOT_MET: (data) => {
+    const minimum = Number(data?.minimum_amount);
+    const label = data?.method_label;
+    const currency = String(data?.currency || "");
+
+    if (!Number.isFinite(minimum) || minimum <= 0) {
+      return "That amount is below the minimum for this payment method.";
+    }
+
+    const symbol = currency === "NGN" ? "₦" : currency === "USD" ? "$" : `${currency} `;
+    const amount = `${symbol}${minimum.toLocaleString("en-NG")}`;
+
+    return label
+      ? `${label} needs at least ${amount}.`
+      : `The minimum top-up is ${amount}.`;
+  },
+  UNSUPPORTED_CURRENCY: (data) =>
+    `We cannot fund a wallet in ${data?.currency || "that currency"} yet.`,
+  FUNDING_PROVIDER_UNAVAILABLE: () =>
+    "That payment method is not available right now. Please pick another one.",
+  FUNDING_INITIALIZATION_FAILED: () =>
+    "We could not start that payment. Please try again in a moment.",
+};
+
+/**
+ * Funding errors carry a machine `code` plus the facts behind it. Prefer that over the raw
+ * `message` so a customer never reads "MINIMUM_FUNDING_AMOUNT_NOT_MET".
+ */
+export function getFundingErrorMessage(error, fallback = "Something went wrong.") {
+  const payload = error?.response?.data;
+  const code = payload?.code;
+  const localise = code && FUNDING_ERROR_COPY[code];
+
+  if (localise) return localise(payload?.data);
+
+  // A bare code smuggled into a message is still not something to show a human.
+  const raw = String(payload?.message || error?.message || "");
+  if (FUNDING_ERROR_COPY[raw]) return FUNDING_ERROR_COPY[raw](payload?.data);
+
+  return raw || fallback;
+}
+
 export function getApiErrorMessage(error, fallback = "Something went wrong.") {
   return (
     error?.response?.data?.message ||

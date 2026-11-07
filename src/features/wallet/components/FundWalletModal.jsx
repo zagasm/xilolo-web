@@ -19,6 +19,7 @@ import { useAuth } from "../../../pages/auth/AuthContext";
 import {
   getDefaultWalletProvider,
   getApiErrorMessage,
+  getFundingErrorMessage,
   groupWalletPaymentMethods,
 } from "../walletUtils";
 import PaymentMark from "./PaymentMark";
@@ -231,7 +232,7 @@ export default function FundWalletModal({
         setPreviewLoading(false);
         setReviewData(null);
         setFormError(
-          getApiErrorMessage(error, "Unable to initialize wallet funding.")
+          getFundingErrorMessage(error, "Unable to initialize wallet funding.")
         );
       }
     })();
@@ -309,7 +310,7 @@ export default function FundWalletModal({
 
       window.location.href = payload.authorization_url;
     } catch (error) {
-      const message = getApiErrorMessage(
+      const message = getFundingErrorMessage(
         error,
         "Unable to initialize wallet funding."
       );
