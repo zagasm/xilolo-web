@@ -21,12 +21,7 @@ import {
   getApiErrorMessage,
   groupWalletPaymentMethods,
 } from "../walletUtils";
-import {
-  formatForeign,
-  formatNaira,
-  getGroupAccent,
-  getGroupIcon,
-} from "../paymentMethodPresentation";
+import PaymentMark from "./PaymentMark";
 import {
   selectPendingWalletPurchase,
   setLastFundingContext,
@@ -324,9 +319,6 @@ export default function FundWalletModal({
     }
   };
 
-  const selectedMethod = selectableMethods.find((method) => method.value === provider);
-  const isCryptoFunding = String(provider).toLowerCase() === "cryptomus" || selectedMethod?.raw?.metadata?.category === "crypto";
-
   const handleClose = () => {
     if (previewLoading) return;
     onClose();
@@ -384,62 +376,49 @@ export default function FundWalletModal({
                         How do you want to pay?
                       </span>
 
-                      {methodGroups.map((group) => {
-                        const GroupIcon = getGroupIcon(group.icon);
-                        const accent = getGroupAccent(group.accent);
-
-                        return (
-                          <div key={group.code} className="tw:flex tw:flex-col tw:gap-2">
-                            <div className="tw:mt-1 tw:flex tw:items-center tw:gap-2">
-                              <GroupIcon className={`tw:h-3.5 tw:w-3.5 ${accent.text}`} />
-                              <span className="tw:text-[12px] tw:font-semibold tw:text-muted-strong">
-                                {group.label}
-                              </span>
-                            </div>
-
-                            {group.methods.map((method) => {
-                              const active = provider === method.value;
-
-                              return (
-                                <button
-                                  key={method.value}
-                                  type="button"
-                                  onClick={() => setProvider(method.value)}
-                                  aria-pressed={active}
-                                  className={`tw:flex tw:w-full tw:items-center tw:gap-3 tw:border tw:px-3.5 tw:py-2.5 tw:text-left tw:transition ${
-                                    active
-                                      ? accent.selected
-                                      : "tw:border-hairline tw:bg-white tw:hover:bg-paper"
-                                  }`}
-                                  style={{ borderRadius: 14 }}
-                                >
-                                  <span
-                                    className={`tw:flex tw:h-4 tw:w-4 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border-2 ${
-                                      active
-                                        ? `tw:border-transparent ${accent.dot}`
-                                        : "tw:border-faint"
-                                    }`}
-                                  >
-                                    {active ? (
-                                      <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-white" />
-                                    ) : null}
-                                  </span>
-                                  <span className="tw:min-w-0 tw:flex-1">
-                                    <span className="tw:block tw:text-[13.5px] tw:font-semibold tw:text-ink">
-                                      {method.label}
-                                    </span>
-                                    <span className="tw:mt-0.5 tw:block tw:truncate tw:text-[12px] tw:text-muted">
-                                      {method.metadata?.fee_note ||
-                                        method.metadata?.description ||
-                                        "Secure checkout."}
-                                    </span>
-                                  </span>
-                                </button>
-                              );
-                            })}
+                      {methodGroups.map((group) => (
+                        <div key={group.code} className="tw:flex tw:flex-col">
+                          <div className="tw:mt-2 tw:mb-1 tw:text-[10.5px] tw:font-semibold tw:uppercase tw:tracking-[0.14em] tw:text-muted">
+                            {group.label}
                           </div>
-                        );
-                      })}
+
+                          {group.methods.map((method) => {
+                            const active = provider === method.value;
+
+                            return (
+                              <button
+                                key={method.value}
+                                type="button"
+                                onClick={() => setProvider(method.value)}
+                                aria-pressed={active}
+                                className="tw:flex tw:w-full tw:items-center tw:gap-3 tw:py-2.5 tw:text-left tw:transition tw:hover:bg-paper"
+                                style={{ borderBottom: "1px solid rgba(17,19,22,0.06)" }}
+                              >
+                                <PaymentMark mark={method.metadata?.mark} label={method.label} />
+                                <span className="tw:min-w-0 tw:flex-1">
+                                  <span className="tw:block tw:text-[14px] tw:font-semibold tw:text-ink">
+                                    {method.label}
+                                  </span>
+                                  <span className="tw:mt-0.5 tw:block tw:line-clamp-2 tw:text-[12px] tw:text-muted">
+                                    {method.metadata?.description ||
+                                      method.metadata?.fee_note ||
+                                      "Secure checkout."}
+                                  </span>
+                                </span>
+                                <span
+                                  className={`tw:flex tw:h-5 tw:w-5 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:border-2 ${
+                                    active ? "tw:border-accent tw:bg-accent" : "tw:border-faint"
+                                  }`}
+                                >
+                                  {active ? (
+                                    <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-white" />
+                                  ) : null}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
 
                       {methodsError ? (
                         <span className="tw:text-[12px] tw:text-danger">
@@ -458,84 +437,9 @@ export default function FundWalletModal({
                       disabled={false}
                     />
 
-                    {previewLoading && currentInputPreviewKey ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#e5e4e2,#ffffff)] tw:p-4">
-                        <div className="tw:space-y-3 tw:animate-pulse">
-                          <div className="tw:h-4 tw:w-40 tw:rounded-full tw:bg-[#e9ddff]" />
-                          <div className="tw:flex tw:items-center tw:justify-between">
-                            <div className="tw:h-3 tw:w-28 tw:rounded-full tw:bg-[#f0e8ff]" />
-                            <div className="tw:h-3 tw:w-20 tw:rounded-full tw:bg-[#f0e8ff]" />
-                          </div>
-                          <div className="tw:flex tw:items-center tw:justify-between">
-                            <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-[#f0e8ff]" />
-                            <div className="tw:h-3 tw:w-16 tw:rounded-full tw:bg-[#f0e8ff]" />
-                          </div>
-                          <div className="tw:flex tw:items-center tw:justify-between">
-                            <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-[#f0e8ff]" />
-                            <div className="tw:h-3 tw:w-24 tw:rounded-full tw:bg-[#f0e8ff]" />
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {reviewData ? (
-                      <div className="tw:rounded-3xl tw:border tw:border-[#ded6cd] tw:bg-[linear-gradient(135deg,#e5e4e2,#ffffff)] tw:p-4">
-                        <div className="tw:text-sm tw:font-semibold tw:text-gray-900">
-                          Review funding charge
-                        </div>
-                        <div className="tw:mt-4 tw:space-y-3 tw:text-sm">
-                          {Number(reviewData.bonus_amount || 0) > 0 ? (
-                            <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
-                              <span>
-                                Bonus credit
-                                {reviewData.bonus_percent ? (
-                                  <span className="tw:ml-1 tw:text-[11px] tw:font-semibold tw:text-amber-700">
-                                    {reviewData.bonus_percent}%
-                                  </span>
-                                ) : null}
-                              </span>
-                              <span className="tw:font-semibold tw:text-emerald-600">
-                                +{Number(reviewData.bonus_amount || 0).toLocaleString()}
-                              </span>
-                            </div>
-                          ) : null}
-                          <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
-                            <span>Wallet credit</span>
-                            <span className="tw:font-semibold tw:text-gray-900">
-                              {formatNaira(reviewData.requested_credit_amount || 0)}
-                            </span>
-                          </div>
-                          <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
-                            <span>Gateway fee</span>
-                            <span className="tw:font-semibold tw:text-gray-900">
-                              {formatNaira(reviewData.fee_amount || 0)}
-                            </span>
-                          </div>
-                          <div className="tw:flex tw:items-center tw:justify-between tw:text-gray-600">
-                            <span>Total charged</span>
-                            <span className="tw:font-semibold tw:text-gray-900">
-                              {String(
-                                reviewData.gateway_charge_currency ||
-                                  reviewData.currency
-                              ).toUpperCase() ===
-                              String(reviewData.currency).toUpperCase() ? (
-                                formatNaira(reviewData.total_charge_amount || 0)
-                              ) : (
-                                formatForeign(
-                                  reviewData.gateway_charge_amount || 0,
-                                  reviewData.gateway_charge_currency
-                                )
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                        {isCryptoFunding ? (
-                          <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-primary/20 tw:bg-primary/5 tw:p-3 tw:text-xs tw:text-gray-600">
-                            Crypto funding is processed by {selectedMethod?.label || "Cryptomus"}. The gateway fee is added to your charge, so your wallet receives only the credit amount shown above.
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
+                    <p className="tw:mt-1 tw:text-[11.5px] tw:leading-snug tw:text-gray-500">
+                      The final amount and any provider fee are shown on the secure checkout page.
+                    </p>
 
                     {methodsError && (
                       <div className="tw:rounded-2xl tw:border tw:border-amber-200 tw:bg-amber-50 tw:p-3 tw:text-sm tw:text-amber-800">
