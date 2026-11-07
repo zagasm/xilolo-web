@@ -40,8 +40,22 @@ export default function WalletFundingCallbackPage() {
   });
   const navigate = useNavigate();
 
+  // Some vendors (Bachs, for one) return to our success URL without the funding reference.
+  // We stash it before leaving for checkout so the return screen can still verify.
+  const storedFunding = React.useMemo(() => {
+    try {
+      const raw = window.sessionStorage.getItem("xilolo:pending-wallet-funding");
+      return raw ? JSON.parse(raw) : null;
+    } catch (_error) {
+      return null;
+    }
+  }, []);
+
   const provider = String(
-    searchParams.get("provider") || lastFunding?.provider || ""
+    searchParams.get("provider") ||
+      lastFunding?.provider ||
+      storedFunding?.provider ||
+      ""
   ).toLowerCase();
   const cryptomusStatus = String(
     searchParams.get("status") ||
@@ -64,6 +78,7 @@ export default function WalletFundingCallbackPage() {
     searchParams.get("trxref") ||
     searchParams.get("order_id") ||
     lastFunding?.reference ||
+    storedFunding?.reference ||
     "";
 
   const verifyFunding = useVerifyWalletFunding({
@@ -240,6 +255,12 @@ export default function WalletFundingCallbackPage() {
       return undefined;
     }
 
+    try {
+      window.sessionStorage.removeItem("xilolo:pending-wallet-funding");
+    } catch (_error) {
+      // Nothing to clear if storage is unavailable.
+    }
+
     if (pendingPurchase?.eventId && purchaseState.status !== "success") {
       return undefined;
     }
@@ -304,9 +325,9 @@ export default function WalletFundingCallbackPage() {
                 Payment confirmation pending
               </div>
               <div className="tw:mt-3 tw:text-sm tw:text-gray-500">
-                Cryptomus is still confirming your crypto payment. Your wallet
-                will be credited automatically after the blockchain payment is
-                confirmed and Cryptomus sends the webhook.
+                Your payment is still confirming with the provider. Your wallet
+                will be credited automatically as soon as the payment is
+                confirmed and the signed webhook lands.
               </div>
               {reference ? (
                 <div className="tw:mt-5 tw:rounded-2xl tw:bg-amber-50 tw:px-4 tw:py-3 tw:text-xs tw:font-medium tw:text-amber-800">
