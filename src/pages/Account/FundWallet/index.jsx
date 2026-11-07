@@ -80,7 +80,11 @@ export default function FundWalletPage() {
 
   const quoteReady = Boolean(quote) && quote?.provider === provider;
   const minimumAmount = Number(quote?.minimum_amount || 100);
-  const amountTooSmall = numericAmount > 0 && numericAmount < minimumAmount;
+  // The floor is per rail and comes from the server (a card top-up carries a fixed $0.40,
+  // crypto carries network cost). Before the quote lands, fall back to the naira minimum.
+  const amountTooSmall = quoteReady
+    ? quote?.meets_minimum === false
+    : numericAmount > 0 && numericAmount < minimumAmount;
   // Between selecting a rail and its price arriving (an FX conversion takes a beat), show a
   // shimmer instead of a zero. A stale "₦0 fee" reads as a broken page, not as loading.
   const quotePending = numericAmount > 0 && !amountTooSmall && !quoteReady;
@@ -208,17 +212,24 @@ export default function FundWalletPage() {
               </div>
 
               <div className="tw:mt-4 tw:grid tw:grid-cols-4 tw:gap-2">
-                              {PRESETS.map((preset) => {
-                  const active = Number(numericAmount) === preset;
+                {PRESETS.map((preset) => {
+                  // A preset below the selected rail's floor is not offered: on a card it
+                  // would be a fee with a top-up attached. It can never read as "selected".
+                  const belowFloor = preset < minimumAmount;
+                  const active = Number(numericAmount) === preset && !belowFloor;
                   return (
                     <button
                       key={preset}
                       type="button"
                       onClick={() => setAmount(String(preset))}
+                      disabled={belowFloor}
+                      title={belowFloor ? `Minimum for this method is ${formatNaira(minimumAmount)}` : undefined}
                       className={`tw:truncate tw:rounded-full tw:px-2 tw:py-1.5 tw:text-center tw:text-[12.5px] tw:font-semibold tw:transition ${
                         active
                           ? "tw:bg-ink tw:text-white"
-                          : "tw:bg-chip tw:text-ink tw:hover:bg-inner"
+                          : belowFloor
+                            ? "tw:bg-chip/60 tw:text-faint tw:cursor-not-allowed"
+                            : "tw:bg-chip tw:text-ink tw:hover:bg-inner"
                       }`}
                     >
                       {formatNaira(preset)}
@@ -229,7 +240,8 @@ export default function FundWalletPage() {
 
               {amountTooSmall ? (
                 <p className="tw:mt-3! tw:text-[13px] tw:font-medium tw:text-danger">
-                  Minimum top-up is {formatNaira(minimumAmount)}.
+                  {selectedMethod?.label || "This method"} needs at least{" "}
+                  {formatNaira(minimumAmount)}.
                 </p>
               ) : null}
             </section>
@@ -351,6 +363,11 @@ export default function FundWalletPage() {
                                   {assets ? (
                                     <span className="tw:rounded-full tw:bg-chip tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-semibold tw:text-muted-strong">
                                       {assets}
+                                    </span>
+                                  ) : null}
+                                  {Number(method.metadata?.min_amount) > 100 ? (
+                                    <span className="tw:rounded-full tw:bg-chip tw:px-2 tw:py-0.5 tw:text-[10px] tw:font-semibold tw:text-muted-strong">
+                                      Min {formatNaira(method.metadata.min_amount)}
                                     </span>
                                   ) : null}
                                 </span>
