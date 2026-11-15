@@ -138,6 +138,7 @@ const EventEditPage = lazy(() => import("./pages/event/EventEditPage.jsx"));
 // import DisableRightClick from "./component/DisableRightClick.jsx";
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import OpenInAppBanner from "./component/OpenInAppBanner";
+import ShareLinkHandoff from "./component/ShareLinkHandoff";
 import EventShareRedirect from "./component/Events/EventShareRedirect.jsx";
 /* lazily loaded — keeps this page out of the first-load bundle */
 const EventStreamControlPage = lazy(() => import("./pages/event/EventStreamControlPage.jsx"));
@@ -561,6 +562,9 @@ export function App() {
           the cases where they don't (in-app browsers, installs from outside the
           stores, iOS cache). */}
       <OpenInAppBanner />
+      {/* A signed-out visitor on a phone who opens a shared link lands in the app
+          instead of a sign-in form. Silent when a session exists. */}
+      <ShareLinkHandoff />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
         <Route path="/maintenance" element={<MaintenancePage />} />

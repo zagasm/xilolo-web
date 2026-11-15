@@ -6,9 +6,7 @@ import SEO from "../../component/SEO";
 import { useSharedEventPage } from "../../features/eventShare/hooks/useSharedEventPage";
 import { getEventDescription } from "../../features/eventShare/shareUtils";
 
-// TODO(mobile): confirm the real App Store Apple ID + iOS bundle identifier.
-const APP_STORE_URL =
-  "https://apps.apple.com/app/id0000000000"; // Apple ID from the mobile team
+const APP_STORE_URL = "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.zagasmstudio.app";
 
