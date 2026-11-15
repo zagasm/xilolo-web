@@ -1,58 +1,123 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, ArrowRight, Send, MessagesSquare } from "lucide-react";
-import { Button, Card, Chip, Field, Input, SectionHeading } from "../ui";
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  Link as MuiLink,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { showSuccess } from "../ui/toast";
 
 /**
- * Contact form + contact details.
+ * Contact form + contact details — presentation rebuilt on Material UI.
  *
- * STYLING PASS ONLY. The form logic is untouched: same `submitting` / `sent`
- * state, same `handleSubmit` (preventDefault → 900ms simulated submit →
- * showSuccess), same control types, `required` flags, default values and
- * placeholder copy. There is no API call to preserve — this screen has always
- * been the simulated-submit version.
+ * ── What was NOT touched (functional contract) ──────────────────────────────
+ * `submitting` / `sent` state, `handleSubmit` (preventDefault → guard on
+ * submitting → 900ms → setSent → showSuccess with the same string), the
+ * simulated submit with no endpoint, the visual order of the six controls,
+ * every label, placeholder, option value, `required` flag and default value,
+ * `disabled={submitting}`, and the "Sending…" / "Send message" labels.
  *
- * Presentation uses the shared primitives (Card / Field / Input / Button / Chip
- * / SectionHeading): flat, hairline borders, 12px cards, pill buttons, accent as
- * a fill with ink on top. The retired cyan glow blobs, #050505 panels,
- * `0 24px 70px` shadows and white-on-accent button are gone.
+ * ── What changed (presentation only) ────────────────────────────────────────
+ * The Tailwind primitives (Card / Field / Input / Button) and the hand-rolled
+ * <select>/<textarea> recipes are replaced by Paper, TextField (outlined, with
+ * `multiline` for the two textareas), Select + MenuItem, Button and Chip from
+ * @mui/material, styled through muiTheme tokens via sx: 12px radii, hairline
+ * borders, no elevation, accent as a fill with a white label, 48px submit.
  *
- * Real, verified contact details only (as already carried in this repo):
- * support@xilolo.com · +234 802 379 7265 · 16192 Coastal Highway, Lewes,
- * Delaware 19958, Sussex County, United States — plus the existing
- * support-hours line and a link to the existing /support route.
+ * The dark rail stays dark (ink surface) because that contrast is the point of
+ * the column, but it is flattened: hairline dividers instead of bordered tiles,
+ * 10px tracked captions as labels, 15px semibold values, no icon circles and
+ * no glow. Real details only: support@xilolo.com, +234 802 379 7265,
+ * Mon – Sat 10:00 – 17:00 WAT, 16192 Coastal Highway, Lewes, Delaware 19958.
  *
- * ── Why the `!` suffixes ────────────────────────────────────────────────────
- * Tailwind ships in `@layer utilities`; Bootstrap's reboot and the template
- * stylesheet are unlayered and therefore win on the properties their ELEMENT
- * rules declare (`#root p{color:inherit}`, `a{color}`, `h1..h6{font-weight:500;
- * margin-bottom:.5rem}`, `button{border-radius:0}`). Utilities that collide with
- * those carry Tailwind's important modifier so the tokens land. Arbitrary child
- * variants are used to reach inside the shared SectionHeading, whose internal
- * <p>/<h2> hit the same trap; the primitive itself is not modified.
+ * Colour note: `#root p { color: inherit }` in the template sheet outranks
+ * MUI's class-based colours, so muted body copy is tinted on its container and
+ * rendered as a plain <p> inside it.
  */
 
-const micro = "tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em]";
+const LABELS = {
+  role: {
+    creator: "Creator / Host",
+    agency: "Agency",
+    brand: "Brand / Organisation",
+    event: "Event organiser",
+    other: "Other",
+  },
+  cadence: {
+    once: "One-off / occasional",
+    monthly: "1 to 3 times per month",
+    weekly: "Weekly",
+    often: "Multiple times per week",
+  },
+};
 
-/* Selects and textareas are not part of the Input primitive, so they reuse its
-   exact token recipe rather than inventing a second input look. */
-const controlBase =
-  "tw:w-full tw:rounded-control tw:border tw:border-hairline tw:bg-paper-raised " +
-  "tw:px-3.5 tw:text-base! tw:text-ink tw:outline-none tw:placeholder:text-faint " +
-  "tw:focus:border-accent tw:focus:ring-2 tw:focus:ring-accent/25";
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    fontSize: 15,
+    borderRadius: "12px",
+    backgroundColor: "background.paper",
+    boxShadow: "none",
+  },
+  "& .MuiOutlinedInput-input": { padding: "13px 16px" },
+  "& .MuiOutlinedInput-inputMultiline": { padding: "12px 16px", lineHeight: 1.6 },
+  "& .MuiSelect-select": { py: 1.65, px: 2 },
+  "& .MuiSelect-icon": { color: "text.secondary", right: 12 },
+};
 
-const selectClass = `${controlBase} tw:h-12`;
-const textareaClass = `${controlBase} tw:min-h-[112px] tw:resize-none tw:py-2.5`;
+const labelSx = {
+  display: "block",
+  mb: 1,
+  fontSize: 10.5,
+  fontWeight: 600,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "text.secondary",
+  lineHeight: 1.5,
+};
 
-/* SectionHeading internals: kill Bootstrap's heading margin/weight and the
-   greyscale on its paragraph. */
-const headingFixes =
-  "tw:[&>h2]:m-0! tw:[&>h2]:font-extrabold! tw:[&>p]:m-0! tw:[&>p]:text-muted-strong!";
+const captionSx = {
+  fontSize: 10,
+  fontWeight: 600,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  lineHeight: 1.5,
+};
 
-const detailRow = "tw:flex tw:items-start tw:gap-3 tw:rounded-card tw:border tw:border-hairline-dark tw:p-3";
-const detailIcon =
-  "tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-pill tw:bg-paper-raised/10 tw:text-ink-muted";
+function FieldLabel({ htmlFor, id, children }) {
+  return (
+    <Typography component="label" htmlFor={htmlFor} id={id} sx={labelSx}>
+      {children}
+    </Typography>
+  );
+}
+
+/** One row of the dark rail: tracked caption over a 15px semibold value. */
+function RailRow({ caption, children, last = false }) {
+  return (
+    <Box
+      sx={{
+        py: 2,
+        borderBottom: last ? "none" : "1px solid",
+        borderColor: (theme) => alpha(theme.palette.common.white, 0.14),
+        "&:last-of-type": { pb: 0 },
+      }}
+    >
+      <Typography component="div" sx={{ ...captionSx, color: (theme) => alpha(theme.palette.common.white, 0.62) }}>
+        {caption}
+      </Typography>
+      <Box sx={{ mt: 0.75 }}>{children}</Box>
+    </Box>
+  );
+}
 
 export default function ContactFormSection() {
   const [submitting, setSubmitting] = useState(false);
@@ -70,175 +135,372 @@ export default function ContactFormSection() {
   };
 
   return (
-    <section className="tw:grid tw:grid-cols-1 tw:gap-6 tw:lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] tw:lg:items-start tw:lg:gap-8">
-      {/* ── Form ───────────────────────────────────────────────────────────── */}
-      <Card className="tw:p-5 tw:md:p-6">
-        <SectionHeading
-          title="Tell us about your event"
-          subtitle="A few details help us respond with something useful, not a generic reply."
-          className={headingFixes}
-        />
+    <Box
+      component="section"
+      id="contact-form"
+      aria-labelledby="contact-form-title"
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "minmax(0, 1fr)", lg: "minmax(0, 7fr) minmax(0, 5fr)" },
+        columnGap: { lg: 4 },
+        rowGap: { xs: 4, md: 4 },
+        alignItems: "start",
+        scrollMarginTop: "24px",
+      }}
+    >
+      {/* ── Brief ─────────────────────────────────────────────────────────── */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2.5, md: 4 },
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "12px",
+          bgcolor: "background.paper",
+          boxShadow: "none",
+        }}
+      >
+        <Typography id="contact-form-title" variant="h2" component="h2" sx={{ fontSize: { xs: 24, md: 28 }, letterSpacing: "-0.025em" }}>
+          Tell us about your event
+        </Typography>
+
+        <Box sx={{ mt: 1.25, maxWidth: "56ch", color: "text.secondary" }}>
+          <Typography component="p" sx={{ fontSize: 14.5, lineHeight: 1.6 }}>
+            A few details help us respond with something useful, not a generic reply.
+          </Typography>
+        </Box>
 
         {sent ? (
-          /* Success state — flat; accent FILL with ink icon (white on accent is 2.97:1) */
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-3 tw:py-14 tw:text-center">
-            <span className="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-pill tw:bg-accent tw:text-ink">
-              <Send className="tw:size-5" aria-hidden="true" />
-            </span>
-            <p className="tw:m-0! tw:font-display tw:text-lg tw:font-bold tw:text-ink!">
+          /* Success state — flat, left-aligned, no coloured icon disc. */
+          <Box sx={{ mt: 4, pt: 3.5, pb: 2, borderTop: "1px solid", borderColor: "divider" }}>
+            <Typography component="div" sx={{ ...captionSx, color: "primary.dark" }}>
+              Sent
+            </Typography>
+            <Typography variant="h3" component="h3" sx={{ mt: 1.5, fontSize: 22, letterSpacing: "-0.02em" }}>
               Message sent
-            </p>
-            <p className="tw:m-0! tw:max-w-[42ch] tw:text-sm tw:text-muted-strong!">
-              We will get back to you within 24 hours. Check your inbox.
-            </p>
-          </div>
+            </Typography>
+            <Box sx={{ mt: 1, maxWidth: "46ch", color: "text.secondary" }}>
+              <Typography component="p" sx={{ fontSize: 15, lineHeight: 1.62 }}>
+                We will get back to you within 24 hours. Check your inbox.
+              </Typography>
+            </Box>
+          </Box>
         ) : (
-          <form className="tw:mt-6 tw:flex tw:flex-col tw:gap-4" onSubmit={handleSubmit}>
-            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2">
-              <Field label="Full name">
-                <Input type="text" required placeholder="Your name" className="tw:text-base!" />
-              </Field>
-              <Field label="Email">
-                <Input type="email" required placeholder="you@brand.com" className="tw:text-base!" />
-              </Field>
-            </div>
+          <Box
+            component="form"
+            noValidate={false}
+            onSubmit={handleSubmit}
+            sx={{ mt: 3.5, display: "flex", flexDirection: "column", gap: 2.5 }}
+          >
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
+              <Box>
+                <FieldLabel htmlFor="contact-full-name">Full name</FieldLabel>
+                <TextField
+                  id="contact-full-name"
+                  type="text"
+                  required
+                  placeholder="Your name"
+                  fullWidth
+                  sx={fieldSx}
+                />
+              </Box>
 
-            <div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:md:grid-cols-2">
-              <Field label="You are">
-                <select className={selectClass} defaultValue="" required>
-                  <option value="" disabled>Choose one</option>
-                  <option value="creator">Creator / Host</option>
-                  <option value="agency">Agency</option>
-                  <option value="brand">Brand / Organisation</option>
-                  <option value="event">Event organiser</option>
-                  <option value="other">Other</option>
-                </select>
-              </Field>
-              <Field label="How often do you host?">
-                <select className={selectClass} defaultValue="" required>
-                  <option value="" disabled>Select one</option>
-                  <option value="once">One-off / occasional</option>
-                  <option value="monthly">1 to 3 times per month</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="often">Multiple times per week</option>
-                </select>
-              </Field>
-            </div>
+              <Box>
+                <FieldLabel htmlFor="contact-email">Email</FieldLabel>
+                <TextField
+                  id="contact-email"
+                  type="email"
+                  required
+                  placeholder="you@brand.com"
+                  fullWidth
+                  sx={fieldSx}
+                />
+              </Box>
+            </Box>
 
-            <Field label="What do you want to host?">
-              <textarea
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2.5 }}>
+              <Box>
+                <FieldLabel htmlFor="contact-role" id="contact-role-label">
+                  You are
+                </FieldLabel>
+                <Select
+                  id="contact-role"
+                  defaultValue=""
+                  required
+                  displayEmpty
+                  fullWidth
+                  labelId="contact-role-label"
+                  MenuProps={{
+                    slotProps: {
+                      paper: {
+                        sx: {
+                          mt: 0.75,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: "12px",
+                          boxShadow: "none",
+                          bgcolor: "background.paper",
+                          "& .MuiMenuItem-root": { fontSize: 14, minHeight: 40, px: 2 },
+                          "& .MuiMenuItem-root.Mui-selected": {
+                            bgcolor: "rgba(22, 144, 156, 0.08)",
+                          },
+                        },
+                      },
+                    },
+                  }}
+                  renderValue={(value) =>
+                    value === "" ? (
+                      <Box component="span" sx={{ color: "text.disabled" }}>
+                        Choose one
+                      </Box>
+                    ) : (
+                      LABELS.role[value]
+                    )
+                  }
+                  sx={fieldSx}
+                >
+                  <MenuItem value="" disabled>
+                    Choose one
+                  </MenuItem>
+                  <MenuItem value="creator">Creator / Host</MenuItem>
+                  <MenuItem value="agency">Agency</MenuItem>
+                  <MenuItem value="brand">Brand / Organisation</MenuItem>
+                  <MenuItem value="event">Event organiser</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
+                </Select>
+              </Box>
+
+              <Box>
+                <FieldLabel htmlFor="contact-cadence" id="contact-cadence-label">
+                  How often do you host?
+                </FieldLabel>
+                <Select
+                  id="contact-cadence"
+                  defaultValue=""
+                  required
+                  displayEmpty
+                  fullWidth
+                  labelId="contact-cadence-label"
+                  MenuProps={{
+                    slotProps: {
+                      paper: {
+                        sx: {
+                          mt: 0.75,
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: "12px",
+                          boxShadow: "none",
+                          bgcolor: "background.paper",
+                          "& .MuiMenuItem-root": { fontSize: 14, minHeight: 40, px: 2 },
+                          "& .MuiMenuItem-root.Mui-selected": {
+                            bgcolor: "rgba(22, 144, 156, 0.08)",
+                          },
+                        },
+                      },
+                    },
+                  }}
+                  renderValue={(value) =>
+                    value === "" ? (
+                      <Box component="span" sx={{ color: "text.disabled" }}>
+                        Select one
+                      </Box>
+                    ) : (
+                      LABELS.cadence[value]
+                    )
+                  }
+                  sx={fieldSx}
+                >
+                  <MenuItem value="" disabled>
+                    Select one
+                  </MenuItem>
+                  <MenuItem value="once">One-off / occasional</MenuItem>
+                  <MenuItem value="monthly">1 to 3 times per month</MenuItem>
+                  <MenuItem value="weekly">Weekly</MenuItem>
+                  <MenuItem value="often">Multiple times per week</MenuItem>
+                </Select>
+              </Box>
+            </Box>
+
+            <Box>
+              <FieldLabel htmlFor="contact-host">What do you want to host?</FieldLabel>
+              <TextField
+                id="contact-host"
+                multiline
                 rows={4}
                 required
+                fullWidth
                 placeholder="Concert, talk show, church service, comedy night, community hangout, training, panel…"
-                className={textareaClass}
+                sx={fieldSx}
               />
-            </Field>
+            </Box>
 
-            <Field label="When is your next event?">
-              <textarea
+            <Box>
+              <FieldLabel htmlFor="contact-when">When is your next event?</FieldLabel>
+              <TextField
+                id="contact-when"
+                multiline
                 rows={2}
+                fullWidth
                 placeholder="Date, time, and any deadlines you are working with"
-                className={textareaClass}
+                sx={fieldSx}
               />
-            </Field>
+            </Box>
 
-            <div className="tw:flex tw:flex-col tw:items-start tw:gap-3 tw:border-t tw:border-hairline tw:pt-4">
-              {/* 50px pill — Bootstrap's `button{border-radius:0}` is neutralised */}
+            <Box
+              sx={{
+                mt: 0.5,
+                pt: 3,
+                borderTop: "1px solid",
+                borderColor: "divider",
+                display: "flex",
+                flexDirection: "column",
+                gap: 1.5,
+              }}
+            >
               <Button
                 type="submit"
-                size="lg"
+                variant="contained"
+                fullWidth
                 disabled={submitting}
-                className="tw:rounded-pill! tw:text-base! tw:w-full tw:sm:w-auto"
+                sx={{ height: 48, fontSize: 15 }}
               >
                 {submitting ? "Sending…" : "Send message"}
-                <ArrowRight className="tw:size-4" aria-hidden="true" />
               </Button>
-              <p className="tw:m-0! tw:text-xs tw:text-muted-strong!">
-                We only use your details to reply to this message.
-              </p>
-            </div>
-          </form>
+
+              <Box sx={{ color: "text.secondary" }}>
+                <Typography component="p" sx={{ fontSize: 13, lineHeight: 1.55 }}>
+                  We only use your details to reply to this message.
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
         )}
-      </Card>
+      </Paper>
 
-      {/* ── Details (the page's one dark break) ───────────────────────────── */}
-      <div className="tw:flex tw:flex-col tw:gap-4">
-        <Card dark className="tw:p-5 tw:md:p-6">
-          <p className={`tw:m-0! tw:text-ink-muted! ${micro}`}>Xilolo contact</p>
-          <p className="tw:mt-3! tw:mb-0! tw:text-sm tw:leading-snug tw:text-paper! tw:md:text-[15px]">
-            If you already have a fixed date, include it. We prioritize messages
-            with clear timelines.
-          </p>
+      {/* ── Dark rail (the page's one ink surface) + the "already a user" note ─ */}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, minWidth: 0 }}>
+        <Box
+          sx={{
+            bgcolor: "secondary.main",
+            color: "common.white",
+            borderRadius: "12px",
+            p: { xs: 2.5, md: 3 },
+          }}
+        >
+          <Typography
+            component="div"
+            sx={{ ...captionSx, color: (theme) => alpha(theme.palette.common.white, 0.62) }}
+          >
+            Xilolo contact
+          </Typography>
 
-          <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-3">
-            <div className={detailRow}>
-              <span className={detailIcon}>
-                <Mail className="tw:size-3.5" aria-hidden="true" />
-              </span>
-              <div className="tw:flex tw:flex-col">
-                <span className={micro + " tw:text-ink-muted"}>Email</span>
-                <a
-                  href="mailto:support@xilolo.com"
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:text-sm tw:font-semibold tw:text-paper-raised! tw:hover:underline!"
-                >
-                  support@xilolo.com
-                </a>
-              </div>
-            </div>
+          <Box sx={{ mt: 1.5, color: (theme) => alpha(theme.palette.common.white, 0.88) }}>
+            <Typography component="p" sx={{ fontSize: 14.5, lineHeight: 1.6 }}>
+              If you already have a fixed date, include it. We prioritize messages
+              with clear timelines.
+            </Typography>
+          </Box>
 
-            <div className={detailRow}>
-              <span className={detailIcon}>
-                <Phone className="tw:size-3.5" aria-hidden="true" />
-              </span>
-              <div className="tw:flex tw:flex-col">
-                <span className={micro + " tw:text-ink-muted"}>Xilolo line</span>
-                <a
-                  href="tel:+2348023797265"
-                  className="tw:inline-flex tw:h-11 tw:items-center tw:text-sm tw:font-semibold tw:text-paper-raised! tw:hover:underline!"
-                >
-                  +234 802 379 7265
-                </a>
-                <span className="tw:text-xs tw:text-ink-muted">Mon – Sat, 10:00 – 17:00 WAT</span>
-              </div>
-            </div>
+          <Box sx={{ mt: 2 }}>
+            <RailRow caption="Email">
+              <MuiLink
+                href="mailto:support@xilolo.com"
+                sx={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "common.white",
+                  textUnderlineOffset: "3px",
+                  "&:hover": { color: (theme) => alpha(theme.palette.common.white, 0.78) },
+                }}
+              >
+                support@xilolo.com
+              </MuiLink>
+            </RailRow>
 
-            <div className={detailRow}>
-              <span className={detailIcon}>
-                <MapPin className="tw:size-3.5" aria-hidden="true" />
-              </span>
-              <div className="tw:flex tw:flex-col">
-                <span className={micro + " tw:text-ink-muted"}>Office</span>
-                <span className="tw:text-sm tw:font-semibold tw:leading-snug tw:text-paper-raised">
-                  16192 Coastal Highway, Lewes
-                </span>
-                <span className="tw:text-xs tw:leading-relaxed tw:text-ink-muted">
-                  Delaware 19958, Sussex County
-                  <br />
-                  United States
-                </span>
-              </div>
-            </div>
-          </div>
-        </Card>
+            <RailRow caption="Xilolo line">
+              <MuiLink
+                href="tel:+234****7265"
+                sx={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "common.white",
+                  textUnderlineOffset: "3px",
+                  "&:hover": { color: (theme) => alpha(theme.palette.common.white, 0.78) },
+                }}
+              >
+                +234 802 379 7265
+              </MuiLink>
+              <Typography
+                component="div"
+                sx={{ mt: 0.5, fontSize: 13, color: (theme) => alpha(theme.palette.common.white, 0.62), lineHeight: 1.5 }}
+              >
+                Mon – Sat, 10:00 – 17:00 WAT
+              </Typography>
+            </RailRow>
 
-        <Card className="tw:flex tw:flex-col tw:gap-2">
-          <p className={`tw:m-0! tw:text-muted-strong! ${micro}`}>Already using Xilolo?</p>
-          <p className="tw:m-0! tw:text-sm tw:leading-relaxed tw:text-muted-strong!">
-            For billing or show-day issues, use the in-app help section. This form
-            is best for new projects and collaborations.
-          </p>
-          <div className="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-            <Chip icon={MessagesSquare}>In-app help</Chip>
-            <Link
+            <RailRow caption="Office" last>
+              <Typography sx={{ fontSize: 15, fontWeight: 600, color: "common.white", lineHeight: 1.45 }}>
+                16192 Coastal Highway, Lewes
+              </Typography>
+              <Typography
+                component="div"
+                sx={{ mt: 0.5, fontSize: 13, color: (theme) => alpha(theme.palette.common.white, 0.62), lineHeight: 1.55 }}
+              >
+                Delaware 19958, Sussex County
+                <br />
+                United States
+              </Typography>
+            </RailRow>
+          </Box>
+        </Box>
+
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 2.5, md: 3 },
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "12px",
+            bgcolor: "background.paper",
+            boxShadow: "none",
+          }}
+        >
+          <Typography component="div" sx={{ ...captionSx, color: "text.secondary" }}>
+            Already using Xilolo?
+          </Typography>
+
+          <Box sx={{ mt: 1.25, color: "text.secondary" }}>
+            <Typography component="p" sx={{ fontSize: 14, lineHeight: 1.62 }}>
+              For billing or show-day issues, use the in-app help section. This
+              form is best for new projects and collaborations.
+            </Typography>
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+            <Chip label="In-app help" variant="outlined" size="small" />
+
+            <MuiLink
+              component={Link}
               to="/support"
-              className="tw:inline-flex tw:h-11 tw:items-center tw:gap-1.5 tw:text-sm tw:font-semibold tw:text-accent-deep! tw:hover:underline!"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.5,
+                minHeight: 40,
+                fontSize: 14,
+                fontWeight: 600,
+                color: "primary.dark",
+                textUnderlineOffset: "3px",
+              }}
             >
               Open support
-              <ArrowRight className="tw:size-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </Card>
-      </div>
-    </section>
+              <ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />
+            </MuiLink>
+          </Box>
+        </Paper>
+      </Box>
+    </Box>
   );
 }

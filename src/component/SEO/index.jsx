@@ -4,15 +4,15 @@ import StructuredData from './StructuredData';
 
 const SEO = ({
   title = 'Xilolo',
-  description = 'Discover and create amazing events with Xilolo - your destination for live experiences, creators, and social commerce.',
-  keywords = 'Xilolo, events, event management, tickets, organizers, concerts, parties, entertainment, social events',
-  image = '/images/event-dummy.jpg',
+  description = 'Creators have something to offer. Audience have something to discover. Xilolo brings them together — find live events near you, buy tickets in seconds, host your own show, and get paid directly.',
+  keywords = 'Xilolo, live events, event tickets, buy tickets online, host an event, event platform Nigeria, concerts, festivals, comedy shows, online events, creators, organisers',
+  image = '/og-image.png',
   url = typeof window !== 'undefined' ? window.location.href : 'https://xilolo.com',
   type = 'website',
-  author = 'Xilolo',
+  author = 'Xilolo Technologies',
   twitterCard = 'summary_large_image',
   locale = 'en_US',
-  twitterSite = '@zagasmstudios',
+  twitterSite = '@xilolo_hq',
   publishedTime,
   modifiedTime,
   noIndex = false,
@@ -78,8 +78,12 @@ const SEO = ({
         <meta name="language" content="English" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#050505" />
-        <link rel="apple-touch-icon" href="/img/logo.png" />
+        <meta name="theme-color" content="#F3F2F0" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </Helmet>

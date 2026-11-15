@@ -1,16 +1,18 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { Card, Chip, SectionHeading } from "../ui";
+import { Box, Typography } from "@mui/material";
+import { Body, Caption, Eyebrow, Lead, SECTION_SX, SectionTitle } from "./AboutPrimitives";
 
 /**
  * "Made for real events" — who the platform is for.
  *
- * The intro line used to end with "...real audiences and real revenue." The
- * revenue claim was removed (founder instruction); the rest of the copy is
- * carried over verbatim.
+ * Two columns: prose on the left, a hairline list of what is actually in the
+ * product on the right. This replaces the old 3-card mosaic; the facts are the
+ * same ones (the six feature names, the team-roles line, "built for creators
+ * everywhere"), the 24/7 and +42 countries numbers now live in the stat strip
+ * above so they are not printed twice.
  *
- * Body copy uses <span className="tw:block">, not <p>: `#root p { color: inherit }`
- * outranks every tw:text-* utility on a paragraph, so <p> would lose the tokens.
+ * The intro used to end with "...real audiences and real revenue." — the
+ * revenue claim was removed by founder instruction and is not to come back.
  */
 const FEATURES = [
   "Creator tools",
@@ -21,131 +23,124 @@ const FEATURES = [
   "Payouts",
 ];
 
-const FLAGS = ["🇳🇬", "🇺🇸", "🇬🇧", "🇿🇦"];
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  visible: (delay = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: "easeOut", delay },
-  }),
-};
-
 export default function AboutEcosystemSection() {
   return (
-    <section className="tw:flex tw:flex-col tw:gap-8">
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.4 }}
-        custom={0}
-        variants={fadeUp}
+    <Box component="section" aria-labelledby="who-its-for-title" sx={SECTION_SX}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "minmax(0,1fr)", md: "minmax(0,7fr) minmax(0,5fr)" },
+          columnGap: { md: 8 },
+          rowGap: { xs: 5, md: 0 },
+        }}
       >
-        <SectionHeading
-          eyebrow="Made for real events"
-          title="Built for organisers, performers, and fans."
-          subtitle="Xilolo is a platform for recurring events and serious creators. We built it for the way live shows actually run."
-        />
-      </motion.div>
+        {/* Prose */}
+        <Box>
+          <Eyebrow sx={{ mb: 2 }}>Made for real events</Eyebrow>
+          <SectionTitle id="who-its-for-title" sx={{ maxWidth: "20ch" }}>
+            Built for organisers, performers, and fans.
+          </SectionTitle>
 
-      <div className="tw:grid tw:items-start tw:gap-8 tw:md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] tw:md:gap-10">
-        {/* Copy + feature tags */}
-        <motion.div
-          className="tw:flex tw:flex-col tw:gap-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          custom={0.08}
-          variants={fadeUp}
-        >
-          <span className="tw:block tw:max-w-[62ch] tw:text-[15px] tw:leading-relaxed tw:text-muted">
-            Xilolo is built for organisers who run shows regularly. Plan your calendar,
-            manage performers, sell tickets, and pay out smoothly.
-          </span>
+          <Box sx={{ mt: 3 }}>
+            <Lead sx={{ fontSize: 17 }}>
+              Xilolo is a platform for recurring events and serious creators. We
+              built it for the way live shows actually run.
+            </Lead>
+          </Box>
 
-          <span className="tw:block tw:max-w-[62ch] tw:text-[15px] tw:leading-relaxed tw:text-muted">
-            After each event, you can see what worked. Who showed up, where people stayed
-            engaged, and what to improve for the next show.
-          </span>
+          <Box sx={{ mt: 3, display: "flex", flexDirection: "column", gap: 2 }}>
+            <Body>
+              Xilolo is built for organisers who run shows regularly. Plan your
+              calendar, manage performers, sell tickets, and pay out smoothly.
+            </Body>
+            <Body>
+              After each event, you can see what worked. Who showed up, where people
+              stayed engaged, and what to improve for the next show.
+            </Body>
+            <Body>
+              The goal is simple. Run a professional live show from one place and
+              stay in control of your brand, your audience, and your money.
+            </Body>
+            <Body>
+              Plan events, manage your show, and keep everything in one place — from
+              setup to payout.
+            </Body>
+          </Box>
 
-          <span className="tw:block tw:max-w-[62ch] tw:text-[15px] tw:leading-relaxed tw:text-muted">
-            The goal is simple. Run a professional live show from one place and stay in
-            control of your brand, your audience, and your money.
-          </span>
+          <Box
+            sx={{
+              mt: 4,
+              pt: 2.5,
+              borderTop: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Caption sx={{ fontSize: 13, maxWidth: "44ch" }}>
+              Built for creators everywhere — from small rooms to big stages.
+            </Caption>
+          </Box>
+        </Box>
 
-          <div className="tw:flex tw:flex-wrap tw:gap-2 tw:pt-1">
+        {/* Hairline list of what ships in the product */}
+        <Box sx={{ alignSelf: "start" }}>
+          <Typography
+            component="h3"
+            sx={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              lineHeight: 1.5,
+              textTransform: "uppercase",
+              color: "text.secondary",
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              pb: 1.5,
+            }}
+          >
+            In the platform
+          </Typography>
+
+          <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0 }}>
             {FEATURES.map((feature) => (
-              <Chip key={feature}>{feature}</Chip>
+              <Box
+                component="li"
+                key={feature}
+                sx={{
+                  borderBottom: "1px solid",
+                  borderColor: "divider",
+                  py: 1.75,
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: "text.primary",
+                }}
+              >
+                {feature}
+              </Box>
             ))}
-          </div>
-        </motion.div>
 
-        {/* Supporting facts already on the page — carried over verbatim */}
-        <motion.div
-          className="tw:flex tw:flex-col tw:gap-4"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          custom={0.16}
-          variants={fadeUp}
-        >
-          <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
-            <Card dark className="tw:flex tw:flex-col tw:justify-between tw:gap-6">
-              <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-ink-muted">
-                Reliability
-              </span>
-              <div className="tw:flex tw:flex-col tw:gap-1">
-                <span className="tw:block tw:font-display tw:text-3xl tw:font-extrabold tw:leading-none tw:tracking-[-0.02em] tw:text-paper-raised">
-                  24/7
-                </span>
-                <span className="tw:block tw:text-[11px] tw:leading-relaxed tw:text-ink-muted">
-                  Your events stay stable and supported.
-                </span>
-              </div>
-            </Card>
-
-            <Card className="tw:flex tw:flex-col tw:justify-between tw:gap-6">
-              <span className="tw:block tw:text-[11px] tw:font-medium tw:uppercase tw:tracking-[0.06em] tw:text-muted-dark">
-                Team-ready
-              </span>
-              <div className="tw:flex tw:flex-col tw:gap-1">
-                <span className="tw:block tw:text-sm tw:font-semibold tw:leading-snug tw:text-ink">
-                  Roles for your team and collaborators.
-                </span>
-                <span className="tw:block tw:text-[11px] tw:leading-relaxed tw:text-muted">
+            <Box
+              component="li"
+              sx={{
+                borderBottom: "1px solid",
+                borderColor: "divider",
+                py: 1.75,
+              }}
+            >
+              <Box
+                component="span"
+                sx={{ display: "block", fontSize: 15, fontWeight: 500, color: "text.primary" }}
+              >
+                Roles for your team and collaborators
+              </Box>
+              <Box sx={{ mt: 0.5 }}>
+                <Caption sx={{ fontSize: 13 }}>
                   Invite people in without losing control.
-                </span>
-              </div>
-            </Card>
-          </div>
-
-          <Card className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
-            <div className="tw:flex tw:flex-col tw:gap-1">
-              <span className="tw:block tw:text-[13px] tw:font-semibold tw:text-ink">
-                Built for creators everywhere.
-              </span>
-              <span className="tw:block tw:text-[11px] tw:text-muted">
-                From small rooms to big stages.
-              </span>
-            </div>
-
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <div className="tw:flex tw:-space-x-2">
-                {FLAGS.map((flag) => (
-                  <span
-                    key={flag}
-                    className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-pill tw:border tw:border-hairline tw:bg-chip tw:text-[12px]"
-                  >
-                    {flag}
-                  </span>
-                ))}
-              </div>
-              <span className="tw:text-[11px] tw:text-muted">+42 countries</span>
-            </div>
-          </Card>
-        </motion.div>
-      </div>
-    </section>
+                </Caption>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }

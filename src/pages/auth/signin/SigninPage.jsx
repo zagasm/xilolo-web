@@ -495,11 +495,6 @@ export function Signin() {
       socialSlot={
         showSocialAuth ? (
           <div className="tw:w-full tw:max-w-[420px] tw:mx-auto">
-            <p className="small text-muted mb-3">
-              {isGoogleLoading || isAppleLoading
-                ? "Connecting to your account..."
-                : "Or continue with"}
-            </p>
             <div className="tw:flex tw:flex-col tw:gap-3">
               <GoogleAuthSection
                 label={null}
@@ -528,21 +523,21 @@ export function Signin() {
     >
       <style>{`
         .continue-btn {
-          background-color: ${isCredentialFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
-          color: ${isCredentialFilled ? "#FFFFFF" : "rgba(17, 19, 22, 0.38)"};
+          background-color: ${isCredentialFilled ? "#16909C" : "#EFEFF2"};
+          color: ${isCredentialFilled ? "#FFFFFF" : "#5C5C62"};
           cursor: ${isCredentialFilled ? "pointer" : "not-allowed"};
         }
 
         .signin-btn {
-          background-color: ${isPasswordFilled ? "#050505" : "rgba(230, 230, 230, 1)"};
-          color: ${isPasswordFilled ? "#FFFFFF" : "rgba(17, 19, 22, 0.38)"};
+          background-color: ${isPasswordFilled ? "#16909C" : "#EFEFF2"};
+          color: ${isPasswordFilled ? "#FFFFFF" : "#5C5C62"};
           cursor: ${isPasswordFilled ? "pointer" : "not-allowed"};
         }
 
         .verification-btn {
           background-color: transparent;
-          border: 1px solid #050505;
-          color: #050505;
+          border: 1px solid rgba(17, 19, 22, 0.16);
+          color: #111316;
         }
       `}</style>
 

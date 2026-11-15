@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { showSuccess, showError } from "../../../component/ui/toast";
 import { useAuth } from "../AuthContext";
 import { api, authHeaders } from "../../../lib/apiClient";
@@ -78,8 +77,8 @@ export function ChangePassword({ ResetPasswordVerificationData }) {
         ...getWebDevicePayload(),
       };
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/password/reset`,
+      const response = await api.post(
+        "/api/v1/password/reset",
         payload,
         {
           headers: {

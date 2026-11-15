@@ -61,20 +61,35 @@ export const OrganizationStructuredData = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Xilolo",
+    "legalName": "Xilolo Technologies",
     "url": "https://xilolo.com",
-    "logo": "https://xilolo.com/zagasm_studio_logo.png",
-    "description": "Xilolo is the premier platform for discovering exciting events, connecting with top organizers, and creating unforgettable experiences.",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://xilolo.com/icon-512.png",
+      "width": 512,
+      "height": 512
+    },
+    "description": "Xilolo is where creators host live events and audiences discover them. Sell tickets, go live, and get paid directly.",
     "sameAs": [
-      // Add your social media URLs here
-      // "https://www.facebook.com/zagasmstudios",
-      // "https://twitter.com/zagasmstudios",
-      // "https://www.instagram.com/zagasmstudios",
-      // "https://www.linkedin.com/company/zagasmstudios"
+      "https://web.facebook.com/xilolohq",
+      "https://x.com/xilolo_hq",
+      "https://www.instagram.com/xilolo_hq",
+      "https://www.youtube.com/@xilolo_hq",
+      "https://www.tiktok.com/@xilolo_hq"
     ],
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "16192 Coastal Highway",
+      "addressLocality": "Lewes",
+      "addressRegion": "DE",
+      "postalCode": "19958",
+      "addressCountry": "US"
+    },
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "Customer Service",
-      "email": "support@xilolo.com"
+      "email": "support@xilolo.com",
+      "availableLanguage": "English"
     }
   };
 

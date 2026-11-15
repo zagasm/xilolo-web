@@ -1,51 +1,77 @@
 import React from "react";
 
+/**
+ * Section index for the sticky sidebar. Every label is the section's own
+ * heading, verbatim, and every href points at an id that already exists on
+ * this page — the index adds navigation, never copy.
+ */
+const SECTIONS = [
+  { id: "sec-1", label: "1. Eligibility, accounts, and user responsibilities" },
+  { id: "sec-2", label: "2. Description of the Service and permitted use" },
+  { id: "sec-3", label: "3. Creator-specific obligations and liabilities" },
+  { id: "sec-4", label: "4. Viewer obligations and rights" },
+  { id: "sec-5", label: "5. Payments, fees, taxes, and financial terms" },
+  { id: "sec-6", label: "6. Cancellations, deletions, archiving, and data handling" },
+  { id: "sec-7", label: "7. Prohibited conduct and enforcement" },
+  { id: "sec-8", label: "8. Intellectual property rights and licenses" },
+  { id: "sec-9", label: "9. Takedowns, complaints, and dispute reporting" },
+  { id: "sec-10", label: "10. Termination, suspension, and survival" },
+  { id: "sec-11", label: "11. Disclaimers of warranties" },
+  { id: "sec-12", label: "12. Limitation of liability" },
+  { id: "sec-13", label: "13. Indemnification obligations" },
+  { id: "sec-14", label: "14. Governing law, disputes, and arbitration" },
+  { id: "sec-15", label: "15. Amendments, severability, and miscellaneous terms" },
+  { id: "sec-16", label: "16. Frequently asked questions (FAQs)" },
+];
+
 export default function TermsOfServicePage() {
   return (
-    <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:px-4 tw:py-10 tw:text-slate-800">
-      <div className="tw:mx-auto tw:max-w-6xl">
+    <div className="tw:relative tw:min-h-screen tw:bg-paper tw:font-sans tw:text-ink">
+      <div
+        aria-hidden="true"
+        className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 tw:h-[380px] tw:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(22,144,156,0.10),rgba(22,144,156,0)_70%)]"
+      />
+
+      <div className="tw:relative tw:z-10 tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:pb-20 tw:pt-10 tw:md:px-8 tw:md:pt-14">
         {/* Hero / header */}
-        <div className="tw:mb-6">
-          <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-1 tw:text-[12px] tw:font-medium tw:text-primary">
-            <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
-            <span>Xilolo App · Legal</span>
-          </div>
+        <div className="tw:mb-10">
+          <span className="tw:block tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.14em] tw:text-accent-deep">Legal</span>
 
           <div className="tw:mt-4 tw:flex tw:flex-col tw:gap-2">
-            <span className="tw:block tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
+            <span className="tw:block tw:font-display tw:text-3xl tw:md:text-4xl tw:font-semibold tw:tracking-[-0.02em] tw:text-ink">
               Terms of Service for Xilolo App
             </span>
 
-            <span className="tw:block tw:max-w-2xl tw:text-sm tw:md:text-base tw:text-slate-600">
+            <span className="tw:block tw:max-w-2xl tw:text-[15px] tw:leading-7 tw:text-muted-strong">
               These Terms of Service explain your rights and responsibilities
               when using the Xilolo App as a creator, viewer, or
               collaborator.
             </span>
           </div>
 
-          <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:md:text-sm tw:text-slate-600">
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
-              <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500" />
+          <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-[13px] tw:leading-6 tw:text-muted-strong">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:bg-paper-raised tw:px-3 tw:py-1 tw:border tw:border-hairline">
+              <span className="tw:h-2 tw:w-2 tw:rounded-pill tw:bg-success" />
               <span>
                 Effective: <strong>November 6, 2025</strong>
               </span>
             </span>
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:bg-paper-raised tw:px-3 tw:py-1 tw:border tw:border-hairline">
               <span>Company:</span>
               <strong>Xilolo Inc.</strong>
             </span>
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:bg-paper-raised tw:px-3 tw:py-1 tw:border tw:border-hairline">
               <span>Jurisdiction:</span>
               <strong>Federal Republic of Nigeria</strong>
             </span>
           </div>
 
-          <div className="tw:mt-2 tw:text-xs tw:md:text-sm tw:text-slate-500">
+          <div className="tw:mt-2 tw:text-[13px] tw:leading-6 tw:text-muted">
             <span className="tw:block">
               Contact:{" "}
               <a
                 href="mailto:support@xilolo.com"
-                className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                className="tw:font-medium tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
               >
                 support@xilolo.com
               </a>
@@ -61,15 +87,36 @@ export default function TermsOfServicePage() {
         </div>
 
         {/* Layout: sidebar + main */}
-        <div className="tw:mt-6 tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px,minmax(0,1fr)] tw:gap-8">
+        <div className="tw:mt-10 tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px_minmax(0,1fr)] tw:gap-8 tw:lg:gap-12">
+
+          {/* Sidebar / section index — colour-only states, no pills */}
+          <nav aria-label="On this page" className="tw:hidden tw:lg:block">
+            <div className="tw:lg:sticky tw:lg:top-28 tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-4">
+              <span className="tw:block tw:pb-3 tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.14em] tw:text-muted">
+                On this page
+              </span>
+              <ul className="tw:space-y-2 tw:text-[13px] tw:leading-[1.35]">
+                {SECTIONS.map((section) => (
+                  <li key={section.id}>
+                    <a
+                      href={`#${section.id}`}
+                      className="tw:text-muted-strong! tw:transition-colors tw:hover:text-accent-deep!"
+                    >
+                      {section.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </nav>
 
           {/* Main content */}
-          <div>
-            <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)] tw:space-y-10">
+          <div className="tw:min-w-0">
+            <div className="tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-6 tw:md:p-10 tw:space-y-10 tw:md:space-y-12">
               {/* Intro */}
               <div
                 id="intro"
-                className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700"
+                className="tw:scroll-mt-28 tw:space-y-4 tw:text-[15px] tw:leading-7 tw:text-body"
               >
                 <span className="tw:block">
                   Welcome to the Terms of Service <span>(“Terms”)</span> for
@@ -94,14 +141,14 @@ export default function TermsOfServicePage() {
                   our{" "}
                   <a
                     href="/privacy-policy"
-                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                    className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                   >
                     Privacy Policy
                   </a>{" "}
                   and{" "}
                   <a
                     href="/community-guidelines"
-                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                    className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                   >
                     Community Guidelines
                   </a>{" "}
@@ -126,23 +173,23 @@ export default function TermsOfServicePage() {
               {/* 1. Eligibility, Accounts, Responsibilities */}
               <div
                 id="sec-1"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   1. Eligibility, accounts, and user responsibilities
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   The Service is intended for mature and responsible use. This
                   section explains who can use the App and what is expected of
                   each user.
                 </span>
 
                 {/* 1.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   1.1 Age and capacity requirements
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Minimum age:</strong> You must be at least 13
@@ -166,8 +213,8 @@ export default function TermsOfServicePage() {
                   </li>
                 </ul>
 
-                <div className="tw:rounded-2xl tw:border-l-4 tw:border-amber-400 tw:bg-amber-50 tw:px-4 tw:py-3 tw:text-xs tw:md:text-sm tw:text-slate-700">
-                  <span className="tw:block tw:font-semibold tw:text-amber-800">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:border-l-2 tw:border-l-warning tw:bg-paper tw:px-4 tw:py-3 tw:text-[13px] tw:leading-6 tw:text-muted-strong">
+                  <span className="tw:block tw:font-semibold tw:text-warning">
                     Verification processes
                   </span>
                   <span className="tw:block tw:mt-1">
@@ -179,10 +226,10 @@ export default function TermsOfServicePage() {
                 </div>
 
                 {/* 1.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   1.2 Account creation and security
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Registration:</strong> To access full features,
@@ -212,7 +259,7 @@ export default function TermsOfServicePage() {
                   </li>
                 </ul>
 
-                <span className="tw:block tw:text-xs tw:md:text-sm tw:text-slate-600">
+                <span className="tw:block tw:text-[13px] tw:leading-6 tw:text-muted-strong">
                   <em>Termination rights:</em> We may suspend or terminate
                   accounts for inactivity, suspected fraud, or violations of
                   these Terms or the Governing Documents, with notice where
@@ -223,23 +270,23 @@ export default function TermsOfServicePage() {
               {/* 2. Description of the Service & Permitted Use */}
               <div
                 id="sec-2"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   2. Description of the Service and permitted use
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   The Xilolo App provides tools for content creation and
                   distribution. Usage must stay within these Terms and our
                   community expectations.
                 </span>
 
                 {/* 2.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   2.1 Core features and access
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Creator tools:</strong> Schedule and host live
@@ -265,17 +312,17 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 2.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   2.2 Restrictions and prohibitions
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Content standards:</strong> All content must
                       comply with our{" "}
                       <a
                         href="/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                        className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                       >
                         Community Guidelines
                       </a>
@@ -313,8 +360,8 @@ export default function TermsOfServicePage() {
                   </li>
                 </ul>
 
-                <div className="tw:rounded-2xl tw:border-l-4 tw:border-red-500 tw:bg-red-50 tw:px-4 tw:py-3 tw:text-xs tw:md:text-sm tw:text-slate-700">
-                  <span className="tw:block tw:font-semibold tw:text-red-700">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:border-l-2 tw:border-l-danger tw:bg-paper tw:px-4 tw:py-3 tw:text-[13px] tw:leading-6 tw:text-muted-strong">
+                  <span className="tw:block tw:font-semibold tw:text-danger">
                     Export clause
                   </span>
                   <span className="tw:block tw:mt-1">
@@ -329,23 +376,23 @@ export default function TermsOfServicePage() {
               {/* 3. Creator-specific obligations */}
               <div
                 id="sec-3"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   3. Creator-specific obligations and liabilities
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   Creators are central to the platform. With that influence
                   comes responsibility to comply with law, respect viewers, and
                   honor commitments.
                 </span>
 
                 {/* 3.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   3.1 Content ownership and rights clearance
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Exclusivity warranties:</strong> You affirm that
@@ -366,10 +413,10 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 3.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   3.2 Event delivery and refunds
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Performance standards:</strong> Deliver events as
@@ -389,8 +436,8 @@ export default function TermsOfServicePage() {
                   </li>
                 </ul>
 
-                <div className="tw:rounded-2xl tw:border-l-4 tw:border-amber-400 tw:bg-amber-50 tw:px-4 tw:py-3 tw:text-xs tw:md:text-sm tw:text-slate-700">
-                  <span className="tw:block tw:font-semibold tw:text-amber-800">
+                <div className="tw:rounded-card tw:border tw:border-hairline tw:border-l-2 tw:border-l-warning tw:bg-paper tw:px-4 tw:py-3 tw:text-[13px] tw:leading-6 tw:text-muted-strong">
+                  <span className="tw:block tw:font-semibold tw:text-warning">
                     Refund framework
                   </span>
                   <span className="tw:block tw:mt-1">
@@ -406,22 +453,22 @@ export default function TermsOfServicePage() {
               {/* 4. Viewer obligations and rights */}
               <div
                 id="sec-4"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   4. Viewer obligations and rights
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   Viewers help sustain the ecosystem and must respect both
                   creators’ work and the integrity of the platform.
                 </span>
 
                 {/* 4.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   4.1 Access licenses
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Limited permissions:</strong> Purchases give you a
@@ -441,17 +488,17 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 4.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   4.2 Engagement etiquette
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Respectful interaction:</strong> You must follow
                       the{" "}
                       <a
                         href="/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                        className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                       >
                         Community Guidelines
                       </a>{" "}
@@ -472,22 +519,22 @@ export default function TermsOfServicePage() {
               {/* 5. Payments, fees, taxes */}
               <div
                 id="sec-5"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   5. Payments, fees, taxes, and financial terms
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   Transactions on the Xilolo App rely on secure, compliant
                   payment processing and clear rules for fees and taxes.
                 </span>
 
                 {/* 5.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   5.1 Processing and authorizations
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Partners and methods:</strong> Payments are
@@ -519,22 +566,22 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* Fee table */}
-                <div className="tw:overflow-x-auto tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50">
-                  <table className="tw:min-w-full tw:text-left tw:text-xs tw:md:text-sm">
+                <div className="tw:overflow-x-auto tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised">
+                  <table className="tw:min-w-full tw:text-left tw:text-[13px] tw:leading-6">
                     <thead>
-                      <tr className="tw:bg-slate-100">
-                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-slate-800">
+                      <tr className="tw:bg-paper">
+                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-ink">
                           Fee type
                         </th>
-                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-slate-800">
+                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-ink">
                           Description
                         </th>
-                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-slate-800">
+                        <th className="tw:px-4 tw:py-3 tw:font-semibold tw:text-ink">
                           Rate / example
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="tw:divide-y tw:divide-slate-200">
+                    <tbody className="tw:divide-y tw:divide-hairline">
                       <tr>
                         <td className="tw:px-4 tw:py-3">Streamed ticket revenue share</td>
                         <td className="tw:px-4 tw:py-3">Organiser payout and Xilolo platform share</td>
@@ -568,10 +615,10 @@ export default function TermsOfServicePage() {
                 </div>
 
                 {/* 5.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   5.2 Refunds, disputes, and adjustments
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Chargeback policies:</strong> We may pass through
@@ -593,23 +640,23 @@ export default function TermsOfServicePage() {
               {/* 6. Cancellations, deletions, data */}
               <div
                 id="sec-6"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   6. Cancellations, deletions, archiving, and data handling
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   We preserve records to maintain accountability and comply with
                   legal requirements, while honoring applicable privacy and data
                   rights.
                 </span>
 
                 {/* 6.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   6.1 Event immutability
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Deletion restrictions:</strong> Creators may not
@@ -630,10 +677,10 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 6.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   6.2 Account closure
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>User-initiated:</strong> You can request account
@@ -654,28 +701,28 @@ export default function TermsOfServicePage() {
               {/* 7. Prohibited conduct */}
               <div
                 id="sec-7"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   7. Prohibited conduct and enforcement
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   Certain behaviors are strictly prohibited to protect the
                   community and the platform.
                 </span>
 
                 {/* 7.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   7.1 Enumerated violations
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Guideline infractions:</strong> Violations of the{" "}
                       <a
                         href="/legal/community-guidelines"
-                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                        className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                       >
                         Community Guidelines
                       </a>{" "}
@@ -700,10 +747,10 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 7.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   7.2 Enforcement mechanisms
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Graduated sanctions:</strong> We may issue
@@ -712,7 +759,7 @@ export default function TermsOfServicePage() {
                       depending on severity and history. Appeals can be sent to{" "}
                       <a
                         href="mailto:support@xilolo.com"
-                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                        className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                       >
                         support@xilolo.com
                       </a>
@@ -733,23 +780,23 @@ export default function TermsOfServicePage() {
               {/* 8. IP Rights and Licenses */}
               <div
                 id="sec-8"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   8. Intellectual property rights and licenses
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   IP protections enable sustainable creation. We respect your
                   ownership while securing the licenses needed to operate the
                   Service.
                 </span>
 
                 {/* 8.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   8.1 User content ownership
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Retention of rights:</strong> You retain ownership
@@ -769,10 +816,10 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 8.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   8.2 Our IP
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Protected elements:</strong> The Service itself,
@@ -796,25 +843,25 @@ export default function TermsOfServicePage() {
               {/* 9. Takedowns, complaints */}
               <div
                 id="sec-9"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   9. Takedowns, complaints, and dispute reporting
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   We aim for clear, timely resolution of rights complaints and
                   other issues.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Submission process:</strong> Send rights or policy
                       complaints to{" "}
                       <a
                         href="mailto:support@xilolo.com"
-                        className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                        className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                       >
                         support@xilolo.com
                       </a>{" "}
@@ -843,22 +890,22 @@ export default function TermsOfServicePage() {
               {/* 10. Termination and Survival */}
               <div
                 id="sec-10"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   10. Termination, suspension, and survival
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   While we hope for long-term use, both you and we may need to
                   end the relationship under certain conditions.
                 </span>
 
                 {/* 10.1 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   10.1 Termination options
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Your rights:</strong> You may stop using the
@@ -877,10 +924,10 @@ export default function TermsOfServicePage() {
                 </ul>
 
                 {/* 10.2 */}
-                <span className="tw:block tw:text-sm tw:md:text-base tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:font-semibold tw:text-ink">
                   10.2 Surviving clauses
                 </span>
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       Clauses addressing intellectual property, payments,
@@ -895,19 +942,19 @@ export default function TermsOfServicePage() {
               {/* 11. Disclaimers */}
               <div
                 id="sec-11"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   11. Disclaimers of warranties
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   To the maximum extent permitted by law, we provide the Service
                   “as is” and “as available,” without warranties of any kind,
                   express or implied, except where required by statute.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>No guarantee of perfection:</strong> We do not
@@ -935,18 +982,18 @@ export default function TermsOfServicePage() {
               {/* 12. Limitation of liability */}
               <div
                 id="sec-12"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   12. Limitation of liability
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   To the extent allowed by law, our overall liability is
                   limited.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Exclusion of indirect damages:</strong> We are not
@@ -975,18 +1022,18 @@ export default function TermsOfServicePage() {
               {/* 13. Indemnification */}
               <div
                 id="sec-13"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   13. Indemnification obligations
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   You agree to defend and indemnify Xilolo Inc. against certain
                   claims arising from your use of the Service.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Coverage:</strong> You agree to hold us harmless
@@ -1008,19 +1055,19 @@ export default function TermsOfServicePage() {
               {/* 14. Governing law & arbitration */}
               <div
                 id="sec-14"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   14. Governing law, disputes, and arbitration
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   These Terms and any disputes arising from them are generally
                   governed by the laws of the Federal Republic of Nigeria, to
                   the extent permitted by applicable law.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Law applicable:</strong> Nigerian law applies,
@@ -1042,18 +1089,18 @@ export default function TermsOfServicePage() {
               {/* 15. Amendments, severability, misc */}
               <div
                 id="sec-15"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:space-y-4"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:space-y-4"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink">
                   15. Amendments, severability, and miscellaneous terms
                 </span>
 
-                <span className="tw:block tw:text-sm tw:md:text-base tw:text-slate-700">
+                <span className="tw:block tw:text-[15px] tw:leading-7 tw:text-body">
                   This section covers how changes are made and how these Terms
                   should be interpreted.
                 </span>
 
-                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:list-disc tw:pl-5 tw:space-y-2 tw:text-[15px] tw:leading-7 tw:text-body">
                   <li>
                     <span>
                       <strong>Updates:</strong> We may amend these Terms from
@@ -1090,18 +1137,18 @@ export default function TermsOfServicePage() {
               {/* 16. FAQs */}
               <div
                 id="sec-16"
-                className="tw:pt-8 tw:border-t tw:border-slate-100 tw:text-sm tw:md:text-base tw:text-slate-700"
+                className="tw:scroll-mt-28 tw:pt-8 tw:border-t tw:border-hairline tw:text-[15px] tw:leading-7 tw:text-body"
               >
-                <span className="tw:block tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900 tw:mb-4">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:font-semibold tw:tracking-[-0.01em] tw:text-ink tw:mb-4">
                   16. Frequently asked questions (FAQs)
                 </span>
 
                 <dl className="tw:space-y-4">
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-semibold tw:text-ink">
                       <span>Can I use the App commercially?</span>
                     </dt>
-                    <dd className="tw:mt-1 tw:ml-4 tw:text-slate-700">
+                    <dd className="tw:mt-1 tw:ml-4 tw:text-body">
                       <span>
                         Yes. You can monetize your content consistent with these
                         Terms and applicable laws. Review the creator sections
@@ -1111,10 +1158,10 @@ export default function TermsOfServicePage() {
                   </div>
 
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-semibold tw:text-ink">
                       <span>What if I disagree with a payout or fee?</span>
                     </dt>
-                    <dd className="tw:mt-1 tw:ml-4 tw:text-slate-700">
+                    <dd className="tw:mt-1 tw:ml-4 tw:text-body">
                       <span>
                         You can open a dispute via the in-app support or your
                         dashboard. We aim to review and respond within a
@@ -1124,12 +1171,12 @@ export default function TermsOfServicePage() {
                   </div>
 
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-semibold tw:text-ink">
                       <span>
                         Do these Terms apply to beta or experimental tools?
                       </span>
                     </dt>
-                    <dd className="tw:mt-1 tw:ml-4 tw:text-slate-700">
+                    <dd className="tw:mt-1 tw:ml-4 tw:text-body">
                       <span>
                         Yes, beta features are covered by these Terms, often
                         with additional disclaimers about instability or early
@@ -1139,10 +1186,10 @@ export default function TermsOfServicePage() {
                   </div>
 
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-semibold tw:text-ink">
                       <span>How do I export my data when I leave?</span>
                     </dt>
-                    <dd className="tw:mt-1 tw:ml-4 tw:text-slate-700">
+                    <dd className="tw:mt-1 tw:ml-4 tw:text-body">
                       <span>
                         You can request exports of certain data (for example,
                         project metadata) through our privacy tools or by
@@ -1153,10 +1200,10 @@ export default function TermsOfServicePage() {
                   </div>
 
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-semibold tw:text-ink">
                       <span>What about international users?</span>
                     </dt>
-                    <dd className="tw:mt-1 tw:ml-4 tw:text-slate-700">
+                    <dd className="tw:mt-1 tw:ml-4 tw:text-body">
                       <span>
                         We strive to respect local laws and provide additional
                         rights where required (for example, under GDPR). If you
@@ -1167,7 +1214,7 @@ export default function TermsOfServicePage() {
                   </div>
                 </dl>
 
-                <span className="tw:block tw:mt-4 tw:text-slate-700">
+                <span className="tw:block tw:mt-4 tw:text-body">
                   Thank you for using the Xilolo App. By following these
                   Terms, you help maintain a safe, fair, and high-quality space
                   for everyone.
@@ -1175,12 +1222,12 @@ export default function TermsOfServicePage() {
               </div>
 
               {/* Footer */}
-              <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-slate-100 tw:pt-4">
-                <span className="tw:text-xs tw:md:text-sm tw:text-slate-500">
+              <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-hairline tw:pt-4">
+                <span className="tw:text-[13px] tw:leading-6 tw:text-muted">
                   Last updated: <strong>November 6, 2025</strong>
                 </span>
-                <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-50 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-slate-600 tw:border tw:border-slate-200">
-                  <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
+                <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:bg-paper tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-muted-strong tw:border tw:border-hairline">
+                  <span className="tw:h-1.5 tw:w-1.5 tw:rounded-pill tw:bg-accent" />
                   <span>Xilolo · Terms of Service</span>
                 </span>
               </div>

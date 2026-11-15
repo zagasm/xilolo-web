@@ -1,0 +1,254 @@
+/* ── Auth shell ──────────────────────────────────────────────────────────────
+   Modern field + control treatment for the five auth screens.
+
+   Everything here is scoped under `.auth-shell` and marked !important on
+   purpose. This repo loads template stylesheets UNLAYERED, and unlayered
+   declarations beat Tailwind's layered utilities no matter what the specificity
+   says — so a plain `tw:` class on these controls is silently dead. Scoped
+   !important is the only form that wins deterministically without touching
+   the legacy sheets.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.auth-shell {
+  background: #f3f2f0 !important;
+}
+
+.auth-shell .auth-card {
+  box-shadow: none !important;
+}
+
+/* ── Typography inside the card ──────────────────────────────────────────────
+   The template ships unlayered `h1..h6{font-weight:500}` + RFS font sizes, so
+   a `tw:text-*!` utility on a heading loses here (h1 was computing 40px/w500).
+   These rules are cheaper and honest: scoped, explicit, one place. */
+.auth-shell .auth-card h1 {
+  font-family: "Plus Jakarta Sans", "Work Sans", system-ui, sans-serif !important;
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.02em !important;
+  color: #111316 !important;
+  margin: 0 !important;
+}
+
+.auth-shell .auth-card p {
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  color: #5c5c62 !important;
+  margin: 0 !important;
+}
+
+.auth-shell .auth-card h1 + p {
+  margin-top: 8px !important;
+}
+
+.auth-shell .auth-card label,
+.auth-shell .auth-card .form-label {
+  color: #5c5c62 !important;
+}
+
+/* The MUI helper-text slot is reserved even when empty (it renders a single
+   space), which left a ~50px dead band between the email field and Continue.
+   Collapse the empty case only — real error/hint text still shows. */
+.auth-shell .auth-card .MuiFormHelperText-root {
+  margin: 6px 0 0 !important;
+  min-height: 0 !important;
+}
+
+.auth-shell .auth-card .form-group {
+  margin-bottom: 12px !important;
+}
+
+.auth-shell .auth-card .position-relative {
+  margin-top: 10px !important;
+}
+
+/* ── MUI outlined fields (sign-in) ───────────────────────────────────────── */
+.auth-shell .MuiOutlinedInput-root {
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  font-size: 14px !important;
+  font-family: "Work Sans", system-ui, sans-serif !important;
+}
+
+.auth-shell .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(17, 19, 22, 0.16) !important;
+}
+
+.auth-shell .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(17, 19, 22, 0.3) !important;
+}
+
+.auth-shell .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #16909c !important;
+  border-width: 1.5px !important;
+}
+
+.auth-shell .MuiInputBase-input::placeholder {
+  color: #9a9aa1 !important;
+  opacity: 1 !important;
+}
+
+.auth-shell .MuiInputLabel-root {
+  font-size: 13px !important;
+  color: #5c5c62 !important;
+}
+
+.auth-shell .MuiInputLabel-root.Mui-focused,
+.auth-shell .MuiInputLabel-root.MuiFormLabel-filled {
+  color: #06707d !important;
+}
+
+.auth-shell .MuiFormHelperText-root {
+  margin-left: 0 !important;
+  font-size: 11.5px !important;
+  line-height: 1.5 !important;
+}
+
+.auth-shell .MuiFormHelperText-root.Mui-error {
+  color: #dc2626 !important;
+}
+
+/* ── Bootstrap fields (sign-up / reset screens) ──────────────────────────── */
+.auth-shell .form-control {
+  height: 46px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(17, 19, 22, 0.16) !important;
+  background: #ffffff !important;
+  font-size: 14px !important;
+  font-family: "Work Sans", system-ui, sans-serif !important;
+  color: #111316 !important;
+}
+
+.auth-shell textarea.form-control {
+  height: auto !important;
+  min-height: 96px !important;
+}
+
+.auth-shell .form-control:focus {
+  border-color: #16909c !important;
+  box-shadow: 0 0 0 3px rgba(22, 144, 156, 0.15) !important;
+}
+
+.auth-shell .form-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #5c5c62 !important;
+  margin-bottom: 6px !important;
+}
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+.auth-shell .bt {
+  height: 48px !important;
+  width: 100% !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  font-family: "Work Sans", system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.auth-shell .bt:disabled {
+  background: #efeff2 !important;
+  color: #5c5c62 !important;
+  cursor: not-allowed !important;
+}
+
+.auth-shell .bt:not(:disabled) {
+  background: #16909c !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+}
+
+.auth-shell .bt:not(:disabled):hover {
+  background: #06707d !important;
+}
+
+.auth-shell .verification-btn {
+  background: transparent !important;
+  border: 1px solid rgba(17, 19, 22, 0.16) !important;
+  color: #111316 !important;
+}
+
+.auth-shell .verification-btn:hover {
+  border-color: rgba(17, 19, 22, 0.32) !important;
+}
+
+/* Text links inside the card ("Forgot password?", "Choose remembered
+   account"). The legacy sheet strips underline from every anchor, so these
+   read as plain sentences — underline them back. */
+.auth-shell .btn-link {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: #06707d !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+}
+
+.auth-shell .btn-link:hover {
+  color: #16909c !important;
+  text-decoration: underline !important;
+}
+
+.auth-shell .text-danger.btn-link {
+  color: #dc2626 !important;
+}
+
+/* Remembered-account rows */
+.auth-shell .auth-account-row {
+  border: 1px solid rgba(17, 19, 22, 0.1) !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.auth-shell .auth-account-row:hover {
+  border-color: rgba(22, 144, 156, 0.45) !important;
+  background: #fbfbfa !important;
+}
+
+/* Alerts */
+.auth-shell .alert {
+  border-radius: 12px !important;
+  border: 1px solid rgba(220, 38, 38, 0.25) !important;
+  background: rgba(220, 38, 38, 0.06) !important;
+  color: #a01b1b !important;
+  font-size: 12.5px !important;
+}
+
+/* Social buttons rendered by GoogleAuthSection / AppleAuthSection */
+.auth-shell .social-auth-btn {
+  height: 46px !important;
+  width: 100% !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(17, 19, 22, 0.16) !important;
+  background: #ffffff !important;
+  color: #111316 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease !important;
+}
+
+.auth-shell .social-auth-btn:hover {
+  border-color: rgba(17, 19, 22, 0.34) !important;
+  background: #fbfbfa !important;
+}
+
+.auth-shell .social-auth-btn--dark {
+  background: #111316 !important;
+  border-color: #111316 !important;
+  color: #ffffff !important;
+}
+
+.auth-shell .social-auth-btn--dark:hover {
+  background: #1a1d21 !important;
+  border-color: #1a1d21 !important;
+}

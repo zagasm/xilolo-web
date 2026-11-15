@@ -1,38 +1,48 @@
 import React from "react";
+import { Box, Container, Stack } from "@mui/material";
 import ContactHero from "../../component/contact/ContactHero";
 import ContactFormSection from "../../component/contact/ContactFormSection";
 import ContactMetaSection from "../../component/contact/ContactMetaSection";
 
 /**
- * /contact — marketing page inside LandingLayout (Nav + footer come from there).
+ * /contact — the page shell.
  *
- * One column on mobile, hero → form+details → "what happens next" on desktop.
- * The single soft radial tint below is the only gradient on the page and the
- * only decorative layer DESIGN.md permits behind a hero; everything else is
- * paper surfaces separated by hairlines. No glow stacks, no drop shadows.
+ * Rendered inside LandingLayout, which supplies <BrandBar /> (wordmark + Sign
+ * in + Get started, in normal flow) and the footer. So: no header here, no nav
+ * offset, and no second <main> — the layout already owns one.
  *
- * `tw:font-sans` on this root is deliberate: the legacy template sheet sets
- * `body{font-family:Inter}` (unlayered, so it beats the layered Tailwind
- * default), and tailwind.css's own `html`/`:root` rules reference the
- * unprefixed `--font-sans`, which Tailwind renamed to `--tw-font-sans` because
- * of the `tw` prefix — so the page would otherwise render in Inter, not the
- * design's Work Sans.
+ * Editorial rhythm: one Container that lines up with BrandBar's 1200px/32px
+ * gutter, three stacked sections at 48px (mobile) / 88px (desktop), generous
+ * bottom space before the footer. The page is a single paper surface; the only
+ * tonal break is the ink rail in the form's right column. No radial tint, no
+ * gradient wash, no decorative blobs — the previous hero glow is gone.
+ *
+ * `fontFamily` is set on the root because the template sheet types the document
+ * in Inter and MUI's CssBaseline is deliberately not mounted (see main.jsx);
+ * without this, bare text nodes would fall back to the legacy stack instead of
+ * Work Sans.
  */
+
 export default function ContactPage() {
   return (
-    <div className="tw:relative tw:min-h-screen tw:overflow-x-hidden tw:bg-paper tw:font-sans tw:text-ink">
-      <div
-        aria-hidden="true"
-        className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 tw:h-[380px] tw:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(14,165,180,0.10),rgba(14,165,180,0)_70%)]"
-      />
-
-      <div className="tw:relative tw:z-10 tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:pb-16 tw:pt-10 tw:md:px-8 tw:md:pb-24 tw:md:pt-16">
-        <div className="tw:flex tw:flex-col tw:gap-12 tw:md:gap-16">
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        color: "text.primary",
+        fontFamily: (theme) => theme.typography.fontFamily,
+        pb: { xs: 8, md: 11 },
+      }}
+    >
+      <Container
+        maxWidth={false}
+        sx={{ maxWidth: 1200, px: { xs: 2, md: 4 }, pt: { xs: 5, md: 8 } }}
+      >
+        <Stack spacing={{ xs: 6, md: 11 }}>
           <ContactHero />
           <ContactFormSection />
           <ContactMetaSection />
-        </div>
-      </div>
-    </div>
+        </Stack>
+      </Container>
+    </Box>
   );
 }
