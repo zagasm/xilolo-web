@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { X } from "lucide-react";
 
@@ -19,7 +19,14 @@ const APP_STORE = "https://apps.apple.com/ng/app/zagasm-studios/id6755035145";
  * It is a banner, not a redirect: auto-redirecting a web page is hostile, can
  * loop, and steals the page from someone who wanted to read it.
  */
-const APP_PREFIXES = ["/vote/", "/event/", "/events/", "/users/", "/organisers/"];
+const APP_PREFIXES = [
+  "/vote/",
+  "/v/",
+  "/event/",
+  "/events/",
+  "/users/",
+  "/organisers/",
+];
 
 /**
  * The mobile tab bar is `position: fixed; bottom: 0; z-999` (MobileNav.jsx).
@@ -123,11 +130,35 @@ export default function OpenInAppBanner() {
         )};end`
       : `xilolo://${target.replace(/^\//, "")}`;
 
+  // iOS has no intent:// equivalent: the custom scheme opens the app, and if nothing
+  // handles it the page simply stays put. The store redirect is the fallback for
+  // "app not installed" — but it used to fire unconditionally after 900ms, so when
+  // the app *did* open, the tab behind it still navigated to the store. Coming back
+  // to Safari landed on the store instead of the page you left.
+  //
+  // Now the fallback is cancelled as soon as the page is hidden, which is what
+  // happens the moment the app takes over. If the page is still in front after the
+  // grace period, the app did not open and the store is the right destination.
+  const fallbackTimer = useRef(0);
+
+  useEffect(() => {
+    const cancel = () => window.clearTimeout(fallbackTimer.current);
+    document.addEventListener("visibilitychange", cancel);
+    window.addEventListener("pagehide", cancel);
+    return () => {
+      cancel();
+      document.removeEventListener("visibilitychange", cancel);
+      window.removeEventListener("pagehide", cancel);
+    };
+  }, []);
+
   const onOpen = () => {
     if (device !== "ios") return;
-    window.setTimeout(() => {
+    window.clearTimeout(fallbackTimer.current);
+    fallbackTimer.current = window.setTimeout(() => {
+      if (document.visibilityState === "hidden") return;
       window.location.href = APP_STORE;
-    }, 900);
+    }, 1500);
   };
 
   const close = () => {
