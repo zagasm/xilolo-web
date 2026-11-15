@@ -550,7 +550,7 @@ export function Signin() {
         {rememberedAccounts.length > 0 && !selectedAccount && !showPasswordField && (
           <motion.div variants={inputVariants} className="mb-4">
             <div className="d-flex justify-content-between align-items-center mb-2">
-              <label className="form-label mb-0 tw:text-[11px]">Remembered accounts</label>
+              <label className="form-label mb-0 tw:text-[11px]">Recently logged in as</label>
               {/* <button
                 type="button"
                 className="btn btn-link p-0 text-decoration-none"
@@ -564,7 +564,7 @@ export function Signin() {
               {rememberedAccounts.map((account) => (
                 <div
                   key={account.id || account.userId || account.email}
-                  className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:border tw:border-gray-200 tw:rounded-lg tw:p-3 tw:cursor-pointer tw:hover:bg-gray-50"
+                  className="tw:flex tw:items-center tw:justify-between tw:gap-2.5 tw:border tw:border-hairline tw:rounded-xl tw:px-3 tw:py-2 tw:cursor-pointer tw:transition-colors tw:hover:border-accent/40 tw:hover:bg-paper"
                   onClick={() => handleSelectAccount(account)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -582,19 +582,17 @@ export function Signin() {
                       onError={(event) => {
                         event.currentTarget.src = defaultAvatar;
                       }}
-                      className="me-3"
-                      style={{
-                        width: "44px",
-                        height: "44px",
+                      className="tw:mr-2.5 tw:shrink-0"
+                      style={{ width: "32px", height: "32px",
                         borderRadius: "50%",
                         objectFit: "cover",
                       }}
                     />
                     <span className="d-flex flex-column">
-                      <span className="fw-semibold text-dark tw:text-xs">
+                      <span className="tw:text-[13px] tw:font-semibold tw:text-ink">
                         {account.fullName}
                       </span>
-                      <span className="text-muted tw:text-[10px]">{account.email}</span>
+                      <span className="tw:truncate tw:text-[11.5px] tw:text-muted">{account.email}</span>
                     </span>
                   </span>
 
@@ -603,7 +601,7 @@ export function Signin() {
                       fontSize: 11
                     }}
                     type="button"
-                    className="btn btn-sm btn-link text-danger text-decoration-none"
+                    className="btn btn-sm btn-link auth-remove text-decoration-none"
                     onClick={(event) =>
                       handleRemoveRememberedAccount(event, account)
                     }
@@ -703,10 +701,8 @@ export function Signin() {
                   onError={(event) => {
                     event.currentTarget.src = defaultAvatar;
                   }}
-                  className="me-3"
-                  style={{
-                    width: "48px",
-                    height: "48px",
+                  className="tw:mr-2.5 tw:shrink-0"
+                  style={{ width: "32px", height: "32px",
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}
