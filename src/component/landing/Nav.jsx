@@ -37,8 +37,11 @@ import {
 import { useAuth } from "../../pages/auth/AuthContext";
 import { Button } from "../ui";
 
+/* "Home" removed (founder, 2026-11-15). "/" is the sign-in page now — the
+   landing page was deleted on his instruction — so a nav entry labelled Home
+   pointed at a login form. The wordmark in the bar is the way back to "/" and
+   is labelled "Xilolo home" for screen readers. */
 const SIMPLE_LINKS = [
-  { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ];

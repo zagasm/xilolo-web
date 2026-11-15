@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import AuthContainer from "../assets/auth_container";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { api } from "../../../lib/apiClient";
 import { ChangePassword } from "../ChangePassword";
 import { showSuccess, showError } from "../../../component/ui/toast";
 
@@ -182,7 +182,7 @@ export function CodeVerification({ verificationData }) {
       formData.append("code", verificationCode);
       formData.append("input", editedInput);
 
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/password/verify-code`, formData, {
+      const response = await api.post("/api/v1/password/verify-code", formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         }

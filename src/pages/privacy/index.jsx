@@ -1,44 +1,68 @@
 import React from "react";
 
+/**
+ * Xilolo Privacy Policy (/privacy-policy).
+ *
+ * Presentation only — every sentence, date, company name, jurisdiction, email
+ * address and list item below is carried over verbatim from the previous page.
+ * Nothing is added, merged or reworded.
+ *
+ * Design system: paper page, paper-raised card, hairline borders, 12px card
+ * radius, pills, accent as a FILL only (accent text = accent-deep). The single
+ * soft radial tint behind the hero is the only decorative layer; there are no
+ * shadows on this page.
+ *
+ * `tw:pt-24` / `tw:md:pt-28` are deliberate: the fixed nav is 64px at base and
+ * 72px at md while the layout only reserves 80px at lg, so without them the hero
+ * sits under the nav below the lg breakpoint.
+ *
+ * NOTE ON `!`: the template stylesheets (src/assets/css/*) ship an unlayered
+ * `a{color:inherit;text-decoration:none}` rule that outranks Tailwind's utility
+ * layer, so anchor colour and underline must be pinned with the important
+ * modifier. The values themselves are design-token correct — drop the `!`s once
+ * the global anchor rule is neutralised.
+ */
 export default function PrivacyPolicyPage() {
   return (
-    <div className="tw:min-h-screen tw:bg-[#f5f5f7] tw:px-4 tw:py-10 tw:text-slate-800">
-      <div className="tw:mx-auto tw:max-w-6xl">
-        {/* Top hero */}
-        <div className="tw:mb-6">
-          <div className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-lightPurple tw:px-3 tw:py-1 tw:text-[12px] tw:font-medium tw:text-primary">
-            <span className="tw:inline-block tw:h-2 tw:w-2 tw:rounded-full tw:bg-primary" />
-            <span>Xilolo App · Privacy</span>
-          </div>
+    <div className="tw:relative tw:min-h-screen tw:bg-paper tw:font-sans tw:text-ink">
+      <div
+        aria-hidden="true"
+        className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 tw:h-[380px] tw:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(22,144,156,0.10),rgba(22,144,156,0)_70%)]"
+      />
 
-          <span className="tw:block tw:mt-4 tw:text-3xl tw:md:text-4xl tw:font-semibold tw:text-slate-900">
+      <div className="tw:relative tw:z-10 tw:mx-auto tw:w-full tw:max-w-[1200px] tw:px-4 tw:pb-20 tw:pt-10 tw:md:px-8 tw:md:pt-14">
+        {/* Top hero */}
+        <div className="tw:mx-auto tw:mb-6 tw:w-full tw:max-w-[820px]">
+          <span className="tw:block tw:text-[11px] tw:font-semibold tw:uppercase tw:tracking-[0.14em] tw:text-accent-deep">Legal</span>
+
+          <span className="tw:mt-4 tw:block tw:font-display tw:text-[34px] tw:leading-[1.1] tw:tracking-tight tw:font-semibold tw:text-ink tw:md:text-[46px]">
             Privacy Policy for Xilolo App
           </span>
 
-          <p className="tw:mt-3 tw:max-w-2xl tw:text-sm tw:md:text-base tw:text-slate-600">
+          <p className="tw:mt-3 tw:max-w-[62ch] tw:text-[15px] tw:leading-relaxed tw:text-muted-strong tw:md:text-base">
             This Privacy Policy explains how Xilolo Inc. collects, uses, shares,
             and protects your information when you use the Xilolo App.
           </p>
 
-          <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-xs tw:md:text-sm tw:text-slate-600">
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
-              <span className="tw:h-2 tw:w-2 tw:rounded-full tw:bg-emerald-500" />
+          <div className="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:text-[13px] tw:md:text-sm tw:text-muted-strong">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-1">
+              <span className="tw:h-2 tw:w-2 tw:rounded-pill tw:bg-success" />
               Effective: <strong className="tw:ml-1">November 6, 2025</strong>
             </span>
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-1">
               Company: <strong className="tw:ml-1">Xilolo Inc.</strong>
             </span>
-            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-white tw:px-3 tw:py-1 tw:shadow-sm tw:border tw:border-slate-200">
+            <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:border tw:border-hairline tw:bg-paper-raised tw:px-3 tw:py-1">
               Jurisdiction:
               <strong className="tw:ml-1">Federal Republic of Nigeria</strong>
             </span>
           </div>
 
-          <div className="tw:mt-2 tw:text-xs tw:md:text-sm tw:text-slate-500">
+          <div className="tw:mt-2 tw:text-[13px] tw:md:text-sm tw:text-muted">
             Contact:{" "}
             <a
               href="mailto:support@xilolo.com"
-              className="tw:font-medium tw:text-primary tw:underline-offset-4 tw:hover:underline"
+              className="tw:font-medium tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
             >
               support@xilolo.com
             </a>{" "}
@@ -50,12 +74,14 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
 
-        {/* Main layout */}
-        <div className="tw:grid tw:grid-cols-1 tw:lg:grid-cols-[260px,minmax(0,1fr)] tw:gap-8 tw:mt-6">
+        {/* Main layout — a single reading column. The previous grid reserved a
+            260px sidebar column that had no children, which squeezed the legal
+            text into the narrow track at lg and up. */}
+        <div className="tw:mx-auto tw:mt-8 tw:w-full tw:max-w-[820px]">
           {/* Content */}
           <div>
-            <div className="tw:rounded-3xl tw:bg-white tw:p-5 tw:md:p-8 tw:border tw:border-slate-200 tw:shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-              <section className="tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
+            <div className="tw:w-full tw:rounded-card tw:border tw:border-hairline tw:bg-paper-raised tw:p-5 tw:md:p-8">
+              <section className="tw:space-y-4 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                 <p>
                   Welcome to Xilolo Inc.&apos;s comprehensive Privacy Policy for
                   the Xilolo App. As a provider of creative tools designed to
@@ -90,7 +116,7 @@ export default function PrivacyPolicyPage() {
                   rights, you can contact our Data Protection Officer (DPO) at{" "}
                   <a
                     href="mailto:support@xilolo.com"
-                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                    className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                   >
                     support@xilolo.com
                   </a>
@@ -105,12 +131,12 @@ export default function PrivacyPolicyPage() {
               {/* 1. Information We Collect */}
               <section
                 id="info-we-collect"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   1. Information We Collect: A Detailed Overview
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   At Xilolo, data collection is purposeful and limited. We
                   collect information necessary to deliver core functionalities
                   such as video editing, live streaming, collaborative project
@@ -120,15 +146,15 @@ export default function PrivacyPolicyPage() {
                   principles.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.1 Account and Registration Data
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   When you create an account or log in via third-party
                   providers, we collect identifiers to establish and maintain
                   your user profile.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Personal Identifiers:</strong> Full legal name,
                     username, email address, mobile phone number, and a one-way
@@ -140,21 +166,21 @@ export default function PrivacyPolicyPage() {
                     and collaboration preferences.
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   <em>Source:</em> Directly from you during signup or profile
                   updates. <em>Legal Basis:</em> Performance of contract. We
                   retain this data for the duration of your active account plus
                   a 30-day grace period for recovery.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.2 Identity Verification and Compliance Information
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   For users engaging in monetized features, we implement KYC and
                   AML processes to comply with financial regulations.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Verification Elements:</strong> Date of birth,
                     government-issued ID, proof of address, and results from
@@ -165,26 +191,26 @@ export default function PrivacyPolicyPage() {
                     flags, PEP status, and monitoring alerts.
                   </li>
                 </ul>
-                <div className="tw:mt-3 tw:rounded-2xl tw:border-l-4 tw:border-emerald-500 tw:bg-emerald-50 tw:px-4 tw:py-3 tw:text-sm tw:text-slate-700">
+                <div className="tw:mt-3 tw:rounded-card tw:border-l-2 tw:border-accent tw:bg-accent-soft tw:px-4 tw:py-3 tw:text-[15px] tw:leading-relaxed tw:text-body">
                   <strong>Scope Limitation:</strong> This data is collected only
                   when you opt into financial features and is not used for
                   marketing or unrelated analytics. Verification artifacts (such
                   as ID scans) are deleted after validation unless required for
                   audits.
                 </div>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   <em>Source:</em> You and trusted verification partners.{" "}
                   <em>Legal Basis:</em> Legal obligation.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.3 Financial and Transactional Data
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We process limited financial metadata and delegate sensitive
                   details to certified payment processors.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Transaction Details:</strong> Purchase references,
                     amounts, currencies, statuses, timestamps, and merchant
@@ -196,13 +222,13 @@ export default function PrivacyPolicyPage() {
                     histories.
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   <em>Source:</em> Payment gateways and your inputs.{" "}
                   <em>Legal Basis:</em> Contract performance and legal
                   obligation. We do not store full card or banking credentials.
                 </p>
 
-                <div className="tw:mt-4 tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-slate-50 tw:p-4 tw:text-sm tw:text-slate-700">
+                <div className="tw:mt-4 tw:rounded-card tw:border tw:border-hairline tw:bg-paper tw:p-4 tw:text-[15px] tw:leading-relaxed tw:text-body">
                   <strong>Organizer payout percentages:</strong> For ticket
                   sales, Xilolo retains 10% for physical events and 40% for
                   online or hybrid events. For paid event manuals or materials,
@@ -211,14 +237,14 @@ export default function PrivacyPolicyPage() {
                   payment processing obligations.
                 </div>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.4 Usage, Technical, and Device Data
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   To optimize performance and personalize the experience, we log
                   anonymized or pseudonymized operational data.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Device and Network:</strong> IP address, device
                     identifiers, OS, app version, screen resolution, and
@@ -233,19 +259,19 @@ export default function PrivacyPolicyPage() {
                     from IP; precise GPS only when explicitly enabled.
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   <em>Source:</em> Automatically collected via telemetry.{" "}
                   <em>Legal Basis:</em> Legitimate interests (service
                   improvement) with opt-out options.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.5 User-Generated Content and Metadata
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We store and process your content as instructed by you.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Core Assets:</strong> Video files, audio tracks,
                     thumbnails, project titles, descriptions, tags, and
@@ -256,21 +282,21 @@ export default function PrivacyPolicyPage() {
                     collaboration logs, and export formats.
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   <em>Source:</em> Your uploads and in-app creations.{" "}
                   <em>Legal Basis:</em> Performance of contract. Content remains
                   yours; we only host and process it as needed to provide the
                   Service.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.6 Communication and Interaction Records
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We keep records needed to provide support and collaboration
                   features.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Support Interactions:</strong> Email threads, in-app
                     chat transcripts, ticket IDs, and attachments.
@@ -285,20 +311,20 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   1.7 Cookies, Local Storage, and Similar Technologies
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   These technologies support persistent functionality and
                   analytics, as described further in Section 10.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Categories:</strong> Strictly necessary,
                     performance, functional, and targeting (with consent).
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   In all cases, we pseudonymize data where feasible and conduct
                   Data Protection Impact Assessments for high-risk processing.
                 </p>
@@ -307,13 +333,13 @@ export default function PrivacyPolicyPage() {
               {/* 2. How We Use Your Information */}
               <section
                 id="how-we-use"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   2. How We Use Your Information: Purposeful and Transparent
                   Processing
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We process personal data in line with our mission to
                   democratize content creation. Each use is tied to a specific
                   objective and follows data minimization and accountability
@@ -321,10 +347,10 @@ export default function PrivacyPolicyPage() {
                   produces legal effects without human oversight.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   2.1 Enabling and Enhancing Service Delivery
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Account Management:</strong> Authenticating users,
                     syncing projects, and enforcing access controls.
@@ -340,10 +366,10 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   2.2 Financial Operations and Compliance
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Payment Processing:</strong> Authorizing charges,
                     calculating royalties, and issuing receipts.
@@ -358,10 +384,10 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   2.3 Communication and User Engagement
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Transactional Messaging:</strong> Upload
                     confirmations, payout alerts, and critical feature updates.
@@ -376,10 +402,10 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   2.4 Analytics, Research, and Improvement
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Performance Metrics:</strong> Analyzing load times
                     and drop-offs to improve experience.
@@ -394,10 +420,10 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   2.5 Legal, Security, and Ethical Compliance
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Regulatory Adherence:</strong> Retaining records for
                     audits, responding to requests, and reporting breaches.
@@ -416,16 +442,16 @@ export default function PrivacyPolicyPage() {
               {/* 3. Legal Bases */}
               <section
                 id="legal-bases"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   3. Legal Bases for Processing: Grounded in Law
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We process personal data only where we have a valid legal
                   basis under NDPR, GDPR, and similar frameworks.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-2 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-2 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Performance of Contract:</strong> To deliver the App
                     and its features.
@@ -452,21 +478,21 @@ export default function PrivacyPolicyPage() {
               {/* 4. Sharing */}
               <section
                 id="sharing"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   4. Sharing and Disclosure: Controlled and Accountable
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   Data sharing is limited to subprocessors bound by data
                   processing agreements. We maintain a public register of these
                   subprocessors on our website.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   4.1 Third-Party Service Providers
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Payment and Finance:</strong> Stripe, Paystack.
                   </li>
@@ -485,10 +511,10 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   4.2 Regulatory and Law Enforcement Disclosures
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     Disclosures to authorities such as NDPC, EFCC, or Interpol
                     only when required by valid legal process.
@@ -499,19 +525,19 @@ export default function PrivacyPolicyPage() {
                   </li>
                 </ul>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   4.3 Corporate Transactions
                 </span>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   In the event of a merger, acquisition, or asset sale, data may
                   transfer to a successor under equivalent protections, with
                   notice where required.
                 </p>
 
-                <span className="tw:mt-6 tw:text-base tw:md:text-lg tw:font-semibold tw:text-slate-900">
+                <span className="tw:mt-6 tw:block tw:font-display tw:text-[15px] tw:font-semibold tw:text-ink">
                   4.4 Public and Aggregated Disclosures
                 </span>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     Public profiles such as creator handles, bios, and public
                     project teasers, when you choose to make them visible.
@@ -521,7 +547,7 @@ export default function PrivacyPolicyPage() {
                     publications.
                   </li>
                 </ul>
-                <p className="tw:mt-1 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-1 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   We do not sell personal data. CCPA &quot;sale&quot; opt-outs
                   are respected where applicable.
                 </p>
@@ -530,17 +556,17 @@ export default function PrivacyPolicyPage() {
               {/* 5. International Transfers */}
               <section
                 id="transfers"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   5. International Data Transfers: Safeguarded Global Operations
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We may transfer data to processors outside Nigeria, including
                   in the US, EU, and other regions, using appropriate
                   safeguards.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     Approved mechanisms such as the EU-US Data Privacy
                     Framework.
@@ -556,85 +582,85 @@ export default function PrivacyPolicyPage() {
               {/* 6. Retention */}
               <section
                 id="retention"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   6. Data Retention and Deletion: Principled Lifecycle
                   Management
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We retain data only as long as necessary for the purposes
                   described in this Policy or as required by law.
                 </p>
 
                 <div className="tw:mt-4 tw:overflow-x-auto">
-                  <table className="tw:min-w-full tw:border tw:border-slate-200 tw:text-sm tw:md:text-base tw:text-slate-700 tw:bg-white tw:rounded-xl tw:overflow-hidden">
+                  <table className="tw:min-w-full tw:border tw:border-hairline tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body tw:bg-paper-raised tw:rounded-card tw:overflow-hidden">
                     <thead>
                       <tr>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Data Type
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Retention Period
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Rationale
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Account Data
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Duration of account + 2 years inactivity
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Service provision and recovery
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Financial Records
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           7 years post-transaction
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Tax and audit obligations
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Content Files
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Until deletion request + 90-day backup
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           User control and recovery
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Logs / Analytics
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           12–36 months
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Security and improvement
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Verification Documents
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           5 years post-validation or legal minimum
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Compliance
                         </td>
                       </tr>
@@ -642,7 +668,7 @@ export default function PrivacyPolicyPage() {
                   </table>
                 </div>
 
-                <p className="tw:mt-3 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-3 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   Deletion is irreversible (aside from backups, which are purged
                   on a schedule). We may retain anonymized data that can no
                   longer identify you.
@@ -652,16 +678,16 @@ export default function PrivacyPolicyPage() {
               {/* 7. Rights */}
               <section
                 id="rights"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   7. Your Privacy Rights: Comprehensive Exercise Guide
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   Depending on your jurisdiction, you may have the following
                   rights:
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-2 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-2 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Access:</strong> Request a copy of the personal data
                     we hold about you.
@@ -695,11 +721,11 @@ export default function PrivacyPolicyPage() {
                     of significant decisions made using automated processing.
                   </li>
                 </ul>
-                <p className="tw:mt-3 tw:text-xs tw:md:text-sm tw:text-slate-500">
+                <p className="tw:mt-3 tw:text-[13px] tw:md:text-sm tw:text-muted">
                   To exercise your rights, contact us at{" "}
                   <a
                     href="mailto:support@xilolo.com"
-                    className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                    className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                   >
                     support@xilolo.com
                   </a>{" "}
@@ -711,12 +737,12 @@ export default function PrivacyPolicyPage() {
               {/* 8. Children */}
               <section
                 id="children"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   8. Protection of Children&apos;s Privacy
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   The Xilolo App is intended for users aged 18 and above. We do
                   not knowingly collect personal data from children under 18 (or
                   under 16 in some jurisdictions). If we become aware that such
@@ -728,17 +754,17 @@ export default function PrivacyPolicyPage() {
               {/* 9. Security */}
               <section
                 id="security"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   9. Information Security: Robust and Proactive Measures
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We implement technical and organizational measures designed to
                   protect your data, including encryption in transit and at
                   rest, access controls, training, and security monitoring.
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     Encryption (such as TLS in transit and AES-256 at rest).
                   </li>
@@ -754,12 +780,12 @@ export default function PrivacyPolicyPage() {
               {/* 10. Cookies */}
               <section
                 id="cookies"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   10. Cookies and Tracking Technologies: Detailed Management
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   Cookies and similar technologies help us provide core
                   features, remember preferences, and understand how the App is
                   used. You can manage these through your browser settings and
@@ -767,92 +793,92 @@ export default function PrivacyPolicyPage() {
                 </p>
 
                 <div className="tw:mt-4 tw:overflow-x-auto">
-                  <table className="tw:min-w-full tw:border tw:border-slate-200 tw:text-sm tw:md:text-base tw:text-slate-700 tw:bg-white tw:rounded-xl tw:overflow-hidden">
+                  <table className="tw:min-w-full tw:border tw:border-hairline tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body tw:bg-paper-raised tw:rounded-card tw:overflow-hidden">
                     <thead>
                       <tr>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Category
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Examples
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Purpose
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Duration
                         </th>
-                        <th className="tw:bg-slate-50 tw:px-4 tw:py-2 tw:text-left tw:text-xs tw:md:text-sm tw:font-semibold tw:text-slate-600 tw:border-b tw:border-slate-200">
+                        <th className="tw:border-b tw:border-hairline tw:bg-paper tw:px-4 tw:py-2 tw:text-left tw:text-[12px] tw:font-semibold tw:text-muted-strong tw:md:text-sm">
                           Provider
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Strictly Necessary
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           auth_token, session_id
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Login persistence
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Session / 1 year
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Xilolo
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Performance
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           _ga, app_analytics
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Usage aggregation
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           2 years
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Google
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Functional
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           theme_pref, lang_choice
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Customization
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           1 year
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Xilolo
                         </td>
                       </tr>
                       <tr>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Targeting
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           ads_id (opt-in)
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Personalized content
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           6 months
                         </td>
-                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-slate-200">
+                        <td className="tw:px-4 tw:py-2 tw:border-t tw:border-hairline">
                           Meta/Facebook
                         </td>
                       </tr>
@@ -864,12 +890,12 @@ export default function PrivacyPolicyPage() {
               {/* 11. Updates */}
               <section
                 id="updates"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   11. Policy Updates: Commitment to Ongoing Transparency
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   We may update this Privacy Policy to reflect changes in our
                   practices, technology, or legal requirements. When we make
                   material changes, we will notify you via the App, email, or
@@ -880,12 +906,12 @@ export default function PrivacyPolicyPage() {
               {/* 12. Breach */}
               <section
                 id="breach"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   12. Data Breach Response: Swift and Accountable
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   In the unlikely event of a data breach, we will investigate,
                   contain, and remediate the incident, and notify affected users
                   and regulators where required.
@@ -895,21 +921,21 @@ export default function PrivacyPolicyPage() {
               {/* 13. Contact */}
               <section
                 id="contact"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   13. Contact Information and Dispute Resolution
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   If you have questions or concerns about this Policy or how we
                   handle your data, please contact:
                 </p>
-                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <ul className="tw:mt-2 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <li>
                     <strong>Email:</strong>{" "}
                     <a
                       href="mailto:support@xilolo.com"
-                      className="tw:text-primary tw:underline-offset-4 tw:hover:underline"
+                      className="tw:text-accent-deep! tw:underline! tw:underline-offset-2 tw:hover:text-accent"
                     >
                       support@xilolo.com
                     </a>
@@ -932,14 +958,14 @@ export default function PrivacyPolicyPage() {
               {/* 14. FAQs */}
               <section
                 id="faqs"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   14. Frequently Asked Questions (FAQs)
                 </span>
-                <dl className="tw:mt-4 tw:space-y-4 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <dl className="tw:mt-4 tw:space-y-4 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-display tw:font-semibold tw:text-ink">
                       How do I delete my account?
                     </dt>
                     <dd className="tw:mt-1">
@@ -949,7 +975,7 @@ export default function PrivacyPolicyPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-display tw:font-semibold tw:text-ink">
                       Do you share data with advertisers?
                     </dt>
                     <dd className="tw:mt-1">
@@ -959,7 +985,7 @@ export default function PrivacyPolicyPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-display tw:font-semibold tw:text-ink">
                       What if I&apos;m in the EU?
                     </dt>
                     <dd className="tw:mt-1">
@@ -969,7 +995,7 @@ export default function PrivacyPolicyPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="tw:font-semibold tw:text-slate-900">
+                    <dt className="tw:font-display tw:font-semibold tw:text-ink">
                       Can I export my projects and data?
                     </dt>
                     <dd className="tw:mt-1">
@@ -984,17 +1010,17 @@ export default function PrivacyPolicyPage() {
               {/* 15. Governing Law */}
               <section
                 id="governing-law"
-                className="tw:mt-10 tw:pt-8 tw:border-t tw:border-slate-100"
+                className="tw:mt-10 tw:scroll-mt-28 tw:border-t tw:border-hairline tw:pt-8"
               >
-                <span className="tw:text-xl tw:md:text-2xl tw:font-semibold tw:text-slate-900">
+                <span className="tw:block tw:font-display tw:text-[19px] tw:tracking-tight tw:font-semibold tw:text-ink">
                   15. Governing Law and Miscellaneous Provisions
                 </span>
-                <p className="tw:mt-3 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-3 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   This Privacy Policy and any disputes arising from it are
                   governed by the laws of the Federal Republic of Nigeria,
                   without regard to conflict of law principles.
                 </p>
-                <p className="tw:mt-2 tw:text-sm tw:md:text-base tw:text-slate-700">
+                <p className="tw:mt-2 tw:text-[15px] tw:leading-relaxed tw:md:text-base tw:text-body">
                   Venue for disputes will be courts in Asaba State, Nigeria,
                   unless otherwise required by law. If any provision of this
                   Policy is found invalid, the remaining provisions remain in
@@ -1003,12 +1029,12 @@ export default function PrivacyPolicyPage() {
               </section>
 
               {/* Footer */}
-              <div className="tw:mt-10 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-slate-100 tw:pt-4">
-                <span className="tw:text-xs tw:md:text-sm tw:text-slate-500">
+              <div className="tw:mt-10 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:border-t tw:border-hairline tw:pt-4">
+                <span className="tw:text-[13px] tw:md:text-sm tw:text-muted">
                   Last updated: <strong>November 6, 2025</strong>
                 </span>
-                <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-slate-50 tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-slate-600 tw:border tw:border-slate-200">
-                  <span className="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-primary" />
+                <span className="tw:inline-flex tw:items-center tw:gap-2 tw:rounded-pill tw:border tw:border-hairline tw:bg-paper tw:px-3 tw:py-1 tw:text-[11px] tw:font-medium tw:text-muted-strong">
+                  <span className="tw:h-1.5 tw:w-1.5 tw:rounded-pill tw:bg-accent" />
                   Xilolo · Privacy
                 </span>
               </div>

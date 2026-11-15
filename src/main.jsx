@@ -16,6 +16,9 @@ import { AuthProvider, useAuth } from "./pages/auth/AuthContext/index.jsx";
 import { HelmetProvider } from "react-helmet-async";
 import { ModalProvider } from "./component/assets/ModalContext/index.jsx";
 import { store } from "./store";
+import { ThemeProvider } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
+import muiTheme from "./theme/muiTheme.js";
 
 import { initGA } from "./analytics";
 import GoogleAnalyticsTracker from "./GoogleAnalyticsTracker.jsx";
@@ -50,16 +53,26 @@ const GoogleProviderBoundary = ({ children }) => {
 
 createRoot(document.getElementById("root")).render(
   <ReduxProvider store={store}>
-    <GoogleProviderBoundary>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <HelmetProvider>
-            <ModalProvider>
-              <RootWrapper />
-            </ModalProvider>
-          </HelmetProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </GoogleProviderBoundary>
+    {/* StyledEngineProvider injectFirst puts MUI's emotion styles BEFORE the
+        Tailwind sheet so `tw:` utilities can still override an MUI component
+        where a page needs it. Without it emotion appends last and silently
+        beats every utility. ThemeProvider maps MUI onto the app's tokens —
+        see src/theme/muiTheme.js. CssBaseline is deliberately NOT used: this
+        repo's template CSS is load-bearing and a global reset would move it. */}
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={muiTheme}>
+        <GoogleProviderBoundary>
+          <AuthProvider>
+            <QueryClientProvider client={queryClient}>
+              <HelmetProvider>
+                <ModalProvider>
+                  <RootWrapper />
+                </ModalProvider>
+              </HelmetProvider>
+            </QueryClientProvider>
+          </AuthProvider>
+        </GoogleProviderBoundary>
+      </ThemeProvider>
+    </StyledEngineProvider>
   </ReduxProvider>
 );

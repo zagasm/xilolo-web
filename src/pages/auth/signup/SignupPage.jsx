@@ -354,11 +354,6 @@ export function SignUp() {
       socialSlot={
         showSocialAuth ? (
           <div className="tw:w-full tw:max-w-[420px] tw:mx-auto">
-            <p className="small text-muted mb-3">
-              {isGoogleLoading || isAppleLoading
-                ? "Connecting to your account..."
-                : "Or continue with"}
-            </p>
             <div className="tw:flex tw:flex-col tw:gap-3">
               <GoogleAuthSection
                 label={null}

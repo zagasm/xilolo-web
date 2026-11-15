@@ -1,33 +1,49 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  AtSign,
-  BookOpen,
-  ChevronDown,
-  Globe,
-  Mail,
-  MessageCircle,
-} from "lucide-react";
-import { Button, Card, Chip, Eyebrow, SectionHeading } from "../../component/ui";
+import { Link as RouterLink } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Paper from "@mui/material/Paper";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Link from "@mui/material/Link";
+import AddRounded from "@mui/icons-material/AddRounded";
+import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
+import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRounded";
+import MenuBookOutlined from "@mui/icons-material/MenuBookOutlined";
 
 /**
- * Xilolo Support (/support).
+ * Xilolo Support (/support) — Material UI, Xilolo theme (src/theme/muiTheme.js).
  *
- * Presentation only — every answer, contact detail and link below is carried
- * over verbatim from the previous page. Nothing here is invented: the only
- * links are routes that exist in src/App.jsx (/support-chat,
- * /community-guidelines) plus the pre-existing mailto: and xilolo.com links.
+ * Presentation only. Every FAQ question and answer, every heading, every link
+ * destination and the open/close handler are carried over verbatim from the
+ * previous page; the only routes linked are ones that already existed here
+ * (/support-chat, /community-guidelines, /contact, the mailto: and
+ * https://www.xilolo.com). Nothing about SLAs, phone numbers or response times
+ * is asserted, because none of that was in the source copy.
  *
- * Design system: paper page, paper-raised cards, hairline borders, 12px card
- * radius, pill buttons, accent as a FILL only (accent text = accent-deep).
+ * Design intent — editorial, not "template":
+ *  - one asymmetric hero (display headline left, lead + actions right), closed
+ *    by a hairline rule; no blobs, no gradients, no icon-in-a-circle grid;
+ *  - the FAQ is a ruled index: overline group labels with a count, then
+ *    full-bleed rows separated by hairlines, "+" that turns into "×";
+ *  - the right rail is three small hairlined papers, sticky at 96px above the
+ *    fold on desktop, stacking under the FAQ on mobile in the same DOM order;
+ *  - flat surfaces everywhere (theme sets every shadow to none), accent used as
+ *    a fill only, accent-coloured text always via primary.dark (#06707D).
  *
- * NOTE ON `!`: the template stylesheets (src/assets/css/*) still ship global
- * element rules for h1-h3, p and a that outrank Tailwind's utility layer
- * (headings land on 20px/500, anchors fall back to black, body copy on Inter).
- * Those files are not owned by this page, so the values this page must control
- * are pinned with Tailwind's important modifier. Remove the `!`s once the
- * global element rules are neutralised — the values themselves are already
- * design-token correct.
+ * Styling is done through `sx` (emotion) rather than Tailwind: this repo can't
+ * carry the `tw:` prefix into MUI's overrides, so the page ships zero `tw:`
+ * utilities and relies on the theme for type, radius and colour.
+ *
+ * NOTE: two decorative emoji (a 💌 and a pair of ✨) were dropped from body copy
+ * the founder explicitly banned emoji in the UI. The words themselves are
+ * unchanged.
  */
 
 const FAQ_GROUPS = [
@@ -169,13 +185,102 @@ const FAQ_GROUPS = [
   },
 ];
 
-/* The template stylesheet indents and greys every list; every list on this page
-   is a layout list, so the reset is pinned inline (it outranks any utility). */
-const FLAT_LIST = {
-  listStyle: "none",
-  paddingLeft: 0,
-  margin: 0,
+const GUIDELINE_DONT = [
+  "Posting hateful or harmful content.",
+  "Sharing copyrighted memes without permission.",
+  "Spamming or harassing other users.",
+];
+
+/* Shared editorial type tokens. Kept as plain objects so every block answers to
+   one definition of "overline", "lead" and "body". */
+const OVERLINE = {
+  fontSize: 11.5,
+  fontWeight: 600,
+  letterSpacing: "0.12em",
+  lineHeight: 1.6,
+  textTransform: "uppercase",
+  color: "primary.dark",
 };
+
+const LEAD = {
+  fontSize: { xs: 16, md: 18 },
+  lineHeight: 1.6,
+  letterSpacing: "-0.005em",
+  color: "text.secondary",
+};
+
+const BODY = {
+  fontSize: 15,
+  lineHeight: 1.7,
+  color: "text.secondary",
+};
+
+const CAPTION = {
+  fontSize: 13,
+  lineHeight: 1.55,
+  color: "text.secondary",
+};
+
+/* The rail papers: 12px radius, one hairline, no fill contrast beyond paper. */
+const RAIL_PAPER = {
+  p: { xs: 2.5, md: 3 },
+  // sx multiplies by theme.shape.borderRadius (12) — `3` rendered 36px.
+  borderRadius: 1,
+  border: "1px solid",
+  borderColor: "divider",
+  backgroundColor: "background.paper",
+};
+
+function RailHeading({ children }) {
+  return (
+    <Typography component="h2" sx={{ ...OVERLINE, m: 0 }}>
+      {children}
+    </Typography>
+  );
+}
+
+function RailLink({ to, href, children, icon: Icon }) {
+  const external = Boolean(href);
+  const linkProps = external
+    ? { href, ...(href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {}) }
+    : { component: RouterLink, to };
+
+  return (
+    <Link
+      {...linkProps}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1.25,
+        minHeight: 44,
+        pr: 1,
+        fontSize: 15,
+        fontWeight: 500,
+        color: "text.primary",
+        textDecoration: "none",
+        borderRadius: 1,
+        transition: "color 120ms ease",
+        "&:hover": { color: "primary.dark", textDecoration: "none" },
+        "&:focus-visible": {
+          outline: "2px solid",
+          outlineColor: "primary.main",
+          outlineOffset: 2,
+        },
+        "& .rail-link-icon": { color: "primary.dark" },
+      }}
+    >
+      {Icon ? <Icon className="rail-link-icon" sx={{ fontSize: 18 }} aria-hidden="true" /> : null}
+      <Box component="span" sx={{ flex: 1, minWidth: 0 }}>
+        {children}
+      </Box>
+      <ArrowForwardRounded
+        className="rail-link-icon"
+        sx={{ fontSize: 16, opacity: 0.55 }}
+        aria-hidden="true"
+      />
+    </Link>
+  );
+}
 
 function Support() {
   const [openFaq, setOpenFaq] = useState(null);
@@ -185,241 +290,406 @@ function Support() {
   };
 
   return (
-    <div className="tw:bg-paper tw:px-4 tw:pb-20 tw:pt-24 tw:font-sans tw:text-ink tw:sm:px-6 tw:md:px-8 tw:md:pt-28 tw:lg:pt-10">
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-[1200px] tw:flex-col">
-        {/* ── Hero ───────────────────────────────────────────────────────────
-            Deliberately a <div>, not a <header>: the template stylesheet still
-            carries a bare `header` rule (fixed 40px height, 30px padding, white
-            fill, drop shadow, Inter) that clips every child of a real <header>. */}
-        <div className="tw:flex tw:flex-col tw:items-center tw:gap-3 tw:text-center">
-          <Eyebrow className="tw:m-0! tw:text-accent-deep!">Support</Eyebrow>
+    <Box
+      sx={{
+        backgroundColor: "background.default",
+        color: "text.primary",
+        pb: { xs: 7, md: 10 },
+      }}
+    >
+      <Container
+        maxWidth={false}
+        sx={{ maxWidth: 1200, px: { xs: 2, md: 4 } }}
+        disableGutters
+      >
+        {/* ── Hero ─────────────────────────────────────────────────────────
+            Asymmetric: the display line holds the left, the lead and the two
+            doors (chat / email) sit under it on the right baseline. A rule
+            closes the block, which is what makes it read as a masthead rather
+            than a centred template hero. */}
+        <Box component="section" sx={{ pt: { xs: 4, md: 7 }, pb: { xs: 4, md: 5.5 } }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "minmax(0, 7fr) minmax(0, 5fr)" },
+              columnGap: { md: 6, lg: 9 },
+              rowGap: { xs: 2.5, md: 0 },
+              alignItems: "start",
+            }}
+          >
+            <Box>
+              <Typography component="p" sx={{ ...OVERLINE, mb: { xs: 1.5, md: 2 } }}>
+                Support
+              </Typography>
 
-          <h1 className="tw:font-display! tw:text-[clamp(2rem,5vw,2.75rem)]! tw:font-extrabold! tw:leading-[1.1] tw:tracking-[-0.02em]! tw:text-ink! tw:m-0!">
-            Xilolo Support
-          </h1>
+              <Typography
+                component="h1"
+                sx={{
+                  fontSize: "clamp(40px, 6vw, 56px)",
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.03em",
+                  fontWeight: 700,
+                  textWrap: "balance",
+                  m: 0,
+                }}
+              >
+                Xilolo Support
+              </Typography>
+            </Box>
 
-          <p className="tw:m-0! tw:max-w-[62ch] tw:text-base tw:leading-relaxed tw:text-muted-strong!">
-            Welcome to the Xilolo Support Center. We’re here to make sure your
-            laughter never stops!
-          </p>
+            <Box sx={{ maxWidth: "60ch", pb: { md: 0.5 } }}>
+              <Typography component="p" sx={{ ...LEAD, m: 0 }}>
+                Welcome to the Xilolo Support Center. We’re here to make sure your
+                laughter never stops!
+              </Typography>
 
-          <div className="tw:mt-2 tw:flex tw:w-full tw:flex-col tw:gap-3 tw:sm:w-auto tw:sm:flex-row tw:sm:items-center tw:sm:justify-center">
-            <Button
-              as={Link}
-              to="/support-chat"
-              variant="primary"
-              size="lg"
-              className="tw:w-full tw:text-ink! tw:hover:text-paper-raised! tw:sm:w-auto"
-            >
-              <MessageCircle className="tw:size-4" aria-hidden="true" />
-              Support chat
-            </Button>
-
-            <Button
-              as="a"
-              href="mailto:support@xilolo.com"
-              variant="secondary"
-              size="lg"
-              className="tw:w-full tw:text-accent-deep! tw:sm:w-auto"
-            >
-              <Mail className="tw:size-4" aria-hidden="true" />
-              support@xilolo.com
-            </Button>
-          </div>
-
-          <p className="tw:m-0! tw:text-xs tw:text-muted-strong!">
-            Support chat is available to users with an active subscription.
-          </p>
-        </div>
-
-        {/* ── FAQ + side rail ────────────────────────────────────────────── */}
-        <div className="tw:mt-12 tw:grid tw:grid-cols-1 tw:gap-8 tw:lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] tw:lg:items-start tw:lg:gap-10">
-          <section aria-label="Frequently Asked Questions">
-            <SectionHeading
-              title="Frequently Asked Questions (FAQ)"
-              className="tw:[&>h2]:m-0! tw:[&>h2]:text-[clamp(1.5rem,3vw,2rem)]! tw:[&>h2]:font-extrabold! tw:[&>h2]:text-ink!"
-            />
-
-            <div className="tw:mt-5 tw:flex tw:flex-col tw:gap-4">
-              {FAQ_GROUPS.map((group) => (
-                <Card
-                  key={group.heading}
-                  className="tw:flex tw:flex-col tw:gap-2"
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1.25}
+                sx={{ mt: 3, alignItems: { xs: "stretch", sm: "center" } }}
+              >
+                <Button
+                  component={RouterLink}
+                  to="/support-chat"
+                  variant="contained"
+                  disableElevation
+                  startIcon={<ChatBubbleOutlineRounded sx={{ fontSize: 18 }} />}
+                  sx={{ fontSize: 14.5 }}
                 >
-                  <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
-                    <h3 className="tw:m-0! tw:font-display! tw:text-lg! tw:font-bold! tw:text-ink!">
-                      {group.heading}
-                    </h3>
-                    <Chip>{group.items.length} questions</Chip>
-                  </div>
+                  Support chat
+                </Button>
 
-                  <div>
-                    {group.items.map((item, index) => {
-                      const key = `${group.heading}-${index}`;
-                      const open = openFaq === key;
+                <Button
+                  href="mailto:support@xilolo.com"
+                  variant="outlined"
+                  disableElevation
+                  startIcon={<MailOutlineRounded sx={{ fontSize: 18 }} />}
+                  sx={{
+                    fontSize: 14.5,
+                    borderColor: "divider",
+                    color: "primary.dark",
+                    backgroundColor: "background.paper",
+                    "&:hover": {
+                      borderColor: "rgba(17,19,22,0.32)",
+                      backgroundColor: "background.paper",
+                    },
+                  }}
+                >
+                  support@xilolo.com
+                </Button>
+              </Stack>
 
-                      return (
-                        <div
-                          key={key}
-                          className={
-                            index === 0 ? "" : "tw:border-t tw:border-hairline"
-                          }
+              <Typography component="p" sx={{ ...CAPTION, m: 0, mt: 1.75 }}>
+                Support chat is available to users with an active subscription.
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Divider />
+
+        {/* ── FAQ + rail ───────────────────────────────────────────────────
+            8/4 on desktop, 96px sticky rail, one column on mobile with the rail
+            after the FAQ — identical DOM order in both. */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", lg: "minmax(0,2fr) minmax(0,1fr)" },
+            columnGap: { lg: 10 },
+            rowGap: { xs: 6, lg: 0 },
+            mt: { xs: 5.5, md: 8, lg: 11 },
+            alignItems: "start",
+          }}
+        >
+          <Box component="section" aria-label="Frequently Asked Questions">
+            <Typography
+              component="h2"
+              variant="h2"
+              sx={{
+                fontFamily: "var(--tw-font-display), 'Plus Jakarta Sans', sans-serif",
+                fontSize: { xs: 24, md: 30 },
+                lineHeight: 1.15,
+                letterSpacing: "-0.025em",
+                m: 0,
+              }}
+            >
+              Frequently Asked Questions (FAQ)
+            </Typography>
+
+            {FAQ_GROUPS.map((group, groupIndex) => (
+              <Box
+                key={group.heading}
+                component="div"
+                sx={{ mt: groupIndex === 0 ? { xs: 3.5, md: 4.5 } : { xs: 5.5, md: 7 } }}
+              >
+                <Stack
+                  direction="row"
+                  alignItems="baseline"
+                  justifyContent="space-between"
+                  spacing={2}
+                  sx={{ pb: 1.25, borderBottom: "1px solid", borderColor: "divider" }}
+                >
+                  <Typography component="h3" sx={{ ...OVERLINE, m: 0 }}>
+                    {group.heading}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontSize: 12.5,
+                      fontVariantNumeric: "tabular-nums",
+                      color: "text.disabled",
+                    }}
+                  >
+                    {group.items.length}
+                  </Typography>
+                </Stack>
+
+                <Box>
+                  {group.items.map((item, index) => {
+                    const key = `${group.heading}-${index}`;
+                    const expanded = openFaq === key;
+
+                    return (
+                      <Accordion
+                        key={key}
+                        expanded={expanded}
+                        onChange={() => toggleFaq(key)}
+                        sx={{
+                          borderTop: "none",
+                          borderBottom: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 0,
+                          "&:first-of-type": {
+                            borderTopLeftRadius: 0,
+                            borderTopRightRadius: 0,
+                          },
+                          "&:last-of-type": {
+                            borderBottomLeftRadius: 0,
+                            borderBottomRightRadius: 0,
+                          },
+                          backgroundColor: "transparent",
+                          "&:hover": { backgroundColor: "transparent" },
+                          "&.Mui-expanded": { backgroundColor: "transparent" },
+                        }}
+                      >
+                        <AccordionSummary
+                          expandIcon={<AddRounded />}
+                          aria-controls={`${key}-panel`}
+                          id={`${key}-header`}
+                          sx={{
+                            "& .MuiAccordionSummary-content": {
+                              my: 2.375,
+                              mr: 2,
+                              "&.Mui-expanded": { my: 2.375 },
+                            },
+                            "& .MuiTypography-root": { fontSize: "inherit" },
+                            "& .MuiAccordionSummary-expandIconWrapper": {
+                              transition: "transform 180ms ease",
+                              color: "primary.dark",
+                              "& .MuiSvgIcon-root": {
+                                fontSize: 20,
+                                transition: "transform 180ms ease",
+                              },
+                              "&.Mui-expanded": {
+                                transform: "none",
+                                "& .MuiSvgIcon-root": { transform: "rotate(45deg)" },
+                              },
+                            },
+                            "&:hover .MuiAccordionSummary-content": {
+                              color: "primary.dark",
+                            },
+                            "&.Mui-focusVisible": {
+                              outline: "2px solid",
+                              outlineColor: "primary.main",
+                              outlineOffset: 2,
+                              borderRadius: 1,
+                            },
+                          }}
                         >
-                          <button
-                            type="button"
-                            onClick={() => toggleFaq(key)}
-                            aria-expanded={open}
-                            className="tw:flex tw:min-h-11 tw:w-full tw:items-center tw:justify-between tw:gap-4 tw:py-3 tw:text-left tw:text-[15px] tw:font-semibold tw:text-ink tw:transition-colors tw:hover:text-accent-deep"
+                          <Typography
+                            component="span"
+                            sx={{
+                              fontSize: { xs: 15, md: 16 },
+                              fontWeight: 600,
+                              letterSpacing: "-0.012em",
+                              color: "inherit",
+                              transition: "color 120ms ease",
+                            }}
                           >
-                            <span>{item.question}</span>
-                            <ChevronDown
-                              aria-hidden="true"
-                              className={`tw:size-5 tw:shrink-0 tw:text-accent-deep tw:transition-transform tw:duration-200 ${
-                                open ? "tw:rotate-180" : ""
-                              }`}
-                            />
-                          </button>
+                            {item.question}
+                          </Typography>
+                        </AccordionSummary>
 
-                          {open ? (
-                            <ul
-                              style={FLAT_LIST}
-                              className="tw:flex tw:flex-col tw:gap-1.5 tw:pb-3 tw:text-sm tw:leading-relaxed tw:text-muted-strong"
+                        <AccordionDetails sx={{ pl: 0, pr: { xs: 2, md: 6 }, pb: 2.5 }}>
+                          {item.answer.map((line, lineIndex) => (
+                            <Typography
+                              key={lineIndex}
+                              component="p"
+                              sx={{ ...BODY, m: 0, maxWidth: "62ch" }}
                             >
-                              {item.answer.map((line, lineIndex) => (
-                                <li key={lineIndex}>{line}</li>
-                              ))}
-                            </ul>
-                          ) : null}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
+                              {line}
+                            </Typography>
+                          ))}
+                        </AccordionDetails>
+                      </Accordion>
+                    );
+                  })}
+                </Box>
+              </Box>
+            ))}
+          </Box>
 
-          <aside className="tw:flex tw:flex-col tw:gap-6 tw:lg:sticky tw:lg:top-28">
-            {/* ── Contact ─────────────────────────────────────────────────── */}
-            <Card className="tw:flex tw:flex-col tw:gap-3">
-              <h2 className="tw:m-0! tw:font-display! tw:text-xl! tw:font-bold! tw:text-ink!">
-                Contact Us
-              </h2>
+          {/* ── Rail ─────────────────────────────────────────────────────── */}
+          <Box
+            component="aside"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              position: { lg: "sticky" },
+              top: { lg: "96px" },
+              alignSelf: "start",
+            }}
+          >
+            <Paper elevation={0} sx={RAIL_PAPER}>
+              <RailHeading>Contact Us</RailHeading>
 
-              <p className="tw:m-0! tw:text-sm tw:leading-relaxed tw:text-muted-strong!">
-                Still need help? We’d love to hear from you 💌
-              </p>
+              <Typography component="p" sx={{ ...BODY, fontSize: 14.5, m: 0, mt: 1 }}>
+                Still need help? We’d love to hear from you
+              </Typography>
 
-              <ul
-                style={FLAT_LIST}
-                className="tw:flex tw:flex-col tw:gap-1 tw:text-sm"
+              <Box sx={{ mt: 1.5, mx: -0.5 }}>
+                <RailLink to="/contact">Contact us</RailLink>
+                <Divider sx={{ my: 0.5 }} />
+                <RailLink href="https://www.xilolo.com" icon={null}>
+                  www.xilolo.com
+                </RailLink>
+              </Box>
+
+              <Typography
+                component="p"
+                sx={{ ...CAPTION, fontSize: 12.5, m: 0, mt: 1.5, color: "text.disabled" }}
               >
-                <li>
-                  <a
-                    href="mailto:support@xilolo.com"
-                    className="tw:-mx-2 tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:rounded-control tw:px-2 tw:transition-colors tw:hover:bg-accent-soft"
-                  >
-                    <Mail
-                      className="tw:size-4 tw:shrink-0 tw:text-accent-deep"
-                      aria-hidden="true"
-                    />
-                    <span className="tw:text-muted-strong">Email:</span>
-                    <span className="tw:font-medium tw:text-accent-deep tw:underline tw:underline-offset-4">
-                      support@xilolo.com
-                    </span>
-                  </a>
-                </li>
+                Twitter / Instagram / TikTok:{" "}
+                <Box component="span" sx={{ color: "text.primary", fontWeight: 600 }}>
+                  @xilolo_hq
+                </Box>
+              </Typography>
+            </Paper>
 
-                <li>
-                  <a
-                    href="https://www.xilolo.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="tw:-mx-2 tw:flex tw:min-h-11 tw:items-center tw:gap-2 tw:rounded-control tw:px-2 tw:transition-colors tw:hover:bg-accent-soft"
-                  >
-                    <Globe
-                      className="tw:size-4 tw:shrink-0 tw:text-accent-deep"
-                      aria-hidden="true"
-                    />
-                    <span className="tw:text-muted-strong">Website:</span>
-                    <span className="tw:font-medium tw:text-accent-deep tw:underline tw:underline-offset-4">
-                      www.xilolo.com
-                    </span>
-                  </a>
-                </li>
+            <Paper elevation={0} sx={RAIL_PAPER}>
+              <RailHeading>Community Guidelines</RailHeading>
 
-                <li className="tw:flex tw:min-h-11 tw:items-center tw:gap-2">
-                  <AtSign
-                    className="tw:size-4 tw:shrink-0 tw:text-accent-deep"
-                    aria-hidden="true"
-                  />
-                  <span className="tw:text-muted-strong">
-                    Twitter / Instagram / TikTok:
-                  </span>
-                  <span className="tw:font-semibold tw:text-ink">
-                    @xilolo_hq
-                  </span>
-                </li>
-              </ul>
-            </Card>
-
-            {/* ── Community guidelines ────────────────────────────────────── */}
-            <Card className="tw:flex tw:flex-col tw:gap-3">
-              <h2 className="tw:m-0! tw:font-display! tw:text-xl! tw:font-bold! tw:text-ink!">
-                Community Guidelines
-              </h2>
-
-              <p className="tw:m-0! tw:text-sm tw:leading-relaxed tw:text-muted-strong!">
+              <Typography component="p" sx={{ ...BODY, fontSize: 14.5, m: 0, mt: 1 }}>
                 To keep Xilolo fun for everyone, please avoid:
-              </p>
+              </Typography>
 
-              <ul
-                style={FLAT_LIST}
-                className="tw:flex tw:flex-col tw:gap-2 tw:text-sm tw:leading-relaxed tw:text-muted-strong"
+              <Box
+                component="ul"
+                sx={{
+                  listStyle: "none",
+                  m: 0,
+                  mt: 1.5,
+                  p: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                }}
               >
-                <li className="tw:flex tw:items-start tw:gap-2.5">
-                  <span
-                    aria-hidden="true"
-                    className="tw:mt-2 tw:size-1.5 tw:shrink-0 tw:rounded-pill tw:bg-accent"
-                  />
-                  Posting hateful or harmful content.
-                </li>
-                <li className="tw:flex tw:items-start tw:gap-2.5">
-                  <span
-                    aria-hidden="true"
-                    className="tw:mt-2 tw:size-1.5 tw:shrink-0 tw:rounded-pill tw:bg-accent"
-                  />
-                  Sharing copyrighted memes without permission.
-                </li>
-                <li className="tw:flex tw:items-start tw:gap-2.5">
-                  <span
-                    aria-hidden="true"
-                    className="tw:mt-2 tw:size-1.5 tw:shrink-0 tw:rounded-pill tw:bg-accent"
-                  />
-                  Spamming or harassing other users.
-                </li>
-              </ul>
+                {GUIDELINE_DONT.map((line) => (
+                  <Box
+                    key={line}
+                    component="li"
+                    sx={{
+                      ...BODY,
+                      fontSize: 14,
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: 1.25,
+                    }}
+                  >
+                    <Box
+                      component="span"
+                      aria-hidden="true"
+                      sx={{
+                        flexShrink: 0,
+                        fontSize: 13,
+                        color: "primary.dark",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      &mdash;
+                    </Box>
+                    <Box component="span">{line}</Box>
+                  </Box>
+                ))}
+              </Box>
 
               <Button
-                as={Link}
+                component={RouterLink}
                 to="/community-guidelines"
-                variant="secondary"
-                size="md"
-                className="tw:w-full tw:text-accent-deep!"
+                variant="text"
+                disableElevation
+                endIcon={<MenuBookOutlined sx={{ fontSize: 17 }} />}
+                sx={{
+                  mt: 2,
+                  ml: -1.5,
+                  px: 1.5,
+                  py: 0.75,
+                  minHeight: 40,
+                  fontSize: 14,
+                  color: "primary.dark",
+                  "&:hover": { backgroundColor: "rgba(6,112,125,0.06)" },
+                }}
               >
-                <BookOpen className="tw:size-4" aria-hidden="true" />
                 Read the full guidelines
               </Button>
-            </Card>
-          </aside>
-        </div>
+            </Paper>
+
+            <Paper elevation={0} sx={{ ...RAIL_PAPER, pb: 2 }}>
+              <Typography component="p" sx={{ ...OVERLINE, m: 0 }}>
+                Email
+              </Typography>
+
+              <Link
+                href="mailto:support@xilolo.com"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 1,
+                  mt: 0.75,
+                  fontFamily: '"Plus Jakarta Sans", "Work Sans", system-ui, sans-serif',
+                  fontSize: { xs: 19, md: 20 },
+                  fontWeight: 600,
+                  letterSpacing: "-0.02em",
+                  color: "text.primary",
+                  textDecoration: "none",
+                  wordBreak: "break-word",
+                  borderRadius: 1,
+                  "&:hover": { color: "primary.dark", textDecoration: "none" },
+                  "&:focus-visible": {
+                    outline: "2px solid",
+                    outlineColor: "primary.main",
+                    outlineOffset: 3,
+                  },
+                }}
+              >
+                support@xilolo.com
+              </Link>
+            </Paper>
+          </Box>
+        </Box>
 
         {/* ── Closing ───────────────────────────────────────────────────── */}
-        <p className="tw:mt-12! tw:mb-0! tw:text-center tw:text-sm tw:text-muted-strong!">
-          ✨ Thank you for your feedback! ✨
-        </p>
-      </div>
-    </div>
+        <Divider sx={{ mt: { xs: 6, md: 9 } }} />
+        <Typography
+          component="p"
+          sx={{ ...CAPTION, m: 0, mt: 3, textAlign: "center", color: "text.disabled" }}
+        >
+          Thank you for your feedback!
+        </Typography>
+      </Container>
+    </Box>
   );
 }
 

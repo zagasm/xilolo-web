@@ -1,31 +1,47 @@
 import React from "react";
+import { Box, Container } from "@mui/material";
 import AboutHeroSection from "../../component/about/AboutHeroSection";
+import AboutStatsStrip from "../../component/about/AboutStatsStrip";
 import AboutPipelineSection from "../../component/about/AboutPipelineSection";
 import AboutEcosystemSection from "../../component/about/AboutEcosystemSection";
 import AboutFaqSection from "../../component/about/AboutFaqSection";
 
 /**
- * About page — LandingLayout wraps this in `Nav` + `SectionFooterCTA`.
- * Page shell mirrors the sibling content page (/contact) so the two can never
- * drift: one soft radial tint at the top (the maximum backdrop DESIGN.md allows),
- * a 1200px container, and 48/64px section rhythm.
+ * /about — Material UI rebuild on the Xilolo theme (src/theme/muiTheme.js).
+ *
+ * Layout: LandingLayout supplies the minimal BrandBar and the footer CTA, so
+ * this file is only the page column — 1200px, paper background, hairline rules
+ * between sections. There is no decorative gradient layer any more (the old
+ * radial tint at the top of the page was the thing that read as generic), no
+ * cards in a row, and no shadows: the theme's elevation scale is all "none", so
+ * separation has to come from 1px dividers and whitespace.
+ *
+ * Font stack comes from the theme via a function-form sx value: the legacy
+ * template sheet sets `body { font-family: Inter }` unlayered, which beats
+ * Tailwind's layered default, so the theme family has to be reasserted on the
+ * page root for Work Sans / Plus Jakarta to render here.
+ *
+ * Section order: hero (one h1) → numbers → how it works → who it's for → FAQ.
  */
 export default function AboutPage() {
   return (
-    <div className="tw:relative tw:min-h-screen tw:overflow-x-hidden">
-      <div
-        aria-hidden="true"
-        className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 tw:h-[420px] tw:bg-[radial-gradient(60%_50%_at_50%_0%,rgba(14,165,180,0.10),rgba(14,165,180,0)_70%)]"
-      />
-
-      <div className="tw:relative tw:z-10 tw:px-4 tw:pt-10 tw:pb-20 tw:md:pt-24">
-        <div className="tw:mx-auto tw:max-w-6xl tw:space-y-12 tw:md:space-y-16">
-          <AboutHeroSection />
-          <AboutPipelineSection />
-          <AboutEcosystemSection />
-          <AboutFaqSection />
-        </div>
-      </div>
-    </div>
+    <Box
+      sx={{
+        position: "relative",
+        backgroundColor: "background.default",
+        color: "text.primary",
+        fontFamily: (theme) => theme.typography.fontFamily,
+        width: "100%",
+        overflowX: "clip",
+      }}
+    >
+      <Container maxWidth="lg" disableGutters sx={{ px: { xs: 2, md: 4 } }}>
+        <AboutHeroSection />
+        <AboutStatsStrip />
+        <AboutPipelineSection />
+        <AboutEcosystemSection />
+        <AboutFaqSection />
+      </Container>
+    </Box>
   );
 }

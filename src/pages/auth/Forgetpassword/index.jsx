@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthContainer from "../assets/auth_container";
-import axios from "axios";
+import { api } from "../../../lib/apiClient";
 import { CodeVerification } from "../CodeVerification";
 import { showError, showSuccess } from "../../../component/ui/toast";
 
@@ -31,8 +31,8 @@ export function ForgetPassword() {
       formData.append("input", input);
       formData.append("country_code", "");
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/password/request-code`,
+      const response = await api.post(
+        "/api/v1/password/request-code",
         formData,
         {
           headers: {
@@ -72,34 +72,34 @@ export function ForgetPassword() {
       privacy={false}
       haveAccount={false}
     >
-      <form
-        autoComplete="off"
-        className="tw:px-3 tw:pb-2"
-        onSubmit={handleSubmit}
-      >
-        <div className="tw:rounded-[28px] tw:border tw:border-slate-200 tw:bg-white tw:p-5 tw:shadow-[0_22px_70px_rgba(15,23,42,0.08)]">
-          <span className="tw:block tw:text-sm tw:font-semibold tw:text-slate-900">
+      {/* Presentation only — the request, the endpoint and the validation above
+          are untouched. The nested shadowed card that used to wrap this field
+          is gone: the shell already provides the card, and a card-inside-a-card
+          with a 70px shadow is what made this screen read as a different
+          product from the sign-in page. */}
+      <form autoComplete="off" onSubmit={handleSubmit}>
+        <div className="tw:mb-5">
+          <label
+            htmlFor="reset-email"
+            className="form-label tw:mb-1.5! tw:block"
+          >
             Email address
-          </span>
+          </label>
           <input
+            id="reset-email"
             type="email"
-            className="tw:mt-2 tw:h-12 tw:w-full tw:rounded-2xl tw:border tw:border-slate-200 tw:bg-white tw:px-4 tw:text-sm tw:text-slate-900 tw:outline-none tw:transition tw:placeholder:text-slate-400 tw:focus:border-primary tw:focus:ring-2 tw:focus:ring-primary/10"
+            className="form-control"
             placeholder="you@example.com"
             autoComplete="email"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
-          <span className="tw:block tw:mt-3 tw:text-xs tw:leading-5 tw:text-slate-500">
+          <p className="tw:mt-2! tw:mb-0! tw:text-[11.5px]! tw:leading-relaxed">
             We will send a 5-digit verification code to this email.
-          </span>
+          </p>
         </div>
 
-        <button
-          style={{ borderRadius: 28, fontSize: 12}}
-          className="tw:mt-5 tw:flex tw:h-12 tw:w-full tw:items-center tw:justify-center tw:rounded-2xl! tw:bg-primary tw:px-5 tw:text-sm tw:font-semibold tw:text-white tw:transition tw:hover:bg-primarySecond tw:disabled:cursor-not-allowed tw:disabled:opacity-50"
-          type="submit"
-          disabled={isButtonDisabled}
-        >
+        <button className="bt" type="submit" disabled={isButtonDisabled}>
           {isSubmitting ? (
             <>
               <span

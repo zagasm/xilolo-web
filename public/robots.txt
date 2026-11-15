@@ -1,33 +1,38 @@
 User-agent: *
 Allow: /
 
-Disallow: /auth/
+# ── Major public pages are indexable on purpose (login, signup, reset, vote,
+#    event/contest pages, the marketing + legal pages). This is what lets search
+#    engines build the sitelinks block under the Xilolo result.
+#
+# ── Post-auth / personal surfaces stay out: they render a sign-in wall to a
+#    crawler and carry per-user data.
+Disallow: /auth/change-password
+Disallow: /auth/code-verification
+Disallow: /auth/session
 Disallow: /account/
 Disallow: /feed
 Disallow: /profile
-Disallow: /search
+Disallow: /tickets
 Disallow: /payment/
 Disallow: /wallet/
 Disallow: /kyc/
 Disallow: /notifications
 Disallow: /mentions
-Disallow: /tickets
 Disallow: /organizers
 Disallow: /event/view/
 Disallow: /event/select-event-type
 Disallow: /event/create-event/
 Disallow: /event/edit/
 Disallow: /event/stream/
-Disallow: /event/saved-events
-Disallow: /creator/channel/new
-Disallow: /subscription
-Disallow: /support-chat
-Disallow: /me/
-Disallow: /xilolo-ai
-Disallow: /become-an-organiser
+Disallow: /followers
+Disallow: /following
+Disallow: /dev/
 
-Allow: /events/
-Allow: /users/
-Allow: /organisers/
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
 
 Sitemap: https://xilolo.com/sitemap.xml
