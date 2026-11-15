@@ -8,6 +8,7 @@
           "/event/*",
           "/events/*",
           "/vote/*",
+          "/v/*",
           "/contests/*",
           "/users/*",
           "/organisers/*",
