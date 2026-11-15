@@ -236,6 +236,19 @@ export async function extendVoting(id, votingCloseAt, reason, token) {
   return unwrap(response);
 }
 
+/**
+ * Same forward-only rule for the entries window — and it must stay before
+ * voting closes, so the API refuses a date at or past `voting_close_at`.
+ */
+export async function extendEntries(id, entriesCloseAt, reason, token) {
+  const response = await api.post(
+    `/api/v1/organiser/contests/${id}/extend-entries`,
+    { entries_close_at: entriesCloseAt, reason },
+    authHeaders(token)
+  );
+  return unwrap(response);
+}
+
 export async function disqualifyEntry(id, entryId, { reason, password, code }, token) {
   const response = await api.post(
     `/api/v1/organiser/contests/${id}/entries/${entryId}/disqualify`,

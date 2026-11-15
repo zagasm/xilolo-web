@@ -19,6 +19,7 @@ import {
   declineEntry,
   disqualifyBelow,
   disqualifyEntry,
+  extendEntries,
   extendVoting,
   getContestDashboard,
   getContestVoteTrend,
@@ -101,6 +102,8 @@ export default function ContestConsole() {
   const [disqualifying, setDisqualifying] = useState(null);
   const [extendOpen, setExtendOpen] = useState(false);
   const [extendForm, setExtendForm] = useState({ voting_close_at: "", reason: "" });
+  const [extendEntriesOpen, setExtendEntriesOpen] = useState(false);
+  const [extendEntriesForm, setExtendEntriesForm] = useState({ entries_close_at: "", reason: "" });
 
   const load = useCallback(async () => {
     setError(null);
@@ -138,6 +141,16 @@ export default function ContestConsole() {
   const contest = dashboard?.contest;
   const votes = dashboard?.votes;
   const entries = dashboard?.entries;
+
+  /**
+   * Keyed off status, not the entries window's `open` flag: the flag goes false
+   * the moment the deadline passes, which is exactly when an organiser needs
+   * this control. The API refuses once entries are closed for good.
+   */
+  const canExtendEntries =
+    Boolean(contest) && ["draft", "scheduled", "entries_open", "paused"].includes(contest.status);
+  const entriesWindowLapsed =
+    Boolean(contest) && contest.status === "entries_open" && !contest.entries_window?.open;
 
   const votingLabel = useMemo(() => {
     if (!contest) return "";
@@ -302,6 +315,37 @@ export default function ContestConsole() {
     }
   };
 
+  /**
+   * Entries, not votes. The two deadlines are separate decisions, so they get
+   * separate controls — an organiser who needs more submissions must not have
+   * to move the vote close to get them.
+   */
+  const submitExtendEntries = async (event) => {
+    event.preventDefault();
+    setBusy(true);
+
+    try {
+      await extendEntries(
+        id,
+        extendEntriesForm.entries_close_at,
+        extendEntriesForm.reason || null,
+        token
+      );
+      showSuccess("Entries deadline moved.");
+      setExtendEntriesOpen(false);
+      setExtendEntriesForm({ entries_close_at: "", reason: "" });
+      await load();
+    } catch (err) {
+      // The server owns both refusals (too early, or past voting close) and
+      // its message names the reason — print it instead of a generic line.
+      const errors = err?.response?.data?.errors;
+      const first = errors ? Object.values(errors)[0]?.[0] : null;
+      showError(first || friendlyError(err, "That did not go through. Please try again."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="tw:w-full tw:bg-paper tw:min-h-screen tw:pb-32 tw:pt-24 tw:md:pb-24 tw:font-sans">
@@ -376,6 +420,11 @@ export default function ContestConsole() {
               </Button>
             ) : null}
 
+            {canExtendEntries ? (
+              <Button size="sm" variant="secondary" onClick={() => setExtendEntriesOpen(true)}>
+                Extend entries
+              </Button>
+            ) : null}
             <Button size="sm" variant="secondary" onClick={() => setExtendOpen(true)}>
               Extend voting
             </Button>
@@ -410,7 +459,13 @@ export default function ContestConsole() {
           <Stat
             label="Entry window"
             value={contest.entries_window?.open ? "Open" : "Closed"}
-            hint={contest.entries_window?.closes_at ? `until ${new Date(contest.entries_window.closes_at).toLocaleDateString()}` : undefined}
+            hint={
+              entriesWindowLapsed
+                ? "The deadline passed — extend entries to reopen"
+                : contest.entries_window?.closes_at
+                  ? `until ${new Date(contest.entries_window.closes_at).toLocaleDateString()}`
+                  : undefined
+            }
           />
         </div>
 
@@ -844,6 +899,56 @@ export default function ContestConsole() {
         onClose={() => setDeleteOpen(false)}
         onDeleted={() => navigate("/account/contests")}
       />
+
+      {/* Extend entries: forward only, and it has to stay before voting closes. */}
+      <Modal
+        open={extendEntriesOpen}
+        onClose={() => setExtendEntriesOpen(false)}
+        title="Extend entries"
+      >
+        <form onSubmit={submitExtendEntries} className="tw:flex tw:flex-col tw:gap-3">
+          <span className="tw:text-[12px] tw:text-muted">
+            Current deadline:{" "}
+            {contest.entries_window?.closes_at
+              ? new Date(contest.entries_window.closes_at).toLocaleString()
+              : "not set"}
+            . A deadline can move later, never earlier.
+            {entriesWindowLapsed
+              ? " The window has already passed — a new deadline reopens it."
+              : ""}
+            {contest.voting_window?.closes_at
+              ? ` It must stay before voting closes (${new Date(
+                  contest.voting_window.closes_at
+                ).toLocaleString()}).`
+              : ""}
+          </span>
+
+          <Field label="New entries close">
+            <Input
+              type="datetime-local"
+              required
+              value={extendEntriesForm.entries_close_at}
+              onChange={(event) =>
+                setExtendEntriesForm((prev) => ({ ...prev, entries_close_at: event.target.value }))
+              }
+            />
+          </Field>
+
+          <Field label="Why (optional, kept on the record)">
+            <Input
+              value={extendEntriesForm.reason}
+              onChange={(event) =>
+                setExtendEntriesForm((prev) => ({ ...prev, reason: event.target.value }))
+              }
+              maxLength={500}
+            />
+          </Field>
+
+          <Button type="submit" loading={busy}>
+            Move the deadline
+          </Button>
+        </form>
+      </Modal>
 
       {/* Extend voting: forward only. */}
       <Modal open={extendOpen} onClose={() => setExtendOpen(false)} title="Extend voting">
