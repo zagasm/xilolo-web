@@ -116,6 +116,19 @@ export default function OpenInAppBanner() {
     };
   }, [eligible, pathname]);
 
+  const fallbackTimer = useRef(0);
+
+  useEffect(() => {
+    const cancel = () => window.clearTimeout(fallbackTimer.current);
+    document.addEventListener("visibilitychange", cancel);
+    window.addEventListener("pagehide", cancel);
+    return () => {
+      cancel();
+      document.removeEventListener("visibilitychange", cancel);
+      window.removeEventListener("pagehide", cancel);
+    };
+  }, []);
+
   if (!eligible || dismissed) return null;
 
   const target = `${pathname}${search || ""}`;
@@ -139,19 +152,6 @@ export default function OpenInAppBanner() {
   // Now the fallback is cancelled as soon as the page is hidden, which is what
   // happens the moment the app takes over. If the page is still in front after the
   // grace period, the app did not open and the store is the right destination.
-  const fallbackTimer = useRef(0);
-
-  useEffect(() => {
-    const cancel = () => window.clearTimeout(fallbackTimer.current);
-    document.addEventListener("visibilitychange", cancel);
-    window.addEventListener("pagehide", cancel);
-    return () => {
-      cancel();
-      document.removeEventListener("visibilitychange", cancel);
-      window.removeEventListener("pagehide", cancel);
-    };
-  }, []);
-
   const onOpen = () => {
     if (device !== "ios") return;
     window.clearTimeout(fallbackTimer.current);
